@@ -644,11 +644,17 @@ void MainWindow::loadState() {
         QFile symbolFile(appDir.append(SYMBOLTABLE_FILENAME));
 
         if (symbolFile.exists()) {
-            //TODO: Symbol table serialization error handling
-            symbolFile.open(QFile::ReadOnly);
+            try {
+                symbolFile.open(QFile::ReadOnly);
 
-            QTextStream symbolStream(&symbolFile);
-            symbols = Serializer::deserializeTable(symbolStream.readAll().toStdString());
+                QTextStream symbolStream(&symbolFile);
+                symbols = Serializer::deserializeTable(symbolStream.readAll().toStdString());
+            }
+            catch (std::exception &e) {
+                symbols = {};
+                QMessageBox::warning(this, "Error",
+                                     "Failed to read symbol table at " + symbolFile.fileName() + "\nError: " + e.what());
+            }
 
             for (auto &p : symbols.variables) {
                 int index = ui->tableWidget_variables->rowCount();
