@@ -635,6 +635,8 @@ void MainWindow::loadState() {
 
         ui->dockWidget->setVisible(settings.value(SETTINGS_SHOW_DOCK, true).toBool());
 
+        ui->tabWidget_2->setCurrentIndex(settings.value(SETTINGS_DOCK_TAB, 0).toInt());
+
         QString appDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         if (!QDir(appDir).exists())
             QDir().mkdir(appDir);
@@ -711,6 +713,7 @@ void MainWindow::saveState() {
         settings.setValue(SETTINGS_SHOW_KEYPAD, ui->widget_keypad->isVisible());
         settings.setValue(SETTINGS_SIZE, this->size());
         settings.setValue(SETTINGS_DOCKPOS, dockWidgetArea(ui->dockWidget));
+        settings.setValue(SETTINGS_DOCK_TAB, ui->tabWidget_2->currentIndex());
 
         QString appDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         if (!QDir(appDir).exists())
