@@ -649,7 +649,7 @@ void MainWindow::slot_tableWidget_scripts_currentItemChanged(QTableWidgetItem *c
         ui->textEdit_scripts->setText("");
         ui->textEdit_scripts->setEnabled(false);
     } else if (current->row() != 0) {
-        ui->textEdit_scripts->setText(symbols.scripts[scriptMapping[current]].c_str());
+        ui->textEdit_scripts->setText(symbols.scripts[scriptMapping[current]].body.c_str());
         ui->textEdit_scripts->setEnabled(true);
     } else {
         //Default entry
@@ -672,13 +672,13 @@ void MainWindow::slot_tableWidget_scripts_itemChanged(QTableWidgetItem *item) {
             QMessageBox::warning(this, "Error", "Script with name " + QString(scriptName.c_str()) + " already exists.");
         } else {
             scriptMapping[item] = scriptName;
-            symbols.scripts[scriptName] = "";
+            symbols.scripts[scriptName].body = "";
             ui->tableWidget_scripts->insertRow(0);
             ui->tableWidget_scripts->setCurrentItem(
                     ui->tableWidget_scripts->item(ui->tableWidget_scripts->rowCount() - 1, 0)
             );
             ui->textEdit_scripts->setEnabled(true);
-            ui->textEdit_scripts->setText(symbols.scripts[scriptMapping[item]].c_str());
+            ui->textEdit_scripts->setText(symbols.scripts[scriptMapping[item]].body.c_str());
         }
     } else {
         //Update name
@@ -700,7 +700,7 @@ void MainWindow::slot_tableWidget_scripts_itemChanged(QTableWidgetItem *item) {
 void MainWindow::slot_textEdit_scripts_textChanged() {
     std::string text = ui->textEdit_scripts->toPlainText().toStdString();
     if (currentScript != nullptr) {
-        symbols.scripts[scriptMapping[currentScript]] = text;
+        symbols.scripts[scriptMapping[currentScript]].body = text;
     }
 }
 
@@ -744,17 +744,17 @@ void MainWindow::slotFunctionArgCountChange(int args) {
             throw std::runtime_error("Invalid valid received from function arg count");
     }
     if (currentFunction != nullptr) {
-        symbols.functions[functionMapping[currentFunction]].arguments.resize(args);
+        symbols.functions[functionMapping[currentFunction]].argumentNames.resize(args);
     }
 }
 
 void MainWindow::slotFunctionArgChange0(const QString &arg) {
     if (currentFunction != nullptr && !arg.isEmpty()) {
         Function &fun = symbols.functions[functionMapping[currentFunction]];
-        if (fun.arguments.size() >= 1) {
-            fun.arguments[0] = arg.toStdString();
+        if (fun.argumentNames.size() >= 1) {
+            fun.argumentNames[0] = arg.toStdString();
         } else {
-            fun.arguments.emplace_back(arg.toStdString());
+            fun.argumentNames.emplace_back(arg.toStdString());
         }
     }
 }
@@ -762,11 +762,11 @@ void MainWindow::slotFunctionArgChange0(const QString &arg) {
 void MainWindow::slotFunctionArgChange1(const QString &arg) {
     if (currentFunction != nullptr && !arg.isEmpty()) {
         Function &fun = symbols.functions[functionMapping[currentFunction]];
-        if (fun.arguments.size() >= 2) {
-            fun.arguments[1] = arg.toStdString();
+        if (fun.argumentNames.size() >= 2) {
+            fun.argumentNames[1] = arg.toStdString();
         } else {
-            fun.arguments.resize(2);
-            fun.arguments[1] = arg.toStdString();
+            fun.argumentNames.resize(2);
+            fun.argumentNames[1] = arg.toStdString();
         }
     }
 }
@@ -774,11 +774,11 @@ void MainWindow::slotFunctionArgChange1(const QString &arg) {
 void MainWindow::slotFunctionArgChange2(const QString &arg) {
     if (currentFunction != nullptr && !arg.isEmpty()) {
         Function &fun = symbols.functions[functionMapping[currentFunction]];
-        if (fun.arguments.size() >= 3) {
-            fun.arguments[2] = arg.toStdString();
+        if (fun.argumentNames.size() >= 3) {
+            fun.argumentNames[2] = arg.toStdString();
         } else {
-            fun.arguments.resize(3);
-            fun.arguments[2] = arg.toStdString();
+            fun.argumentNames.resize(3);
+            fun.argumentNames[2] = arg.toStdString();
         }
     }
 }
@@ -786,11 +786,11 @@ void MainWindow::slotFunctionArgChange2(const QString &arg) {
 void MainWindow::slotFunctionArgChange3(const QString &arg) {
     if (currentFunction != nullptr && !arg.isEmpty()) {
         Function &fun = symbols.functions[functionMapping[currentFunction]];
-        if (fun.arguments.size() >= 4) {
-            fun.arguments[3] = arg.toStdString();
+        if (fun.argumentNames.size() >= 4) {
+            fun.argumentNames[3] = arg.toStdString();
         } else {
-            fun.arguments.resize(4);
-            fun.arguments[3] = arg.toStdString();
+            fun.argumentNames.resize(4);
+            fun.argumentNames[3] = arg.toStdString();
         }
     }
 }
@@ -798,11 +798,11 @@ void MainWindow::slotFunctionArgChange3(const QString &arg) {
 void MainWindow::slotFunctionArgChange4(const QString &arg) {
     if (currentFunction != nullptr && !arg.isEmpty()) {
         Function &fun = symbols.functions[functionMapping[currentFunction]];
-        if (fun.arguments.size() >= 5) {
-            fun.arguments[4] = arg.toStdString();
+        if (fun.argumentNames.size() >= 5) {
+            fun.argumentNames[4] = arg.toStdString();
         } else {
-            fun.arguments.resize(5);
-            fun.arguments[4] = arg.toStdString();
+            fun.argumentNames.resize(5);
+            fun.argumentNames[4] = arg.toStdString();
         }
     }
 }
@@ -828,7 +828,7 @@ void MainWindow::slotFunctionTableWidgetcurrentItemChanged(QTableWidgetItem *cur
         ui->spinBox_functions_argcount->setEnabled(true);
 
         ui->textEdit_functions_body->setText(symbols.functions[functionMapping[current]].expression.c_str());
-        ui->spinBox_functions_argcount->setValue(symbols.functions[functionMapping[current]].arguments.size());
+        ui->spinBox_functions_argcount->setValue(symbols.functions[functionMapping[current]].argumentNames.size());
     } else {
         //Default entry
         ui->textEdit_functions_body->setEnabled(false);

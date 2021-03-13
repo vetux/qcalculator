@@ -7,6 +7,7 @@
 #include <map>
 
 #include "function.hpp"
+#include "script.hpp"
 
 /**
  * The calculator engine supports functions and scripts.
@@ -30,7 +31,7 @@ public:
         std::map<std::string, T> variables;
         std::map<std::string, T> constants;
         std::map<std::string, Function> functions;
-        std::map<std::string, std::string> scripts;
+        std::map<std::string, Script> scripts;
     };
 
     CalculatorEngine();

@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "calculatorengine.hpp"
+#include "calculatorengine.hpp" //Has to be the first include because python uses "slots" as a variable name and "slots" is a qt reserved word.
 
 #include <QMainWindow>
 #include <bitset>
@@ -11,9 +11,6 @@
 
 #include "numeralsystem.hpp"
 #include "numpadkey.hpp"
-
-#define MAX_HISTORY 1000
-#define MAX_VARS 100
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -96,25 +93,22 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QSettings settings;
+
     CalculatorEngine<long double> calc;
-
     CalculatorEngine<long double>::SymbolTable symbols;
-
-    std::vector<std::pair<std::string, long double>> expressionHistory;
 
     NumeralSystem inputLiteralParseMode = NumeralSystem::DECIMAL;
 
-    std::bitset<64> bitViewValue;
+    std::vector<std::pair<std::string, long double>> expressionHistory;
 
     std::map<QTableWidgetItem *, std::string> scriptMapping;
     QTableWidgetItem *currentScript = nullptr;
-
     std::map<QTableWidgetItem *, std::string> functionMapping;
     QTableWidgetItem *currentFunction = nullptr;
-
     std::map<QTableWidgetItem *, std::string> variableMapping;
+    std::map<QTableWidgetItem *, std::string> constantsMapping;
 
-    std::map<QTableWidgetItem*, std::string> constantsMapping;
+    std::bitset<64> bitViewValue;
 
     void connectUI();
 

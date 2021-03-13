@@ -20,47 +20,47 @@ T CalculatorEngine<T>::evaluate(const std::string &expr, SymbolTable &symbolTabl
     std::vector<ScriptFunction<T>> funcs;
 
     for (auto &script : symbolTable.scripts) {
-        ScriptFunction<T> func = ScriptFunction<T>(interpreter, script.second);
-        funcs.template emplace_back(func);
+        ScriptFunction<T> func = ScriptFunction<T>(interpreter, script.second.body);
+        funcs.emplace_back(func);
         symbols.add_function(script.first, *(funcs.end() - 1));
     }
 
     for (auto &pair : symbolTable.functions) {
         auto func = pair.second;
-        switch (func.arguments.size()) {
+        switch (func.argumentNames.size()) {
             case 0:
                 compositor.add(typename exprtk::function_compositor<T>::function(func.name, func.expression));
                 break;
             case 1:
                 compositor.add(typename exprtk::function_compositor<T>::function(func.name, func.expression,
-                                                                                 func.arguments[0]));
+                                                                                 func.argumentNames[0]));
                 break;
             case 2:
                 compositor.add(
-                        typename exprtk::function_compositor<T>::function(func.name, func.expression, func.arguments[0],
-                                                                          func.arguments[1]));
+                        typename exprtk::function_compositor<T>::function(func.name, func.expression, func.argumentNames[0],
+                                                                          func.argumentNames[1]));
                 break;
             case 3:
                 compositor.add(
-                        typename exprtk::function_compositor<T>::function(func.name, func.expression, func.arguments[0],
-                                                                          func.arguments[1],
-                                                                          func.arguments[2]));
+                        typename exprtk::function_compositor<T>::function(func.name, func.expression, func.argumentNames[0],
+                                                                          func.argumentNames[1],
+                                                                          func.argumentNames[2]));
                 break;
             case 4:
                 compositor.add(
-                        typename exprtk::function_compositor<T>::function(func.name, func.expression, func.arguments[0],
-                                                                          func.arguments[1],
-                                                                          func.arguments[2], func.arguments[3]));
+                        typename exprtk::function_compositor<T>::function(func.name, func.expression, func.argumentNames[0],
+                                                                          func.argumentNames[1],
+                                                                          func.argumentNames[2], func.argumentNames[3]));
                 break;
             case 5:
                 compositor.add(
-                        typename exprtk::function_compositor<T>::function(func.name, func.expression, func.arguments[0],
-                                                                          func.arguments[1],
-                                                                          func.arguments[2], func.arguments[3],
-                                                                          func.arguments[4]));
+                        typename exprtk::function_compositor<T>::function(func.name, func.expression, func.argumentNames[0],
+                                                                          func.argumentNames[1],
+                                                                          func.argumentNames[2], func.argumentNames[3],
+                                                                          func.argumentNames[4]));
                 break;
             default:
-                throw std::runtime_error("Too many function arguments");
+                throw std::runtime_error("Too many function argumentNames");
         }
     }
 
