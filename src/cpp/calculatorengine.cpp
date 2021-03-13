@@ -1,6 +1,6 @@
 #include "calculatorengine.hpp"
 
-#include "exprtk.hpp"
+#include "extern/exprtk.hpp"
 
 template<typename T>
 CalculatorEngine<T>::CalculatorEngine() {

@@ -2,6 +2,10 @@
 
 #include <QScrollBar>
 #include <QMessageBox>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+#include <QStandardPaths>
 
 #include "ui_mainwindow.h"
 
@@ -9,10 +13,12 @@
 #include "numeralrep.hpp"
 #include "common.hpp"
 #include "settings.hpp"
+#include "serializer.hpp"
 
 #define OBJECT_NAME_PREFIX_BITS "pushButton_bit_"
 #define OBJECT_NAME_PREFIX_KEYPAD "pushButton_kp_"
 
+#define SYMBOLTABLE_FILENAME "/symbols.json"
 
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent), ui(new Ui::MainWindow), calc() {
@@ -172,7 +178,7 @@ void MainWindow::connectUI() {
     connect(ui->textEdit_scripts, SIGNAL(textChanged()), this, SLOT(slot_textEdit_scripts_textChanged()));
 
     connect(ui->tableWidget_functions, SIGNAL(currentItemChanged(QTableWidgetItem * , QTableWidgetItem * )), this,
-            SLOT(slotFunctionTableWidgetcurrentItemChanged(QTableWidgetItem * , QTableWidgetItem * )));
+            SLOT(slotFunctionTableWidgetCurrentItemChanged(QTableWidgetItem * , QTableWidgetItem * )));
     connect(ui->tableWidget_functions, SIGNAL(itemChanged(QTableWidgetItem * )), this,
             SLOT(slotFunctionTableWidgetItemChanged(QTableWidgetItem * )));
 
@@ -226,7 +232,7 @@ void MainWindow::disconnectUI() {
     disconnect(ui->textEdit_scripts, SIGNAL(textChanged()), this, SLOT(slot_textEdit_scripts_textChanged()));
 
     disconnect(ui->tableWidget_functions, SIGNAL(currentItemChanged(QTableWidgetItem * , QTableWidgetItem * )), this,
-               SLOT(slotFunctionTableWidgetcurrentItemChanged(QTableWidgetItem * , QTableWidgetItem * )));
+               SLOT(slotFunctionTableWidgetCurrentItemChanged(QTableWidgetItem * , QTableWidgetItem * )));
     disconnect(ui->tableWidget_functions, SIGNAL(itemChanged(QTableWidgetItem * )), this,
                SLOT(slotFunctionTableWidgetItemChanged(QTableWidgetItem * )));
 
@@ -582,6 +588,35 @@ void MainWindow::on_actionShow_Dock_toggled(bool arg1) {
 
 void MainWindow::loadState() {
     disconnectUI();
+
+    variableMapping.clear();
+    constantsMapping.clear();
+    functionMapping.clear();
+    scriptMapping.clear();
+    currentScript = nullptr;
+    currentFunction = nullptr;
+
+    ui->tableWidget_scripts->setRowCount(0);
+    ui->tableWidget_scripts->setRowCount(1);
+    ui->tableWidget_functions->setRowCount(0);
+    ui->tableWidget_functions->setRowCount(1);
+    ui->tableWidget_variables->setRowCount(0);
+    ui->tableWidget_variables->setRowCount(1);
+    ui->tableWidget_constants->setRowCount(0);
+    ui->tableWidget_constants->setRowCount(1);
+
+    ui->lineEdit_functions_arg0->hide();
+    ui->lineEdit_functions_arg1->hide();
+    ui->lineEdit_functions_arg2->hide();
+    ui->lineEdit_functions_arg3->hide();
+    ui->lineEdit_functions_arg4->hide();
+    ui->spinBox_functions_argcount->setValue(0);
+    ui->textEdit_functions_body->setText("");
+    ui->textEdit_functions_body->setEnabled(false);
+
+    ui->textEdit_scripts->setText("");
+    ui->textEdit_scripts->setEnabled(false);
+
     if (settings.value(SETTINGS_SAVE, true).toBool()) {
         bool v = settings.value(SETTINGS_SHOW_BITTOGGLE, true).toBool();
         ui->actionShow_Bit_Toggle->setChecked(v);
@@ -599,6 +634,62 @@ void MainWindow::loadState() {
         addDockWidget(dockArea, ui->dockWidget);
 
         ui->dockWidget->setVisible(settings.value(SETTINGS_SHOW_DOCK, true).toBool());
+
+        QString appDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        if (!QDir(appDir).exists())
+            QDir().mkdir(appDir);
+
+        QFile symbolFile(appDir.append(SYMBOLTABLE_FILENAME));
+
+        if (symbolFile.exists()) {
+            //TODO: Symbol table serialization error handling
+            symbolFile.open(QFile::ReadOnly);
+
+            QTextStream symbolStream(&symbolFile);
+            symbols = Serializer::deserializeTable(symbolStream.readAll().toStdString());
+
+            for (auto &p : symbols.variables) {
+                int index = ui->tableWidget_variables->rowCount();
+                ui->tableWidget_variables->insertRow(index);
+                ui->tableWidget_variables->setItem(index, 0, new QTableWidgetItem());
+                ui->tableWidget_variables->setItem(index, 1, new QTableWidgetItem());
+                QTableWidgetItem *item = ui->tableWidget_variables->item(index, 0);
+                item->setText(p.first.c_str());
+                variableMapping[item] = p.first;
+                item = ui->tableWidget_variables->item(index, 1);
+                item->setText(std::to_string(p.second).c_str());
+            }
+
+            for (auto &p : symbols.constants) {
+                int index = ui->tableWidget_constants->rowCount();
+                ui->tableWidget_constants->insertRow(index);
+                ui->tableWidget_constants->setItem(index, 0, new QTableWidgetItem());
+                ui->tableWidget_constants->setItem(index, 1, new QTableWidgetItem());
+                QTableWidgetItem *item = ui->tableWidget_constants->item(index, 0);
+                item->setText(p.first.c_str());
+                constantsMapping[item] = p.first;
+                item = ui->tableWidget_constants->item(index, 1);
+                item->setText(std::to_string(p.second).c_str());
+            }
+
+            for (auto &p : symbols.functions) {
+                int index = ui->tableWidget_functions->rowCount();
+                ui->tableWidget_functions->insertRow(index);
+                ui->tableWidget_functions->setItem(index, 0, new QTableWidgetItem());
+                QTableWidgetItem *item = ui->tableWidget_functions->item(index, 0);
+                item->setText(p.first.c_str());
+                functionMapping[item] = p.first;
+            }
+
+            for (auto &p : symbols.scripts) {
+                int index = ui->tableWidget_scripts->rowCount();
+                ui->tableWidget_scripts->insertRow(index);
+                ui->tableWidget_scripts->setItem(index, 0, new QTableWidgetItem());
+                QTableWidgetItem *item = ui->tableWidget_scripts->item(index, 0);
+                item->setText(p.first.c_str());
+                scriptMapping[item] = p.first;
+            }
+        }
     } else {
         ui->actionShow_Bit_Toggle->setChecked(true);
         ui->actionShow_Dock->setChecked(true);
@@ -620,6 +711,17 @@ void MainWindow::saveState() {
         settings.setValue(SETTINGS_SHOW_KEYPAD, ui->widget_keypad->isVisible());
         settings.setValue(SETTINGS_SIZE, this->size());
         settings.setValue(SETTINGS_DOCKPOS, dockWidgetArea(ui->dockWidget));
+
+        QString appDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        if (!QDir(appDir).exists())
+            QDir().mkdir(appDir);
+
+        QFile symbolFile(appDir.append(SYMBOLTABLE_FILENAME));
+        symbolFile.open(QFile::WriteOnly | QFile::Truncate);
+
+        QTextStream symbolStream(&symbolFile);
+        symbolStream << QString(Serializer::serializeTable(symbols).c_str());
+        symbolStream.flush();
     }
 }
 
@@ -628,6 +730,7 @@ void MainWindow::slot_dockWidget_visibilityChanged(bool visible) {
 }
 
 void MainWindow::on_actionSettings_triggered() {
+    saveState();
     SettingsDialog dialog(settings);
     dialog.exec();
     loadState();
@@ -675,7 +778,7 @@ void MainWindow::slot_tableWidget_scripts_itemChanged(QTableWidgetItem *item) {
             symbols.scripts[scriptName].body = "";
             ui->tableWidget_scripts->insertRow(0);
             ui->tableWidget_scripts->setCurrentItem(
-                    ui->tableWidget_scripts->item(ui->tableWidget_scripts->rowCount() - 1, 0)
+                    ui->tableWidget_scripts->item(1, 0)
             );
             ui->textEdit_scripts->setEnabled(true);
             ui->textEdit_scripts->setText(symbols.scripts[scriptMapping[item]].body.c_str());
@@ -814,7 +917,7 @@ void MainWindow::slotFunctionBodyChange() {
     }
 }
 
-void MainWindow::slotFunctionTableWidgetcurrentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous) {
+void MainWindow::slotFunctionTableWidgetCurrentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous) {
     currentFunction = current;
     disconnectUI();
     ui->textEdit_functions_body->setText("");
@@ -828,7 +931,39 @@ void MainWindow::slotFunctionTableWidgetcurrentItemChanged(QTableWidgetItem *cur
         ui->spinBox_functions_argcount->setEnabled(true);
 
         ui->textEdit_functions_body->setText(symbols.functions[functionMapping[current]].expression.c_str());
-        ui->spinBox_functions_argcount->setValue(symbols.functions[functionMapping[current]].argumentNames.size());
+
+        std::vector<std::string> args = symbols.functions[functionMapping[current]].argumentNames;
+        ui->spinBox_functions_argcount->setValue(args.size());
+
+        ui->lineEdit_functions_arg0->setText("");
+        ui->lineEdit_functions_arg0->hide();
+        ui->lineEdit_functions_arg1->setText("");
+        ui->lineEdit_functions_arg1->hide();
+        ui->lineEdit_functions_arg2->setText("");
+        ui->lineEdit_functions_arg2->hide();
+        ui->lineEdit_functions_arg3->setText("");
+        ui->lineEdit_functions_arg3->hide();
+        ui->lineEdit_functions_arg4->setText("");
+        ui->lineEdit_functions_arg4->hide();
+
+        switch (args.size()) {
+            case 5:
+                ui->lineEdit_functions_arg4->show();
+                ui->lineEdit_functions_arg4->setText(args[4].c_str());
+            case 4:
+                ui->lineEdit_functions_arg3->show();
+                ui->lineEdit_functions_arg3->setText(args[3].c_str());
+            case 3:
+                ui->lineEdit_functions_arg2->show();
+                ui->lineEdit_functions_arg2->setText(args[2].c_str());
+            case 2:
+                ui->lineEdit_functions_arg1->show();
+                ui->lineEdit_functions_arg1->setText(args[1].c_str());
+            case 1:
+                ui->lineEdit_functions_arg0->show();
+                ui->lineEdit_functions_arg0->setText(args[0].c_str());
+                break;
+        }
     } else {
         //Default entry
         ui->textEdit_functions_body->setEnabled(false);
@@ -857,7 +992,7 @@ void MainWindow::slotFunctionTableWidgetItemChanged(QTableWidgetItem *item) {
             symbols.functions[functionName].name = functionName;
             ui->tableWidget_functions->insertRow(0);
             ui->tableWidget_functions->setCurrentItem(
-                    ui->tableWidget_functions->item(ui->tableWidget_functions->rowCount() - 1, 0)
+                    ui->tableWidget_functions->item(1, 0)
             );
             ui->textEdit_functions_body->setEnabled(true);
             ui->spinBox_functions_argcount->setEnabled(true);

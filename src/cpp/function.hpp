@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include "extern/json.hpp"
+
 struct Function {
     std::string name;
     std::string expression;

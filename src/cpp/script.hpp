@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "extern/json.hpp"
+
 struct Script {
     std::string name;
     std::string body;

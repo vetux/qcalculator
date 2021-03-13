@@ -16,6 +16,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+//TODO: MVC Rewrite
 class MainWindow : public QMainWindow {
 Q_OBJECT
 
@@ -52,7 +53,7 @@ private slots:
 
     void slot_textEdit_scripts_textChanged();
 
-    void slotFunctionTableWidgetcurrentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous);
+    void slotFunctionTableWidgetCurrentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous);
 
     void slotFunctionTableWidgetItemChanged(QTableWidgetItem *item);
 
