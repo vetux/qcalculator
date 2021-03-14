@@ -653,7 +653,8 @@ void MainWindow::loadState() {
             catch (std::exception &e) {
                 symbols = {};
                 QMessageBox::warning(this, "Error",
-                                     "Failed to read symbol table at " + symbolFile.fileName() + "\nError: " + e.what());
+                                     "Failed to read symbol table at " + symbolFile.fileName() + "\nError: " +
+                                     e.what());
             }
 
             for (auto &p : symbols.variables) {
@@ -795,7 +796,18 @@ void MainWindow::slot_tableWidget_scripts_itemChanged(QTableWidgetItem *item) {
     } else {
         //Update name
         if (scriptName.empty()) {
-            QMessageBox::warning(this, "Error", "Script name cannot be empty.");
+            int reply = QMessageBox::question(this, "Delete Script",
+                                              "Do you want to delete " + QString(scriptMapping[item].c_str()) + " ?");
+            if (reply == QMessageBox::Yes) {
+                ui->tableWidget_scripts->setCurrentCell(0, 0);
+                ui->textEdit_scripts->setText("");
+                ui->textEdit_scripts->setEnabled(false);
+                symbols.scripts.erase(scriptMapping[item]);
+                scriptMapping.erase(item);
+                ui->tableWidget_scripts->removeRow(item->row());
+            } else {
+                item->setText(scriptMapping[item].c_str());
+            }
         } else if (scriptName != scriptMapping[item]
                    && symbols.scripts.find(scriptName) != symbols.scripts.end()) {
             QMessageBox::warning(this, "Error", "Script with name " + QString(scriptName.c_str()) + " already exists.");
@@ -1009,7 +1021,24 @@ void MainWindow::slotFunctionTableWidgetItemChanged(QTableWidgetItem *item) {
     } else {
         //Update name
         if (functionName.empty()) {
-            QMessageBox::warning(this, "Error", "Function name cannot be empty.");
+            int reply = QMessageBox::question(this, "Delete Function",
+                                              "Do you want to delete " + QString(functionMapping[item].c_str()) + " ?");
+            if (reply == QMessageBox::Yes) {
+                ui->tableWidget_functions->setCurrentCell(0, 0);
+                ui->textEdit_functions_body->setText("");
+                ui->textEdit_functions_body->setEnabled(false);
+                ui->spinBox_functions_argcount->setValue(0);
+                ui->lineEdit_functions_arg0->hide();
+                ui->lineEdit_functions_arg1->hide();
+                ui->lineEdit_functions_arg2->hide();
+                ui->lineEdit_functions_arg3->hide();
+                ui->lineEdit_functions_arg4->hide();
+                symbols.functions.erase(functionMapping[item]);
+                functionMapping.erase(item);
+                ui->tableWidget_functions->removeRow(item->row());
+            } else {
+                item->setText(functionMapping[item].c_str());
+            }
         } else if (functionName != functionMapping[item]
                    && symbols.functions.find(functionName) != symbols.functions.end()) {
             QMessageBox::warning(this, "Error",
@@ -1043,14 +1072,20 @@ void MainWindow::slotVariablesTableWidget_itemChanged(QTableWidgetItem *item) {
         return;
 
     QTableWidgetItem *nameItem = ui->tableWidget_variables->item(item->row(), 0);
-    std::string itemName;
-    if (nameItem != nullptr)
-        itemName = nameItem->text().toStdString();
-
     QTableWidgetItem *valueItem = ui->tableWidget_variables->item(item->row(), 1);
+
+    std::string itemName;
     std::string itemValue;
-    if (valueItem != nullptr)
+
+    if (nameItem == nullptr)
+        return;
+    else if (valueItem == nullptr) {
+        itemName = nameItem->text().toStdString();
+        itemValue = "";
+    } else {
+        itemName = nameItem->text().toStdString();
         itemValue = valueItem->text().toStdString();
+    }
 
     if (item->row() == 0) {
         //Create
@@ -1070,32 +1105,45 @@ void MainWindow::slotVariablesTableWidget_itemChanged(QTableWidgetItem *item) {
             }
 
             ui->tableWidget_variables->insertRow(0);
+
             ui->tableWidget_variables->setCurrentItem(nameItem);
         }
     } else {
         //Update name and value
         if (itemName.empty()) {
-            QMessageBox::warning(this, "Error", "Variable name cannot be empty.");
+            int reply = QMessageBox::question(this, "Delete Variable",
+                                              "Do you want to delete " + QString(variableMapping[nameItem].c_str()) +
+                                              " ?");
+            if (reply == QMessageBox::Yes) {
+                ui->tableWidget_variables->setCurrentCell(0, 0);
+                symbols.variables.erase(itemName);
+                variableMapping.erase(nameItem);
+                ui->tableWidget_variables->removeRow(item->row());
+            } else {
+                nameItem->setText(variableMapping[nameItem].c_str());
+            }
         } else if (itemName != variableMapping[nameItem]
                    && (symbols.variables.find(itemName) != symbols.variables.end())) {
+            nameItem->setText(variableMapping[nameItem].c_str());
             QMessageBox::warning(this, "Error",
                                  "Variable with name " + QString(itemName.c_str()) + " already exists.");
         } else {
             symbols.variables[itemName] = symbols.variables[variableMapping[nameItem]];
             symbols.variables.erase(variableMapping[nameItem]);
             variableMapping[nameItem] = itemName;
-        }
-        try {
-            symbols.variables[variableMapping[nameItem]] = std::stold(itemValue);
-        }
-        catch (std::exception &e) {
-            symbols.variables[variableMapping[nameItem]] = 0;
+
+            try {
+                symbols.variables[variableMapping[nameItem]] = std::stold(itemValue);
+            }
+            catch (std::exception &e) {
+                symbols.variables[variableMapping[nameItem]] = 0;
+            }
+
+            nameItem->setText(variableMapping[nameItem].c_str());
+            if (valueItem != nullptr)
+                valueItem->setText(std::to_string(symbols.variables[variableMapping[nameItem]]).c_str());
         }
     }
-    if (nameItem != nullptr)
-        nameItem->setText(variableMapping[nameItem].c_str());
-    if (valueItem != nullptr)
-        valueItem->setText(std::to_string(symbols.variables[variableMapping[nameItem]]).c_str());
 }
 
 void MainWindow::slotConstantsTableWidget_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous) {
@@ -1115,14 +1163,20 @@ void MainWindow::slotConstantsTableWidget_itemChanged(QTableWidgetItem *item) {
         return;
 
     QTableWidgetItem *nameItem = ui->tableWidget_constants->item(item->row(), 0);
-    std::string itemName;
-    if (nameItem != nullptr)
-        itemName = nameItem->text().toStdString();
-
     QTableWidgetItem *valueItem = ui->tableWidget_constants->item(item->row(), 1);
+
+    std::string itemName;
     std::string itemValue;
-    if (valueItem != nullptr)
+
+    if (nameItem == nullptr)
+        return;
+    else if (valueItem == nullptr) {
+        itemName = nameItem->text().toStdString();
+        itemValue = "";
+    } else {
+        itemName = nameItem->text().toStdString();
         itemValue = valueItem->text().toStdString();
+    }
 
     if (item->row() == 0) {
         //Create
@@ -1146,25 +1200,37 @@ void MainWindow::slotConstantsTableWidget_itemChanged(QTableWidgetItem *item) {
     } else {
         //Update name and value
         if (itemName.empty()) {
-            QMessageBox::warning(this, "Error", "Constant name cannot be empty.");
+            int reply = QMessageBox::question(this, "Delete Constant",
+                                              "Do you want to delete " + QString(constantsMapping[nameItem].c_str()) +
+                                              " ?");
+            if (reply == QMessageBox::Yes) {
+                ui->tableWidget_constants->setCurrentCell(0, 0);
+                symbols.constants.erase(constantsMapping[nameItem]);
+                constantsMapping.erase(nameItem);
+                ui->tableWidget_constants->removeRow(nameItem->row());
+            } else {
+                nameItem->setText(variableMapping[nameItem].c_str());
+            }
         } else if (itemName != constantsMapping[nameItem]
                    && (symbols.constants.find(itemName) != symbols.constants.end())) {
+            nameItem->setText(constantsMapping[nameItem].c_str());
             QMessageBox::warning(this, "Error",
                                  "Constant with name " + QString(itemName.c_str()) + " already exists.");
         } else {
             symbols.constants[itemName] = symbols.constants[constantsMapping[nameItem]];
             symbols.constants.erase(constantsMapping[nameItem]);
             constantsMapping[nameItem] = itemName;
-        }
-        try {
-            symbols.constants[constantsMapping[nameItem]] = std::stold(itemValue);
-        }
-        catch (std::exception &e) {
-            symbols.constants[constantsMapping[nameItem]] = 0;
+
+            try {
+                symbols.constants[constantsMapping[nameItem]] = std::stold(itemValue);
+            }
+            catch (std::exception &e) {
+                symbols.constants[constantsMapping[nameItem]] = 0;
+            }
+
+            nameItem->setText(constantsMapping[nameItem].c_str());
+            if (valueItem != nullptr)
+                valueItem->setText(std::to_string(symbols.constants[constantsMapping[nameItem]]).c_str());
         }
     }
-    if (nameItem != nullptr)
-        nameItem->setText(constantsMapping[nameItem].c_str());
-    if (valueItem != nullptr)
-        valueItem->setText(std::to_string(symbols.constants[constantsMapping[nameItem]]).c_str());
 }
