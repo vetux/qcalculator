@@ -1063,6 +1063,7 @@ void MainWindow::slotFunctionTableWidgetItemChanged(QTableWidgetItem *item) {
                 ui->lineEdit_functions_arg2->hide();
                 ui->lineEdit_functions_arg3->hide();
                 ui->lineEdit_functions_arg4->hide();
+                ui->spinBox_functions_argcount->setEnabled(false);
                 symbols.functions.erase(functionMapping[item]);
                 functionMapping.erase(item);
                 ui->tableWidget_functions->removeRow(item->row());
