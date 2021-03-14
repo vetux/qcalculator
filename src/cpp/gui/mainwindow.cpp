@@ -34,6 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->textEdit_functions_body->setEnabled(false);
     ui->spinBox_functions_argcount->setEnabled(false);
     ui->textEdit_scripts->setEnabled(false);
+    ui->lineEdit_variables_search->hide();
+    ui->lineEdit_constants_search->hide();
+    ui->lineEdit_functions_search->hide();
+    ui->lineEdit_scripts_search->hide();
 }
 
 MainWindow::~MainWindow() {
@@ -564,14 +568,40 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 void MainWindow::on_actionAbout_Qt_Calculator_triggered() {
+    QString license = "MIT License\n"
+                      "\n"
+                      "Copyright (c) 2021 Julian Zampiccoli\n"
+                      "\n"
+                      "Permission is hereby granted, free of charge, to any person obtaining a copy\n"
+                      "of this software and associated documentation files (the \"Software\"), to deal\n"
+                      "in the Software without restriction, including without limitation the rights\n"
+                      "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n"
+                      "copies of the Software, and to permit persons to whom the Software is\n"
+                      "furnished to do so, subject to the following conditions:\n"
+                      "\n"
+                      "The above copyright notice and this permission notice shall be included in all\n"
+                      "copies or substantial portions of the Software.\n"
+                      "\n"
+                      "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n"
+                      "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n"
+                      "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n"
+                      "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n"
+                      "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n"
+                      "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n"
+                      "SOFTWARE.";
+
     QMessageBox::about(this, "About " + QApplication::applicationDisplayName(),
                        QApplication::applicationDisplayName()
-                       + " " + QApplication::applicationVersion()
+                       + " "
+                       + QApplication::applicationVersion()
+                       + " written by Julian Zampiccoli"
                        + "\n\n"
                        + QString(R"LLL(Source: https://github.com/nepomok/qt-calc
 
 Powered by https://github.com/ArashPartow/exprtk
-)LLL"));
+
+)LLL")
+                       + license);
 }
 
 void MainWindow::on_actionShow_Keypad_toggled(bool arg1) {
