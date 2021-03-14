@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     a.setApplicationDisplayName("Qt-Calculator");
-    a.setApplicationVersion("v0.0.3");
+    a.setApplicationVersion("v0.0.1");
 
     MainWindow w;
     w.show();

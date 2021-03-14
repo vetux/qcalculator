@@ -1,8 +1,5 @@
 # Qt-Calculator
-A programmer calculator inspired by gnome-calculator.
-
-Features the bit toggle ui and keypad arrangement from the gnome-calculator(programmer mode), and a value display which lets you convert and view values in different numeral systems at once.
+A simple programmer calculator with embedded python interpreter and [exprtk](https://github.com/ArashPartow/exprtk) as expression parser.
 
 # Screenshots
-
 ![img](.docs/screenshot.png)
