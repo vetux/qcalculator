@@ -1116,7 +1116,7 @@ void MainWindow::slotVariablesTableWidget_itemChanged(QTableWidgetItem *item) {
                                               " ?");
             if (reply == QMessageBox::Yes) {
                 ui->tableWidget_variables->setCurrentCell(0, 0);
-                symbols.variables.erase(itemName);
+                symbols.variables.erase(variableMapping[nameItem]);
                 variableMapping.erase(nameItem);
                 ui->tableWidget_variables->removeRow(item->row());
             } else {
