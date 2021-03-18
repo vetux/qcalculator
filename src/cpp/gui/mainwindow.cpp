@@ -596,7 +596,7 @@ void MainWindow::on_actionAbout_Qt_Calculator_triggered() {
                        + QApplication::applicationVersion()
                        + " written by Julian Zampiccoli"
                        + "\n\n"
-                       + QString(R"LLL(Source: https://github.com/nepomok/qt-calc
+                       + QString(R"LLL(Source: https://github.com/xenotux/qcalc
 
 Powered by https://github.com/ArashPartow/exprtk
 
@@ -754,7 +754,7 @@ void MainWindow::saveState() {
 
         QString appDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         if (!QDir(appDir).exists())
-            QDir().mkdir(appDir);
+            QDir().mkpath(appDir);
 
         QFile symbolFile(appDir.append(SYMBOLTABLE_FILENAME));
         symbolFile.open(QFile::WriteOnly | QFile::Truncate);

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.11)
 
-project(Qt-Calc)
+project(QCalc)
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
@@ -33,7 +33,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}) # Include for generated ui head
 include_directories(src/cpp/)
 include_directories(${Python_INCLUDE_DIRS}) # Python
 
-add_executable(qt-calc ${SRC} ${WRAP_CPP} ${WRAP_UI})
+add_executable(qcalc ${SRC} ${WRAP_CPP} ${WRAP_UI})
 
-target_link_libraries(qt-calc Qt5::Core Qt5::Widgets)
-target_link_libraries(qt-calc ${Python_LIBRARIES}) # Python
+target_link_libraries(qcalc Qt5::Core Qt5::Widgets)
+target_link_libraries(qcalc ${Python_LIBRARIES}) # Python

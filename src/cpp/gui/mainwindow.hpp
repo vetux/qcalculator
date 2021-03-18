@@ -17,6 +17,8 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 //TODO: MVC Rewrite
+//TODO: Fix bitview on win32
+//TODO: Replace QSettings with custom json settings file (QSettings uses registry on win32 which is unnacceptable in my opinion)
 class MainWindow : public QMainWindow {
 Q_OBJECT
 
