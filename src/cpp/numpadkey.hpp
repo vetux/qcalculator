@@ -1,8 +1,9 @@
 #ifndef NUMPADKEY_HPP
 #define NUMPADKEY_HPP
 
-enum NumPadKey
-{
+#include <string>
+
+enum NumPadKey {
     START,
 
     KEY_0,
@@ -36,5 +37,7 @@ enum NumPadKey
 
     END
 };
+
+std::string convertNumPadKeyToString(NumPadKey key);
 
 #endif // NUMPADKEY_HPP

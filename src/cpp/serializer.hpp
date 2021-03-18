@@ -3,21 +3,21 @@
 
 #include <string>
 
-#include "calculatorengine.hpp"
+#include "symboltable.hpp"
 
 #include "extern/json.hpp"
 
 class Serializer {
 public:
-    static std::string serializeTable(const CalculatorEngine<long double>::SymbolTable &table) {
+    static std::string serializeTable(const SymbolTable &table) {
         nlohmann::json j;
         j["version"] = 0;
 
         std::vector<nlohmann::json> tmp;
         for (auto &p : table.variables) {
             nlohmann::json t;
-            t["name"] = p.first;
-            t["value"] = std::to_string(p.second);
+            t["name"] = p.name;
+            t["value"] = std::to_string(p.value);
             tmp.emplace_back(t);
         }
         j["variables"] = tmp;
@@ -25,8 +25,8 @@ public:
 
         for (auto &p : table.constants) {
             nlohmann::json t;
-            t["name"] = p.first;
-            t["value"] = std::to_string(p.second);
+            t["name"] = p.name;
+            t["value"] = std::to_string(p.value);
             tmp.emplace_back(t);
         }
         j["constants"] = tmp;
@@ -34,9 +34,9 @@ public:
 
         for (auto &p : table.functions) {
             nlohmann::json t;
-            t["name"] = p.first;
-            t["expression"] = p.second.expression;
-            t["argumentNames"] = p.second.argumentNames;
+            t["name"] = p.name;
+            t["expression"] = p.expression;
+            t["argumentNames"] = p.argumentNames;
             tmp.emplace_back(t);
         }
         j["functions"] = tmp;
@@ -44,9 +44,9 @@ public:
 
         for (auto &p : table.scripts) {
             nlohmann::json t;
-            t["name"] = p.first;
-            t["body"] = p.second.body;
-            t["argCount"] = std::to_string(p.second.argCount);
+            t["name"] = p.name;
+            t["body"] = p.body;
+            t["argCount"] = std::to_string(p.argCount);
             tmp.emplace_back(t);
         }
         j["scripts"] = tmp;
@@ -55,22 +55,22 @@ public:
         return nlohmann::to_string(j);
     }
 
-    static CalculatorEngine<long double>::SymbolTable deserializeTable(const std::string &str) {
+    static SymbolTable deserializeTable(const std::string &str) {
         nlohmann::json j = nlohmann::json::parse(str);
-        CalculatorEngine<long double>::SymbolTable ret;
+        SymbolTable ret;
 
         std::vector<nlohmann::json> tmp = j["variables"].get<std::vector<nlohmann::json>>();
         for (auto &v : tmp) {
             std::string name = v["name"].get<std::string>();
-            long double value = std::stold(v["value"].get<std::string>());
-            ret.variables[name] = value;
+            ValueType value = std::stold(v["value"].get<std::string>());
+            ret.variables.emplace_back(Variable(name, value));
         }
 
         tmp = j["constants"].get<std::vector<nlohmann::json>>();
         for (auto &v : tmp) {
             std::string name = v["name"].get<std::string>();
-            long double value = std::stold(v["value"].get<std::string>());
-            ret.constants[name] = value;
+            ValueType value = std::stold(v["value"].get<std::string>());
+            ret.constants.emplace_back(Constant(name, value));
         }
 
         tmp = j["functions"].get<std::vector<nlohmann::json>>();
@@ -79,7 +79,7 @@ public:
             f.name = v["name"].get<std::string>();
             f.expression = v["expression"].get<std::string>();
             f.argumentNames = v["argumentNames"].get<std::vector<std::string>>();
-            ret.functions[f.name] = f;
+            ret.functions.emplace_back(f);
         }
 
         tmp = j["scripts"].get<std::vector<nlohmann::json>>();
@@ -88,7 +88,7 @@ public:
             s.name = v["name"].get<std::string>();
             s.body = v["body"].get<std::string>();
             s.argCount = std::stoul(v["argCount"].get<std::string>());
-            ret.scripts[s.name] = s;
+            ret.scripts.emplace_back(s);
         }
 
         return ret;

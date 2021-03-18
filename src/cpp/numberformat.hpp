@@ -9,12 +9,13 @@
 #include <bitset>
 #include <iomanip>
 
-#include "common.hpp"
+#include "fractiontest.hpp"
+#include "valuetype.hpp"
 
-class NumeralRep
+class NumberFormat
 {
 public:
-    static std::string toDecimal(long double v, int floatPrecision = 32)
+    static std::string toDecimal(ValueType v, int floatPrecision = 32)
     {
         std::stringstream stream;
         stream << std::fixed << std::setprecision(floatPrecision) << v;
@@ -36,18 +37,18 @@ public:
         return s;
     }
 
-    static long double fromDecimal(std::string s)
+    static ValueType fromDecimal(std::string s)
     {
         return std::stold(s);
     }
 
-    static std::string toHex(long double v)
+    static std::string toHex(ValueType v)
     {
         if (v < 0)
         {
             return "Error sign";
         }
-        else if (v > (long double)std::numeric_limits<long long>().max())
+        else if (v > (ValueType)std::numeric_limits<long long>().max())
         {
             return "Error range";
         }
@@ -65,22 +66,22 @@ public:
         }
     }
 
-    static long double fromHex(std::string s)
+    static ValueType fromHex(std::string s)
     {
         long long x;
         std::stringstream ss;
         ss << std::hex << s;
         ss >> x;
-        return (long double)x;
+        return (ValueType)x;
     }
 
-    static std::string toOctal(long double v)
+    static std::string toOctal(ValueType v)
     {
         if (v < 0)
         {
             return "Error sign";
         }
-        else if (v > (long double)std::numeric_limits<long long>().max())
+        else if (v > (ValueType)std::numeric_limits<long long>().max())
         {
             return "Error range";
         }
@@ -97,22 +98,22 @@ public:
         }
     }
 
-    static long double fromOctal(std::string s)
+    static ValueType fromOctal(std::string s)
     {
         long long x;
         std::stringstream ss;
         ss << std::oct << s;
         ss >> x;
-        return (long double)x;
+        return (ValueType)x;
     }
 
-    static std::string toBinary(long double v)
+    static std::string toBinary(ValueType v)
     {
         if (v < 0)
         {
             return "Error sign";
         }
-        else if (v > (long double)std::numeric_limits<long long>().max())
+        else if (v > (ValueType)std::numeric_limits<long long>().max())
         {
             return "Error range";
         }
@@ -136,11 +137,11 @@ public:
         }
     }
 
-    static long double fromBinary(std::string s)
+    static ValueType fromBinary(std::string s)
     {
         if (s.size() > 63)
             throw std::runtime_error("Bit limit");
-        return (long double)std::bitset<64>(s).to_ullong();
+        return (ValueType)std::bitset<64>(s).to_ullong();
     }
 };
 

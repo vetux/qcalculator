@@ -6,8 +6,7 @@
 #include <string>
 #include <map>
 
-#include "function.hpp"
-#include "script.hpp"
+#include "symboltable.hpp"
 
 /**
  * The calculator engine supports functions and scripts.
@@ -22,18 +21,9 @@
  *
  * Arguments are passed to the scripts via argv.
  *
- * @tparam T The type to use for arithmetics.
  */
-template<typename T>
 class CalculatorEngine {
 public:
-    struct SymbolTable {
-        std::map<std::string, T> variables;
-        std::map<std::string, T> constants;
-        std::map<std::string, Function> functions;
-        std::map<std::string, Script> scripts;
-    };
-
     CalculatorEngine();
 
     ~CalculatorEngine();
@@ -41,19 +31,17 @@ public:
     /**
      * Evaluate the arithmetic expression using the defined symbol table.
      *
-     * @param expr The mathematical expression which may contain symbols defined in the table.
+     * @param expr The mathematical expression which may contain symbolTable defined in the table.
      * @param symbolTable The symbol table to use when evaluating the expression.
      *
      * @return The value of the expression.
      */
-    T evaluate(const std::string &expr, SymbolTable &symbolTable);
+    ValueType evaluate(const std::string &expr, SymbolTable &symbolTable);
 
-    T evaluate(const std::string &expr);
+    ValueType evaluate(const std::string &expr);
 
 private:
     PythonInterpreter interpreter;
 };
-
-template class CalculatorEngine<long double>;
 
 #endif // CALCULATORENGINE_HPP

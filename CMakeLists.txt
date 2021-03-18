@@ -23,8 +23,9 @@ endif(WIN32)
 
 file(GLOB_RECURSE SRC src/cpp/*.cpp)
 file(GLOB_RECURSE HDR src/cpp/*.hpp)
-file(GLOB_RECURSE HDR_GUI src/cpp/gui/*.hpp)
 file(GLOB_RECURSE FORMS src/forms/*.ui)
+
+set(HDR_GUI src/cpp/mainwindow.hpp src/cpp/settingsdialog.hpp src/cpp/presenter.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
 qt5_wrap_ui(WRAP_UI ${FORMS}) # Seems to output into CMAKE_CURRENT_BINARY_DIR

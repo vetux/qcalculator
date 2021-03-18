@@ -2,7 +2,6 @@
 #define SETTINGSDIALOG_HPP
 
 #include <QDialog>
-#include <QSettings>
 
 namespace Ui {
     class SettingsDialog;
@@ -12,7 +11,7 @@ class SettingsDialog : public QDialog {
 Q_OBJECT
 
 public:
-    explicit SettingsDialog(QSettings &settings, QWidget *parent = nullptr);
+    explicit SettingsDialog(QWidget *parent = nullptr);
 
     ~SettingsDialog() override;
 
@@ -24,7 +23,6 @@ private slots:
 
 private:
     Ui::SettingsDialog *ui;
-    QSettings &settings;
 };
 
 #endif // SETTINGSDIALOG_HPP
