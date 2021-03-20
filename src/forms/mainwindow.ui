@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>838</width>
-    <height>512</height>
+    <width>806</width>
+    <height>794</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -4310,7 +4310,7 @@ QPushButton:hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>838</width>
+     <width>806</width>
      <height>22</height>
     </rect>
    </property>
@@ -4355,7 +4355,7 @@ QPushButton:hover {
     <string/>
    </property>
    <attribute name="dockWidgetArea">
-    <number>2</number>
+    <number>8</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -4377,7 +4377,7 @@ QPushButton:hover {
      <item>
       <widget class="QTabWidget" name="tabWidget_2">
        <property name="currentIndex">
-        <number>0</number>
+        <number>3</number>
        </property>
        <property name="documentMode">
         <bool>false</bool>
@@ -4689,6 +4689,9 @@ QPushButton:hover {
            <property name="sizeAdjustPolicy">
             <enum>QAbstractScrollArea::AdjustIgnored</enum>
            </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
+           </property>
            <property name="selectionBehavior">
             <enum>QAbstractItemView::SelectRows</enum>
            </property>
@@ -4757,6 +4760,9 @@ QPushButton:hover {
            </property>
            <property name="sizeAdjustPolicy">
             <enum>QAbstractScrollArea::AdjustIgnored</enum>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
            </property>
            <property name="selectionBehavior">
             <enum>QAbstractItemView::SelectRows</enum>
@@ -4906,7 +4912,7 @@ QPushButton:hover {
            <item>
             <widget class="QLineEdit" name="lineEdit_functions_arg0">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -4916,7 +4922,7 @@ QPushButton:hover {
            <item>
             <widget class="QLineEdit" name="lineEdit_functions_arg1">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -4926,7 +4932,7 @@ QPushButton:hover {
            <item>
             <widget class="QLineEdit" name="lineEdit_functions_arg2">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -4936,7 +4942,7 @@ QPushButton:hover {
            <item>
             <widget class="QLineEdit" name="lineEdit_functions_arg3">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -4946,7 +4952,7 @@ QPushButton:hover {
            <item>
             <widget class="QLineEdit" name="lineEdit_functions_arg4">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -4985,6 +4991,9 @@ QPushButton:hover {
            </property>
            <property name="sizeAdjustPolicy">
             <enum>QAbstractScrollArea::AdjustIgnored</enum>
+           </property>
+           <property name="selectionMode">
+            <enum>QAbstractItemView::SingleSelection</enum>
            </property>
            <property name="selectionBehavior">
             <enum>QAbstractItemView::SelectRows</enum>

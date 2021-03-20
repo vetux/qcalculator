@@ -9,25 +9,55 @@
 
 #include "numpadkey.hpp"
 #include "view.hpp"
+#include "statelistener.hpp"
 
-class Presenter : public QObject {
+class Presenter : public QObject, public StateListener {
 Q_OBJECT
 public:
     Presenter(Model &model, View &view);
 
-    void init();
+    void onStateValueChanged(ValueType value) override;
 
-    void onStateChange(const State &state);
+    void onStateHistoryChanged(std::vector<std::pair<std::string, ValueType>> value) override;
+
+    void onStateInputChanged(std::string value) override;
+
+    void onStateSymbolTableChanged(SymbolTable value) override;
+
+    void onStateShowKeyPadChanged(bool value) override;
+
+    void onStateShowBitViewChanged(bool value) override;
+
+    void onStateShowDockChanged(bool value) override;
+
+    void onStateHistoryLimitChanged(int value) override;
+
+    void onStateDockPositionChanged(Qt::DockWidgetArea value) override;
+
+    void onStateDockSelectedTabChanged(int value) override;
+
+    void onStateWindowSizeChanged(QSize value) override;
+
+    void onStateCurrentVariableChanged(int value) override;
+
+    void onStateCurrentConstantChanged(int value) override;
+
+    void onStateCurrentFunctionChanged(int value) override;
+
+    void onStateCurrentScriptChanged(int value) override;
 
 public slots:
 
+    //+Presenter Interface
     void onWindowClose(QCloseEvent *event);
 
     void onWindowResize(QResizeEvent *event);
 
+
     void onInputSubmit();
 
     void onInputUpdate(const QString &value);
+
 
     void onDecimalSubmit(QString value);
 
@@ -37,21 +67,23 @@ public slots:
 
     void onBinarySubmit(QString value);
 
+
     void onNumPadKeyPressed(NumPadKey key);
 
     void onBitViewKeyPressed(int bitIndex);
 
-    void onDockVisibilityChanged(bool visible);
+
+    void onSelectedVariableChanged(int index);
+
+    void onVariableChanged(std::string name, std::string value);
 
 
-    void onCurrentScriptChanged(int index);
+    void onSelectedConstantChanged(int index);
 
-    void onScriptNameChanged(std::string value);
-
-    void onScriptBodyChanged(std::string value);
+    void onConstantChanged(std::string name, std::string value);
 
 
-    void onCurrentFunctionChanged(int index);
+    void onSelectedFunctionChanged(int index);
 
     void onFunctionNameChanged(std::string value);
 
@@ -60,14 +92,11 @@ public slots:
     void onFunctionArgsChanged(std::vector<std::string> arguments);
 
 
-    void onCurrentVariableChanged(int index);
+    void onSelectedScriptChanged(int index);
 
-    void onVariableChanged(std::string name, std::string value);
+    void onScriptNameChanged(std::string value);
 
-
-    void onCurrentConstantChanged(int index);
-
-    void onConstantChanged(std::string name, std::string value);
+    void onScriptBodyChanged(std::string value);
 
 
     void onActionExit();
@@ -84,6 +113,9 @@ public slots:
 
 
     void onDockTabChanged(int tabIndex);
+
+    void onDockVisibilityChanged(bool visible);
+    //-Presenter Interface
 
 private:
     Model &model;

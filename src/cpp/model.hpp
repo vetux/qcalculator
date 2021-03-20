@@ -5,12 +5,19 @@
 
 #include "valuetype.hpp"
 #include "state.hpp"
+#include "statelistener.hpp"
 
-typedef std::function<void(State)> StateListener;
-
+/**
+ * The model handles the most abstract form of application state.
+ *
+ * The presenter transforms the abstract form into gui data such as strings,
+ * and passes that data to the view.
+ */
 class Model {
 public:
-    Model(StateListener listener);
+    Model();
+
+    void setStateListener(StateListener &listener);
 
     void evaluateInput();
 
@@ -50,7 +57,7 @@ public:
 
     void updateHistoryLimit(int limit);
 
-    void updateDockPosition(int position);
+    void updateDockPosition(Qt::DockWidgetArea position);
 
     void updateDockSelectedTab(int tab);
 
@@ -67,7 +74,7 @@ public:
     const State &getState();
 
 private:
-    StateListener listener;
+    StateListener *listener;
     CalculatorEngine engine;
     State state;
 };
