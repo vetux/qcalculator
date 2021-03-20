@@ -198,6 +198,10 @@ bool MainWindow::showFileChooserDialog(const std::string &title, bool existingFi
     }
 }
 
+bool MainWindow::showQuestionDialog(const std::string &title, const std::string &text) {
+    return QMessageBox::question(this, title.c_str(), text.c_str()) == QMessageBox::Yes;
+}
+
 void MainWindow::quit() {
     exit(0);
 }

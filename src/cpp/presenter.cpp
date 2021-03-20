@@ -258,7 +258,18 @@ void Presenter::onVariableChanged(std::string name, std::string value) {
             model.addVariable(var);
         }
     } else {
-        model.updateVariable(state.currentVariable, {name, NumberFormat::fromDecimal(value)});
+        if (name.empty()) {
+            Variable v = state.symbolTable.variables.at(state.currentVariable);
+            if (view.showQuestionDialog("Delete Variable", "Do you want to delete " +
+                                                           v.name +
+                                                           " ?")) {
+                model.removeVariable(state.currentVariable);
+            } else {
+                model.updateVariable(state.currentVariable, v);
+            }
+        } else {
+            model.updateVariable(state.currentVariable, {name, NumberFormat::fromDecimal(value)});
+        }
     }
 }
 
@@ -276,7 +287,18 @@ void Presenter::onConstantChanged(std::string name, std::string value) {
             model.addConstant(con);
         }
     } else {
-        model.updateConstant(state.currentConstant, {name, NumberFormat::fromDecimal(value)});
+        if (name.empty()) {
+            Constant c = state.symbolTable.constants.at(state.currentConstant);
+            if (view.showQuestionDialog("Delete Constant", "Do you want to delete " +
+                                                           c.name +
+                                                           " ?")) {
+                model.removeConstant(state.currentConstant);
+            } else {
+                model.updateConstant(state.currentConstant, c);
+            }
+        } else {
+            model.updateConstant(state.currentConstant, {name, NumberFormat::fromDecimal(value)});
+        }
     }
 }
 
@@ -296,8 +318,18 @@ void Presenter::onFunctionNameChanged(std::string value) {
         }
     } else {
         Function f = state.symbolTable.functions.at(state.currentFunction);
-        f.name = value;
-        model.updateFunction(state.currentFunction, f);
+        if (value.empty()) {
+            if (view.showQuestionDialog("Delete Function", "Do you want to delete " +
+                                                           f.name +
+                                                           " ?")) {
+                model.removeFunction(state.currentFunction);
+            } else {
+                model.updateFunction(state.currentFunction, f);
+            }
+        } else {
+            f.name = value;
+            model.updateFunction(state.currentFunction, f);
+        }
     }
 }
 
@@ -334,8 +366,18 @@ void Presenter::onScriptNameChanged(std::string value) {
         }
     } else {
         Script s = state.symbolTable.scripts.at(state.currentScript);
-        s.name = value;
-        model.updateScript(state.currentScript, s);
+        if (value.empty()) {
+            if (view.showQuestionDialog("Delete Script", "Do you want to delete " +
+                                                         s.name +
+                                                         " ?")) {
+                model.removeScript(state.currentScript);
+            } else {
+                model.updateScript(state.currentScript, s);
+            }
+        } else {
+            s.name = value;
+            model.updateScript(state.currentScript, s);
+        }
     }
 }
 

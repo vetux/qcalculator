@@ -95,10 +95,11 @@ public:
 
     void showWarningDialog(const std::string &title, const std::string &text) override;
 
-private:
     void showInfoDialog(const std::string &title, const std::string &text) override;
 
     bool showFileChooserDialog(const std::string &title, bool existingFile, std::string &filePathOut) override;
+
+    bool showQuestionDialog(const std::string &title, const std::string &text) override;
 
 public:
 

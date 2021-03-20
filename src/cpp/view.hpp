@@ -24,6 +24,8 @@ public:
 
     virtual bool showFileChooserDialog(const std::string &title, bool existingFile, std::string &filePathOut) = 0;
 
+    virtual bool showQuestionDialog(const std::string &title, const std::string &text) = 0;
+
     virtual void quit() = 0;
 
     //UI Update
