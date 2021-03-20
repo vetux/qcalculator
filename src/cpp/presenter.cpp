@@ -1,9 +1,21 @@
 #include "presenter.hpp"
 
 #include "numberformat.hpp"
+#include "serializer.hpp"
 
 Presenter::Presenter(Model &model, View &view)
         : model(model), view(view) {
+}
+
+void Presenter::init() {
+    try {
+        model.loadSettings();
+    }
+    catch (std::exception &e) {
+        std::string error = "Failed to load settings: ";
+        error += e.what();
+        view.showWarningDialog("Error", error);
+    }
 }
 
 void Presenter::onStateValueChanged(ValueType value) {
@@ -177,6 +189,14 @@ void Presenter::onStateCurrentScriptChanged(int value) {
 }
 
 void Presenter::onWindowClose(QCloseEvent *event) {
+    try {
+        model.saveSettings();
+    }
+    catch (std::exception &e) {
+        std::string error = "Failed to save settings: ";
+        error += e.what();
+        view.showWarningDialog("Error", error);
+    }
     view.quit();
 }
 
@@ -328,6 +348,14 @@ void Presenter::onScriptBodyChanged(std::string value) {
 }
 
 void Presenter::onActionExit() {
+    try {
+        model.saveSettings();
+    }
+    catch (std::exception &e) {
+        std::string error = "Failed to save settings: ";
+        error += e.what();
+        view.showWarningDialog("Error", error);
+    }
     view.quit();
 }
 
@@ -349,6 +377,40 @@ void Presenter::onActionShowBitView(bool show) {
 
 void Presenter::onActionShowDock(bool show) {
     model.updateShowDock(show);
+}
+
+void Presenter::onActionImportSymbolTable() {
+    std::string filepath;
+    if (view.showFileChooserDialog("Import symbol table", true, filepath)) {
+        try {
+            model.importSymbolTable(filepath);
+            view.showInfoDialog("Import successful", "Successfully imported symbol table from " + filepath);
+        }
+        catch (std::exception &e) {
+            std::string error = "Failed to import symbol table at ";
+            error += filepath;
+            error += " Error: ";
+            error += e.what();
+            view.showWarningDialog("Import failed", error);
+        }
+    }
+}
+
+void Presenter::onActionExportSymbolTable() {
+    std::string filepath;
+    if (view.showFileChooserDialog("Export symbol table", false, filepath)) {
+        try {
+            model.exportSymbolTable(filepath);
+            view.showInfoDialog("Export successful", "Successfully exported symbol table to " + filepath);
+        }
+        catch (std::exception &e) {
+            std::string error = "Failed to export symbol table to ";
+            error += filepath;
+            error += " Error: ";
+            error += e.what();
+            view.showWarningDialog("Export failed", error);
+        }
+    }
 }
 
 void Presenter::onDockTabChanged(int tabIndex) {

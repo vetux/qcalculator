@@ -4320,6 +4320,9 @@ QPushButton:hover {
     </property>
     <addaction name="actionSettings"/>
     <addaction name="separator"/>
+    <addaction name="actionImport_Symbols"/>
+    <addaction name="actionExport_Symbols"/>
+    <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -4377,7 +4380,7 @@ QPushButton:hover {
      <item>
       <widget class="QTabWidget" name="tabWidget_2">
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <property name="documentMode">
         <bool>false</bool>
@@ -5078,6 +5081,16 @@ QPushButton:hover {
   <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionImport_Symbols">
+   <property name="text">
+    <string>Import Symbols...</string>
+   </property>
+  </action>
+  <action name="actionExport_Symbols">
+   <property name="text">
+    <string>Export Symbols...</string>
    </property>
   </action>
  </widget>

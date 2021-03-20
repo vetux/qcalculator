@@ -71,6 +71,14 @@ public:
 
     void updateCurrentScript(int currentScript);
 
+    void importSymbolTable(const std::string &filePath);
+
+    void exportSymbolTable(const std::string &filePath);
+
+    void loadSettings();
+
+    void saveSettings();
+
     const State &getState();
 
 private:

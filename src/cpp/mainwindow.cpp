@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QStandardPaths>
+#include <QFileDialog>
 
 #include "ui_mainwindow.h"
 
@@ -55,6 +56,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->textEdit_scripts, SIGNAL(textChanged()), this, SLOT(onScriptsBodyTextChanged()));
 
     model.setStateListener(presenter);
+
+    presenter.init();
 }
 
 MainWindow::~MainWindow() {
@@ -108,6 +111,8 @@ void MainWindow::connectPresenter(const Presenter &target) {
     connect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
     connect(ui->actionShow_Bit_Toggle, SIGNAL(toggled(bool)), &target, SLOT(onActionShowBitView(bool)));
     connect(ui->actionShow_Dock, SIGNAL(toggled(bool)), &target, SLOT(onActionShowDock(bool)));
+    connect(ui->actionImport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionImportSymbolTable()));
+    connect(ui->actionExport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionExportSymbolTable()));
 
     connect(ui->tabWidget_2, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
     connect(ui->dockWidget, SIGNAL(visibilityChanged(bool)), &target, SLOT(onDockVisibilityChanged(bool)));
@@ -150,6 +155,8 @@ void MainWindow::disconnectPresenter(const Presenter &target) {
     disconnect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
     disconnect(ui->actionShow_Bit_Toggle, SIGNAL(toggled(bool)), &target, SLOT(onActionShowBitView(bool)));
     disconnect(ui->actionShow_Dock, SIGNAL(toggled(bool)), &target, SLOT(onActionShowDock(bool)));
+    disconnect(ui->actionImport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionImportSymbolTable()));
+    disconnect(ui->actionExport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionExportSymbolTable()));
 
     disconnect(ui->tabWidget_2, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
     disconnect(ui->dockWidget, SIGNAL(visibilityChanged(bool)), &target, SLOT(onDockVisibilityChanged(bool)));
@@ -167,6 +174,30 @@ void MainWindow::showWarningDialog(const std::string &title, const std::string &
     QMessageBox::warning(this, title.c_str(), text.c_str());
 }
 
+void MainWindow::showInfoDialog(const std::string &title, const std::string &text) {
+    QMessageBox::information(this, title.c_str(), text.c_str());
+}
+
+bool MainWindow::showFileChooserDialog(const std::string &title, bool existingFile, std::string &filePathOut) {
+    QFileDialog dialog(this);
+    if (existingFile)
+        dialog.setFileMode(QFileDialog::ExistingFile);
+    else
+        dialog.setFileMode(QFileDialog::AnyFile);
+
+    if (dialog.exec()) {
+        QStringList list = dialog.selectedFiles();
+        if (list.size() != 1) {
+            return false;
+        } else {
+            filePathOut = list[0].toStdString();
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
+
 void MainWindow::quit() {
     exit(0);
 }
@@ -177,14 +208,17 @@ void MainWindow::setInputText(const std::string &value) {
 
 void MainWindow::setKeyPadVisibility(bool visible) {
     ui->widget_keypad->setVisible(visible);
+    ui->actionShow_Keypad->setChecked(visible);
 }
 
 void MainWindow::setBitViewVisibility(bool visible) {
     ui->widget_bits->setVisible(visible);
+    ui->actionShow_Bit_Toggle->setChecked(visible);
 }
 
 void MainWindow::setDockVisibility(bool visible) {
     ui->dockWidget->setVisible(visible);
+    ui->actionShow_Dock->setChecked(visible);
 }
 
 void MainWindow::setActiveDockTab(int tab) {

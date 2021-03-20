@@ -20,6 +20,10 @@ public:
 
     virtual void showWarningDialog(const std::string &title, const std::string &text) = 0;
 
+    virtual void showInfoDialog(const std::string &title, const std::string &text) = 0;
+
+    virtual bool showFileChooserDialog(const std::string &title, bool existingFile, std::string &filePathOut) = 0;
+
     virtual void quit() = 0;
 
     //UI Update
@@ -69,7 +73,7 @@ public:
 
     virtual void setFunctionArgsSpinBoxEnabled(bool enabled) = 0;
 
-    virtual void setFunctionBodyEnabled(bool enabled)= 0;
+    virtual void setFunctionBodyEnabled(bool enabled) = 0;
 
     virtual void setScriptsListView(const std::vector<std::string> &value) = 0;
 

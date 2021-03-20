@@ -16,6 +16,8 @@ Q_OBJECT
 public:
     Presenter(Model &model, View &view);
 
+    void init();
+
     void onStateValueChanged(ValueType value) override;
 
     void onStateHistoryChanged(std::vector<std::pair<std::string, ValueType>> value) override;
@@ -110,6 +112,10 @@ public slots:
     void onActionShowBitView(bool show);
 
     void onActionShowDock(bool show);
+
+    void onActionImportSymbolTable();
+
+    void onActionExportSymbolTable();
 
 
     void onDockTabChanged(int tabIndex);
