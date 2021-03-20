@@ -185,7 +185,15 @@ void Presenter::onWindowResize(QResizeEvent *event) {
 }
 
 void Presenter::onInputSubmit() {
-    model.evaluateInput();
+    try {
+        model.evaluateInput();
+    } catch (std::exception &e) {
+        std::string text = "Failed to evaluate { ";
+        text += model.getState().input;
+        text += " } Error: ";
+        text += e.what();
+        view.showWarningDialog("Error", text);
+    }
 }
 
 void Presenter::onInputUpdate(const QString &value) {
