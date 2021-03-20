@@ -210,6 +210,10 @@ void MainWindow::setInputText(const std::string &value) {
     ui->lineEdit_input->setText(value.c_str());
 }
 
+void MainWindow::setValueText(const std::string &value) {
+    ui->label_lastResult->setText(value.c_str());
+}
+
 void MainWindow::setKeyPadVisibility(bool visible) {
     ui->widget_keypad->setVisible(visible);
     ui->actionShow_Keypad->setChecked(visible);

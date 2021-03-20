@@ -31,6 +31,8 @@ public:
     //UI Update
     virtual void setInputText(const std::string &value) = 0;
 
+    virtual void setValueText(const std::string &value) = 0;
+
     virtual void setKeyPadVisibility(bool visible) = 0;
 
     virtual void setBitViewVisibility(bool visible) = 0;

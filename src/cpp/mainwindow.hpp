@@ -101,11 +101,11 @@ public:
 
     bool showQuestionDialog(const std::string &title, const std::string &text) override;
 
-public:
-
     void quit() override;
 
     void setInputText(const std::string &value) override;
+
+    void setValueText(const std::string &value) override;
 
     void setKeyPadVisibility(bool visible) override;
 

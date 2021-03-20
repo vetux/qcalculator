@@ -2,6 +2,7 @@
 
 #include "numberformat.hpp"
 #include "serializer.hpp"
+#include "fractiontest.hpp"
 
 Presenter::Presenter(Model &model, View &view)
         : model(model), view(view) {
@@ -21,10 +22,27 @@ void Presenter::init() {
 void Presenter::onStateValueChanged(ValueType value) {
     view.disconnectPresenter(*this);
 
-    view.setDecimalText(NumberFormat::toDecimal(value));
-    view.setHexText(NumberFormat::toHex(value));
-    view.setOctalText(NumberFormat::toOctal(value));
-    view.setBinaryText(NumberFormat::toBinary(value));
+    view.setValueText(NumberFormat::toDecimal(value));
+
+    if (hasFraction(value) || value < 0) {
+        view.setNumericSystemsEnabled(false);
+        view.setDecimalText("");
+        view.setHexText("");
+        view.setOctalText("");
+        view.setBinaryText("");
+
+        view.setBitViewEnabled(false);
+        view.setBitViewContents(std::bitset<64>(0));
+    } else {
+        view.setNumericSystemsEnabled(true);
+        view.setDecimalText(NumberFormat::toDecimal(value));
+        view.setHexText(NumberFormat::toHex(value));
+        view.setOctalText(NumberFormat::toOctal(value));
+        view.setBinaryText(NumberFormat::toBinary(value));
+
+        view.setBitViewEnabled(true);
+        view.setBitViewContents(std::bitset<64>(static_cast<unsigned long>(value)));
+    }
 
     view.connectPresenter(*this);
 }
@@ -237,11 +255,17 @@ void Presenter::onBinarySubmit(QString value) {
 }
 
 void Presenter::onNumPadKeyPressed(NumPadKey key) {
-    //TODO: Add key to input
+    if (key == NumPadKey::KEY_EQUAL) {
+        onInputSubmit();
+    } else {
+        model.updateInput(model.getState().input + convertNumPadKeyToString(key));
+    }
 }
 
 void Presenter::onBitViewKeyPressed(int bitIndex) {
-    //TODO: Get bitset from value and calculate new value based on bit toggle
+    std::bitset<64> bits(model.getState().value);
+    bits.flip(bitIndex);
+    model.updateValue(bits.to_ulong());
 }
 
 void Presenter::onSelectedVariableChanged(int index) {
