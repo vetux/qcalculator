@@ -108,7 +108,6 @@ void MainWindow::connectPresenter(const Presenter &target) {
 
     connect(ui->actionExit, SIGNAL(triggered(bool)), &target, SLOT(onActionExit()));
     connect(ui->actionAbout, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
-    connect(ui->actionSettings, SIGNAL(triggered(bool)), &target, SLOT(onActionSettings()));
     connect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
     connect(ui->actionShow_Bit_Toggle, SIGNAL(toggled(bool)), &target, SLOT(onActionShowBitView(bool)));
     connect(ui->actionShow_Dock, SIGNAL(toggled(bool)), &target, SLOT(onActionShowDock(bool)));
@@ -153,7 +152,6 @@ void MainWindow::disconnectPresenter(const Presenter &target) {
 
     disconnect(ui->actionExit, SIGNAL(triggered(bool)), &target, SLOT(onActionExit()));
     disconnect(ui->actionAbout, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
-    disconnect(ui->actionSettings, SIGNAL(triggered(bool)), &target, SLOT(onActionSettings()));
     disconnect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
     disconnect(ui->actionShow_Bit_Toggle, SIGNAL(toggled(bool)), &target, SLOT(onActionShowBitView(bool)));
     disconnect(ui->actionShow_Dock, SIGNAL(toggled(bool)), &target, SLOT(onActionShowDock(bool)));
@@ -221,7 +219,8 @@ void MainWindow::quit() {
 }
 
 void MainWindow::setInputText(const std::string &value) {
-    ui->lineEdit_input->setText(value.c_str());
+    if (ui->lineEdit_input->text() != value.c_str())
+        ui->lineEdit_input->setText(value.c_str());
 }
 
 void MainWindow::setValueText(const std::string &value) {
