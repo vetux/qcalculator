@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
           presenter(model, *this) {
     ui->setupUi(this);
 
+    ui->statusbar->hide();
+
     connect(ui->lineEdit_input_decimal, SIGNAL(editingFinished()), this, SLOT(onNumericSystemsFinishEditing()));
     connect(ui->lineEdit_input_hex, SIGNAL(editingFinished()), this, SLOT(onNumericSystemsFinishEditing()));
     connect(ui->lineEdit_input_octal, SIGNAL(editingFinished()), this, SLOT(onNumericSystemsFinishEditing()));
