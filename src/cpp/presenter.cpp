@@ -25,24 +25,18 @@ void Presenter::onStateValueChanged(ValueType value) {
     view.setValueText(NumberFormat::toDecimal(value));
 
     if (hasFraction(value) || value < 0) {
-        view.setNumericSystemsEnabled(false);
-        view.setDecimalText("");
-        view.setHexText("");
-        view.setOctalText("");
-        view.setBinaryText("");
-
         view.setBitViewEnabled(false);
         view.setBitViewContents(std::bitset<64>(0));
     } else {
-        view.setNumericSystemsEnabled(true);
-        view.setDecimalText(NumberFormat::toDecimal(value));
-        view.setHexText(NumberFormat::toHex(value));
-        view.setOctalText(NumberFormat::toOctal(value));
-        view.setBinaryText(NumberFormat::toBinary(value));
-
         view.setBitViewEnabled(true);
         view.setBitViewContents(std::bitset<64>(static_cast<unsigned long>(value)));
     }
+
+    view.setNumericSystemsEnabled(true);
+    view.setDecimalText(NumberFormat::toDecimal(value));
+    view.setHexText(NumberFormat::toHex(value));
+    view.setOctalText(NumberFormat::toOctal(value));
+    view.setBinaryText(NumberFormat::toBinary(value));
 
     view.connectPresenter(*this);
 }
