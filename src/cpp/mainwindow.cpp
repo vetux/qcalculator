@@ -24,10 +24,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->statusbar->hide();
 
-    connect(ui->lineEdit_input_decimal, SIGNAL(editingFinished()), this, SLOT(onNumericSystemsFinishEditing()));
-    connect(ui->lineEdit_input_hex, SIGNAL(editingFinished()), this, SLOT(onNumericSystemsFinishEditing()));
-    connect(ui->lineEdit_input_octal, SIGNAL(editingFinished()), this, SLOT(onNumericSystemsFinishEditing()));
-    connect(ui->lineEdit_input_binary, SIGNAL(editingFinished()), this, SLOT(onNumericSystemsFinishEditing()));
+    connect(ui->lineEdit_input_decimal, SIGNAL(returnPressed()), this, SLOT(onNumericSystemsFinishEditing()));
+    connect(ui->lineEdit_input_hex, SIGNAL(returnPressed()), this, SLOT(onNumericSystemsFinishEditing()));
+    connect(ui->lineEdit_input_octal, SIGNAL(returnPressed()), this, SLOT(onNumericSystemsFinishEditing()));
+    connect(ui->lineEdit_input_binary, SIGNAL(returnPressed()), this, SLOT(onNumericSystemsFinishEditing()));
 
     for (int i = NumPadKey::START + 1; i < NumPadKey::END; i++) {
         connect(&getKeyPadButton(static_cast<NumPadKey>(i)), SIGNAL(pressed()), this, SLOT(onNumPadKeyPressed()));

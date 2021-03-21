@@ -244,19 +244,59 @@ void Presenter::onInputUpdate(const QString &value) {
 }
 
 void Presenter::onDecimalSubmit(const QString &value) {
-    model.updateValue(NumberFormat::fromDecimal(value.toStdString()));
+    try {
+        ValueType v = NumberFormat::fromDecimal(value.toStdString());
+        model.updateValue(v);
+    }
+    catch (std::exception &e) {
+        std::string error = "Failed to parse ";
+        error += value.toStdString();
+        error += " as decimal.";
+
+        view.showWarningDialog("Error", error);
+    }
 }
 
 void Presenter::onHexSubmit(const QString &value) {
-    model.updateValue(NumberFormat::fromHex(value.toStdString()));
+    try {
+        ValueType v = NumberFormat::fromHex(value.toStdString());
+        model.updateValue(v);
+    }
+    catch (std::exception &e) {
+        std::string error = "Failed to parse ";
+        error += value.toStdString();
+        error += " as hex.";
+
+        view.showWarningDialog("Error", error);
+    }
 }
 
 void Presenter::onOctalSubmit(const QString &value) {
-    model.updateValue(NumberFormat::fromOctal(value.toStdString()));
+    try {
+        ValueType v = NumberFormat::fromOctal(value.toStdString());
+        model.updateValue(v);
+    }
+    catch (std::exception &e) {
+        std::string error = "Failed to parse ";
+        error += value.toStdString();
+        error += " as octal.";
+
+        view.showWarningDialog("Error", error);
+    }
 }
 
 void Presenter::onBinarySubmit(const QString &value) {
-    model.updateValue(NumberFormat::fromBinary(value.toStdString()));
+    try {
+        ValueType v = NumberFormat::fromBinary(value.toStdString());
+        model.updateValue(v);
+    }
+    catch (std::exception &e) {
+        std::string error = "Failed to parse ";
+        error += value.toStdString();
+        error += " as binary.";
+
+        view.showWarningDialog("Error", error);
+    }
 }
 
 void Presenter::onNumPadKeyPressed(NumPadKey key) {
