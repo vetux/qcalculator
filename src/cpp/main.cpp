@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     a.setOrganizationName("xenotux");
     a.setApplicationName("qcalc");
-    a.setApplicationDisplayName("QCalc");
+    a.setApplicationDisplayName("QCalculator");
     a.setApplicationVersion("v0.2.0");
 
     MainWindow w;

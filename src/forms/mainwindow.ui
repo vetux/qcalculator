@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>806</width>
-    <height>794</height>
+    <width>648</width>
+    <height>763</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -125,6 +125,12 @@
            </item>
            <item>
             <widget class="QLabel" name="label_lastResult">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string>0</string>
              </property>
@@ -4310,7 +4316,7 @@ QPushButton:hover {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>806</width>
+     <width>648</width>
      <height>22</height>
     </rect>
    </property>
@@ -4892,7 +4898,7 @@ QPushButton:hover {
            <item>
             <widget class="QLineEdit" name="lineEdit_functions_arg0">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -4902,7 +4908,7 @@ QPushButton:hover {
            <item>
             <widget class="QLineEdit" name="lineEdit_functions_arg1">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -4912,7 +4918,7 @@ QPushButton:hover {
            <item>
             <widget class="QLineEdit" name="lineEdit_functions_arg2">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -4922,7 +4928,7 @@ QPushButton:hover {
            <item>
             <widget class="QLineEdit" name="lineEdit_functions_arg3">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -4932,7 +4938,7 @@ QPushButton:hover {
            <item>
             <widget class="QLineEdit" name="lineEdit_functions_arg4">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>

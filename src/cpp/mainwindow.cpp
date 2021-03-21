@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <QStandardPaths>
 #include <QFileDialog>
+#include <QSizePolicy>
 
 #include "ui_mainwindow.h"
 
@@ -288,13 +289,16 @@ void MainWindow::setBinaryText(const std::string &value) {
 
 void MainWindow::setHistory(const std::vector<std::pair<std::string, std::string>> &value) {
     std::string text;
-    for (auto &pair : value) {
-        text.append(pair.first);
+    for (auto it = value.begin(); it != value.end(); it++) {
+        text.append(it->first);
         text.append(" = ");
-        text.append(pair.second);
-        text.append("\n");
+        text.append(it->second);
+        if (it + 1 != value.end())
+            text.append("\n");
     }
     ui->textEdit_history->setText(text.c_str());
+    ui->textEdit_history->verticalScrollBar()->setValue(ui->textEdit_history->verticalScrollBar()->maximum());
+    ui->textEdit_history->horizontalScrollBar()->setValue(ui->textEdit_history->horizontalScrollBar()->minimum());
 }
 
 void MainWindow::setVariableListView(const std::vector<std::pair<std::string, std::string>> &value) {
@@ -371,18 +375,23 @@ void MainWindow::setFunctionArgs(const std::vector<std::string> &value) {
     switch (numberOfArguments) {
         case 0:
             ui->lineEdit_functions_arg0->setVisible(false);
+            ui->lineEdit_functions_arg0->setSizePolicy(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg0->setText("");
         case 1:
             ui->lineEdit_functions_arg1->setVisible(false);
+            ui->lineEdit_functions_arg1->setSizePolicy(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg1->setText("");
         case 2:
             ui->lineEdit_functions_arg2->setVisible(false);
+            ui->lineEdit_functions_arg2->setSizePolicy(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg2->setText("");
         case 3:
             ui->lineEdit_functions_arg3->setVisible(false);
+            ui->lineEdit_functions_arg3->setSizePolicy(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg3->setText("");
         case 4:
             ui->lineEdit_functions_arg4->setVisible(false);
+            ui->lineEdit_functions_arg4->setSizePolicy(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg4->setText("");
         default:
             break;
@@ -391,18 +400,23 @@ void MainWindow::setFunctionArgs(const std::vector<std::string> &value) {
     switch (numberOfArguments) {
         case 5:
             ui->lineEdit_functions_arg4->setVisible(true);
+            ui->lineEdit_functions_arg4->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg4->setText(value[4].c_str());
         case 4:
             ui->lineEdit_functions_arg3->setVisible(true);
+            ui->lineEdit_functions_arg3->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg3->setText(value[3].c_str());
         case 3:
             ui->lineEdit_functions_arg2->setVisible(true);
+            ui->lineEdit_functions_arg2->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg2->setText(value[2].c_str());
         case 2:
             ui->lineEdit_functions_arg1->setVisible(true);
+            ui->lineEdit_functions_arg1->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg1->setText(value[1].c_str());
         case 1:
             ui->lineEdit_functions_arg0->setVisible(true);
+            ui->lineEdit_functions_arg0->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg0->setText(value[0].c_str());
         default:
             break;
