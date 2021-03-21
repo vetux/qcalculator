@@ -323,7 +323,11 @@ void Presenter::onVariableChanged(const std::string &name, const std::string &va
         error += value;
         error += " as decimal.";
         view.showWarningDialog("Error", error);
-        return;
+
+        if (state.currentVariable == -1)
+            return;
+        else
+            convertedValue = state.symbolTable.variables.at(state.currentVariable).value;
     }
 
     if (state.currentVariable == -1) {
@@ -365,7 +369,11 @@ void Presenter::onConstantChanged(const std::string &name, const std::string &va
         error += value;
         error += " as decimal.";
         view.showWarningDialog("Error", error);
-        return;
+
+        if (state.currentConstant == -1)
+            return;
+        else
+            convertedValue = state.symbolTable.constants.at(state.currentConstant).value;
     }
 
     if (state.currentConstant == -1) {
