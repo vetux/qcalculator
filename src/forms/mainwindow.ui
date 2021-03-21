@@ -79,51 +79,6 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
-            <widget class="QComboBox" name="comboBox">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>100</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <item>
-              <property name="text">
-               <string>Decimal</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Hexadecimal</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Octal</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Binary</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item>
             <widget class="QLabel" name="label_lastResult">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -4343,7 +4298,7 @@ QPushButton:hover {
      <property name="title">
       <string>Widgets</string>
      </property>
-     <addaction name="actionShow_Bit_Toggle"/>
+     <addaction name="actionShow_Bitview"/>
      <addaction name="actionShow_Keypad"/>
      <addaction name="actionShow_Dock"/>
     </widget>
@@ -5045,12 +5000,12 @@ QPushButton:hover {
     <string>Show Keypad</string>
    </property>
   </action>
-  <action name="actionShow_Bit_Toggle">
+  <action name="actionShow_Bitview">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Show Bit Toggle</string>
+    <string>Show Bitview</string>
    </property>
   </action>
   <action name="actionShow_Dock">

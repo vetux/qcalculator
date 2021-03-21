@@ -112,7 +112,7 @@ void MainWindow::connectPresenter(const Presenter &target) {
     connect(ui->actionExit, SIGNAL(triggered(bool)), &target, SLOT(onActionExit()));
     connect(ui->actionAbout, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
     connect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
-    connect(ui->actionShow_Bit_Toggle, SIGNAL(toggled(bool)), &target, SLOT(onActionShowBitView(bool)));
+    connect(ui->actionShow_Bitview, SIGNAL(toggled(bool)), &target, SLOT(onActionShowBitView(bool)));
     connect(ui->actionShow_Dock, SIGNAL(toggled(bool)), &target, SLOT(onActionShowDock(bool)));
     connect(ui->actionImport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionImportSymbolTable()));
     connect(ui->actionExport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionExportSymbolTable()));
@@ -157,7 +157,7 @@ void MainWindow::disconnectPresenter(const Presenter &target) {
     disconnect(ui->actionExit, SIGNAL(triggered(bool)), &target, SLOT(onActionExit()));
     disconnect(ui->actionAbout, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
     disconnect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
-    disconnect(ui->actionShow_Bit_Toggle, SIGNAL(toggled(bool)), &target, SLOT(onActionShowBitView(bool)));
+    disconnect(ui->actionShow_Bitview, SIGNAL(toggled(bool)), &target, SLOT(onActionShowBitView(bool)));
     disconnect(ui->actionShow_Dock, SIGNAL(toggled(bool)), &target, SLOT(onActionShowDock(bool)));
     disconnect(ui->actionImport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionImportSymbolTable()));
     disconnect(ui->actionExport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionExportSymbolTable()));
@@ -239,7 +239,7 @@ void MainWindow::setKeyPadVisibility(bool visible) {
 
 void MainWindow::setBitViewVisibility(bool visible) {
     ui->widget_bits->setVisible(visible);
-    ui->actionShow_Bit_Toggle->setChecked(visible);
+    ui->actionShow_Bitview->setChecked(visible);
 }
 
 void MainWindow::setDockVisibility(bool visible) {
