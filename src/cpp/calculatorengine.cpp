@@ -20,24 +20,26 @@ ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbo
             scriptCount++;
     }
 
-    //Use arrays to store the function objects as the symbol table itself only stores references.
+    //Use vectors with fixed size to store the function objects as the symbol table itself only stores references.
     int varArgScriptIndex = 0;
-    ScriptVarArgFunction<ValueType> varArgScriptFunctions[varArgScriptCount];
+    std::vector<ScriptVarArgFunction<ValueType>> varArgScriptFunctions;
+    varArgScriptFunctions.resize(varArgScriptCount);
 
     int scriptIndex = 0;
-    ScriptFunction<ValueType> scriptFunctions[scriptCount];
+    std::vector<ScriptFunction<ValueType>> scriptFunctions;
+    scriptFunctions.resize(scriptCount);
 
     for (auto &script : symbolTable.scripts) {
         if (script.enableArguments) {
             int index = varArgScriptIndex++;
             assert(index < varArgScriptCount);
-            varArgScriptFunctions[index] = ScriptVarArgFunction<ValueType>(interpreter, script.body);
-            symbols.add_function(script.name, varArgScriptFunctions[index]);
+            varArgScriptFunctions.at(index) = ScriptVarArgFunction<ValueType>(interpreter, script.body);
+            symbols.add_function(script.name, varArgScriptFunctions.at(index));
         } else {
             int index = scriptIndex++;
             assert(index < scriptCount);
-            scriptFunctions[index] = ScriptFunction<ValueType>(interpreter, script.body);
-            symbols.add_function(script.name, scriptFunctions[index]);
+            scriptFunctions.at(index) = ScriptFunction<ValueType>(interpreter, script.body);
+            symbols.add_function(script.name, scriptFunctions.at(index));
         }
     }
 
