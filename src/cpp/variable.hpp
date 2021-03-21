@@ -7,11 +7,11 @@
 
 struct Variable {
     std::string name;
-    ValueType value;
+    ValueType value = 0;
 
     Variable() = default;
 
-    Variable(std::string name, ValueType value) : name(name), value(value) {}
+    Variable(std::string name, ValueType value) : name(std::move(name)), value(value) {}
 };
 
 #endif //QCALC_VARIABLE_HPP

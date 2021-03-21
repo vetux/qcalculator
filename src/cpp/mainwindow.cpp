@@ -65,12 +65,12 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    presenter.onWindowClose(event);
+    presenter.onWindowClose(*event);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
-    presenter.onWindowResize(event);
+    presenter.onWindowResize(*event);
 }
 
 //+View
@@ -252,7 +252,7 @@ void MainWindow::setDockPosition(Qt::DockWidgetArea position) {
     addDockWidget(position, ui->dockWidget);
 }
 
-void MainWindow::setBitViewContents(std::bitset<64> value) {
+void MainWindow::setBitViewContents(const std::bitset<64> &value) {
     for (int i = 0; i < 64; i++) {
         QPushButton &button = getBitButton(i);
         if (value.test(i)) {

@@ -25,29 +25,29 @@ public:
 
     void updateValue(ValueType value);
 
-    void addVariable(Variable var);
+    void addVariable(const Variable &var);
 
     void removeVariable(int index);
 
-    void updateVariable(int index, Variable value);
+    void updateVariable(int index, const Variable &value);
 
-    void addConstant(Constant value);
+    void addConstant(const Constant &value);
 
     void removeConstant(int index);
 
-    void updateConstant(int index, Constant value);
+    void updateConstant(int index, const Constant &value);
 
-    void addFunction(Function value);
+    void addFunction(const Function &value);
 
     void removeFunction(int index);
 
-    void updateFunction(int index, Function value);
+    void updateFunction(int index, const Function &value);
 
-    void addScript(Script value);
+    void addScript(const Script &value);
 
     void removeScript(int index);
 
-    void updateScript(int index, Script value);
+    void updateScript(int index, const Script &value);
 
     void updateShowKeyPad(bool value);
 

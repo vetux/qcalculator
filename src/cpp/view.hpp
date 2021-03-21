@@ -43,7 +43,7 @@ public:
 
     virtual void setDockPosition(Qt::DockWidgetArea position) = 0;
 
-    virtual void setBitViewContents(std::bitset<64> value) = 0;
+    virtual void setBitViewContents(const std::bitset<64> &value) = 0;
 
     virtual void setBitViewEnabled(bool enabled) = 0;
 

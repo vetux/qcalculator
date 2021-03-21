@@ -14,8 +14,8 @@ class Observable {
 public:
     typedef std::function<void(T)> Observer;
 
-    void setObserver(Observer observer) {
-        this->observer = observer;
+    void setObserver(Observer obs) {
+        this->observer = obs;
     }
 
     void clearObserver() {

@@ -19,9 +19,9 @@ public:
     ScriptVarArgFunction(PythonInterpreter &interpreter, std::string script)
             : interpreter(&interpreter), script(std::move(script)) {}
 
-    inline T operator()(const std::vector<T> &arglist) {
+    inline T operator()(const std::vector<T> &args) {
         assert(interpreter != nullptr);
-        return interpreter->run(script, arglist);
+        return interpreter->run(script, args);
     }
 
 private:

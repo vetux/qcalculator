@@ -2,6 +2,7 @@
 #define QCALC_CONSTANT_HPP
 
 #include <string>
+#include <utility>
 
 #include "valuetype.hpp"
 
@@ -11,7 +12,7 @@ struct Constant {
 
     Constant() = default;
 
-    Constant(std::string name, ValueType value) : name(name), value(value) {}
+    Constant(std::string name, ValueType value) : name(std::move(name)), value(value) {}
 };
 
 #endif //QCALC_CONSTANT_HPP

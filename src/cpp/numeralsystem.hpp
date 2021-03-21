@@ -1,8 +1,7 @@
 #ifndef NUMBERINGSYSTEM_HPP
 #define NUMBERINGSYSTEM_HPP
 
-enum NumeralSystem
-{
+enum NumeralSystem {
     DECIMAL,
     HEXADECIMAL,
     OCTAL,

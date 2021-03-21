@@ -47,7 +47,7 @@ void Presenter::onStateValueChanged(ValueType value) {
     view.connectPresenter(*this);
 }
 
-void Presenter::onStateHistoryChanged(std::vector<std::pair<std::string, ValueType>> value) {
+void Presenter::onStateHistoryChanged(const std::vector<std::pair<std::string, ValueType>> &value) {
     view.disconnectPresenter(*this);
 
     std::vector<std::pair<std::string, std::string>> tmp;
@@ -59,7 +59,7 @@ void Presenter::onStateHistoryChanged(std::vector<std::pair<std::string, ValueTy
     view.connectPresenter(*this);
 }
 
-void Presenter::onStateInputChanged(std::string value) {
+void Presenter::onStateInputChanged(const std::string &value) {
     view.disconnectPresenter(*this);
 
     view.setInputText(value);
@@ -67,7 +67,7 @@ void Presenter::onStateInputChanged(std::string value) {
     view.connectPresenter(*this);
 }
 
-void Presenter::onStateSymbolTableChanged(SymbolTable value) {
+void Presenter::onStateSymbolTableChanged(const SymbolTable &value) {
     view.disconnectPresenter(*this);
 
     std::vector<std::pair<std::string, std::string>> tmp;
@@ -211,7 +211,7 @@ void Presenter::onStateCurrentScriptChanged(int value) {
     view.connectPresenter(*this);
 }
 
-void Presenter::onWindowClose(QCloseEvent *event) {
+void Presenter::onWindowClose(const QCloseEvent &event) {
     try {
         model.saveSettings();
     }
@@ -223,8 +223,8 @@ void Presenter::onWindowClose(QCloseEvent *event) {
     view.quit();
 }
 
-void Presenter::onWindowResize(QResizeEvent *event) {
-    model.updateWindowSize(event->size());
+void Presenter::onWindowResize(const QResizeEvent &event) {
+    model.updateWindowSize(event.size());
 }
 
 void Presenter::onInputSubmit() {
@@ -243,19 +243,19 @@ void Presenter::onInputUpdate(const QString &value) {
     model.updateInput(value.toStdString());
 }
 
-void Presenter::onDecimalSubmit(QString value) {
+void Presenter::onDecimalSubmit(const QString &value) {
     model.updateValue(NumberFormat::fromDecimal(value.toStdString()));
 }
 
-void Presenter::onHexSubmit(QString value) {
+void Presenter::onHexSubmit(const QString &value) {
     model.updateValue(NumberFormat::fromHex(value.toStdString()));
 }
 
-void Presenter::onOctalSubmit(QString value) {
+void Presenter::onOctalSubmit(const QString &value) {
     model.updateValue(NumberFormat::fromOctal(value.toStdString()));
 }
 
-void Presenter::onBinarySubmit(QString value) {
+void Presenter::onBinarySubmit(const QString &value) {
     model.updateValue(NumberFormat::fromBinary(value.toStdString()));
 }
 
@@ -277,7 +277,7 @@ void Presenter::onSelectedVariableChanged(int index) {
     model.updateCurrentVariable(index);
 }
 
-void Presenter::onVariableChanged(std::string name, std::string value) {
+void Presenter::onVariableChanged(const std::string &name, const std::string &value) {
     const State &state = model.getState();
     if (state.currentVariable == -1) {
         if (name.empty()) {
@@ -306,7 +306,7 @@ void Presenter::onSelectedConstantChanged(int index) {
     model.updateCurrentConstant(index);
 }
 
-void Presenter::onConstantChanged(std::string name, std::string value) {
+void Presenter::onConstantChanged(const std::string &name, const std::string &value) {
     const State &state = model.getState();
     if (state.currentConstant == -1) {
         if (name.empty()) {
@@ -335,7 +335,7 @@ void Presenter::onSelectedFunctionChanged(int index) {
     model.updateCurrentFunction(index);
 }
 
-void Presenter::onFunctionNameChanged(std::string value) {
+void Presenter::onFunctionNameChanged(const std::string &value) {
     const State &state = model.getState();
     if (state.currentFunction == -1) {
         if (value.empty()) {
@@ -362,7 +362,7 @@ void Presenter::onFunctionNameChanged(std::string value) {
     }
 }
 
-void Presenter::onFunctionBodyChanged(std::string value) {
+void Presenter::onFunctionBodyChanged(const std::string &value) {
     const State &state = model.getState();
     assert(state.currentFunction != -1);
     Function f = state.symbolTable.functions.at(state.currentFunction);
@@ -370,7 +370,7 @@ void Presenter::onFunctionBodyChanged(std::string value) {
     model.updateFunction(state.currentFunction, f);
 }
 
-void Presenter::onFunctionArgsChanged(std::vector<std::string> arguments) {
+void Presenter::onFunctionArgsChanged(const std::vector<std::string> &arguments) {
     const State &state = model.getState();
     assert(state.currentFunction != -1);
     Function f = state.symbolTable.functions.at(state.currentFunction);
@@ -383,7 +383,7 @@ void Presenter::onSelectedScriptChanged(int index) {
     model.updateCurrentScript(index);
 }
 
-void Presenter::onScriptNameChanged(std::string value) {
+void Presenter::onScriptNameChanged(const std::string &value) {
     const State &state = model.getState();
     if (state.currentScript == -1) {
         if (value.empty()) {
@@ -410,7 +410,7 @@ void Presenter::onScriptNameChanged(std::string value) {
     }
 }
 
-void Presenter::onScriptBodyChanged(std::string value) {
+void Presenter::onScriptBodyChanged(const std::string &value) {
     const State &state = model.getState();
     assert(state.currentScript != -1);
     Script s = state.symbolTable.scripts.at(state.currentScript);

@@ -22,7 +22,7 @@ QT_END_NAMESPACE
 //TODO: Fix bitview layout for win32
 
 /**
- * For behaviours which cannot be directly linked using the standard qt widgets (Like the QTableWidget logic)
+ * For behaviours which are currently not directly linked to the presenter (Like the QTableWidget logic)
  * the main window binds the widget behaviour to itself and emits
  * custom signals which map to the presenter member functions.
  *
@@ -36,13 +36,13 @@ Q_OBJECT
 
 signals:
 
-    void signalDecimalSubmit(QString value);
+    void signalDecimalSubmit(const QString &value);
 
-    void signalHexSubmit(QString value);
+    void signalHexSubmit(const QString &value);
 
-    void signalOctalSubmit(QString value);
+    void signalOctalSubmit(const QString &value);
 
-    void signalBinarySubmit(QString value);
+    void signalBinarySubmit(const QString &value);
 
 
     void signalNumPadKeyPressed(NumPadKey key);
@@ -52,28 +52,28 @@ signals:
 
     void signalSelectedVariableChanged(int index);
 
-    void signalVariableChanged(std::string name, std::string value);
+    void signalVariableChanged(const std::string &name, const std::string &value);
 
 
     void signalSelectedConstantChanged(int index);
 
-    void signalConstantChanged(std::string name, std::string value);
+    void signalConstantChanged(const std::string &name, const std::string &value);
 
 
     void signalSelectedFunctionChanged(int index);
 
-    void signalFunctionNameChanged(std::string value);
+    void signalFunctionNameChanged(const std::string &value);
 
-    void signalFunctionBodyChanged(std::string value);
+    void signalFunctionBodyChanged(const std::string &value);
 
-    void signalFunctionArgsChanged(std::vector<std::string> arguments);
+    void signalFunctionArgsChanged(const std::vector<std::string> &arguments);
 
 
     void signalSelectedScriptChanged(int index);
 
-    void signalScriptNameChanged(std::string value);
+    void signalScriptNameChanged(const std::string &value);
 
-    void signalScriptBodyChanged(std::string value);
+    void signalScriptBodyChanged(const std::string &value);
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
@@ -117,7 +117,7 @@ public:
 
     void setDockPosition(Qt::DockWidgetArea position) override;
 
-    void setBitViewContents(std::bitset<64> value) override;
+    void setBitViewContents(const std::bitset<64> &value) override;
 
     void setBitViewEnabled(bool enabled) override;
 

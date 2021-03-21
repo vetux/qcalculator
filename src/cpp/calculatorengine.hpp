@@ -10,12 +10,13 @@
 #include "symboltable.hpp"
 
 /**
- * The calculator engine supports functions and scripts.
+ * The calculator engine evaluates expressions in string form using a supplied symbol table.
  *
- * Functions are executed as native c++ using the templated type for arithmetic but may only contain syntax defined by the exprtk readme.
+ * The symbol table defines variables, constants, functions and scripts.
  *
- * Scripts pass through the python interpreter and may therefore only be capable of limited arithmetic accuracy and performance compared to functions,
- * but allow full python functionality with io etc.
+ * Functions are implemented using exprtk's function_compositor.
+ *
+ * Scripts are implemented as a custom exprtk function.
  *
  * Scripts get access to arguments through the variable "argv" and may output a single scalar by setting "outv".
  */
@@ -38,6 +39,7 @@ public:
     ValueType evaluate(const std::string &expr);
 
 private:
+    exprtk::parser<ValueType> parser;
     PythonInterpreter interpreter;
 };
 

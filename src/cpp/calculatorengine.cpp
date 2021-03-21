@@ -3,15 +3,11 @@
 #include "extern/exprtk.hpp"
 
 
-CalculatorEngine::CalculatorEngine() {
-}
+CalculatorEngine::CalculatorEngine() = default;
 
-CalculatorEngine::~CalculatorEngine() {
-
-}
+CalculatorEngine::~CalculatorEngine() = default;
 
 ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbolTable) {
-    exprtk::parser<ValueType> parser;
     exprtk::function_compositor<ValueType> compositor;
     exprtk::symbol_table<ValueType> symbols = compositor.symbol_table();
 
@@ -111,7 +107,6 @@ ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbo
 }
 
 ValueType CalculatorEngine::evaluate(const std::string &expr) {
-    exprtk::parser<ValueType> parser;
     exprtk::expression<ValueType> expression;
 
     if (parser.compile(expr, expression)) {

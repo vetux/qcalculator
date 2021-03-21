@@ -20,11 +20,11 @@ public:
 
     void onStateValueChanged(ValueType value) override;
 
-    void onStateHistoryChanged(std::vector<std::pair<std::string, ValueType>> value) override;
+    void onStateHistoryChanged(const std::vector<std::pair<std::string, ValueType>> &value) override;
 
-    void onStateInputChanged(std::string value) override;
+    void onStateInputChanged(const std::string &value) override;
 
-    void onStateSymbolTableChanged(SymbolTable value) override;
+    void onStateSymbolTableChanged(const SymbolTable &value) override;
 
     void onStateShowKeyPadChanged(bool value) override;
 
@@ -51,9 +51,9 @@ public:
 public slots:
 
     //+Presenter Interface
-    void onWindowClose(QCloseEvent *event);
+    void onWindowClose(const QCloseEvent &event);
 
-    void onWindowResize(QResizeEvent *event);
+    void onWindowResize(const QResizeEvent &event);
 
 
     void onInputSubmit();
@@ -61,13 +61,13 @@ public slots:
     void onInputUpdate(const QString &value);
 
 
-    void onDecimalSubmit(QString value);
+    void onDecimalSubmit(const QString &value);
 
-    void onHexSubmit(QString value);
+    void onHexSubmit(const QString &value);
 
-    void onOctalSubmit(QString value);
+    void onOctalSubmit(const QString &value);
 
-    void onBinarySubmit(QString value);
+    void onBinarySubmit(const QString &value);
 
 
     void onNumPadKeyPressed(NumPadKey key);
@@ -77,28 +77,28 @@ public slots:
 
     void onSelectedVariableChanged(int index);
 
-    void onVariableChanged(std::string name, std::string value);
+    void onVariableChanged(const std::string &name, const std::string &value);
 
 
     void onSelectedConstantChanged(int index);
 
-    void onConstantChanged(std::string name, std::string value);
+    void onConstantChanged(const std::string &name, const std::string &value);
 
 
     void onSelectedFunctionChanged(int index);
 
-    void onFunctionNameChanged(std::string value);
+    void onFunctionNameChanged(const std::string &value);
 
-    void onFunctionBodyChanged(std::string value);
+    void onFunctionBodyChanged(const std::string &value);
 
-    void onFunctionArgsChanged(std::vector<std::string> arguments);
+    void onFunctionArgsChanged(const std::vector<std::string> &arguments);
 
 
     void onSelectedScriptChanged(int index);
 
-    void onScriptNameChanged(std::string value);
+    void onScriptNameChanged(const std::string &value);
 
-    void onScriptBodyChanged(std::string value);
+    void onScriptBodyChanged(const std::string &value);
 
     void onScriptEnableArgsChanged(bool value);
 

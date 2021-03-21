@@ -39,7 +39,7 @@ void Model::updateValue(ValueType value) {
     listener->onStateValueChanged(state.value);
 }
 
-void Model::addVariable(Variable var) {
+void Model::addVariable(const Variable &var) {
     state.symbolTable.variables.push_back(var);
     state.currentVariable = static_cast<int>(state.symbolTable.variables.size()) - 1;
     listener->onStateSymbolTableChanged(state.symbolTable);
@@ -54,12 +54,12 @@ void Model::removeVariable(int index) {
     listener->onStateCurrentVariableChanged(state.currentVariable);
 }
 
-void Model::updateVariable(int index, Variable value) {
+void Model::updateVariable(int index, const Variable &value) {
     state.symbolTable.variables.at(index) = value;
     listener->onStateSymbolTableChanged(state.symbolTable);
 }
 
-void Model::addConstant(Constant value) {
+void Model::addConstant(const Constant &value) {
     state.symbolTable.constants.emplace_back(value);
     state.currentConstant = static_cast<int>(state.symbolTable.constants.size()) - 1;
     listener->onStateSymbolTableChanged(state.symbolTable);
@@ -74,12 +74,12 @@ void Model::removeConstant(int index) {
     listener->onStateCurrentConstantChanged(state.currentConstant);
 }
 
-void Model::updateConstant(int index, Constant value) {
+void Model::updateConstant(int index, const Constant &value) {
     state.symbolTable.constants.at(index) = value;
     listener->onStateSymbolTableChanged(state.symbolTable);
 }
 
-void Model::addFunction(Function value) {
+void Model::addFunction(const Function &value) {
     state.symbolTable.functions.emplace_back(value);
     state.currentFunction = static_cast<int>(state.symbolTable.functions.size()) - 1;
     listener->onStateSymbolTableChanged(state.symbolTable);
@@ -94,12 +94,12 @@ void Model::removeFunction(int index) {
     listener->onStateCurrentFunctionChanged(state.currentFunction);
 }
 
-void Model::updateFunction(int index, Function value) {
+void Model::updateFunction(int index, const Function &value) {
     state.symbolTable.functions.at(index) = value;
     listener->onStateSymbolTableChanged(state.symbolTable);
 }
 
-void Model::addScript(Script value) {
+void Model::addScript(const Script &value) {
     state.symbolTable.scripts.emplace_back(value);
     state.currentScript = state.symbolTable.scripts.size() - 1;
     listener->onStateSymbolTableChanged(state.symbolTable);
@@ -108,13 +108,13 @@ void Model::addScript(Script value) {
 
 void Model::removeScript(int index) {
     state.symbolTable.scripts.erase(state.symbolTable.scripts.begin() + index);
-    if (state.currentScript != - 1 && index >= state.currentScript)
+    if (state.currentScript != -1 && index >= state.currentScript)
         state.currentScript--;
     listener->onStateSymbolTableChanged(state.symbolTable);
     listener->onStateCurrentScriptChanged(state.currentScript);
 }
 
-void Model::updateScript(int index, Script value) {
+void Model::updateScript(int index, const Script &value) {
     state.symbolTable.scripts.at(index) = value;
     listener->onStateSymbolTableChanged(state.symbolTable);
 }

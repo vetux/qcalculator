@@ -7,11 +7,11 @@ class StateListener {
 public:
     virtual void onStateValueChanged(ValueType value) = 0;
 
-    virtual void onStateHistoryChanged(std::vector<std::pair<std::string, ValueType>> value) = 0;
+    virtual void onStateHistoryChanged(const std::vector<std::pair<std::string, ValueType>> &value) = 0;
 
-    virtual void onStateInputChanged(std::string value) = 0;
+    virtual void onStateInputChanged(const std::string &value) = 0;
 
-    virtual void onStateSymbolTableChanged(SymbolTable value) = 0;
+    virtual void onStateSymbolTableChanged(const SymbolTable &value) = 0;
 
     virtual void onStateShowKeyPadChanged(bool value) = 0;
 

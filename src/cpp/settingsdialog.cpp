@@ -15,11 +15,11 @@ SettingsDialog::~SettingsDialog() {
 }
 
 void SettingsDialog::on_pushButton_resetstate_pressed() {
-  /*  settings.clear();
-    settings.sync();
-    ui->checkBox->setChecked(settings.value(SETTINGS_SAVE, true).toBool());*/
+    /*  settings.clear();
+      settings.sync();
+      ui->checkBox->setChecked(settings.value(SETTINGS_SAVE, true).toBool());*/
 }
 
 void SettingsDialog::on_checkBox_toggled(bool arg1) {
- //   settings.setValue(SETTINGS_SAVE, arg1);
+    //   settings.setValue(SETTINGS_SAVE, arg1);
 }
