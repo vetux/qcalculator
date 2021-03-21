@@ -26,6 +26,7 @@ void Model::evaluateInput() {
     listener->onStateValueChanged(state.value);
     listener->onStateHistoryChanged(state.history);
     listener->onStateInputChanged(state.input);
+    listener->onStateSymbolTableChanged(state.symbolTable);
 }
 
 void Model::updateInput(const std::string &input) {
