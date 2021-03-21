@@ -313,11 +313,24 @@ void Presenter::onSelectedVariableChanged(int index) {
 
 void Presenter::onVariableChanged(const std::string &name, const std::string &value) {
     const State &state = model.getState();
+
+    ValueType convertedValue;
+    try {
+        convertedValue = NumberFormat::fromDecimal(value);
+    }
+    catch (std::exception &e) {
+        std::string error = "Failed to parse ";
+        error += value;
+        error += " as decimal.";
+        view.showWarningDialog("Error", error);
+        return;
+    }
+
     if (state.currentVariable == -1) {
         if (name.empty()) {
             view.showWarningDialog("Error", "The variable name cannot be empty.");
         } else {
-            Variable var = {name, NumberFormat::fromDecimal(value)};
+            Variable var = {name, convertedValue};
             model.addVariable(var);
         }
     } else {
@@ -331,7 +344,7 @@ void Presenter::onVariableChanged(const std::string &name, const std::string &va
                 model.updateVariable(state.currentVariable, v);
             }
         } else {
-            model.updateVariable(state.currentVariable, {name, NumberFormat::fromDecimal(value)});
+            model.updateVariable(state.currentVariable, {name, convertedValue});
         }
     }
 }
@@ -342,11 +355,24 @@ void Presenter::onSelectedConstantChanged(int index) {
 
 void Presenter::onConstantChanged(const std::string &name, const std::string &value) {
     const State &state = model.getState();
+
+    ValueType convertedValue;
+    try {
+        convertedValue = NumberFormat::fromDecimal(value);
+    }
+    catch (std::exception &e) {
+        std::string error = "Failed to parse ";
+        error += value;
+        error += " as decimal.";
+        view.showWarningDialog("Error", error);
+        return;
+    }
+
     if (state.currentConstant == -1) {
         if (name.empty()) {
             view.showWarningDialog("Error", "The constant name cannot be empty.");
         } else {
-            Constant con = {name, NumberFormat::fromDecimal(value)};
+            Constant con = {name, convertedValue};
             model.addConstant(con);
         }
     } else {
@@ -360,7 +386,7 @@ void Presenter::onConstantChanged(const std::string &name, const std::string &va
                 model.updateConstant(state.currentConstant, c);
             }
         } else {
-            model.updateConstant(state.currentConstant, {name, NumberFormat::fromDecimal(value)});
+            model.updateConstant(state.currentConstant, {name, convertedValue});
         }
     }
 }
