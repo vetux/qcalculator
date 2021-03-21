@@ -4329,7 +4329,7 @@ QPushButton:hover {
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionAbout_Qt_Calculator"/>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -5056,9 +5056,9 @@ QPushButton:hover {
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionAbout_Qt_Calculator">
+  <action name="actionAbout">
    <property name="text">
-    <string>About Qt-Calculator</string>
+    <string>About QCalculator</string>
    </property>
   </action>
   <action name="actionShow_Keypad">
