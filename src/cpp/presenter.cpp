@@ -499,3 +499,20 @@ void Presenter::onDockTabChanged(int tabIndex) {
 void Presenter::onDockVisibilityChanged(bool visible) {
     model.updateShowDock(visible);
 }
+
+bool isValidArea(Qt::DockWidgetArea area) {
+    switch (area) {
+        case Qt::DockWidgetArea::LeftDockWidgetArea:
+        case Qt::DockWidgetArea::TopDockWidgetArea:
+        case Qt::DockWidgetArea::RightDockWidgetArea:
+        case Qt::DockWidgetArea::BottomDockWidgetArea:
+            return true;
+        default:
+            return false;
+    }
+}
+
+void Presenter::onDockPositionChanged(Qt::DockWidgetArea area) {
+    if (isValidArea(area))
+        model.updateDockPosition(area);
+}

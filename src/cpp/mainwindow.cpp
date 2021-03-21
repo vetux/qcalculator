@@ -117,6 +117,7 @@ void MainWindow::connectPresenter(const Presenter &target) {
 
     connect(ui->tabWidget_2, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
     connect(ui->dockWidget, SIGNAL(visibilityChanged(bool)), &target, SLOT(onDockVisibilityChanged(bool)));
+    connect(ui->dockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), &target, SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
 }
 
 void MainWindow::disconnectPresenter(const Presenter &target) {
@@ -161,6 +162,7 @@ void MainWindow::disconnectPresenter(const Presenter &target) {
 
     disconnect(ui->tabWidget_2, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
     disconnect(ui->dockWidget, SIGNAL(visibilityChanged(bool)), &target, SLOT(onDockVisibilityChanged(bool)));
+    disconnect(ui->dockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), &target, SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
 }
 
 void MainWindow::showAboutDialog() {
@@ -248,6 +250,8 @@ void MainWindow::setActiveDockTab(int tab) {
 }
 
 void MainWindow::setDockPosition(Qt::DockWidgetArea position) {
+    if (dockWidgetArea(ui->dockWidget) == position)
+        return;
     removeDockWidget(ui->dockWidget);
     addDockWidget(position, ui->dockWidget);
 }

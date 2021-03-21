@@ -123,6 +123,8 @@ public slots:
     void onDockTabChanged(int tabIndex);
 
     void onDockVisibilityChanged(bool visible);
+
+    void onDockPositionChanged(Qt::DockWidgetArea area);
     //-Presenter Interface
 
 private:
