@@ -10,7 +10,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     for (auto &p : table.variables) {
         nlohmann::json t;
         t["name"] = p.name;
-        t["value"] = std::to_string(p.value);
+        t["value"] = p.value;
         tmp.emplace_back(t);
     }
     j["variables"] = tmp;
@@ -19,7 +19,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     for (auto &p : table.constants) {
         nlohmann::json t;
         t["name"] = p.name;
-        t["value"] = std::to_string(p.value);
+        t["value"] = p.value;
         tmp.emplace_back(t);
     }
     j["constants"] = tmp;
@@ -39,7 +39,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
         nlohmann::json t;
         t["name"] = p.name;
         t["body"] = p.body;
-        t["argCount"] = std::to_string(p.argCount);
+        t["enableArguments"] = p.enableArguments;
         tmp.emplace_back(t);
     }
     j["scripts"] = tmp;
@@ -54,23 +54,23 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
 
     std::vector<nlohmann::json> tmp = j["variables"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
-        std::string name = v["name"].get<std::string>();
-        ValueType value = std::stold(v["value"].get<std::string>());
+        std::string name = v["name"];
+        ValueType value = v["value"];
         ret.variables.emplace_back(Variable(name, value));
     }
 
     tmp = j["constants"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
-        std::string name = v["name"].get<std::string>();
-        ValueType value = std::stold(v["value"].get<std::string>());
+        std::string name = v["name"];
+        ValueType value = v["value"];
         ret.constants.emplace_back(Constant(name, value));
     }
 
     tmp = j["functions"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
         Function f;
-        f.name = v["name"].get<std::string>();
-        f.expression = v["expression"].get<std::string>();
+        f.name = v["name"];
+        f.expression = v["expression"];
         f.argumentNames = v["argumentNames"].get<std::vector<std::string>>();
         ret.functions.emplace_back(f);
     }
@@ -78,9 +78,9 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
     tmp = j["scripts"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
         Script s;
-        s.name = v["name"].get<std::string>();
-        s.body = v["body"].get<std::string>();
-        s.argCount = std::stoul(v["argCount"].get<std::string>());
+        s.name = v["name"];
+        s.body = v["body"];
+        s.enableArguments = v["enableArguments"];
         ret.scripts.emplace_back(s);
     }
 

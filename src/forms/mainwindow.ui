@@ -5035,6 +5035,13 @@ QPushButton:hover {
           </widget>
          </item>
          <item>
+          <widget class="QCheckBox" name="checkBox_scripts_enableargs">
+           <property name="text">
+            <string>Enable Arguments</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QTextEdit" name="textEdit_scripts"/>
          </item>
         </layout>

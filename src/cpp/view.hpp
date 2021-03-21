@@ -87,6 +87,10 @@ public:
 
     virtual void setScriptBodyEnabled(bool enabled) = 0;
 
+    virtual void setScriptEnableArgs(bool value) = 0;
+
+    virtual void setScriptEnableArgsEnabled(bool value) = 0;
+
     virtual void setWindowSize(QSize size) = 0;
 };
 

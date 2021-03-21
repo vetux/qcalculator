@@ -196,11 +196,16 @@ void Presenter::onStateCurrentScriptChanged(int value) {
     view.setSelectedScript(value);
 
     if (value >= 0) {
-        view.setScriptBody(model.getState().symbolTable.scripts.at(value).body);
+        Script s = model.getState().symbolTable.scripts.at(value);
+        view.setScriptBody(s.body);
         view.setScriptBodyEnabled(true);
+        view.setScriptEnableArgs(s.enableArguments);
+        view.setScriptEnableArgsEnabled(true);
     } else {
         view.setScriptBody("");
         view.setScriptBodyEnabled(false);
+        view.setScriptEnableArgs(false);
+        view.setScriptEnableArgsEnabled(false);
     }
 
     view.connectPresenter(*this);
@@ -410,6 +415,14 @@ void Presenter::onScriptBodyChanged(std::string value) {
     assert(state.currentScript != -1);
     Script s = state.symbolTable.scripts.at(state.currentScript);
     s.body = value;
+    model.updateScript(state.currentScript, s);
+}
+
+void Presenter::onScriptEnableArgsChanged(bool value) {
+    const State &state = model.getState();
+    assert(state.currentScript != -1);
+    Script s = state.symbolTable.scripts.at(state.currentScript);
+    s.enableArguments = value;
     model.updateScript(state.currentScript, s);
 }
 

@@ -1,6 +1,7 @@
 #ifndef CALCULATORENGINE_HPP
 #define CALCULATORENGINE_HPP
 
+#include "scriptvarargfunction.hpp"
 #include "scriptfunction.hpp"
 
 #include <string>
@@ -16,11 +17,7 @@
  * Scripts pass through the python interpreter and may therefore only be capable of limited arithmetic accuracy and performance compared to functions,
  * but allow full python functionality with io etc.
  *
- * The ScriptFunction mapping is interpreted as the keys beeing the function names as invoked in the expressions
- * and the values beeing the python scripts invoked in response.
- *
- * Arguments are passed to the scripts via argv.
- *
+ * Scripts get access to arguments through the variable "argv" and may output a single scalar by setting "outv".
  */
 class CalculatorEngine {
 public:
@@ -31,7 +28,7 @@ public:
     /**
      * Evaluate the arithmetic expression using the defined symbol table.
      *
-     * @param expr The mathematical expression which may contain symbolTable defined in the table.
+     * @param expr The mathematical expression which may contain symbols defined in the table.
      * @param symbolTable The symbol table to use when evaluating the expression.
      *
      * @return The value of the expression.

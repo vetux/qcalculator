@@ -15,13 +15,38 @@ ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbo
     exprtk::function_compositor<ValueType> compositor;
     exprtk::symbol_table<ValueType> symbols = compositor.symbol_table();
 
-    std::vector<ScriptFunction<ValueType>> funcs;
+    int varArgScriptCount = 0;
+    int scriptCount = 0;
+    for (auto &script : symbolTable.scripts) {
+        if (script.enableArguments)
+            varArgScriptCount++;
+        else
+            scriptCount++;
+    }
+
+    //Use arrays to store the function objects as the symbol table itself only stores references.
+    int varArgScriptIndex = 0;
+    ScriptVarArgFunction<ValueType> varArgScriptFunctions[varArgScriptCount];
+
+    int scriptIndex = 0;
+    ScriptFunction<ValueType> scriptFunctions[scriptCount];
 
     for (auto &script : symbolTable.scripts) {
-        ScriptFunction<ValueType> func = ScriptFunction<ValueType>(interpreter, script.body);
-        funcs.emplace_back(func);
-        symbols.add_function(script.name, *(funcs.end() - 1));
+        if (script.enableArguments) {
+            int index = varArgScriptIndex++;
+            assert(index < varArgScriptCount);
+            varArgScriptFunctions[index] = ScriptVarArgFunction<ValueType>(interpreter, script.body);
+            symbols.add_function(script.name, varArgScriptFunctions[index]);
+        } else {
+            int index = scriptIndex++;
+            assert(index < scriptCount);
+            scriptFunctions[index] = ScriptFunction<ValueType>(interpreter, script.body);
+            symbols.add_function(script.name, scriptFunctions[index]);
+        }
     }
+
+    assert(varArgScriptIndex == varArgScriptCount);
+    assert(scriptIndex == scriptCount);
 
     for (auto &func : symbolTable.functions) {
         switch (func.argumentNames.size()) {
@@ -30,31 +55,37 @@ ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbo
                 break;
             case 1:
                 compositor.add(typename exprtk::function_compositor<ValueType>::function(func.name, func.expression,
-                                                                                 func.argumentNames[0]));
+                                                                                         func.argumentNames[0]));
                 break;
             case 2:
                 compositor.add(
-                        typename exprtk::function_compositor<ValueType>::function(func.name, func.expression, func.argumentNames[0],
-                                                                          func.argumentNames[1]));
+                        typename exprtk::function_compositor<ValueType>::function(func.name, func.expression,
+                                                                                  func.argumentNames[0],
+                                                                                  func.argumentNames[1]));
                 break;
             case 3:
                 compositor.add(
-                        typename exprtk::function_compositor<ValueType>::function(func.name, func.expression, func.argumentNames[0],
-                                                                          func.argumentNames[1],
-                                                                          func.argumentNames[2]));
+                        typename exprtk::function_compositor<ValueType>::function(func.name, func.expression,
+                                                                                  func.argumentNames[0],
+                                                                                  func.argumentNames[1],
+                                                                                  func.argumentNames[2]));
                 break;
             case 4:
                 compositor.add(
-                        typename exprtk::function_compositor<ValueType>::function(func.name, func.expression, func.argumentNames[0],
-                                                                          func.argumentNames[1],
-                                                                          func.argumentNames[2], func.argumentNames[3]));
+                        typename exprtk::function_compositor<ValueType>::function(func.name, func.expression,
+                                                                                  func.argumentNames[0],
+                                                                                  func.argumentNames[1],
+                                                                                  func.argumentNames[2],
+                                                                                  func.argumentNames[3]));
                 break;
             case 5:
                 compositor.add(
-                        typename exprtk::function_compositor<ValueType>::function(func.name, func.expression, func.argumentNames[0],
-                                                                          func.argumentNames[1],
-                                                                          func.argumentNames[2], func.argumentNames[3],
-                                                                          func.argumentNames[4]));
+                        typename exprtk::function_compositor<ValueType>::function(func.name, func.expression,
+                                                                                  func.argumentNames[0],
+                                                                                  func.argumentNames[1],
+                                                                                  func.argumentNames[2],
+                                                                                  func.argumentNames[3],
+                                                                                  func.argumentNames[4]));
                 break;
             default:
                 throw std::runtime_error("Too many function argumentNames");

@@ -104,6 +104,7 @@ void MainWindow::connectPresenter(const Presenter &target) {
     connect(this, SIGNAL(signalScriptNameChanged(std::string)), &target, SLOT(onScriptNameChanged(std::string)));
     connect(this, SIGNAL(signalScriptBodyChanged(std::string)), &target, SLOT(onScriptBodyChanged(std::string)));
     connect(this, SIGNAL(signalScriptBodyChanged(std::string)), &target, SLOT(onScriptBodyChanged(std::string)));
+    connect(ui->checkBox_scripts_enableargs, SIGNAL(toggled(bool)), &target, SLOT(onScriptEnableArgsChanged(bool)));
 
     connect(ui->actionExit, SIGNAL(triggered(bool)), &target, SLOT(onActionExit()));
     connect(ui->actionAbout_Qt_Calculator, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
@@ -148,6 +149,7 @@ void MainWindow::disconnectPresenter(const Presenter &target) {
     disconnect(this, SIGNAL(signalScriptNameChanged(std::string)), &target, SLOT(onScriptNameChanged(std::string)));
     disconnect(this, SIGNAL(signalScriptBodyChanged(std::string)), &target, SLOT(onScriptBodyChanged(std::string)));
     disconnect(this, SIGNAL(signalScriptBodyChanged(std::string)), &target, SLOT(onScriptBodyChanged(std::string)));
+    disconnect(ui->checkBox_scripts_enableargs, SIGNAL(toggled(bool)), &target, SLOT(onScriptEnableArgsChanged(bool)));
 
     disconnect(ui->actionExit, SIGNAL(triggered(bool)), &target, SLOT(onActionExit()));
     disconnect(ui->actionAbout_Qt_Calculator, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
@@ -470,6 +472,14 @@ void MainWindow::setScriptBody(const std::string &value) {
 
 void MainWindow::setScriptBodyEnabled(bool enabled) {
     ui->textEdit_scripts->setEnabled(enabled);
+}
+
+void MainWindow::setScriptEnableArgs(bool value) {
+    ui->checkBox_scripts_enableargs->setChecked(value);
+}
+
+void MainWindow::setScriptEnableArgsEnabled(bool value) {
+    ui->checkBox_scripts_enableargs->setEnabled(value);
 }
 
 void MainWindow::setWindowSize(QSize size) {

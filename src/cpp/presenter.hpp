@@ -100,6 +100,8 @@ public slots:
 
     void onScriptBodyChanged(std::string value);
 
+    void onScriptEnableArgsChanged(bool value);
+
 
     void onActionExit();
 

@@ -8,7 +8,7 @@
 struct Script {
     std::string name;
     std::string body;
-    size_t argCount;
+    bool enableArguments = false; //If true the script is wrapped by a vararg function otherwise a function with 0 arguments is used.
 };
 
 #endif //QT_CALC_SCRIPT_HPP

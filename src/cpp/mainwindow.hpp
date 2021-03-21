@@ -161,6 +161,10 @@ public:
 
     void setScriptBodyEnabled(bool enabled) override;
 
+    void setScriptEnableArgs(bool value) override;
+
+    void setScriptEnableArgsEnabled(bool value) override;
+
     void setWindowSize(QSize size) override;
     //-View
 
