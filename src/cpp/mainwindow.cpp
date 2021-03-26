@@ -18,8 +18,7 @@
 MainWindow::MainWindow(QWidget *parent)
         : QMainWindow(parent),
           ui(new Ui::MainWindow),
-          model(),
-          presenter(model, *this) {
+          presenter(*this) {
     ui->setupUi(this);
 
     ui->statusbar->hide();
@@ -57,8 +56,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->tableWidget_scripts, SIGNAL(itemSelectionChanged()), this, SLOT(onScriptsSelectionChanged()));
     connect(ui->tableWidget_scripts, SIGNAL(cellChanged(int, int)), this, SLOT(onScriptsCellChanged(int, int)));
     connect(ui->textEdit_scripts, SIGNAL(textChanged()), this, SLOT(onScriptsBodyTextChanged()));
-
-    model.setStateListener(presenter);
 
     presenter.init();
 }
@@ -119,7 +116,8 @@ void MainWindow::connectPresenter(const Presenter &target) {
 
     connect(ui->tabWidget_2, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
     connect(ui->dockWidget, SIGNAL(visibilityChanged(bool)), &target, SLOT(onDockVisibilityChanged(bool)));
-    connect(ui->dockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), &target, SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
+    connect(ui->dockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), &target,
+            SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
 }
 
 void MainWindow::disconnectPresenter(const Presenter &target) {
@@ -164,7 +162,8 @@ void MainWindow::disconnectPresenter(const Presenter &target) {
 
     disconnect(ui->tabWidget_2, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
     disconnect(ui->dockWidget, SIGNAL(visibilityChanged(bool)), &target, SLOT(onDockVisibilityChanged(bool)));
-    disconnect(ui->dockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), &target, SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
+    disconnect(ui->dockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), &target,
+               SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
 }
 
 void MainWindow::showAboutDialog() {

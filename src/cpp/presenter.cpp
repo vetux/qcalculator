@@ -1,215 +1,150 @@
 #include "presenter.hpp"
 
+#include <QStandardPaths>
+#include <QTextStream>
+#include <QDir>
+
 #include "numberformat.hpp"
 #include "serializer.hpp"
 #include "fractiontest.hpp"
 
-Presenter::Presenter(Model &model, View &view)
-        : model(model), view(view) {
+#define SETTINGS_FILENAME "/settings.json"
+
+using namespace NumberFormat;
+using namespace FractionTest;
+
+QString getAppDir() {
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+}
+
+Settings loadSettings() {
+    QString fileName = getAppDir();
+    fileName.append(SETTINGS_FILENAME);
+    try {
+        QFile file(fileName);
+        if (file.exists()) {
+            file.open(QFile::ReadOnly);
+
+            QTextStream stream(&file);
+            QString settingsContents = stream.readAll();
+            stream.flush();
+
+            file.close();
+
+            return Serializer::deserializeSettings(settingsContents.toStdString());
+        } else {
+            return {};
+        }
+    }
+    catch (const std::exception &e) {
+        std::string error = "Failed to read settings file at ";
+        error += fileName.toStdString();
+        error += " Error: ";
+        error += e.what();
+        throw std::runtime_error(error);
+    }
+}
+
+void saveSettings(const Settings &settings) {
+    QString appDir = getAppDir();
+    QString fileName = appDir;
+    fileName.append(SETTINGS_FILENAME);
+    try {
+        if (!QDir(appDir).exists())
+            QDir().mkpath(appDir);
+
+        QFile file(fileName);
+
+        file.open(QFile::WriteOnly | QFile::Truncate);
+
+        QTextStream stream(&file);
+        QString str = Serializer::serializeSettings(settings).c_str();
+        stream << str;
+        stream.flush();
+
+        file.close();
+    }
+    catch (const std::exception &e) {
+        std::string error = "Failed to write settings file at ";
+        error += fileName.toStdString();
+        error += " Error: ";
+        error += e.what();
+        throw std::runtime_error(error);
+    }
+}
+
+SymbolTable loadSymbolTable(const std::string &filePath) {
+    QFile file(filePath.c_str());
+    if (!file.exists()) {
+        std::string error = "File ";
+        error += filePath;
+        error += " not found.";
+        throw std::runtime_error(error);
+    }
+
+    file.open(QFile::ReadOnly);
+
+    QTextStream stream(&file);
+    QString contents = stream.readAll();
+    stream.flush();
+
+    file.close();
+
+    return Serializer::deserializeTable(contents.toStdString());
+}
+
+void saveSymbolTable(const std::string &filePath, const SymbolTable &symbolTable) {
+    QFile file(filePath.c_str());
+    QFileInfo info(file);
+
+    //Failsafe, dont accept filepaths which point to an existing directory
+    //as overwriting an existing directory with a file would not make sense in this case.
+    if (info.isDir()) {
+        std::string error = "File ";
+        error += filePath;
+        error += " is a directory.";
+        throw std::runtime_error(error);
+    }
+
+    file.open(QFile::WriteOnly | QFile::Truncate);
+
+    QTextStream stream(&file);
+    QString contents = Serializer::serializeTable(symbolTable).c_str();
+    stream << contents;
+    stream.flush();
+
+    file.close();
+}
+
+Presenter::Presenter(View &view)
+        : view(view), currentValue(0) {
 }
 
 void Presenter::init() {
     try {
-        model.loadSettings();
+        settings = loadSettings();
     }
-    catch (std::exception &e) {
+    catch (const std::exception &e) {
+        settings = {};
         std::string error = "Failed to load settings: ";
         error += e.what();
         view.showWarningDialog("Error", error);
     }
-}
-
-void Presenter::onStateValueChanged(ValueType value) {
-    view.disconnectPresenter(*this);
-
-    view.setValueText(NumberFormat::toDecimal(value));
-
-    if (hasFraction(value) || value < 0) {
-        view.setBitViewEnabled(false);
-        view.setBitViewContents(std::bitset<64>(0));
-    } else {
-        view.setBitViewEnabled(true);
-        view.setBitViewContents(std::bitset<64>(static_cast<unsigned long>(value)));
-    }
-
-    view.setNumericSystemsEnabled(true);
-    view.setDecimalText(NumberFormat::toDecimal(value));
-    view.setHexText(NumberFormat::toHex(value));
-    view.setOctalText(NumberFormat::toOctal(value));
-    view.setBinaryText(NumberFormat::toBinary(value));
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateHistoryChanged(const std::vector<std::pair<std::string, ValueType>> &value) {
-    view.disconnectPresenter(*this);
-
-    std::vector<std::pair<std::string, std::string>> tmp;
-    for (auto &pair : value) {
-        tmp.emplace_back(std::pair<std::string, std::string>(pair.first, NumberFormat::toDecimal(pair.second)));
-    }
-    view.setHistory(tmp);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateInputChanged(const std::string &value) {
-    view.disconnectPresenter(*this);
-
-    view.setInputText(value);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateSymbolTableChanged(const SymbolTable &value) {
-    view.disconnectPresenter(*this);
-
-    std::vector<std::pair<std::string, std::string>> tmp;
-    for (auto &v : value.variables) {
-        tmp.emplace_back(std::pair<std::string, std::string>(v.name, NumberFormat::toDecimal(v.value)));
-    }
-    view.setVariableListView(tmp);
-
-    tmp.clear();
-    for (auto &v : value.constants) {
-        tmp.emplace_back(std::pair<std::string, std::string>(v.name, NumberFormat::toDecimal(v.value)));
-    }
-    view.setConstantsListView(tmp);
-
-    std::vector<std::string> names;
-    for (auto &v : value.functions) {
-        names.emplace_back(v.name);
-    }
-    view.setFunctionsListView(names);
-    view.setSelectedFunction(model.getState().currentFunction);
-
-    names.clear();
-    for (auto &v : value.scripts) {
-        names.emplace_back(v.name);
-    }
-    view.setScriptsListView(names);
-    view.setSelectedScript(model.getState().currentScript);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateShowKeyPadChanged(bool value) {
-    view.disconnectPresenter(*this);
-
-    view.setKeyPadVisibility(value);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateShowBitViewChanged(bool value) {
-    view.disconnectPresenter(*this);
-
-    view.setBitViewVisibility(value);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateShowDockChanged(bool value) {
-    view.disconnectPresenter(*this);
-
-    view.setDockVisibility(value);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateHistoryLimitChanged(int value) {
-    view.disconnectPresenter(*this);
-
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateDockPositionChanged(Qt::DockWidgetArea value) {
-    view.disconnectPresenter(*this);
-
-    view.setDockPosition(value);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateDockSelectedTabChanged(int value) {
-    view.disconnectPresenter(*this);
-
-    view.setActiveDockTab(value);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateWindowSizeChanged(QSize value) {
-    view.disconnectPresenter(*this);
-
-    view.setWindowSize(value);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateCurrentVariableChanged(int value) {
-    view.disconnectPresenter(*this);
-
-    view.setSelectedVariable(value);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateCurrentConstantChanged(int value) {
-    view.disconnectPresenter(*this);
-
-    view.setSelectedConstant(value);
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateCurrentFunctionChanged(int value) {
-    view.disconnectPresenter(*this);
-
-    view.setSelectedFunction(value);
-
-    if (value >= 0) {
-        view.setFunctionArgs(model.getState().symbolTable.functions.at(value).argumentNames);
-        view.setFunctionBody(model.getState().symbolTable.functions.at(value).expression);
-        view.setFunctionArgsSpinBoxEnabled(true);
-        view.setFunctionBodyEnabled(true);
-    } else {
-        view.setFunctionArgs({});
-        view.setFunctionBody("");
-        view.setFunctionArgsSpinBoxEnabled(false);
-        view.setFunctionBodyEnabled(false);
-    }
-
-    view.connectPresenter(*this);
-}
-
-void Presenter::onStateCurrentScriptChanged(int value) {
-    view.disconnectPresenter(*this);
-
-    view.setSelectedScript(value);
-
-    if (value >= 0) {
-        Script s = model.getState().symbolTable.scripts.at(value);
-        view.setScriptBody(s.body);
-        view.setScriptBodyEnabled(true);
-        view.setScriptEnableArgs(s.enableArguments);
-        view.setScriptEnableArgsEnabled(true);
-    } else {
-        view.setScriptBody("");
-        view.setScriptBodyEnabled(false);
-        view.setScriptEnableArgs(false);
-        view.setScriptEnableArgsEnabled(false);
-    }
+    view.setKeyPadVisibility(settings.showKeypad);
+    view.setBitViewVisibility(settings.showBitView);
+    view.setDockPosition(settings.dockPosition);
+    view.setDockVisibility(settings.showDock);
+    view.setActiveDockTab(settings.dockActiveTab);
+    view.setWindowSize(settings.windowSize);
 
     view.connectPresenter(*this);
 }
 
 void Presenter::onWindowClose(const QCloseEvent &event) {
     try {
-        model.saveSettings();
+        saveSettings(settings);
     }
-    catch (std::exception &e) {
+    catch (const std::exception &e) {
         std::string error = "Failed to save settings: ";
         error += e.what();
         view.showWarningDialog("Error", error);
@@ -218,31 +153,40 @@ void Presenter::onWindowClose(const QCloseEvent &event) {
 }
 
 void Presenter::onWindowResize(const QResizeEvent &event) {
-    model.updateWindowSize(event.size());
+    settings.windowSize = event.size();
 }
 
 void Presenter::onInputSubmit() {
     try {
-        model.evaluateInput();
-    } catch (std::exception &e) {
+        currentValue = calculatorEngine.evaluate(inputText, symbolTable);
+        history.add(inputText, currentValue);
+        inputText = toDecimal(currentValue);
+    } catch (const std::exception &e) {
         std::string text = "Failed to evaluate { ";
-        text += model.getState().input;
+        text += inputText;
         text += " } Error: ";
         text += e.what();
         view.showWarningDialog("Error", text);
     }
+
+    view.setInputText(inputText);
+    view.setHistory(history.getVectorWithDecimalStringValues());
+
+    applyCurrentValue();
+
+    applyVariables(); //Update in case of variable changes
 }
 
 void Presenter::onInputUpdate(const QString &value) {
-    model.updateInput(value.toStdString());
+    inputText = value.toStdString();
 }
 
 void Presenter::onDecimalSubmit(const QString &value) {
     try {
-        ValueType v = NumberFormat::fromDecimal(value.toStdString());
-        model.updateValue(v);
+        currentValue = fromDecimal(value.toStdString());
+        applyCurrentValue();
     }
-    catch (std::exception &e) {
+    catch (const std::exception &e) {
         std::string error = "Failed to parse ";
         error += value.toStdString();
         error += " as decimal.";
@@ -253,10 +197,10 @@ void Presenter::onDecimalSubmit(const QString &value) {
 
 void Presenter::onHexSubmit(const QString &value) {
     try {
-        ValueType v = NumberFormat::fromHex(value.toStdString());
-        model.updateValue(v);
+        currentValue = fromHex(value.toStdString());
+        applyCurrentValue();
     }
-    catch (std::exception &e) {
+    catch (const std::exception &e) {
         std::string error = "Failed to parse ";
         error += value.toStdString();
         error += " as hex.";
@@ -267,10 +211,10 @@ void Presenter::onHexSubmit(const QString &value) {
 
 void Presenter::onOctalSubmit(const QString &value) {
     try {
-        ValueType v = NumberFormat::fromOctal(value.toStdString());
-        model.updateValue(v);
+        currentValue = fromOctal(value.toStdString());
+        applyCurrentValue();
     }
-    catch (std::exception &e) {
+    catch (const std::exception &e) {
         std::string error = "Failed to parse ";
         error += value.toStdString();
         error += " as octal.";
@@ -281,10 +225,10 @@ void Presenter::onOctalSubmit(const QString &value) {
 
 void Presenter::onBinarySubmit(const QString &value) {
     try {
-        ValueType v = NumberFormat::fromBinary(value.toStdString());
-        model.updateValue(v);
+        currentValue = fromBinary(value.toStdString());
+        applyCurrentValue();
     }
-    catch (std::exception &e) {
+    catch (const std::exception &e) {
         std::string error = "Failed to parse ";
         error += value.toStdString();
         error += " as binary.";
@@ -297,208 +241,250 @@ void Presenter::onNumPadKeyPressed(NumPadKey key) {
     if (key == NumPadKey::KEY_EQUAL) {
         onInputSubmit();
     } else {
-        model.updateInput(model.getState().input + convertNumPadKeyToString(key));
+        inputText += convertNumPadKeyToString(key);
+        view.setInputText(inputText);
     }
 }
 
 void Presenter::onBitViewKeyPressed(int bitIndex) {
-    std::bitset<64> bits(model.getState().value);
+    std::bitset<64> bits(currentValue);
     bits.flip(bitIndex);
-    model.updateValue(bits.to_ulong());
+    currentValue = bits.to_ulong();
+    applyCurrentValue();
 }
 
 void Presenter::onSelectedVariableChanged(int index) {
-    model.updateCurrentVariable(index);
+    currentVariable = index;
 }
 
 void Presenter::onVariableChanged(const std::string &name, const std::string &value) {
-    const State &state = model.getState();
-
     ValueType convertedValue;
     try {
-        convertedValue = NumberFormat::fromDecimal(value);
+        convertedValue = fromDecimal(value);
     }
-    catch (std::exception &e) {
+    catch (const std::exception &e) {
         std::string error = "Failed to parse ";
         error += value;
         error += " as decimal.";
         view.showWarningDialog("Error", error);
 
-        if (state.currentVariable == -1)
+        if (currentVariable == -1)
             return;
         else
-            convertedValue = state.symbolTable.variables.at(state.currentVariable).value;
+            convertedValue = symbolTable.getVariable(currentVariable).value;
     }
 
-    if (state.currentVariable == -1) {
+    if (currentVariable == -1) {
         if (name.empty()) {
             view.showWarningDialog("Error", "The variable name cannot be empty.");
         } else {
-            Variable var = {name, convertedValue};
-            model.addVariable(var);
+            try {
+                Variable var = {name, convertedValue};
+                symbolTable.addVariable(var);
+                applyVariables();
+            }
+            catch (const std::exception &e) {
+                view.showWarningDialog("Error", e.what());
+            }
         }
     } else {
         if (name.empty()) {
-            Variable v = state.symbolTable.variables.at(state.currentVariable);
+            Variable v = symbolTable.getVariable(currentVariable);
             if (view.showQuestionDialog("Delete Variable", "Do you want to delete " +
                                                            v.name +
                                                            " ?")) {
-                model.removeVariable(state.currentVariable);
-            } else {
-                model.updateVariable(state.currentVariable, v);
+                symbolTable.removeVariable(currentVariable);
+                currentVariable = -1;
+                applyVariables();
             }
         } else {
-            model.updateVariable(state.currentVariable, {name, convertedValue});
+            try {
+                symbolTable.setVariable(currentVariable, {name, convertedValue});
+                applyVariables();
+            }
+            catch (const std::exception &e) {
+                view.showWarningDialog("Error", e.what());
+            }
         }
     }
 }
 
 void Presenter::onSelectedConstantChanged(int index) {
-    model.updateCurrentConstant(index);
+    currentConstant = index;
 }
 
 void Presenter::onConstantChanged(const std::string &name, const std::string &value) {
-    const State &state = model.getState();
-
     ValueType convertedValue;
     try {
-        convertedValue = NumberFormat::fromDecimal(value);
+        convertedValue = fromDecimal(value);
     }
-    catch (std::exception &e) {
+    catch (const std::exception &e) {
         std::string error = "Failed to parse ";
         error += value;
         error += " as decimal.";
         view.showWarningDialog("Error", error);
 
-        if (state.currentConstant == -1)
+        if (currentConstant == -1)
             return;
         else
-            convertedValue = state.symbolTable.constants.at(state.currentConstant).value;
+            convertedValue = symbolTable.getConstant(currentConstant).value;
     }
 
-    if (state.currentConstant == -1) {
+    if (currentConstant == -1) {
         if (name.empty()) {
             view.showWarningDialog("Error", "The constant name cannot be empty.");
         } else {
-            Constant con = {name, convertedValue};
-            model.addConstant(con);
+            try {
+                Constant con = {name, convertedValue};
+                symbolTable.addConstant(con);
+                applyConstants();
+            }
+            catch (const std::exception &e) {
+                view.showWarningDialog("Error", e.what());
+            }
         }
     } else {
         if (name.empty()) {
-            Constant c = state.symbolTable.constants.at(state.currentConstant);
+            Constant c = symbolTable.getConstant(currentConstant);
             if (view.showQuestionDialog("Delete Constant", "Do you want to delete " +
                                                            c.name +
                                                            " ?")) {
-                model.removeConstant(state.currentConstant);
-            } else {
-                model.updateConstant(state.currentConstant, c);
+                symbolTable.removeConstant(currentConstant);
+                currentConstant = -1;
+                applyConstants();
             }
         } else {
-            model.updateConstant(state.currentConstant, {name, convertedValue});
+            try {
+                symbolTable.setConstant(currentConstant, {name, convertedValue});
+                applyConstants();
+            }
+            catch (const std::exception &e) {
+                view.showWarningDialog("Error", e.what());
+            }
         }
     }
 }
 
 void Presenter::onSelectedFunctionChanged(int index) {
-    model.updateCurrentFunction(index);
+    currentFunction = index;
+    applyCurrentFunction();
 }
 
 void Presenter::onFunctionNameChanged(const std::string &value) {
-    const State &state = model.getState();
-    if (state.currentFunction == -1) {
+    if (currentFunction == -1) {
         if (value.empty()) {
             view.showWarningDialog("Error", "Function name cannot be empty.");
         } else {
-            Function f;
-            f.name = value;
-            model.addFunction(f);
+            try {
+                Function f;
+                f.name = value;
+                symbolTable.addFunction(f);
+                applyFunctions();
+            }
+            catch (const std::exception &e) {
+                view.showWarningDialog("Error", e.what());
+            }
         }
     } else {
-        Function f = state.symbolTable.functions.at(state.currentFunction);
+        Function f = symbolTable.getFunction(currentFunction);
         if (value.empty()) {
             if (view.showQuestionDialog("Delete Function", "Do you want to delete " +
                                                            f.name +
                                                            " ?")) {
-                model.removeFunction(state.currentFunction);
-            } else {
-                model.updateFunction(state.currentFunction, f);
+                symbolTable.removeFunction(currentFunction);
+                currentFunction = -1;
+                applyFunctions();
             }
         } else {
-            f.name = value;
-            model.updateFunction(state.currentFunction, f);
+            try {
+                f.name = value;
+                symbolTable.setFunction(currentFunction, f);
+                applyFunctions();
+            }
+            catch (const std::exception &e) {
+                view.showWarningDialog("Error", e.what());
+            }
         }
     }
 }
 
 void Presenter::onFunctionBodyChanged(const std::string &value) {
-    const State &state = model.getState();
-    assert(state.currentFunction != -1);
-    Function f = state.symbolTable.functions.at(state.currentFunction);
+    assert(currentFunction != -1);
+    Function f = symbolTable.getFunction(currentFunction);
     f.expression = value;
-    model.updateFunction(state.currentFunction, f);
+    symbolTable.setFunction(currentFunction, f);
 }
 
 void Presenter::onFunctionArgsChanged(const std::vector<std::string> &arguments) {
-    const State &state = model.getState();
-    assert(state.currentFunction != -1);
-    Function f = state.symbolTable.functions.at(state.currentFunction);
-    f.argumentNames = std::move(arguments);
-    model.updateFunction(state.currentFunction, f);
-    model.updateCurrentFunction(state.currentFunction);
+    assert(currentFunction != -1);
+    Function f = symbolTable.getFunction(currentFunction);
+    f.argumentNames = arguments;
+    symbolTable.setFunction(currentFunction, f);
+    view.setFunctionArgs(arguments);
 }
 
 void Presenter::onSelectedScriptChanged(int index) {
-    model.updateCurrentScript(index);
+    currentScript = index;
+    applyCurrentScript();
 }
 
 void Presenter::onScriptNameChanged(const std::string &value) {
-    const State &state = model.getState();
-    if (state.currentScript == -1) {
+    if (currentScript == -1) {
         if (value.empty()) {
             view.showWarningDialog("Error", "Script name cannot be empty.");
         } else {
-            Script s;
-            s.name = value;
-            model.addScript(s);
+            try {
+                Script s;
+                s.name = value;
+                symbolTable.addScript(s);
+                applyScripts();
+            }
+            catch (const std::exception &e) {
+                view.showWarningDialog("Error", e.what());
+            }
         }
     } else {
-        Script s = state.symbolTable.scripts.at(state.currentScript);
+        Script s = symbolTable.getScript(currentScript);
         if (value.empty()) {
             if (view.showQuestionDialog("Delete Script", "Do you want to delete " +
                                                          s.name +
                                                          " ?")) {
-                model.removeScript(state.currentScript);
-            } else {
-                model.updateScript(state.currentScript, s);
+                symbolTable.removeScript(currentScript);
+                currentScript = -1;
+                applyScripts();
             }
         } else {
-            s.name = value;
-            model.updateScript(state.currentScript, s);
+            try {
+                s.name = value;
+                symbolTable.setScript(currentScript, s);
+                applyScripts();
+            }
+            catch (const std::exception &e) {
+                view.showWarningDialog("Error", e.what());
+            }
         }
     }
 }
 
 void Presenter::onScriptBodyChanged(const std::string &value) {
-    const State &state = model.getState();
-    assert(state.currentScript != -1);
-    Script s = state.symbolTable.scripts.at(state.currentScript);
+    assert(currentScript != -1);
+    Script s = symbolTable.getScript(currentScript);
     s.body = value;
-    model.updateScript(state.currentScript, s);
+    symbolTable.setScript(currentScript, s);
 }
 
 void Presenter::onScriptEnableArgsChanged(bool value) {
-    const State &state = model.getState();
-    assert(state.currentScript != -1);
-    Script s = state.symbolTable.scripts.at(state.currentScript);
+    assert(currentScript != -1);
+    Script s = symbolTable.getScript(currentScript);
     s.enableArguments = value;
-    model.updateScript(state.currentScript, s);
+    symbolTable.setScript(currentScript, s);
 }
 
 void Presenter::onActionExit() {
     try {
-        model.saveSettings();
+        saveSettings(settings);
     }
-    catch (std::exception &e) {
+    catch (const std::exception &e) {
         std::string error = "Failed to save settings: ";
         error += e.what();
         view.showWarningDialog("Error", error);
@@ -515,25 +501,36 @@ void Presenter::onActionSettings() {
 }
 
 void Presenter::onActionShowKeyPad(bool show) {
-    model.updateShowKeyPad(show);
+    settings.showKeypad = show;
+    view.setKeyPadVisibility(show);
 }
 
 void Presenter::onActionShowBitView(bool show) {
-    model.updateShowBitView(show);
+    settings.showBitView = show;
+    view.setBitViewVisibility(show);
 }
 
 void Presenter::onActionShowDock(bool show) {
-    model.updateShowDock(show);
+    settings.showDock = show;
+    view.setDockVisibility(show);
 }
 
 void Presenter::onActionImportSymbolTable() {
     std::string filepath;
     if (view.showFileChooserDialog("Import symbol table", true, filepath)) {
         try {
-            model.importSymbolTable(filepath);
+            symbolTable = loadSymbolTable(filepath);
+
+            currentVariable = -1;
+            currentConstant = -1;
+            currentFunction = -1;
+            currentScript = -1;
+
+            applySymbolTable();
+
             view.showInfoDialog("Import successful", "Successfully imported symbol table from " + filepath);
         }
-        catch (std::exception &e) {
+        catch (const std::exception &e) {
             std::string error = "Failed to import symbol table at ";
             error += filepath;
             error += " Error: ";
@@ -547,10 +544,10 @@ void Presenter::onActionExportSymbolTable() {
     std::string filepath;
     if (view.showFileChooserDialog("Export symbol table", false, filepath)) {
         try {
-            model.exportSymbolTable(filepath);
+            saveSymbolTable(filepath, symbolTable);
             view.showInfoDialog("Export successful", "Successfully exported symbol table to " + filepath);
         }
-        catch (std::exception &e) {
+        catch (const std::exception &e) {
             std::string error = "Failed to export symbol table to ";
             error += filepath;
             error += " Error: ";
@@ -561,11 +558,11 @@ void Presenter::onActionExportSymbolTable() {
 }
 
 void Presenter::onDockTabChanged(int tabIndex) {
-    model.updateDockSelectedTab(tabIndex);
+    settings.dockActiveTab = tabIndex;
 }
 
 void Presenter::onDockVisibilityChanged(bool visible) {
-    model.updateShowDock(visible);
+    settings.showDock = visible;
 }
 
 bool isValidArea(Qt::DockWidgetArea area) {
@@ -582,5 +579,152 @@ bool isValidArea(Qt::DockWidgetArea area) {
 
 void Presenter::onDockPositionChanged(Qt::DockWidgetArea area) {
     if (isValidArea(area))
-        model.updateDockPosition(area);
+        settings.dockPosition = area;
+}
+
+void Presenter::applyCurrentValue() {
+    view.setValueText(toDecimal(currentValue));
+    view.setDecimalText(toDecimal(currentValue));
+    view.setHexText(toHex(currentValue));
+    view.setOctalText(toOctal(currentValue));
+    view.setBinaryText(toBinary(currentValue));
+
+    if (currentValue < 0 || hasFraction(currentValue)) {
+        view.setBitViewEnabled(false);
+        view.setBitViewContents(std::bitset<64>(0));
+    } else {
+        view.setBitViewEnabled(true);
+        view.setBitViewContents(std::bitset<64>(currentValue));
+    }
+}
+
+void Presenter::applySymbolTable() {
+    applyVariables();
+    applyConstants();
+    applyFunctions();
+    applyScripts();
+}
+
+void Presenter::applyVariables() {
+    view.disconnectPresenter(*this);
+
+    std::vector<std::pair<std::string, std::string>> tmp;
+    for (auto &v : symbolTable.getVariables()) {
+        tmp.emplace_back(std::pair<std::string, std::string>(v.name, toDecimal(v.value)));
+    }
+    view.setVariableListView(tmp);
+    view.setSelectedVariable(currentVariable);
+
+    view.connectPresenter(*this);
+}
+
+void Presenter::applyConstants() {
+    view.disconnectPresenter(*this);
+
+    std::vector<std::pair<std::string, std::string>> tmp;
+    for (auto &v : symbolTable.getConstants()) {
+        tmp.emplace_back(std::pair<std::string, std::string>(v.name, toDecimal(v.value)));
+    }
+    view.setConstantsListView(tmp);
+    view.setSelectedConstant(currentConstant);
+
+    view.connectPresenter(*this);
+}
+
+void Presenter::applyFunctions() {
+    view.disconnectPresenter(*this);
+
+    std::vector<std::string> tmp;
+    for (auto &v : symbolTable.getFunctions()) {
+        tmp.emplace_back(v.name);
+    }
+    view.setFunctionsListView(tmp);
+
+    view.setSelectedFunction(currentFunction);
+
+    if (currentFunction == -1) {
+        view.setFunctionBodyEnabled(false);
+        view.setFunctionArgsSpinBoxEnabled(false);
+        view.setFunctionBody("");
+        view.setFunctionArgs({});
+    } else {
+        Function func = symbolTable.getFunction(currentFunction);
+
+        view.setFunctionBodyEnabled(true);
+        view.setFunctionArgsSpinBoxEnabled(true);
+        view.setFunctionBody(func.expression);
+        view.setFunctionArgs(func.argumentNames);
+    }
+
+    view.connectPresenter(*this);
+}
+
+void Presenter::applyCurrentFunction() {
+    view.disconnectPresenter(*this);
+
+    view.setSelectedFunction(currentFunction);
+
+    if (currentFunction == -1) {
+        view.setFunctionBodyEnabled(false);
+        view.setFunctionArgsSpinBoxEnabled(false);
+        view.setFunctionBody("");
+        view.setFunctionArgs({});
+    } else {
+        Function func = symbolTable.getFunction(currentFunction);
+
+        view.setFunctionBodyEnabled(true);
+        view.setFunctionArgsSpinBoxEnabled(true);
+        view.setFunctionBody(func.expression);
+        view.setFunctionArgs(func.argumentNames);
+    }
+
+    view.connectPresenter(*this);
+}
+
+void Presenter::applyScripts() {
+    view.disconnectPresenter(*this);
+
+    std::vector<std::string> tmp;
+    for (auto &v : symbolTable.getScripts()) {
+        tmp.emplace_back(v.name);
+    }
+    view.setScriptsListView(tmp);
+
+    view.setSelectedScript(currentScript);
+
+    if (currentScript == -1) {
+        view.setScriptEnableArgsEnabled(false);
+        view.setScriptBodyEnabled(false);
+        view.setScriptEnableArgs(false);
+        view.setScriptBody("");
+    } else {
+        Script s = symbolTable.getScript(currentScript);
+        view.setScriptEnableArgsEnabled(true);
+        view.setScriptBodyEnabled(true);
+        view.setScriptEnableArgs(s.enableArguments);
+        view.setScriptBody(s.body);
+    }
+
+    view.connectPresenter(*this);
+}
+
+void Presenter::applyCurrentScript() {
+    view.disconnectPresenter(*this);
+
+    view.setSelectedScript(currentScript);
+
+    if (currentScript == -1) {
+        view.setScriptEnableArgsEnabled(false);
+        view.setScriptBodyEnabled(false);
+        view.setScriptEnableArgs(false);
+        view.setScriptBody("");
+    } else {
+        Script s = symbolTable.getScript(currentScript);
+        view.setScriptEnableArgsEnabled(true);
+        view.setScriptBodyEnabled(true);
+        view.setScriptEnableArgs(s.enableArguments);
+        view.setScriptBody(s.body);
+    }
+
+    view.connectPresenter(*this);
 }

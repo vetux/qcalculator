@@ -13,7 +13,7 @@ ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbo
 
     int varArgScriptCount = 0;
     int scriptCount = 0;
-    for (auto &script : symbolTable.scripts) {
+    for (auto &script : symbolTable.getScripts()) {
         if (script.enableArguments)
             varArgScriptCount++;
         else
@@ -29,7 +29,7 @@ ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbo
     std::vector<ScriptFunction<ValueType>> scriptFunctions;
     scriptFunctions.resize(scriptCount);
 
-    for (auto &script : symbolTable.scripts) {
+    for (auto &script : symbolTable.getScripts()) {
         if (script.enableArguments) {
             int index = varArgScriptIndex++;
             assert(index < varArgScriptCount);
@@ -46,7 +46,7 @@ ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbo
     assert(varArgScriptIndex == varArgScriptCount);
     assert(scriptIndex == scriptCount);
 
-    for (auto &func : symbolTable.functions) {
+    for (auto &func : symbolTable.getFunctions()) {
         switch (func.argumentNames.size()) {
             case 0:
                 compositor.add(typename exprtk::function_compositor<ValueType>::function(func.name, func.expression));
@@ -90,11 +90,12 @@ ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbo
         }
     }
 
-    for (auto &constant : symbolTable.constants) {
+    for (auto &constant : symbolTable.getConstants()) {
         symbols.add_constant(constant.name, constant.value);
     }
 
-    for (auto &variable : symbolTable.variables) {
+    std::vector<Variable> variables = symbolTable.getVariables();
+    for (auto &variable : variables) {
         symbols.add_variable(variable.name, variable.value);
     }
 
@@ -102,7 +103,9 @@ ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbo
     expression.register_symbol_table(symbols);
 
     if (parser.compile(expr, expression)) {
-        return expression.value();
+        ValueType ret = expression.value();
+        symbolTable.setVariables(variables);
+        return ret;
     } else {
         throw std::runtime_error(parser.error());
     }

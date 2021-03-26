@@ -7,11 +7,15 @@
 
 struct Variable {
     std::string name;
-    ValueType value = 0;
+    ValueType value;
 
-    Variable() = default;
+    Variable() : name(), value() {};
 
     Variable(std::string name, ValueType value) : name(std::move(name)), value(value) {}
+
+    bool operator==(const Variable &other) const {
+        return name == other.name && value == other.value;
+    }
 };
 
 #endif //QCALC_VARIABLE_HPP

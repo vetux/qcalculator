@@ -10,9 +10,13 @@ struct Constant {
     std::string name;
     ValueType value;
 
-    Constant() = default;
+    Constant() : name(), value() {};
 
     Constant(std::string name, ValueType value) : name(std::move(name)), value(value) {}
+
+    bool operator==(const Constant &other) const {
+        return name == other.name && value == other.value;
+    }
 };
 
 #endif //QCALC_CONSTANT_HPP

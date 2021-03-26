@@ -14,6 +14,10 @@ struct Script {
 
     Script(std::string name, std::string body, bool enableArguments)
             : name(std::move(name)), body(std::move(body)), enableArguments(enableArguments) {}
+
+    bool operator==(const Script &other) const {
+        return name == other.name && body == other.body && enableArguments == other.enableArguments;
+    }
 };
 
 #endif //QT_CALC_SCRIPT_HPP

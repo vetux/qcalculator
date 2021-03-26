@@ -1,7 +1,7 @@
 #ifndef QCALC_PRESENTER_HPP
 #define QCALC_PRESENTER_HPP
 
-#include "model.hpp"
+#include "calculatorengine.hpp"
 
 #include <QObject>
 #include <QCloseEvent>
@@ -9,44 +9,15 @@
 
 #include "numpadkey.hpp"
 #include "view.hpp"
-#include "statelistener.hpp"
+#include "settings.hpp"
+#include "history.hpp"
 
-class Presenter : public QObject, public StateListener {
+class Presenter : public QObject {
 Q_OBJECT
 public:
-    Presenter(Model &model, View &view);
+    explicit Presenter(View &view);
 
     void init();
-
-    void onStateValueChanged(ValueType value) override;
-
-    void onStateHistoryChanged(const std::vector<std::pair<std::string, ValueType>> &value) override;
-
-    void onStateInputChanged(const std::string &value) override;
-
-    void onStateSymbolTableChanged(const SymbolTable &value) override;
-
-    void onStateShowKeyPadChanged(bool value) override;
-
-    void onStateShowBitViewChanged(bool value) override;
-
-    void onStateShowDockChanged(bool value) override;
-
-    void onStateHistoryLimitChanged(int value) override;
-
-    void onStateDockPositionChanged(Qt::DockWidgetArea value) override;
-
-    void onStateDockSelectedTabChanged(int value) override;
-
-    void onStateWindowSizeChanged(QSize value) override;
-
-    void onStateCurrentVariableChanged(int value) override;
-
-    void onStateCurrentConstantChanged(int value) override;
-
-    void onStateCurrentFunctionChanged(int value) override;
-
-    void onStateCurrentScriptChanged(int value) override;
 
 public slots:
 
@@ -128,8 +99,38 @@ public slots:
     //-Presenter Interface
 
 private:
-    Model &model;
     View &view;
+
+    CalculatorEngine calculatorEngine;
+    SymbolTable symbolTable;
+    Settings settings;
+
+    History history;
+
+    ValueType currentValue;
+
+    std::string inputText;
+
+    int currentVariable = -1;
+    int currentConstant = -1;
+    int currentFunction = -1;
+    int currentScript = -1;
+
+    void applyCurrentValue();
+
+    void applySymbolTable();
+
+    void applyVariables();
+
+    void applyConstants();
+
+    void applyFunctions();
+
+    void applyCurrentFunction();
+
+    void applyScripts();
+
+    void applyCurrentScript();
 };
 
 #endif //QCALC_PRESENTER_HPP

@@ -3,7 +3,8 @@
 
 #include <string>
 
-#include "state.hpp"
+#include "settings.hpp"
+#include "symboltable.hpp"
 
 class Serializer {
 public:
@@ -11,9 +12,9 @@ public:
 
     static SymbolTable deserializeTable(const std::string &str);
 
-    static std::string serializeSettings(const State &state);
+    static std::string serializeSettings(const Settings &settings);
 
-    static State deserializeSettings(const std::string &str);
+    static Settings deserializeSettings(const std::string &str);
 };
 
 #endif //QT_CALC_SERIALIZER_HPP

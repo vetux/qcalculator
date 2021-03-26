@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "model.hpp" //Has to be the first include because python uses "slots" as a variable name and "slots" is a qt reserved word.
+#include "presenter.hpp" //Has to be the first include because python uses "slots" as a variable name and "slots" is a qt reserved word.
 
 #include <QMainWindow>
 #include <bitset>
@@ -208,7 +208,6 @@ private:
 
     Ui::MainWindow *ui;
 
-    Model model;
     Presenter presenter;
 
     //Helpers

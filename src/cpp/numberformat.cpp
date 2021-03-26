@@ -1,5 +1,9 @@
 #include "numberformat.hpp"
 
+#include "fractiontest.hpp"
+
+using namespace FractionTest;
+
 std::string NumberFormat::toDecimal(ValueType v, int floatPrecision) {
     std::stringstream stream;
     stream << std::fixed << std::setprecision(floatPrecision) << v;

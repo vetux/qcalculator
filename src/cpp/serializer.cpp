@@ -7,7 +7,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     j["version"] = 0;
 
     std::vector<nlohmann::json> tmp;
-    for (auto &p : table.variables) {
+    for (auto &p : table.getVariables()) {
         nlohmann::json t;
         t["name"] = p.name;
         t["value"] = p.value;
@@ -16,7 +16,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     j["variables"] = tmp;
     tmp.clear();
 
-    for (auto &p : table.constants) {
+    for (auto &p : table.getConstants()) {
         nlohmann::json t;
         t["name"] = p.name;
         t["value"] = p.value;
@@ -25,7 +25,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     j["constants"] = tmp;
     tmp.clear();
 
-    for (auto &p : table.functions) {
+    for (auto &p : table.getFunctions()) {
         nlohmann::json t;
         t["name"] = p.name;
         t["expression"] = p.expression;
@@ -35,7 +35,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     j["functions"] = tmp;
     tmp.clear();
 
-    for (auto &p : table.scripts) {
+    for (auto &p : table.getScripts()) {
         nlohmann::json t;
         t["name"] = p.name;
         t["body"] = p.body;
@@ -56,14 +56,14 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
     for (auto &v : tmp) {
         std::string name = v["name"];
         ValueType value = v["value"];
-        ret.variables.emplace_back(Variable(name, value));
+        ret.addVariable(Variable(name, value));
     }
 
     tmp = j["constants"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
         std::string name = v["name"];
         ValueType value = v["value"];
-        ret.constants.emplace_back(Constant(name, value));
+        ret.addConstant(Constant(name, value));
     }
 
     tmp = j["functions"].get<std::vector<nlohmann::json>>();
@@ -72,7 +72,7 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
         f.name = v["name"];
         f.expression = v["expression"];
         f.argumentNames = v["argumentNames"].get<std::vector<std::string>>();
-        ret.functions.emplace_back(f);
+        ret.addFunction(f);
     }
 
     tmp = j["scripts"].get<std::vector<nlohmann::json>>();
@@ -81,7 +81,7 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
         s.name = v["name"];
         s.body = v["body"];
         s.enableArguments = v["enableArguments"];
-        ret.scripts.emplace_back(s);
+        ret.addScript(s);
     }
 
     return ret;
@@ -124,28 +124,28 @@ int clampTabIndex(int index) {
         return index;
 }
 
-std::string Serializer::serializeSettings(const State &state) {
+std::string Serializer::serializeSettings(const Settings &settings) {
     nlohmann::json j;
-    j["showKeypad"] = state.showKeypad;
-    j["showBitView"] = state.showBitView;
-    j["showDock"] = state.showDock;
-    j["historyLimit"] = state.historyLimit;
-    j["dockPosition"] = convertDockAreaToInt(state.dockPosition);
-    j["dockTab"] = clampTabIndex(state.dockSelectedTab);
-    j["windowWidth"] = state.windowSize.width();
-    j["windowHeight"] = state.windowSize.height();
+    j["showKeypad"] = settings.showKeypad;
+    j["showBitView"] = settings.showBitView;
+    j["showDock"] = settings.showDock;
+    j["historyLimit"] = settings.historyLimit;
+    j["dockPosition"] = convertDockAreaToInt(settings.dockPosition);
+    j["dockTab"] = clampTabIndex(settings.dockActiveTab);
+    j["windowWidth"] = settings.windowSize.width();
+    j["windowHeight"] = settings.windowSize.height();
     return nlohmann::to_string(j);
 }
 
-State Serializer::deserializeSettings(const std::string &str) {
+Settings Serializer::deserializeSettings(const std::string &str) {
     nlohmann::json j = nlohmann::json::parse(str);
-    State ret;
+    Settings ret;
     ret.showKeypad = j["showKeypad"];
     ret.showBitView = j["showBitView"];
     ret.showDock = j["showDock"];
     ret.historyLimit = j["historyLimit"];
     ret.dockPosition = convertIntToDockArea(j["dockPosition"]);
-    ret.dockSelectedTab = clampTabIndex(j["dockTab"]);
+    ret.dockActiveTab = clampTabIndex(j["dockTab"]);
     ret.windowSize = {j["windowWidth"], j["windowHeight"]};
     return ret;
 }

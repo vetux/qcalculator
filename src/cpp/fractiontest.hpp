@@ -3,6 +3,8 @@
 
 #include <cmath>
 
-bool hasFraction(long double v);
+namespace FractionTest {
+    bool hasFraction(long double v);
+}
 
 #endif // COMMON_HPP

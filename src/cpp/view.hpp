@@ -9,7 +9,6 @@ class Presenter;
 
 class View {
 public:
-    //Actions
     virtual void connectPresenter(const Presenter &target) = 0;
 
     virtual void disconnectPresenter(const Presenter &target) = 0;
@@ -28,7 +27,7 @@ public:
 
     virtual void quit() = 0;
 
-    //UI Update
+
     virtual void setInputText(const std::string &value) = 0;
 
     virtual void setValueText(const std::string &value) = 0;
