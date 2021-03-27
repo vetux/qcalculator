@@ -9,6 +9,8 @@ class UUIDGenerator {
 public:
     UUID get() {
         if (availableUUIDS.empty()) {
+            if (counter == std::numeric_limits<UUID>::max() - 1)
+                throw std::runtime_error("Maximum amount of uuids reached");
             return ++counter;
         } else {
             UUID ret = *availableUUIDS.begin();
