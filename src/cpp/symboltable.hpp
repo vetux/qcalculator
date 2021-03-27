@@ -1,93 +1,87 @@
 #ifndef QCALC_SYMBOLTABLE_HPP
 #define QCALC_SYMBOLTABLE_HPP
 
+#include <map>
+
 #include "variable.hpp"
 #include "constant.hpp"
 #include "function.hpp"
 #include "script.hpp"
+#include "uuid.hpp"
+#include "uuidgenerator.hpp"
 
 class SymbolTable {
 public:
     SymbolTable();
 
-    SymbolTable(const std::vector<Variable> &variables,
-                const std::vector<Constant> &constants,
-                const std::vector<Function> &functions,
-                const std::vector<Script> &scripts);
 
-    void setVariables(const std::vector<Variable> &value);
+    const std::map<UUID, Variable> &getVariables() const;
 
-    const std::vector<Variable> &getVariables() const;
+    const std::map<UUID, Constant> &getConstants() const;
 
-    void setConstants(const std::vector<Constant> &value);
+    const std::map<UUID, Function> &getFunctions() const;
 
-    const std::vector<Constant> &getConstants() const;
-
-    void setFunctions(const std::vector<Function> &value);
-
-    const std::vector<Function> &getFunctions() const;
-
-    void setScript(const std::vector<Script> &value);
-
-    const std::vector<Script> &getScripts() const;
+    const std::map<UUID, Script> &getScripts() const;
 
 
-    void addVariable(const Variable &variable);
+    UUID addVariable(const Variable &variable);
 
-    Variable getVariable(size_t index) const;
+    const Variable &getVariable(UUID id) const;
 
-    void setVariable(size_t index, const Variable &variable);
+    void setVariable(UUID id, const Variable &variable);
 
-    size_t getVariableCount() const;
-
-    void removeVariable(size_t index);
+    void removeVariable(UUID id);
 
     bool hasVariable(const std::string &name) const;
 
+    void clearVariables();
 
-    void addConstant(const Constant &constant);
 
-    Constant getConstant(size_t index) const;
+    UUID addConstant(const Constant &constant);
 
-    void setConstant(size_t index, const Constant &constant);
+    const Constant &getConstant(UUID id) const;
 
-    size_t getConstantCount() const;
+    void setConstant(UUID id, const Constant &constant);
 
-    void removeConstant(size_t index);
+    void removeConstant(UUID id);
 
     bool hasConstant(const std::string &name) const;
 
+    void clearConstants();
 
-    void addFunction(const Function &function);
 
-    Function getFunction(size_t index) const;
+    UUID addFunction(const Function &function);
 
-    void setFunction(size_t index, const Function &function);
+    const Function &getFunction(UUID id) const;
 
-    size_t getFunctionCount() const;
+    void setFunction(UUID id, const Function &function);
 
-    void removeFunction(size_t index);
+    void removeFunction(UUID id);
 
     bool hasFunction(const std::string &name) const;
 
+    void clearFunctions();
 
-    void addScript(const Script &script);
 
-    Script getScript(size_t index) const;
+    UUID addScript(const Script &script);
 
-    void setScript(size_t index, const Script &script);
+    const Script &getScript(UUID id) const;
 
-    size_t getScriptCount() const;
+    void setScript(UUID id, const Script &script);
 
-    void removeScript(size_t index);
+    void removeScript(UUID id);
 
     bool hasScript(const std::string &name) const;
 
+    void clearScripts();
+
 private:
-    std::vector<Variable> variables;
-    std::vector<Constant> constants;
-    std::vector<Function> functions;
-    std::vector<Script> scripts;
+    UUIDGenerator generator;
+
+    std::map<UUID, Variable> variables;
+    std::map<UUID, Constant> constants;
+    std::map<UUID, Function> functions;
+    std::map<UUID, Script> scripts;
 };
 
 #endif //QCALC_SYMBOLTABLE_HPP

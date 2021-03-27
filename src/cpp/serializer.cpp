@@ -9,8 +9,8 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     std::vector<nlohmann::json> tmp;
     for (auto &p : table.getVariables()) {
         nlohmann::json t;
-        t["name"] = p.name;
-        t["value"] = p.value;
+        t["name"] = p.second.name;
+        t["value"] = p.second.value;
         tmp.emplace_back(t);
     }
     j["variables"] = tmp;
@@ -18,8 +18,8 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
 
     for (auto &p : table.getConstants()) {
         nlohmann::json t;
-        t["name"] = p.name;
-        t["value"] = p.value;
+        t["name"] = p.second.name;
+        t["value"] = p.second.value;
         tmp.emplace_back(t);
     }
     j["constants"] = tmp;
@@ -27,9 +27,9 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
 
     for (auto &p : table.getFunctions()) {
         nlohmann::json t;
-        t["name"] = p.name;
-        t["expression"] = p.expression;
-        t["argumentNames"] = p.argumentNames;
+        t["name"] = p.second.name;
+        t["expression"] = p.second.expression;
+        t["argumentNames"] = p.second.argumentNames;
         tmp.emplace_back(t);
     }
     j["functions"] = tmp;
@@ -37,9 +37,9 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
 
     for (auto &p : table.getScripts()) {
         nlohmann::json t;
-        t["name"] = p.name;
-        t["body"] = p.body;
-        t["enableArguments"] = p.enableArguments;
+        t["name"] = p.second.name;
+        t["body"] = p.second.body;
+        t["enableArguments"] = p.second.enableArguments;
         tmp.emplace_back(t);
     }
     j["scripts"] = tmp;

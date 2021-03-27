@@ -19,8 +19,6 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-//TODO: Fix bitview layout for win32
-
 /**
  * For behaviours which are currently not directly linked to the presenter (Like the QTableWidget logic)
  * the main window binds the widget behaviour to itself and emits
@@ -205,7 +203,6 @@ private slots:
     void onScriptsBodyTextChanged();
 
 private:
-
     Ui::MainWindow *ui;
 
     Presenter presenter;

@@ -11,6 +11,7 @@
 #include "view.hpp"
 #include "settings.hpp"
 #include "history.hpp"
+#include "uuid.hpp"
 
 class Presenter : public QObject {
 Q_OBJECT
@@ -111,10 +112,15 @@ private:
 
     std::string inputText;
 
-    int currentVariable = -1;
-    int currentConstant = -1;
-    int currentFunction = -1;
-    int currentScript = -1;
+    UUID currentVariable = UUID_NULL;
+    UUID currentConstant = UUID_NULL;
+    UUID currentFunction = UUID_NULL;
+    UUID currentScript = UUID_NULL;
+
+    std::map<int, UUID> variableMapping;
+    std::map<int, UUID> constantMapping;
+    std::map<int, UUID> functionMapping;
+    std::map<int, UUID> scriptMapping;
 
     void applyCurrentValue();
 
