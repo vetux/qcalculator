@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include "valuetype.hpp"
+
 class PythonInterpreter {
     PyObject *main;
 public:
@@ -16,7 +18,7 @@ public:
 
     ~PythonInterpreter();
 
-    long double run(const std::string &src, const std::vector<long double> &args);
+    ValueType run(const std::string &src, const std::vector<ValueType> &args);
 };
 
 #endif //QT_CALC_PYTHONINTERPRETER_HPP

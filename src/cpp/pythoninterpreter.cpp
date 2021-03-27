@@ -9,7 +9,7 @@ PythonInterpreter::~PythonInterpreter() {
     Py_Finalize();
 }
 
-long double PythonInterpreter::run(const std::string &src, const std::vector<long double> &args) {
+ValueType PythonInterpreter::run(const std::string &src, const std::vector<ValueType> &args) {
     PyObject *globalDictionary = PyModule_GetDict(main);
     PyObject *localDictionary = PyDict_New();
 
