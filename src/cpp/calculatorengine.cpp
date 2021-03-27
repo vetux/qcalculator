@@ -100,7 +100,7 @@ ValueType CalculatorEngine::evaluate(const std::string &expr, SymbolTable &symbo
         symbols.add_constant(constant.second.name, constant.second.value);
     }
 
-    std::map<UUID, Variable> variables = symbolTable.getVariables();
+    std::map<UID, Variable> variables = symbolTable.getVariables();
     for (auto &variable : variables) {
         symbols.add_variable(variable.second.name, variable.second.value);
     }

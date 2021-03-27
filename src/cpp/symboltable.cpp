@@ -2,23 +2,23 @@
 
 SymbolTable::SymbolTable() = default;
 
-const std::map<UUID, Variable> &SymbolTable::getVariables() const {
+const std::map<UID, Variable> &SymbolTable::getVariables() const {
     return variables;
 }
 
-const std::map<UUID, Constant> &SymbolTable::getConstants() const {
+const std::map<UID, Constant> &SymbolTable::getConstants() const {
     return constants;
 }
 
-const std::map<UUID, Function> &SymbolTable::getFunctions() const {
+const std::map<UID, Function> &SymbolTable::getFunctions() const {
     return functions;
 }
 
-const std::map<UUID, Script> &SymbolTable::getScripts() const {
+const std::map<UID, Script> &SymbolTable::getScripts() const {
     return scripts;
 }
 
-UUID SymbolTable::addVariable(const Variable &variable) {
+UID SymbolTable::addVariable(const Variable &variable) {
     std::string prefix = "Cannot add variable, ";
     if (hasVariable(variable.name))
         throw std::runtime_error(prefix + "Variable with name " + variable.name + " already exists.");
@@ -29,16 +29,16 @@ UUID SymbolTable::addVariable(const Variable &variable) {
     if (hasScript(variable.name))
         throw std::runtime_error(prefix + "Script with name " + variable.name + " already exists");
 
-    UUID id = generator.get();
+    UID id = generator.get();
     variables[id] = variable;
     return id;
 }
 
-const Variable &SymbolTable::getVariable(UUID id) const {
+const Variable &SymbolTable::getVariable(UID id) const {
     return variables.at(id);
 }
 
-void SymbolTable::setVariable(UUID id, const Variable &variable) {
+void SymbolTable::setVariable(UID id, const Variable &variable) {
     std::string prefix = "Cannot set variable, ";
     if (hasVariable(variable.name) && variables.at(id).name != variable.name)
         throw std::runtime_error(prefix + "Variable with name " + variable.name + " already exists.");
@@ -52,7 +52,7 @@ void SymbolTable::setVariable(UUID id, const Variable &variable) {
     variables.at(id) = variable;
 }
 
-void SymbolTable::removeVariable(UUID id) {
+void SymbolTable::removeVariable(UID id) {
     variables.erase(id);
     generator.put(id);
 }
@@ -72,7 +72,7 @@ void SymbolTable::clearVariables() {
     variables.clear();
 }
 
-UUID SymbolTable::addConstant(const Constant &constant) {
+UID SymbolTable::addConstant(const Constant &constant) {
     std::string prefix = "Cannot add constant, ";
     if (hasVariable(constant.name))
         throw std::runtime_error(prefix + "Variable with name " + constant.name + " already exists.");
@@ -83,16 +83,16 @@ UUID SymbolTable::addConstant(const Constant &constant) {
     if (hasScript(constant.name))
         throw std::runtime_error(prefix + "Script with name " + constant.name + " already exists");
 
-    UUID id = generator.get();
+    UID id = generator.get();
     constants[id] = constant;
     return id;
 }
 
-const Constant &SymbolTable::getConstant(UUID id) const {
+const Constant &SymbolTable::getConstant(UID id) const {
     return constants.at(id);
 }
 
-void SymbolTable::setConstant(UUID id, const Constant &constant) {
+void SymbolTable::setConstant(UID id, const Constant &constant) {
     std::string prefix = "Cannot set constant, ";
     if (hasVariable(constant.name))
         throw std::runtime_error(prefix + "Variable with name " + constant.name + " already exists.");
@@ -106,7 +106,7 @@ void SymbolTable::setConstant(UUID id, const Constant &constant) {
     constants.at(id) = constant;
 }
 
-void SymbolTable::removeConstant(UUID id) {
+void SymbolTable::removeConstant(UID id) {
     constants.erase(id);
     generator.put(id);
 }
@@ -126,7 +126,7 @@ void SymbolTable::clearConstants() {
     constants.clear();
 }
 
-UUID SymbolTable::addFunction(const Function &function) {
+UID SymbolTable::addFunction(const Function &function) {
     std::string prefix = "Cannot add function, ";
     if (hasVariable(function.name))
         throw std::runtime_error(prefix + "Variable with name " + function.name + " already exists.");
@@ -137,16 +137,16 @@ UUID SymbolTable::addFunction(const Function &function) {
     if (hasScript(function.name))
         throw std::runtime_error(prefix + "Script with name " + function.name + " already exists");
 
-    UUID id = generator.get();
+    UID id = generator.get();
     functions[id] = function;
     return id;
 }
 
-const Function &SymbolTable::getFunction(UUID id) const {
+const Function &SymbolTable::getFunction(UID id) const {
     return functions.at(id);
 }
 
-void SymbolTable::setFunction(UUID id, const Function &function) {
+void SymbolTable::setFunction(UID id, const Function &function) {
     std::string prefix = "Cannot set function, ";
     if (hasVariable(function.name))
         throw std::runtime_error(prefix + "Variable with name " + function.name + " already exists.");
@@ -160,7 +160,7 @@ void SymbolTable::setFunction(UUID id, const Function &function) {
     functions.at(id) = function;
 }
 
-void SymbolTable::removeFunction(UUID id) {
+void SymbolTable::removeFunction(UID id) {
     functions.erase(id);
     generator.put(id);
 }
@@ -180,7 +180,7 @@ void SymbolTable::clearFunctions() {
     functions.clear();
 }
 
-UUID SymbolTable::addScript(const Script &script) {
+UID SymbolTable::addScript(const Script &script) {
     std::string prefix = "Cannot add script, ";
     if (hasVariable(script.name))
         throw std::runtime_error(prefix + "Variable with name " + script.name + " already exists.");
@@ -191,16 +191,16 @@ UUID SymbolTable::addScript(const Script &script) {
     if (hasScript(script.name))
         throw std::runtime_error(prefix + "Script with name " + script.name + " already exists");
 
-    UUID id = generator.get();
+    UID id = generator.get();
     scripts[id] = script;
     return id;
 }
 
-const Script &SymbolTable::getScript(UUID id) const {
+const Script &SymbolTable::getScript(UID id) const {
     return scripts.at(id);
 }
 
-void SymbolTable::setScript(UUID id, const Script &script) {
+void SymbolTable::setScript(UID id, const Script &script) {
     std::string prefix = "Cannot set script, ";
     if (hasVariable(script.name))
         throw std::runtime_error(prefix + "Variable with name " + script.name + " already exists.");
@@ -214,7 +214,7 @@ void SymbolTable::setScript(UUID id, const Script &script) {
     scripts.at(id) = script;
 }
 
-void SymbolTable::removeScript(UUID id) {
+void SymbolTable::removeScript(UID id) {
     scripts.erase(id);
 }
 

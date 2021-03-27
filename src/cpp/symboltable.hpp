@@ -7,81 +7,81 @@
 #include "constant.hpp"
 #include "function.hpp"
 #include "script.hpp"
-#include "uuid.hpp"
-#include "uuidgenerator.hpp"
+#include "uid.hpp"
+#include "uidgenerator.hpp"
 
 class SymbolTable {
 public:
     SymbolTable();
 
 
-    const std::map<UUID, Variable> &getVariables() const;
+    const std::map<UID, Variable> &getVariables() const;
 
-    const std::map<UUID, Constant> &getConstants() const;
+    const std::map<UID, Constant> &getConstants() const;
 
-    const std::map<UUID, Function> &getFunctions() const;
+    const std::map<UID, Function> &getFunctions() const;
 
-    const std::map<UUID, Script> &getScripts() const;
+    const std::map<UID, Script> &getScripts() const;
 
 
-    UUID addVariable(const Variable &variable);
+    UID addVariable(const Variable &variable);
 
-    const Variable &getVariable(UUID id) const;
+    const Variable &getVariable(UID id) const;
 
-    void setVariable(UUID id, const Variable &variable);
+    void setVariable(UID id, const Variable &variable);
 
-    void removeVariable(UUID id);
+    void removeVariable(UID id);
 
     bool hasVariable(const std::string &name) const;
 
     void clearVariables();
 
 
-    UUID addConstant(const Constant &constant);
+    UID addConstant(const Constant &constant);
 
-    const Constant &getConstant(UUID id) const;
+    const Constant &getConstant(UID id) const;
 
-    void setConstant(UUID id, const Constant &constant);
+    void setConstant(UID id, const Constant &constant);
 
-    void removeConstant(UUID id);
+    void removeConstant(UID id);
 
     bool hasConstant(const std::string &name) const;
 
     void clearConstants();
 
 
-    UUID addFunction(const Function &function);
+    UID addFunction(const Function &function);
 
-    const Function &getFunction(UUID id) const;
+    const Function &getFunction(UID id) const;
 
-    void setFunction(UUID id, const Function &function);
+    void setFunction(UID id, const Function &function);
 
-    void removeFunction(UUID id);
+    void removeFunction(UID id);
 
     bool hasFunction(const std::string &name) const;
 
     void clearFunctions();
 
 
-    UUID addScript(const Script &script);
+    UID addScript(const Script &script);
 
-    const Script &getScript(UUID id) const;
+    const Script &getScript(UID id) const;
 
-    void setScript(UUID id, const Script &script);
+    void setScript(UID id, const Script &script);
 
-    void removeScript(UUID id);
+    void removeScript(UID id);
 
     bool hasScript(const std::string &name) const;
 
     void clearScripts();
 
 private:
-    UUIDGenerator generator;
+    UIDGenerator generator;
 
-    std::map<UUID, Variable> variables;
-    std::map<UUID, Constant> constants;
-    std::map<UUID, Function> functions;
-    std::map<UUID, Script> scripts;
+    std::map<UID, Variable> variables;
+    std::map<UID, Constant> constants;
+    std::map<UID, Function> functions;
+    std::map<UID, Script> scripts;
 };
 
 #endif //QCALC_SYMBOLTABLE_HPP

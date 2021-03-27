@@ -259,7 +259,7 @@ void Presenter::onBitViewKeyPressed(int bitIndex) {
 
 void Presenter::onSelectedVariableChanged(int index) {
     if (index == -1)
-        currentVariable = UUID_NULL;
+        currentVariable = UID_NULL;
     else
         currentVariable = variableMapping.at(index);
 }
@@ -275,13 +275,13 @@ void Presenter::onVariableChanged(const std::string &name, const std::string &va
         error += " as decimal.";
         view.showWarningDialog("Error", error);
 
-        if (currentVariable == UUID_NULL)
+        if (currentVariable == UID_NULL)
             return;
         else
             convertedValue = symbolTable.getVariable(currentVariable).value;
     }
 
-    if (currentVariable == UUID_NULL) {
+    if (currentVariable == UID_NULL) {
         if (name.empty()) {
             view.showWarningDialog("Error", "The variable name cannot be empty.");
         } else {
@@ -301,7 +301,7 @@ void Presenter::onVariableChanged(const std::string &name, const std::string &va
                                                            v.name +
                                                            " ?")) {
                 symbolTable.removeVariable(currentVariable);
-                currentVariable = UUID_NULL;
+                currentVariable = UID_NULL;
                 applyVariables();
             }
         } else {
@@ -318,7 +318,7 @@ void Presenter::onVariableChanged(const std::string &name, const std::string &va
 
 void Presenter::onSelectedConstantChanged(int index) {
     if (index == -1)
-        currentConstant = UUID_NULL;
+        currentConstant = UID_NULL;
     else
         currentConstant = constantMapping.at(index);
 }
@@ -334,13 +334,13 @@ void Presenter::onConstantChanged(const std::string &name, const std::string &va
         error += " as decimal.";
         view.showWarningDialog("Error", error);
 
-        if (currentConstant == UUID_NULL)
+        if (currentConstant == UID_NULL)
             return;
         else
             convertedValue = symbolTable.getConstant(currentConstant).value;
     }
 
-    if (currentConstant == UUID_NULL) {
+    if (currentConstant == UID_NULL) {
         if (name.empty()) {
             view.showWarningDialog("Error", "The constant name cannot be empty.");
         } else {
@@ -360,7 +360,7 @@ void Presenter::onConstantChanged(const std::string &name, const std::string &va
                                                            c.name +
                                                            " ?")) {
                 symbolTable.removeConstant(currentConstant);
-                currentConstant = UUID_NULL;
+                currentConstant = UID_NULL;
                 applyConstants();
             }
         } else {
@@ -377,7 +377,7 @@ void Presenter::onConstantChanged(const std::string &name, const std::string &va
 
 void Presenter::onSelectedFunctionChanged(int index) {
     if (index == -1)
-        currentFunction = UUID_NULL;
+        currentFunction = UID_NULL;
     else
         currentFunction = functionMapping.at(index);
 
@@ -385,7 +385,7 @@ void Presenter::onSelectedFunctionChanged(int index) {
 }
 
 void Presenter::onFunctionNameChanged(const std::string &value) {
-    if (currentFunction == UUID_NULL) {
+    if (currentFunction == UID_NULL) {
         if (value.empty()) {
             view.showWarningDialog("Error", "Function name cannot be empty.");
         } else {
@@ -406,7 +406,7 @@ void Presenter::onFunctionNameChanged(const std::string &value) {
                                                            f.name +
                                                            " ?")) {
                 symbolTable.removeFunction(currentFunction);
-                currentFunction = UUID_NULL;
+                currentFunction = UID_NULL;
                 applyFunctions();
             }
         } else {
@@ -423,14 +423,14 @@ void Presenter::onFunctionNameChanged(const std::string &value) {
 }
 
 void Presenter::onFunctionBodyChanged(const std::string &value) {
-    assert(currentFunction != UUID_NULL);
+    assert(currentFunction != UID_NULL);
     Function f = symbolTable.getFunction(currentFunction);
     f.expression = value;
     symbolTable.setFunction(currentFunction, f);
 }
 
 void Presenter::onFunctionArgsChanged(const std::vector<std::string> &arguments) {
-    assert(currentFunction != UUID_NULL);
+    assert(currentFunction != UID_NULL);
     Function f = symbolTable.getFunction(currentFunction);
     f.argumentNames = arguments;
     symbolTable.setFunction(currentFunction, f);
@@ -439,7 +439,7 @@ void Presenter::onFunctionArgsChanged(const std::vector<std::string> &arguments)
 
 void Presenter::onSelectedScriptChanged(int index) {
     if (index == -1)
-        currentScript = UUID_NULL;
+        currentScript = UID_NULL;
     else
         currentScript = scriptMapping.at(index);
 
@@ -447,7 +447,7 @@ void Presenter::onSelectedScriptChanged(int index) {
 }
 
 void Presenter::onScriptNameChanged(const std::string &value) {
-    if (currentScript == UUID_NULL) {
+    if (currentScript == UID_NULL) {
         if (value.empty()) {
             view.showWarningDialog("Error", "Script name cannot be empty.");
         } else {
@@ -468,7 +468,7 @@ void Presenter::onScriptNameChanged(const std::string &value) {
                                                          s.name +
                                                          " ?")) {
                 symbolTable.removeScript(currentScript);
-                currentScript = UUID_NULL;
+                currentScript = UID_NULL;
                 applyScripts();
             }
         } else {
@@ -485,14 +485,14 @@ void Presenter::onScriptNameChanged(const std::string &value) {
 }
 
 void Presenter::onScriptBodyChanged(const std::string &value) {
-    assert(currentScript != UUID_NULL);
+    assert(currentScript != UID_NULL);
     Script s = symbolTable.getScript(currentScript);
     s.body = value;
     symbolTable.setScript(currentScript, s);
 }
 
 void Presenter::onScriptEnableArgsChanged(bool value) {
-    assert(currentScript != UUID_NULL);
+    assert(currentScript != UID_NULL);
     Script s = symbolTable.getScript(currentScript);
     s.enableArguments = value;
     symbolTable.setScript(currentScript, s);
@@ -539,10 +539,10 @@ void Presenter::onActionImportSymbolTable() {
         try {
             symbolTable = loadSymbolTable(filepath);
 
-            currentVariable = UUID_NULL;
-            currentConstant = UUID_NULL;
-            currentFunction = UUID_NULL;
-            currentScript = UUID_NULL;
+            currentVariable = UID_NULL;
+            currentConstant = UID_NULL;
+            currentFunction = UID_NULL;
+            currentScript = UID_NULL;
 
             applySymbolTable();
 
@@ -627,7 +627,7 @@ void Presenter::applyVariables() {
     view.disconnectPresenter(*this);
 
     //Sort by using map with names as keys
-    std::map<std::string, UUID> dataSorted;
+    std::map<std::string, UID> dataSorted;
     for (auto &v : symbolTable.getVariables()) {
         dataSorted[v.second.name] = v.first;
     }
@@ -660,7 +660,7 @@ void Presenter::applyConstants() {
     view.disconnectPresenter(*this);
 
     //Sort by using map with names as keys
-    std::map<std::string, UUID> dataSorted;
+    std::map<std::string, UID> dataSorted;
     for (auto &v : symbolTable.getConstants()) {
         dataSorted[v.second.name] = v.first;
     }
@@ -693,7 +693,7 @@ void Presenter::applyFunctions() {
     view.disconnectPresenter(*this);
 
     //Sort by using map with names as keys
-    std::map<std::string, UUID> dataSorted;
+    std::map<std::string, UID> dataSorted;
     for (auto &v : symbolTable.getFunctions()) {
         dataSorted[v.second.name] = v.first;
     }
@@ -719,7 +719,7 @@ void Presenter::applyFunctions() {
     view.setFunctionsListView(tmp);
     view.setSelectedFunction(currentIndex);
 
-    if (currentFunction == UUID_NULL) {
+    if (currentFunction == UID_NULL) {
         view.setFunctionBodyEnabled(false);
         view.setFunctionArgsSpinBoxEnabled(false);
         view.setFunctionBody("");
@@ -749,7 +749,7 @@ void Presenter::applyCurrentFunction() {
 
     view.setSelectedFunction(currentIndex);
 
-    if (currentFunction == UUID_NULL) {
+    if (currentFunction == UID_NULL) {
         view.setFunctionBodyEnabled(false);
         view.setFunctionArgsSpinBoxEnabled(false);
         view.setFunctionBody("");
@@ -770,7 +770,7 @@ void Presenter::applyScripts() {
     view.disconnectPresenter(*this);
 
     //Sort by using map with names as keys
-    std::map<std::string, UUID> dataSorted;
+    std::map<std::string, UID> dataSorted;
     for (auto &v : symbolTable.getScripts()) {
         dataSorted[v.second.name] = v.first;
     }
@@ -796,7 +796,7 @@ void Presenter::applyScripts() {
     view.setScriptsListView(tmp);
     view.setSelectedScript(currentIndex);
 
-    if (currentScript == UUID_NULL) {
+    if (currentScript == UID_NULL) {
         view.setScriptEnableArgsEnabled(false);
         view.setScriptBodyEnabled(false);
         view.setScriptEnableArgs(false);
@@ -825,7 +825,7 @@ void Presenter::applyCurrentScript() {
 
     view.setSelectedScript(currentIndex);
 
-    if (currentScript == UUID_NULL) {
+    if (currentScript == UID_NULL) {
         view.setScriptEnableArgsEnabled(false);
         view.setScriptBodyEnabled(false);
         view.setScriptEnableArgs(false);
