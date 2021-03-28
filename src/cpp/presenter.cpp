@@ -288,16 +288,16 @@ void Presenter::onVariableChanged(const std::string &name, const std::string &va
         } else {
             if (symbolTable.hasVariable(name)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add variable, a variable with the name " + name + " already exists.");
+                                       "Variable with the name " + name + " already exists.");
             } else if (symbolTable.hasConstant(name)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add variable, a constant with the name " + name + " already exists.");
+                                       "Constant with the name " + name + " already exists.");
             } else if (symbolTable.hasFunction(name)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add variable, a function with the name " + name + " already exists.");
+                                       "Function with the name " + name + " already exists.");
             } else if (symbolTable.hasScript(name)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add variable, a script with the name " + name + " already exists.");
+                                       "Script with the name " + name + " already exists.");
             } else {
                 symbolTable.setVariable(name, convertedValue);
                 applyVariables();
@@ -317,19 +317,19 @@ void Presenter::onVariableChanged(const std::string &name, const std::string &va
                 //Update name
                 if (symbolTable.hasVariable(name)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set variable name, a variable with the name " + name +
+                                           "Variable with the name " + name +
                                            " already exists.");
                 } else if (symbolTable.hasConstant(name)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set variable name, a constant with the name " + name +
+                                           "Constant with the name " + name +
                                            " already exists.");
                 } else if (symbolTable.hasFunction(name)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set variable name, a function with the name " + name +
+                                           "Function with the name " + name +
                                            " already exists.");
                 } else if (symbolTable.hasScript(name)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set variable name, a script with the name " + name +
+                                           "Script with the name " + name +
                                            " already exists.");
                 } else {
                     symbolTable.remove(currentVariable);
@@ -376,16 +376,16 @@ void Presenter::onConstantChanged(const std::string &name, const std::string &va
         } else {
             if (symbolTable.hasVariable(name)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add constant, a variable with the name " + name + " already exists.");
+                                       "Variable with the name " + name + " already exists.");
             } else if (symbolTable.hasConstant(name)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add constant, a constant with the name " + name + " already exists.");
+                                       "Constant with the name " + name + " already exists.");
             } else if (symbolTable.hasFunction(name)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add constant, a function with the name " + name + " already exists.");
+                                       "Function with the name " + name + " already exists.");
             } else if (symbolTable.hasScript(name)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add constant, a script with the name " + name + " already exists.");
+                                       "Script with the name " + name + " already exists.");
             } else {
                 symbolTable.setConstant(name, convertedValue);
                 applyConstants();
@@ -406,20 +406,16 @@ void Presenter::onConstantChanged(const std::string &name, const std::string &va
                 //Update name
                 if (symbolTable.hasVariable(name)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set constant name, a variable with the name " + name +
-                                           " already exists.");
+                                           "Variable with the name " + name + " already exists.");
                 } else if (symbolTable.hasConstant(name)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set constant name, a constant with the name " + name +
-                                           " already exists.");
+                                           "Constant with the name " + name + " already exists.");
                 } else if (symbolTable.hasFunction(name)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set constant name, a function with the name " + name +
-                                           " already exists.");
+                                           "Function with the name " + name + " already exists.");
                 } else if (symbolTable.hasScript(name)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set constant name, a script with the name " + name +
-                                           " already exists.");
+                                           "Script with the name " + name + " already exists.");
                 } else {
                     symbolTable.remove(currentConstant);
                     symbolTable.setConstant(name, convertedValue);
@@ -451,16 +447,16 @@ void Presenter::onFunctionNameChanged(const std::string &value) {
         } else {
             if (symbolTable.hasVariable(value)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add function, a variable with the name " + value + " already exists.");
+                                       "Variable with the name " + value + " already exists.");
             } else if (symbolTable.hasConstant(value)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add function, a constant with the name " + value + " already exists.");
+                                       "Constant with the name " + value + " already exists.");
             } else if (symbolTable.hasFunction(value)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add function, a function with the name " + value + " already exists.");
+                                       "Function with the name " + value + " already exists.");
             } else if (symbolTable.hasScript(value)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add function, a script with the name " + value + " already exists.");
+                                       "Script with the name " + value + " already exists.");
             } else {
                 symbolTable.setFunction(value, {});
                 applyFunctions();
@@ -469,9 +465,8 @@ void Presenter::onFunctionNameChanged(const std::string &value) {
     } else {
         if (value.empty()) {
             //Delete
-            if (view.showQuestionDialog("Delete Function", "Do you want to delete " +
-                                                           currentFunction +
-                                                           " ?")) {
+            if (view.showQuestionDialog("Delete Function",
+                                        "Do you want to delete " + currentFunction + " ?")) {
                 symbolTable.remove(currentFunction);
                 currentFunction.clear();
                 applyFunctions();
@@ -482,20 +477,16 @@ void Presenter::onFunctionNameChanged(const std::string &value) {
                 //Update name
                 if (symbolTable.hasVariable(value)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set function name, a variable with the name " + value +
-                                           " already exists.");
+                                           "Variable with the name " + value + " already exists.");
                 } else if (symbolTable.hasConstant(value)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set function name, a constant with the name " + value +
-                                           " already exists.");
+                                           "Constant with the name " + value + " already exists.");
                 } else if (symbolTable.hasFunction(value)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set function name, a function with the name " + value +
-                                           " already exists.");
+                                           "Function with the name " + value + " already exists.");
                 } else if (symbolTable.hasScript(value)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set function name, a script with the name " + value +
-                                           " already exists.");
+                                           "Script with the name " + value + " already exists.");
                 } else {
                     Function f = symbolTable.getFunctions().at(currentFunction);
                     symbolTable.remove(currentFunction);
@@ -540,16 +531,16 @@ void Presenter::onScriptNameChanged(const std::string &value) {
         } else {
             if (symbolTable.hasVariable(value)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add script, a variable with the name " + value + " already exists.");
+                                       "Variable with the name " + value + " already exists.");
             } else if (symbolTable.hasConstant(value)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add script, a constant with the name " + value + " already exists.");
+                                       "Constant with the name " + value + " already exists.");
             } else if (symbolTable.hasFunction(value)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add script, a function with the name " + value + " already exists.");
+                                       "Function with the name " + value + " already exists.");
             } else if (symbolTable.hasScript(value)) {
                 view.showWarningDialog("Error",
-                                       "Cannot add script, a script with the name " + value + " already exists.");
+                                       "Script with the name " + value + " already exists.");
             } else {
                 symbolTable.setScript(value, {});
                 applyScripts();
@@ -558,9 +549,8 @@ void Presenter::onScriptNameChanged(const std::string &value) {
     } else {
         if (value.empty()) {
             //Delete
-            if (view.showQuestionDialog("Delete Script", "Do you want to delete " +
-                                                         currentScript +
-                                                         " ?")) {
+            if (view.showQuestionDialog("Delete Script",
+                                        "Do you want to delete " + currentScript + " ?")) {
                 symbolTable.remove(currentScript);
                 currentScript.clear();
                 applyScripts();
@@ -571,20 +561,16 @@ void Presenter::onScriptNameChanged(const std::string &value) {
                 //Update name
                 if (symbolTable.hasVariable(value)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set script name, a variable with the name " + value +
-                                           " already exists.");
+                                           "Variable with the name " + value + " already exists.");
                 } else if (symbolTable.hasConstant(value)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set script name, a constant with the name " + value +
-                                           " already exists.");
+                                           "Constant with the name " + value + " already exists.");
                 } else if (symbolTable.hasFunction(value)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set script name, a function with the name " + value +
-                                           " already exists.");
+                                           "Function with the name " + value + " already exists.");
                 } else if (symbolTable.hasScript(value)) {
                     view.showWarningDialog("Error",
-                                           "Cannot set script name, a script with the name " + value +
-                                           " already exists.");
+                                           "Script with the name " + value + " already exists.");
                 } else {
                     Script s = symbolTable.getScripts().at(currentScript);
                     symbolTable.remove(currentScript);
