@@ -1,11 +1,11 @@
 #ifndef QCALC_SCRIPTFUNCTION_HPP
 #define QCALC_SCRIPTFUNCTION_HPP
 
-#include "pythoninterpreter.hpp"
-
-#include <utility>
+#include <string>
 
 #include "extern/exprtk.hpp"
+
+#include "calc/pythonparser.hpp"
 
 /**
  * A exprtk function which executes a single python script.
@@ -15,18 +15,18 @@ struct ScriptFunction : public exprtk::ifunction<T> {
     using exprtk::ifunction<T>::operator();
 
     ScriptFunction()
-            : exprtk::ifunction<T>(0), interpreter(nullptr) {}
+            : exprtk::ifunction<T>(0), pythonParser(nullptr) {}
 
-    ScriptFunction(PythonInterpreter &interpreter, std::string script)
-            : exprtk::ifunction<T>(0), interpreter(&interpreter), script(std::move(script)) {}
+    ScriptFunction(PythonParser &interpreter, std::string script)
+            : exprtk::ifunction<T>(0), pythonParser(&interpreter), script(std::move(script)) {}
 
     inline T operator()() {
-        assert(interpreter != nullptr);
-        return interpreter->run(script, {});
+        assert(pythonParser != nullptr);
+        return pythonParser->run(script, {});
     }
 
 private:
-    PythonInterpreter *interpreter;
+    PythonParser *pythonParser;
     std::string script;
 };
 

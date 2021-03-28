@@ -9,8 +9,8 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     std::vector<nlohmann::json> tmp;
     for (auto &p : table.getVariables()) {
         nlohmann::json t;
-        t["name"] = p.second.name;
-        t["value"] = p.second.value;
+        t["name"] = p.first;
+        t["value"] = p.second;
         tmp.emplace_back(t);
     }
     j["variables"] = tmp;
@@ -18,8 +18,8 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
 
     for (auto &p : table.getConstants()) {
         nlohmann::json t;
-        t["name"] = p.second.name;
-        t["value"] = p.second.value;
+        t["name"] = p.first;
+        t["value"] = p.second;
         tmp.emplace_back(t);
     }
     j["constants"] = tmp;
@@ -27,7 +27,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
 
     for (auto &p : table.getFunctions()) {
         nlohmann::json t;
-        t["name"] = p.second.name;
+        t["name"] = p.first;
         t["expression"] = p.second.expression;
         t["argumentNames"] = p.second.argumentNames;
         tmp.emplace_back(t);
@@ -37,8 +37,8 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
 
     for (auto &p : table.getScripts()) {
         nlohmann::json t;
-        t["name"] = p.second.name;
-        t["body"] = p.second.body;
+        t["name"] = p.first;
+        t["expression"] = p.second.expression;
         t["enableArguments"] = p.second.enableArguments;
         tmp.emplace_back(t);
     }
@@ -55,33 +55,35 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
     std::vector<nlohmann::json> tmp = j["variables"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
         std::string name = v["name"];
-        ValueType value = v["value"];
-        ret.addVariable(Variable(name, value));
+        ArithmeticType value = v["value"];
+        ret.setVariable(name, value);
     }
 
     tmp = j["constants"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
         std::string name = v["name"];
-        ValueType value = v["value"];
-        ret.addConstant(Constant(name, value));
+        ArithmeticType value = v["value"];
+        ret.setConstant(name, value);
     }
 
     tmp = j["functions"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
+        std::string name;
+        name = v["name"];
         Function f;
-        f.name = v["name"];
         f.expression = v["expression"];
         f.argumentNames = v["argumentNames"].get<std::vector<std::string>>();
-        ret.addFunction(f);
+        ret.setFunction(name, f);
     }
 
     tmp = j["scripts"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
+        std::string name;
+        name = v["name"];
         Script s;
-        s.name = v["name"];
-        s.body = v["body"];
+        s.expression = v["expression"];
         s.enableArguments = v["enableArguments"];
-        ret.addScript(s);
+        ret.setScript(name, s);
     }
 
     return ret;

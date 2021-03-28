@@ -1,15 +1,15 @@
-#include "pythoninterpreter.hpp"
+#include "calc/pythonparser.hpp"
 
-PythonInterpreter::PythonInterpreter() {
+PythonParser::PythonParser() {
     Py_Initialize();
     main = PyImport_AddModule("__main__");
 }
 
-PythonInterpreter::~PythonInterpreter() {
+PythonParser::~PythonParser() {
     Py_Finalize();
 }
 
-ValueType PythonInterpreter::run(const std::string &src, const std::vector<ValueType> &args) {
+double PythonParser::run(const std::string &src, const std::vector<double> &args) {
     PyObject *globalDictionary = PyModule_GetDict(main);
     PyObject *localDictionary = PyDict_New();
 

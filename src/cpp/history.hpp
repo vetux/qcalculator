@@ -4,20 +4,19 @@
 #include <vector>
 #include <string>
 
-#include "valuetype.hpp"
 #include "numberformat.hpp"
 
 class History {
 public:
-    void add(const std::string &expression, ValueType result) {
-        data.emplace_back(std::pair<std::string, ValueType>(expression, result));
+    void add(const std::string &expression, ArithmeticType result) {
+        data.emplace_back(std::pair<std::string, ArithmeticType>(expression, result));
     }
 
-    std::pair<std::string, ValueType> get(size_t index) {
+    std::pair<std::string, ArithmeticType> get(size_t index) {
         return data.at(index);
     }
 
-    const std::vector<std::pair<std::string, ValueType>> &getVector() {
+    const std::vector<std::pair<std::string, ArithmeticType>> &getVector() {
         return data;
     }
 
@@ -30,7 +29,7 @@ public:
     }
 
 private:
-    std::vector<std::pair<std::string, ValueType>> data;
+    std::vector<std::pair<std::string, ArithmeticType>> data;
 };
 
 #endif //QCALC_HISTORY_HPP

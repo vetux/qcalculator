@@ -4,7 +4,8 @@
 #include <string>
 
 #include "settings.hpp"
-#include "symboltable.hpp"
+
+#include "calc/symboltable.hpp"
 
 class Serializer {
 public:

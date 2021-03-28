@@ -9,24 +9,24 @@
 #include <bitset>
 #include <iomanip>
 
-#include "valuetype.hpp"
+#include "calc/arithmetictype.hpp"
 
 namespace NumberFormat {
-    std::string toDecimal(ValueType v, int floatPrecision = 32);
+    std::string toDecimal(ArithmeticType v, int floatPrecision = 32);
 
-    ValueType fromDecimal(const std::string &s);
+    std::string toHex(ArithmeticType v);
 
-    std::string toHex(ValueType v);
+    std::string toOctal(ArithmeticType v);
 
-    ValueType fromHex(const std::string &s);
+    std::string toBinary(ArithmeticType v);
 
-    std::string toOctal(ValueType v);
+    ArithmeticType fromDecimal(const std::string &s);
 
-    ValueType fromOctal(const std::string &s);
+    ArithmeticType fromHex(const std::string &s);
 
-    std::string toBinary(ValueType v);
+    ArithmeticType fromOctal(const std::string &s);
 
-    ValueType fromBinary(const std::string &s);
+    ArithmeticType fromBinary(const std::string &s);
 }
 
 #endif // NUMBERFORMAT_HPP

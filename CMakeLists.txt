@@ -22,7 +22,6 @@ if (WIN32)
 endif(WIN32)
 
 file(GLOB_RECURSE SRC src/cpp/*.cpp)
-file(GLOB_RECURSE HDR src/cpp/*.hpp)
 file(GLOB_RECURSE FORMS src/forms/*.ui)
 
 set(HDR_GUI src/cpp/mainwindow.hpp src/cpp/settingsdialog.hpp src/cpp/presenter.hpp)

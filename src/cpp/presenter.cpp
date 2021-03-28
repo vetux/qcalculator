@@ -4,9 +4,9 @@
 #include <QTextStream>
 #include <QDir>
 
-#include "numberformat.hpp"
 #include "serializer.hpp"
 #include "fractiontest.hpp"
+#include "numberformat.hpp"
 
 #define SETTINGS_FILENAME "/settings.json"
 
@@ -162,7 +162,7 @@ void Presenter::onWindowResize(const QResizeEvent &event) {
 
 void Presenter::onInputSubmit() {
     try {
-        currentValue = calculatorEngine.evaluate(inputText, symbolTable);
+        currentValue = expressionParser.evaluate(inputText, symbolTable);
         history.add(inputText, currentValue);
         inputText = toDecimal(currentValue);
     } catch (const std::exception &e) {
@@ -259,13 +259,13 @@ void Presenter::onBitViewKeyPressed(int bitIndex) {
 
 void Presenter::onSelectedVariableChanged(int index) {
     if (index == -1)
-        currentVariable = UID_NULL;
+        currentVariable.clear();
     else
         currentVariable = variableMapping.at(index);
 }
 
 void Presenter::onVariableChanged(const std::string &name, const std::string &value) {
-    ValueType convertedValue;
+    ArithmeticType convertedValue;
     try {
         convertedValue = fromDecimal(value);
     }
@@ -275,41 +275,70 @@ void Presenter::onVariableChanged(const std::string &name, const std::string &va
         error += " as decimal.";
         view.showWarningDialog("Error", error);
 
-        if (currentVariable == UID_NULL)
+        if (currentVariable.empty())
             return;
         else
-            convertedValue = symbolTable.getVariable(currentVariable).value;
+            convertedValue = symbolTable.getVariables().at(currentVariable);
     }
 
-    if (currentVariable == UID_NULL) {
+    if (currentVariable.empty()) {
+        //Create
         if (name.empty()) {
             view.showWarningDialog("Error", "The variable name cannot be empty.");
         } else {
-            try {
-                Variable var = {name, convertedValue};
-                symbolTable.addVariable(var);
+            if (symbolTable.hasVariable(name)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add variable, a variable with the name " + name + " already exists.");
+            } else if (symbolTable.hasConstant(name)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add variable, a constant with the name " + name + " already exists.");
+            } else if (symbolTable.hasFunction(name)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add variable, a function with the name " + name + " already exists.");
+            } else if (symbolTable.hasScript(name)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add variable, a script with the name " + name + " already exists.");
+            } else {
+                symbolTable.setVariable(name, convertedValue);
                 applyVariables();
-            }
-            catch (const std::exception &e) {
-                view.showWarningDialog("Error", e.what());
             }
         }
     } else {
         if (name.empty()) {
-            Variable v = symbolTable.getVariable(currentVariable);
-            if (view.showQuestionDialog("Delete Variable", "Do you want to delete " +
-                                                           v.name +
-                                                           " ?")) {
-                symbolTable.removeVariable(currentVariable);
-                currentVariable = UID_NULL;
+            //Delete
+            if (view.showQuestionDialog("Delete Variable",
+                                        "Do you want to delete " + currentVariable + " ?")) {
+                symbolTable.remove(currentVariable);
+                currentVariable.clear();
                 applyVariables();
             }
         } else {
-            try {
-                symbolTable.setVariable(currentVariable, {name, convertedValue});
-            }
-            catch (const std::exception &e) {
-                view.showWarningDialog("Error", e.what());
+            if (name != currentVariable) {
+                //Update name
+                if (symbolTable.hasVariable(name)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set variable name, a variable with the name " + name +
+                                           " already exists.");
+                } else if (symbolTable.hasConstant(name)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set variable name, a constant with the name " + name +
+                                           " already exists.");
+                } else if (symbolTable.hasFunction(name)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set variable name, a function with the name " + name +
+                                           " already exists.");
+                } else if (symbolTable.hasScript(name)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set variable name, a script with the name " + name +
+                                           " already exists.");
+                } else {
+                    symbolTable.remove(currentVariable);
+                    symbolTable.setVariable(name, convertedValue);
+                    currentVariable = name;
+                }
+            } else {
+                //Update value
+                symbolTable.setVariable(currentVariable, convertedValue);
             }
             applyVariables();
         }
@@ -318,13 +347,13 @@ void Presenter::onVariableChanged(const std::string &name, const std::string &va
 
 void Presenter::onSelectedConstantChanged(int index) {
     if (index == -1)
-        currentConstant = UID_NULL;
+        currentConstant.clear();
     else
         currentConstant = constantMapping.at(index);
 }
 
 void Presenter::onConstantChanged(const std::string &name, const std::string &value) {
-    ValueType convertedValue;
+    ArithmeticType convertedValue;
     try {
         convertedValue = fromDecimal(value);
     }
@@ -334,41 +363,71 @@ void Presenter::onConstantChanged(const std::string &name, const std::string &va
         error += " as decimal.";
         view.showWarningDialog("Error", error);
 
-        if (currentConstant == UID_NULL)
+        if (currentConstant.empty())
             return;
         else
-            convertedValue = symbolTable.getConstant(currentConstant).value;
+            convertedValue = symbolTable.getConstants().at(currentConstant);
     }
 
-    if (currentConstant == UID_NULL) {
+    if (currentConstant.empty()) {
+        //Create
         if (name.empty()) {
             view.showWarningDialog("Error", "The constant name cannot be empty.");
         } else {
-            try {
-                Constant con = {name, convertedValue};
-                symbolTable.addConstant(con);
+            if (symbolTable.hasVariable(name)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add constant, a variable with the name " + name + " already exists.");
+            } else if (symbolTable.hasConstant(name)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add constant, a constant with the name " + name + " already exists.");
+            } else if (symbolTable.hasFunction(name)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add constant, a function with the name " + name + " already exists.");
+            } else if (symbolTable.hasScript(name)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add constant, a script with the name " + name + " already exists.");
+            } else {
+                symbolTable.setConstant(name, convertedValue);
                 applyConstants();
-            }
-            catch (const std::exception &e) {
-                view.showWarningDialog("Error", e.what());
             }
         }
     } else {
         if (name.empty()) {
-            Constant c = symbolTable.getConstant(currentConstant);
-            if (view.showQuestionDialog("Delete Constant", "Do you want to delete " +
-                                                           c.name +
-                                                           " ?")) {
-                symbolTable.removeConstant(currentConstant);
-                currentConstant = UID_NULL;
+            //Delete
+            if (view.showQuestionDialog("Delete Constant",
+                                        "Do you want to delete " + currentConstant + " ?")) {
+                symbolTable.remove(currentConstant);
+                currentConstant.clear();
                 applyConstants();
             }
         } else {
-            try {
-                symbolTable.setConstant(currentConstant, {name, convertedValue});
-            }
-            catch (const std::exception &e) {
-                view.showWarningDialog("Error", e.what());
+            //Update
+            if (currentConstant != name) {
+                //Update name
+                if (symbolTable.hasVariable(name)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set constant name, a variable with the name " + name +
+                                           " already exists.");
+                } else if (symbolTable.hasConstant(name)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set constant name, a constant with the name " + name +
+                                           " already exists.");
+                } else if (symbolTable.hasFunction(name)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set constant name, a function with the name " + name +
+                                           " already exists.");
+                } else if (symbolTable.hasScript(name)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set constant name, a script with the name " + name +
+                                           " already exists.");
+                } else {
+                    symbolTable.remove(currentConstant);
+                    symbolTable.setConstant(name, convertedValue);
+                    currentConstant = name;
+                }
+            } else {
+                //Update value
+                symbolTable.setConstant(currentConstant, convertedValue);
             }
             applyConstants();
         }
@@ -377,7 +436,7 @@ void Presenter::onConstantChanged(const std::string &name, const std::string &va
 
 void Presenter::onSelectedFunctionChanged(int index) {
     if (index == -1)
-        currentFunction = UID_NULL;
+        currentFunction.clear();
     else
         currentFunction = functionMapping.at(index);
 
@@ -385,37 +444,64 @@ void Presenter::onSelectedFunctionChanged(int index) {
 }
 
 void Presenter::onFunctionNameChanged(const std::string &value) {
-    if (currentFunction == UID_NULL) {
+    if (currentFunction.empty()) {
+        //Create
         if (value.empty()) {
             view.showWarningDialog("Error", "Function name cannot be empty.");
         } else {
-            try {
-                Function f;
-                f.name = value;
-                symbolTable.addFunction(f);
+            if (symbolTable.hasVariable(value)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add function, a variable with the name " + value + " already exists.");
+            } else if (symbolTable.hasConstant(value)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add function, a constant with the name " + value + " already exists.");
+            } else if (symbolTable.hasFunction(value)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add function, a function with the name " + value + " already exists.");
+            } else if (symbolTable.hasScript(value)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add function, a script with the name " + value + " already exists.");
+            } else {
+                symbolTable.setFunction(value, {});
                 applyFunctions();
-            }
-            catch (const std::exception &e) {
-                view.showWarningDialog("Error", e.what());
             }
         }
     } else {
-        Function f = symbolTable.getFunction(currentFunction);
         if (value.empty()) {
+            //Delete
             if (view.showQuestionDialog("Delete Function", "Do you want to delete " +
-                                                           f.name +
+                                                           currentFunction +
                                                            " ?")) {
-                symbolTable.removeFunction(currentFunction);
-                currentFunction = UID_NULL;
+                symbolTable.remove(currentFunction);
+                currentFunction.clear();
                 applyFunctions();
             }
         } else {
-            try {
-                f.name = value;
-                symbolTable.setFunction(currentFunction, f);
-            }
-            catch (const std::exception &e) {
-                view.showWarningDialog("Error", e.what());
+            //Update
+            if (currentFunction != value) {
+                //Update name
+                if (symbolTable.hasVariable(value)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set function name, a variable with the name " + value +
+                                           " already exists.");
+                } else if (symbolTable.hasConstant(value)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set function name, a constant with the name " + value +
+                                           " already exists.");
+                } else if (symbolTable.hasFunction(value)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set function name, a function with the name " + value +
+                                           " already exists.");
+                } else if (symbolTable.hasScript(value)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set function name, a script with the name " + value +
+                                           " already exists.");
+                } else {
+                    Function f = symbolTable.getFunctions().at(currentFunction);
+                    symbolTable.remove(currentFunction);
+                    symbolTable.setFunction(value, f);
+                    currentFunction = value;
+                }
             }
             applyFunctions();
         }
@@ -423,15 +509,15 @@ void Presenter::onFunctionNameChanged(const std::string &value) {
 }
 
 void Presenter::onFunctionBodyChanged(const std::string &value) {
-    assert(currentFunction != UID_NULL);
-    Function f = symbolTable.getFunction(currentFunction);
+    assert(!currentFunction.empty());
+    Function f = symbolTable.getFunctions().at(currentFunction);
     f.expression = value;
     symbolTable.setFunction(currentFunction, f);
 }
 
 void Presenter::onFunctionArgsChanged(const std::vector<std::string> &arguments) {
-    assert(currentFunction != UID_NULL);
-    Function f = symbolTable.getFunction(currentFunction);
+    assert(!currentFunction.empty());
+    Function f = symbolTable.getFunctions().at(currentFunction);
     f.argumentNames = arguments;
     symbolTable.setFunction(currentFunction, f);
     view.setFunctionArgs(arguments);
@@ -439,7 +525,7 @@ void Presenter::onFunctionArgsChanged(const std::vector<std::string> &arguments)
 
 void Presenter::onSelectedScriptChanged(int index) {
     if (index == -1)
-        currentScript = UID_NULL;
+        currentScript.clear();
     else
         currentScript = scriptMapping.at(index);
 
@@ -447,37 +533,64 @@ void Presenter::onSelectedScriptChanged(int index) {
 }
 
 void Presenter::onScriptNameChanged(const std::string &value) {
-    if (currentScript == UID_NULL) {
+    if (currentScript.empty()) {
+        //Create
         if (value.empty()) {
             view.showWarningDialog("Error", "Script name cannot be empty.");
         } else {
-            try {
-                Script s;
-                s.name = value;
-                symbolTable.addScript(s);
+            if (symbolTable.hasVariable(value)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add script, a variable with the name " + value + " already exists.");
+            } else if (symbolTable.hasConstant(value)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add script, a constant with the name " + value + " already exists.");
+            } else if (symbolTable.hasFunction(value)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add script, a function with the name " + value + " already exists.");
+            } else if (symbolTable.hasScript(value)) {
+                view.showWarningDialog("Error",
+                                       "Cannot add script, a script with the name " + value + " already exists.");
+            } else {
+                symbolTable.setScript(value, {});
                 applyScripts();
-            }
-            catch (const std::exception &e) {
-                view.showWarningDialog("Error", e.what());
             }
         }
     } else {
-        Script s = symbolTable.getScript(currentScript);
         if (value.empty()) {
+            //Delete
             if (view.showQuestionDialog("Delete Script", "Do you want to delete " +
-                                                         s.name +
+                                                         currentScript +
                                                          " ?")) {
-                symbolTable.removeScript(currentScript);
-                currentScript = UID_NULL;
+                symbolTable.remove(currentScript);
+                currentScript.clear();
                 applyScripts();
             }
         } else {
-            try {
-                s.name = value;
-                symbolTable.setScript(currentScript, s);
-            }
-            catch (const std::exception &e) {
-                view.showWarningDialog("Error", e.what());
+            //Update
+            if (currentScript != value) {
+                //Update name
+                if (symbolTable.hasVariable(value)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set script name, a variable with the name " + value +
+                                           " already exists.");
+                } else if (symbolTable.hasConstant(value)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set script name, a constant with the name " + value +
+                                           " already exists.");
+                } else if (symbolTable.hasFunction(value)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set script name, a function with the name " + value +
+                                           " already exists.");
+                } else if (symbolTable.hasScript(value)) {
+                    view.showWarningDialog("Error",
+                                           "Cannot set script name, a script with the name " + value +
+                                           " already exists.");
+                } else {
+                    Script s = symbolTable.getScripts().at(currentScript);
+                    symbolTable.remove(currentScript);
+                    symbolTable.setScript(value, s);
+                    currentScript = value;
+                }
             }
             applyScripts();
         }
@@ -485,15 +598,15 @@ void Presenter::onScriptNameChanged(const std::string &value) {
 }
 
 void Presenter::onScriptBodyChanged(const std::string &value) {
-    assert(currentScript != UID_NULL);
-    Script s = symbolTable.getScript(currentScript);
-    s.body = value;
+    assert(!currentScript.empty());
+    Script s = symbolTable.getScripts().at(currentScript);
+    s.expression = value;
     symbolTable.setScript(currentScript, s);
 }
 
 void Presenter::onScriptEnableArgsChanged(bool value) {
-    assert(currentScript != UID_NULL);
-    Script s = symbolTable.getScript(currentScript);
+    assert(!currentScript.empty());
+    Script s = symbolTable.getScripts().at(currentScript);
     s.enableArguments = value;
     symbolTable.setScript(currentScript, s);
 }
@@ -539,10 +652,10 @@ void Presenter::onActionImportSymbolTable() {
         try {
             symbolTable = loadSymbolTable(filepath);
 
-            currentVariable = UID_NULL;
-            currentConstant = UID_NULL;
-            currentFunction = UID_NULL;
-            currentScript = UID_NULL;
+            currentVariable.clear();
+            currentConstant.clear();
+            currentFunction.clear();
+            currentScript.clear();
 
             applySymbolTable();
 
@@ -626,12 +739,6 @@ void Presenter::applySymbolTable() {
 void Presenter::applyVariables() {
     view.disconnectPresenter(*this);
 
-    //Sort by using map with names as keys
-    std::map<std::string, UID> dataSorted;
-    for (auto &v : symbolTable.getVariables()) {
-        dataSorted[v.second.name] = v.first;
-    }
-
     variableMapping.clear();
 
     //Update mapping with indices into the vector passed to the view
@@ -639,14 +746,13 @@ void Presenter::applyVariables() {
     int currentIndex = -1;
 
     int i = 0;
-    for (auto &v : dataSorted) {
-        variableMapping[i] = v.second;
+    for (auto &v : symbolTable.getVariables()) {
+        variableMapping[i] = v.first;
 
-        if (v.second == currentVariable)
+        if (currentVariable == v.first)
             currentIndex = i;
 
-        Variable var = symbolTable.getVariable(v.second);
-        tmp.emplace_back(std::pair<std::string, std::string>(var.name, toDecimal(var.value)));
+        tmp.emplace_back(std::pair<std::string, std::string>(v.first, toDecimal(v.second)));
         i++;
     }
 
@@ -659,12 +765,6 @@ void Presenter::applyVariables() {
 void Presenter::applyConstants() {
     view.disconnectPresenter(*this);
 
-    //Sort by using map with names as keys
-    std::map<std::string, UID> dataSorted;
-    for (auto &v : symbolTable.getConstants()) {
-        dataSorted[v.second.name] = v.first;
-    }
-
     constantMapping.clear();
 
     //Update mapping with indices into the vector passed to the view
@@ -672,14 +772,13 @@ void Presenter::applyConstants() {
     int currentIndex = -1;
 
     int i = 0;
-    for (auto &v : dataSorted) {
-        constantMapping[i] = v.second;
+    for (auto &v : symbolTable.getConstants()) {
+        constantMapping[i] = v.first;
 
-        if (v.second == currentConstant)
+        if (currentConstant == v.first)
             currentIndex = i;
 
-        Constant var = symbolTable.getConstant(v.second);
-        tmp.emplace_back(std::pair<std::string, std::string>(var.name, toDecimal(var.value)));
+        tmp.emplace_back(std::pair<std::string, std::string>(v.first, toDecimal(v.second)));
         i++;
     }
 
@@ -692,12 +791,6 @@ void Presenter::applyConstants() {
 void Presenter::applyFunctions() {
     view.disconnectPresenter(*this);
 
-    //Sort by using map with names as keys
-    std::map<std::string, UID> dataSorted;
-    for (auto &v : symbolTable.getFunctions()) {
-        dataSorted[v.second.name] = v.first;
-    }
-
     functionMapping.clear();
 
     //Update mapping with indices into the vector passed to the view
@@ -705,27 +798,26 @@ void Presenter::applyFunctions() {
     int currentIndex = -1;
 
     int i = 0;
-    for (auto &v : dataSorted) {
-        functionMapping[i] = v.second;
+    for (auto &v : symbolTable.getFunctions()) {
+        functionMapping[i] = v.first;
 
-        if (v.second == currentFunction)
+        if (currentFunction == v.first)
             currentIndex = i;
 
-        Function var = symbolTable.getFunction(v.second);
-        tmp.emplace_back(var.name);
+        tmp.emplace_back(v.first);
         i++;
     }
 
     view.setFunctionsListView(tmp);
     view.setSelectedFunction(currentIndex);
 
-    if (currentFunction == UID_NULL) {
+    if (currentFunction.empty()) {
         view.setFunctionBodyEnabled(false);
         view.setFunctionArgsSpinBoxEnabled(false);
         view.setFunctionBody("");
         view.setFunctionArgs({});
     } else {
-        Function func = symbolTable.getFunction(currentFunction);
+        Function func = symbolTable.getFunctions().at(currentFunction);
 
         view.setFunctionBodyEnabled(true);
         view.setFunctionArgsSpinBoxEnabled(true);
@@ -749,13 +841,13 @@ void Presenter::applyCurrentFunction() {
 
     view.setSelectedFunction(currentIndex);
 
-    if (currentFunction == UID_NULL) {
+    if (currentFunction.empty()) {
         view.setFunctionBodyEnabled(false);
         view.setFunctionArgsSpinBoxEnabled(false);
         view.setFunctionBody("");
         view.setFunctionArgs({});
     } else {
-        Function func = symbolTable.getFunction(currentFunction);
+        Function func = symbolTable.getFunctions().at(currentFunction);
 
         view.setFunctionBodyEnabled(true);
         view.setFunctionArgsSpinBoxEnabled(true);
@@ -769,12 +861,6 @@ void Presenter::applyCurrentFunction() {
 void Presenter::applyScripts() {
     view.disconnectPresenter(*this);
 
-    //Sort by using map with names as keys
-    std::map<std::string, UID> dataSorted;
-    for (auto &v : symbolTable.getScripts()) {
-        dataSorted[v.second.name] = v.first;
-    }
-
     scriptMapping.clear();
 
     //Update mapping with indices into the vector passed to the view
@@ -782,31 +868,30 @@ void Presenter::applyScripts() {
     int currentIndex = -1;
 
     int i = 0;
-    for (auto &v : dataSorted) {
-        scriptMapping[i] = v.second;
+    for (auto &v : symbolTable.getScripts()) {
+        scriptMapping[i] = v.first;
 
-        if (v.second == currentScript)
+        if (currentScript == v.first)
             currentIndex = i;
 
-        Script var = symbolTable.getScript(v.second);
-        tmp.emplace_back(var.name);
+        tmp.emplace_back(v.first);
         i++;
     }
 
     view.setScriptsListView(tmp);
     view.setSelectedScript(currentIndex);
 
-    if (currentScript == UID_NULL) {
+    if (currentScript.empty()) {
         view.setScriptEnableArgsEnabled(false);
         view.setScriptBodyEnabled(false);
         view.setScriptEnableArgs(false);
         view.setScriptBody("");
     } else {
-        Script s = symbolTable.getScript(currentScript);
+        Script s = symbolTable.getScripts().at(currentScript);
         view.setScriptEnableArgsEnabled(true);
         view.setScriptBodyEnabled(true);
         view.setScriptEnableArgs(s.enableArguments);
-        view.setScriptBody(s.body);
+        view.setScriptBody(s.expression);
     }
 
     view.connectPresenter(*this);
@@ -825,17 +910,17 @@ void Presenter::applyCurrentScript() {
 
     view.setSelectedScript(currentIndex);
 
-    if (currentScript == UID_NULL) {
+    if (currentScript.empty()) {
         view.setScriptEnableArgsEnabled(false);
         view.setScriptBodyEnabled(false);
         view.setScriptEnableArgs(false);
         view.setScriptBody("");
     } else {
-        Script s = symbolTable.getScript(currentScript);
+        Script s = symbolTable.getScripts().at(currentScript);
         view.setScriptEnableArgsEnabled(true);
         view.setScriptBodyEnabled(true);
         view.setScriptEnableArgs(s.enableArguments);
-        view.setScriptBody(s.body);
+        view.setScriptBody(s.expression);
     }
 
     view.connectPresenter(*this);

@@ -4,7 +4,7 @@
 
 using namespace FractionTest;
 
-std::string NumberFormat::toDecimal(ValueType v, int floatPrecision) {
+std::string NumberFormat::toDecimal(ArithmeticType v, int floatPrecision) {
     std::stringstream stream;
     stream << std::fixed << std::setprecision(floatPrecision) << v;
     std::string s = stream.str();
@@ -20,11 +20,7 @@ std::string NumberFormat::toDecimal(ValueType v, int floatPrecision) {
     return s;
 }
 
-ValueType NumberFormat::fromDecimal(const std::string &s) {
-    return std::stold(s);
-}
-
-std::string NumberFormat::toHex(ValueType v) {
+std::string NumberFormat::toHex(ArithmeticType v) {
     if (v < 0) {
         return "Error sign";
     } else if (v > std::numeric_limits<long long>::max()) {
@@ -41,15 +37,7 @@ std::string NumberFormat::toHex(ValueType v) {
     }
 }
 
-ValueType NumberFormat::fromHex(const std::string &s) {
-    long long x;
-    std::stringstream ss;
-    ss << std::hex << s;
-    ss >> x;
-    return x;
-}
-
-std::string NumberFormat::toOctal(ValueType v) {
+std::string NumberFormat::toOctal(ArithmeticType v) {
     if (v < 0) {
         return "Error sign";
     } else if (v > std::numeric_limits<long long>::max()) {
@@ -64,15 +52,7 @@ std::string NumberFormat::toOctal(ValueType v) {
     }
 }
 
-ValueType NumberFormat::fromOctal(const std::string &s) {
-    long long x;
-    std::stringstream ss;
-    ss << std::oct << s;
-    ss >> x;
-    return x;
-}
-
-std::string NumberFormat::toBinary(ValueType v) {
+std::string NumberFormat::toBinary(ArithmeticType v) {
     if (v < 0) {
         return "Error sign";
     } else if (v > std::numeric_limits<long long>::max()) {
@@ -92,7 +72,27 @@ std::string NumberFormat::toBinary(ValueType v) {
     }
 }
 
-ValueType NumberFormat::fromBinary(const std::string &s) {
+ArithmeticType NumberFormat::fromDecimal(const std::string &s) {
+    return std::stold(s);
+}
+
+ArithmeticType NumberFormat::fromHex(const std::string &s) {
+    long long x;
+    std::stringstream ss;
+    ss << std::hex << s;
+    ss >> x;
+    return x;
+}
+
+ArithmeticType NumberFormat::fromOctal(const std::string &s) {
+    long long x;
+    std::stringstream ss;
+    ss << std::oct << s;
+    ss >> x;
+    return x;
+}
+
+ArithmeticType NumberFormat::fromBinary(const std::string &s) {
     if (s.size() > 63)
         throw std::runtime_error("Bit limit");
     return std::bitset<64>(s).to_ullong();

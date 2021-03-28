@@ -1,7 +1,7 @@
 #ifndef QCALC_PRESENTER_HPP
 #define QCALC_PRESENTER_HPP
 
-#include "calculatorengine.hpp"
+#include "calc/expressionparser.hpp" //Has to be before qt includes because of python include.
 
 #include <QObject>
 #include <QCloseEvent>
@@ -11,7 +11,6 @@
 #include "view.hpp"
 #include "settings.hpp"
 #include "history.hpp"
-#include "uid.hpp"
 
 class Presenter : public QObject {
 Q_OBJECT
@@ -102,25 +101,26 @@ public slots:
 private:
     View &view;
 
-    CalculatorEngine calculatorEngine;
+    ExpressionParser expressionParser;
     SymbolTable symbolTable;
+
     Settings settings;
 
     History history;
 
-    ValueType currentValue;
+    ArithmeticType currentValue;
 
     std::string inputText;
 
-    UID currentVariable = UID_NULL;
-    UID currentConstant = UID_NULL;
-    UID currentFunction = UID_NULL;
-    UID currentScript = UID_NULL;
+    std::string currentVariable;
+    std::string currentConstant;
+    std::string currentFunction;
+    std::string currentScript;
 
-    std::map<int, UID> variableMapping;
-    std::map<int, UID> constantMapping;
-    std::map<int, UID> functionMapping;
-    std::map<int, UID> scriptMapping;
+    std::map<int, std::string> variableMapping;
+    std::map<int, std::string> constantMapping;
+    std::map<int, std::string> functionMapping;
+    std::map<int, std::string> scriptMapping;
 
     void applyCurrentValue();
 
