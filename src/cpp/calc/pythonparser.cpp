@@ -10,7 +10,7 @@ std::string Py_GetErrorMessage() {
     PyObject *pType, *pValue, *pTraceback;
     PyErr_Fetch(&pType, &pValue, &pTraceback);
 
-    std::string error = "Failed to run script: Error{ Type: ";
+    std::string error = "{ Type: ";
     if (pType != PyNULL) {
         PyObject *pTypeStr = PyObject_Str(pType);
         const char *pErrorType = PyUnicode_AsUTF8(pTypeStr);
@@ -63,7 +63,6 @@ PythonParser::~PythonParser() {
 }
 
 double PythonParser::run(const std::string &src, const std::vector<double> &args) {
-    //Create arguments list object
     PyObject *pyArgsList = PyList_New(0);
     for (auto arg : args) {
         PyObject *f = PyFloat_FromDouble(arg);

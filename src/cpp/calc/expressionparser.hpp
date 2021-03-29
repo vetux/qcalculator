@@ -5,10 +5,8 @@
 
 #include "calc/symboltable.hpp"
 #include "calc/arithmetictype.hpp"
-#include "calc/pythonparser.hpp"
 
-#include "calc/scriptvarargfunction.hpp"
-#include "calc/scriptfunction.hpp"
+#include "calc/pythonparser.hpp"
 
 /**
  * The expression expressionParser evaluates expressions in string form using an optionally supplied symbol table.
@@ -44,7 +42,6 @@ public:
     ArithmeticType evaluate(const std::string &expr);
 
 private:
-    exprtk::parser<ArithmeticType> parser;
     PythonParser pythonParser;
 };
 

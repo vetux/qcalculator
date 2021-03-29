@@ -1,5 +1,8 @@
 #include "calc/expressionparser.hpp"
 
+#include "calc/scriptfunction.hpp"
+#include "calc/scriptvarargfunction.hpp"
+
 ExpressionParser::ExpressionParser() = default;
 
 ExpressionParser::~ExpressionParser() = default;
@@ -13,6 +16,7 @@ ExpressionParser::~ExpressionParser() = default;
  * @return The value of the expression.
  */
 ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &symbolTable) {
+    exprtk::parser<ArithmeticType> parser;
     exprtk::function_compositor<ArithmeticType> compositor;
     exprtk::symbol_table<ArithmeticType> symbols = compositor.symbol_table();
 
@@ -125,6 +129,7 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
 }
 
 ArithmeticType ExpressionParser::evaluate(const std::string &expr) {
+    exprtk::parser<ArithmeticType> parser;
     exprtk::expression<ArithmeticType> expression;
 
     if (parser.compile(expr, expression)) {
