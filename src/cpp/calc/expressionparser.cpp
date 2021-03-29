@@ -1,6 +1,5 @@
 #include "calc/expressionparser.hpp"
 
-
 ExpressionParser::ExpressionParser() = default;
 
 ExpressionParser::~ExpressionParser() = default;

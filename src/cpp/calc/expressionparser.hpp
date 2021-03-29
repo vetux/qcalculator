@@ -3,12 +3,12 @@
 
 #include <string>
 
-
-#include "calc/scriptvarargfunction.hpp"
-#include "calc/scriptfunction.hpp"
 #include "calc/symboltable.hpp"
 #include "calc/arithmetictype.hpp"
 #include "calc/pythonparser.hpp"
+
+#include "calc/scriptvarargfunction.hpp"
+#include "calc/scriptfunction.hpp"
 
 /**
  * The expression expressionParser evaluates expressions in string form using an optionally supplied symbol table.

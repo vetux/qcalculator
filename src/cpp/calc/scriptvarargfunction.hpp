@@ -2,6 +2,7 @@
 #define QCALC_SCRIPTVARARGFUNCTION_HPP
 
 #include <string>
+#include <cassert>
 
 #include "extern/exprtk.hpp"
 

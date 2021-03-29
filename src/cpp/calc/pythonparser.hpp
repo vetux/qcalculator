@@ -1,10 +1,6 @@
 #ifndef QCALC_PYTHONPARSER_HPP
 #define QCALC_PYTHONPARSER_HPP
 
-#define PY_SSIZE_T_CLEAN
-
-#include <Python.h> //TODO: Move python include into source file
-
 #include <string>
 #include <stdexcept>
 #include <vector>
@@ -14,7 +10,6 @@
  * Parses a python script in string form, passes the arguments to the script int the python list "argv" and returns the value of the python float "outv"
  */
 class PythonParser {
-    PyObject *main;
 public:
     PythonParser();
 

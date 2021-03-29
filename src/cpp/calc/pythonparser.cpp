@@ -1,8 +1,61 @@
 #include "calc/pythonparser.hpp"
 
+#define PY_SSIZE_T_CLEAN
+
+#include <Python.h>
+
+#define PyNULL NULL
+
+std::string Py_GetErrorMessage() {
+    PyObject *pType, *pValue, *pTraceback;
+    PyErr_Fetch(&pType, &pValue, &pTraceback);
+
+    std::string error = "Failed to run script: Error{ Type: ";
+    if (pType != PyNULL) {
+        PyObject *pTypeStr = PyObject_Str(pType);
+        const char *pErrorType = PyUnicode_AsUTF8(pTypeStr);
+
+        error += pErrorType;
+
+        Py_DECREF(pTypeStr);
+        Py_DECREF(pType);
+    } else {
+        error += "NoType";
+    }
+
+    error += ", Value: ";
+    if (pValue != PyNULL) {
+        PyObject *pValueStr = PyObject_Str(pValue);
+        const char *pErrorValue = PyUnicode_AsUTF8(pValueStr);
+
+        error += pErrorValue;
+
+        Py_DECREF(pValueStr);
+        Py_DECREF(pValue);
+    } else {
+        error += "NoValue";
+    }
+
+    error += ", Traceback: ";
+    if (pTraceback != PyNULL) {
+        PyObject *pTracebackStr = PyObject_Str(pTraceback);
+        const char *pErrorTraceback = PyUnicode_AsUTF8(pTracebackStr);
+
+        error += pErrorTraceback;
+
+        Py_DECREF(pTracebackStr);
+        Py_DECREF(pTraceback);
+    } else {
+        error += "NoTraceback";
+    }
+
+    error += " }";
+
+    return error;
+}
+
 PythonParser::PythonParser() {
     Py_Initialize();
-    main = PyImport_AddModule("__main__");
 }
 
 PythonParser::~PythonParser() {
@@ -10,52 +63,41 @@ PythonParser::~PythonParser() {
 }
 
 double PythonParser::run(const std::string &src, const std::vector<double> &args) {
-    PyObject *globalDictionary = PyModule_GetDict(main);
-    PyObject *localDictionary = PyDict_New();
-
-    PyObject *pythonlist = PyList_New(0);
-
+    //Create arguments list object
+    PyObject *pyArgsList = PyList_New(0);
     for (auto arg : args) {
         PyObject *f = PyFloat_FromDouble(arg);
-        PyList_Append(pythonlist, f);
+        PyList_Append(pyArgsList, f);
     }
 
-    PyDict_SetItemString(localDictionary, "argv", pythonlist);
+    PyObject *pyArgsName = PyUnicode_FromString("argv");
 
-    PyObject *result = PyRun_String(src.c_str(), Py_file_input, globalDictionary, localDictionary);
+    PyObject *globals = PyDict_New();
+    PyObject *locals = PyDict_New();
 
-    if (result == nullptr) {
-        /*
-        //The documentation does not give clear insight as to what PyErr_Fetch does so i will not risk a segfault because of bad documentation.
-        PyObject *pType, *pValue, *pTraceback;
-        PyErr_Fetch(&pType, &pValue, &pTraceback);
+    PyDict_SetItem(globals, pyArgsName, pyArgsList);
 
-        PyObject *pTypeStr = PyObject_Str(pType);
-        PyObject *pValueStr = PyObject_Str(pValue);
-        PyObject *pTracebackStr = PyObject_Str(pTraceback);
+    PyObject *pyRunStringReturnValue = PyRun_String(src.c_str(), Py_file_input, globals, locals);
 
-        const char *pErrorType = PyUnicode_AsUTF8(pTypeStr);
-        const char *pErrorValue = PyUnicode_AsUTF8(pValueStr);
-        const char *pErrorTraceback = PyUnicode_AsUTF8(pTracebackStr);
-
-        std::string error = "Failed to run script, Error{ Type: ";
-        error += pErrorType;
-        error += ", Value: ";
-        error += pErrorValue;
-        error += ", Traceback: ";
-        error += pErrorTraceback;
-        error += " }";
-
-        throw std::runtime_error(error);
-        */
-        PyErr_Print();
-        throw std::runtime_error("Failed to run script, See standard error for a detailed error description");
-    } else {
-        PyObject *output = PyDict_GetItemString(localDictionary, "outv");
-        if (output != nullptr) {
-            return PyFloat_AsDouble(output);
-        } else {
-            return 0;
-        }
+    if (pyRunStringReturnValue == PyNULL) {
+        throw std::runtime_error(Py_GetErrorMessage());
     }
+
+    PyObject *pyOutName = PyUnicode_FromString("outv");
+
+    PyObject *pyOutValue = PyDict_GetItem(locals, pyOutName);
+
+    double ret = 0;
+    if (pyOutValue != PyNULL) {
+        ret = PyFloat_AsDouble(pyOutValue);
+    }
+
+    Py_DECREF(pyOutName);
+    Py_DECREF(pyRunStringReturnValue);
+    Py_DECREF(locals);
+    Py_DECREF(globals);
+    Py_DECREF(pyArgsName);
+    Py_DECREF(pyArgsList);
+
+    return ret;
 }
