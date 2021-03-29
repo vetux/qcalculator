@@ -23,6 +23,9 @@ endif(WIN32)
 
 file(GLOB_RECURSE SRC src/cpp/*.cpp)
 file(GLOB_RECURSE FORMS src/forms/*.ui)
+file(GLOB_RECURSE PLUGIN_SRC src/python/*.py)
+
+file(COPY ${PLUGIN_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/plugins) # Copy python plugin files
 
 set(HDR_GUI src/cpp/mainwindow.hpp src/cpp/settingsdialog.hpp src/cpp/presenter.hpp)
 
