@@ -81,12 +81,11 @@ double PythonParser::run(const std::string &src, const std::vector<double> &args
         PyList_Append(pyArgsList, f);
     }
 
-    PyObject *pyArgsName = PyUnicode_FromString("argv");
+    PyObject *pyArgsName = PyUnicode_FromString("_QCalcArguments");
+    PyDict_SetItem(qcDict, pyArgsName, pyArgsList);
 
     PyObject *globals = PyDict_New();
     PyObject *locals = PyDict_New();
-
-    PyDict_SetItem(globals, pyArgsName, pyArgsList);
 
     PyObject *pyRunStringReturnValue = PyRun_String(src.c_str(), Py_file_input, globals, locals);
 
@@ -95,7 +94,6 @@ double PythonParser::run(const std::string &src, const std::vector<double> &args
     }
 
     PyObject *pyOutName = PyUnicode_FromString("_QCalcOutputValue");
-
     PyObject *pyOutValue = PyDict_GetItem(qcDict, pyOutName);
 
     double ret = 0;
@@ -104,6 +102,7 @@ double PythonParser::run(const std::string &src, const std::vector<double> &args
     }
 
     PyDict_DelItem(qcDict, pyOutName);
+    PyDict_DelItem(qcDict, pyArgsName);
 
     Py_DECREF(pyOutName);
     Py_DECREF(pyRunStringReturnValue);
