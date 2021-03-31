@@ -1,6 +1,5 @@
 #include "io.hpp"
 
-#include <QStandardPaths>
 #include <QFile>
 #include <QDir>
 #include <QTextStream>
@@ -8,12 +7,31 @@
 #include "serializer.hpp"
 
 namespace IO {
-    std::string getAppDirectory() {
-        QString appDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        if (!QDir(appDir).exists()) {
-            QDir().mkpath(appDir);
+    std::vector<std::string> findFilesInDirectory(const std::string &directory,
+                                                  const std::string &suffix,
+                                                  bool recursive) {
+        QDir dir(directory.c_str());
+
+        std::vector<std::string> ret;
+
+        QFileInfoList entries = dir.entryInfoList(QDir::NoFilter, QDir::Name);
+        for (auto &entry : entries) {
+            if (entry.isDir()) {
+                if (recursive) {
+                    std::vector<std::string> tmp = findFilesInDirectory(entry.absoluteFilePath().toStdString(),
+                                                                        suffix,
+                                                                        recursive);
+                    for (auto &tmpPath : tmp) {
+                        ret.emplace_back(tmpPath);
+                    }
+                }
+            } else {
+                if (suffix.empty() || entry.completeSuffix().toStdString() == suffix)
+                    ret.emplace_back(entry.absoluteFilePath().toStdString());
+            }
         }
-        return appDir.toStdString();
+
+        return ret;
     }
 
     Settings loadSettings(const std::string &fileName) {

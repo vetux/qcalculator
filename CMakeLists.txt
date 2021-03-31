@@ -23,9 +23,12 @@ endif(WIN32)
 
 file(GLOB_RECURSE SRC src/cpp/*.cpp)
 file(GLOB_RECURSE FORMS src/forms/*.ui)
-file(GLOB_RECURSE PLUGIN_SRC src/python/*.py)
 
-file(COPY ${PLUGIN_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/plugins) # Copy python plugin files
+file(GLOB_RECURSE ADDON_SRC src/python/addon/*.py)
+file(GLOB_RECURSE SYSTEM_SRC src/python/system/*.py)
+
+file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy addon scripts
+file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/system) # Copy system scripts
 
 set(HDR_GUI src/cpp/gui/mainwindow.hpp src/cpp/gui/settingsdialog.hpp src/cpp/gui/mainpresenter.hpp)
 

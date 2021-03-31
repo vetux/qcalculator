@@ -1,6 +1,7 @@
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QDir>
+#include <QCoreApplication>
 
 #include "serializer.hpp"
 #include "fractiontest.hpp"
@@ -15,16 +16,26 @@
 using namespace NumberFormat;
 using namespace FractionTest;
 
+QString getAppDataDirectory() {
+    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+
+    if (QDir(dirPath).exists())
+        QDir().mkpath(dirPath);
+
+    return dirPath;
+}
+
 MainPresenter::MainPresenter(MainView &view)
         : view(view), currentValue(0) {
     NativeInterface::initialize(view);
     PyUtil::initializePython();
-    PyUtil::addModuleDirectory("./plugins");
+    PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/addon").toStdString());
+    PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/system").toStdString());
 }
 
 void MainPresenter::init() {
     try {
-        settings = IO::loadSettings(IO::getAppDirectory().append(SETTINGS_FILENAME));
+        settings = IO::loadSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString());
     }
     catch (const std::exception &e) {
         settings = {};
@@ -48,7 +59,7 @@ void MainPresenter::init() {
 
 void MainPresenter::onWindowClose(const QCloseEvent &event) {
     try {
-        IO::saveSettings(IO::getAppDirectory().append(SETTINGS_FILENAME), settings);
+        IO::saveSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(), settings);
     }
     catch (const std::exception &e) {
         std::string error = "Failed to save settings: ";
@@ -501,7 +512,7 @@ void MainPresenter::onScriptEnableArgsChanged(bool value) {
 
 void MainPresenter::onActionExit() {
     try {
-        IO::saveSettings(IO::getAppDirectory().append(SETTINGS_FILENAME), settings);
+        IO::saveSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(), settings);
     }
     catch (const std::exception &e) {
         std::string error = "Failed to save settings: ";
