@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "presenter.hpp" //Has to be the first include because python uses "slots" as a variable name and "slots" is a qt reserved word.
+#include "mainpresenter.hpp" //Has to be the first include because python uses "slots" as a variable name and "slots" is a qt reserved word.
 
 #include <QMainWindow>
 #include <bitset>
@@ -12,8 +12,8 @@
 #include "numeralsystem.hpp"
 #include "numpadkey.hpp"
 
-#include "view.hpp"
-#include "presenter.hpp"
+#include "mainview.hpp"
+#include "mainpresenter.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,7 +29,7 @@ QT_END_NAMESPACE
  * Alternatives are giving the presenter access to the ui pointer (Bad)
  * or making the presenter interface less abstract.
  */
-class MainWindow : public QMainWindow, View {
+class MainWindow : public QMainWindow, MainView {
 Q_OBJECT
 
 signals:
@@ -82,10 +82,10 @@ public:
 
     void resizeEvent(QResizeEvent *event) override;
 
-    //+View
-    void connectPresenter(const Presenter &target) override;
+    //+MainView
+    void connectPresenter(const MainPresenter &target) override;
 
-    void disconnectPresenter(const Presenter &target) override;
+    void disconnectPresenter(const MainPresenter &target) override;
 
     void showAboutDialog() override;
 
@@ -164,7 +164,7 @@ public:
     void setScriptEnableArgsEnabled(bool value) override;
 
     void setWindowSize(QSize size) override;
-    //-View
+    //-MainView
 
 private slots:
 
@@ -205,7 +205,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    Presenter presenter;
+    MainPresenter presenter;
 
     //Helpers
     QPushButton &getBitButton(int bitIndex);

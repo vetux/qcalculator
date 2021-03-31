@@ -1,5 +1,5 @@
-#ifndef QCALC_PRESENTER_HPP
-#define QCALC_PRESENTER_HPP
+#ifndef QCALC_MAINPRESENTER_HPP
+#define QCALC_MAINPRESENTER_HPP
 
 #include "calc/expressionparser.hpp" //Has to be before qt includes because of python include.
 
@@ -8,21 +8,21 @@
 #include <QResizeEvent>
 
 #include "numpadkey.hpp"
-#include "view.hpp"
+#include "mainview.hpp"
 #include "settings.hpp"
 #include "history.hpp"
 #include "nativeinterface.hpp"
 
-class Presenter : public QObject {
+class MainPresenter : public QObject {
 Q_OBJECT
 public:
-    explicit Presenter(View &view);
+    explicit MainPresenter(MainView &view);
 
     void init();
 
 public slots:
 
-    //+Presenter Interface
+    //+MainPresenter Interface
     void onWindowClose(const QCloseEvent &event);
 
     void onWindowResize(const QResizeEvent &event);
@@ -97,10 +97,10 @@ public slots:
     void onDockVisibilityChanged(bool visible);
 
     void onDockPositionChanged(Qt::DockWidgetArea area);
-    //-Presenter Interface
+    //-MainPresenter Interface
 
 private:
-    View &view;
+    MainView &view;
 
     ExpressionParser expressionParser;
     SymbolTable symbolTable;
@@ -140,4 +140,4 @@ private:
     void applyCurrentScript();
 };
 
-#endif //QCALC_PRESENTER_HPP
+#endif //QCALC_MAINPRESENTER_HPP

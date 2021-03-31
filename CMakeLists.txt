@@ -27,7 +27,7 @@ file(GLOB_RECURSE PLUGIN_SRC src/python/*.py)
 
 file(COPY ${PLUGIN_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/plugins) # Copy python plugin files
 
-set(HDR_GUI src/cpp/mainwindow.hpp src/cpp/settingsdialog.hpp src/cpp/presenter.hpp)
+set(HDR_GUI src/cpp/gui/mainwindow.hpp src/cpp/gui/settingsdialog.hpp src/cpp/gui/mainpresenter.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
 qt5_wrap_ui(WRAP_UI ${FORMS}) # Seems to output into CMAKE_CURRENT_BINARY_DIR

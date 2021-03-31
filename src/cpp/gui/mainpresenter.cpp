@@ -1,4 +1,4 @@
-#include "presenter.hpp"
+#include "mainpresenter.hpp"
 
 #include <QStandardPaths>
 #include <QTextStream>
@@ -117,14 +117,16 @@ void saveSymbolTable(const std::string &filePath, const SymbolTable &symbolTable
     file.close();
 }
 
-Presenter::Presenter(View &view)
+#include "plugin.hpp"
+
+MainPresenter::MainPresenter(MainView &view)
         : view(view), currentValue(0) {
     NativeInterface::initialize(view);
     PyUtil::initializePython();
     PyUtil::addModuleDirectory("./plugins");
 }
 
-void Presenter::init() {
+void MainPresenter::init() {
     try {
         settings = loadSettings();
     }
@@ -148,7 +150,7 @@ void Presenter::init() {
     view.connectPresenter(*this);
 }
 
-void Presenter::onWindowClose(const QCloseEvent &event) {
+void MainPresenter::onWindowClose(const QCloseEvent &event) {
     try {
         saveSettings(settings);
     }
@@ -160,11 +162,11 @@ void Presenter::onWindowClose(const QCloseEvent &event) {
     view.quit();
 }
 
-void Presenter::onWindowResize(const QResizeEvent &event) {
+void MainPresenter::onWindowResize(const QResizeEvent &event) {
     settings.windowSize = event.size();
 }
 
-void Presenter::onInputSubmit() {
+void MainPresenter::onInputSubmit() {
     try {
         currentValue = expressionParser.evaluate(inputText, symbolTable);
         history.add(inputText, currentValue);
@@ -185,11 +187,11 @@ void Presenter::onInputSubmit() {
     applyVariables(); //Update in case of variable changes
 }
 
-void Presenter::onInputUpdate(const QString &value) {
+void MainPresenter::onInputUpdate(const QString &value) {
     inputText = value.toStdString();
 }
 
-void Presenter::onDecimalSubmit(const QString &value) {
+void MainPresenter::onDecimalSubmit(const QString &value) {
     try {
         currentValue = fromDecimal(value.toStdString());
         applyCurrentValue();
@@ -203,7 +205,7 @@ void Presenter::onDecimalSubmit(const QString &value) {
     }
 }
 
-void Presenter::onHexSubmit(const QString &value) {
+void MainPresenter::onHexSubmit(const QString &value) {
     try {
         currentValue = fromHex(value.toStdString());
         applyCurrentValue();
@@ -217,7 +219,7 @@ void Presenter::onHexSubmit(const QString &value) {
     }
 }
 
-void Presenter::onOctalSubmit(const QString &value) {
+void MainPresenter::onOctalSubmit(const QString &value) {
     try {
         currentValue = fromOctal(value.toStdString());
         applyCurrentValue();
@@ -231,7 +233,7 @@ void Presenter::onOctalSubmit(const QString &value) {
     }
 }
 
-void Presenter::onBinarySubmit(const QString &value) {
+void MainPresenter::onBinarySubmit(const QString &value) {
     try {
         currentValue = fromBinary(value.toStdString());
         applyCurrentValue();
@@ -245,7 +247,7 @@ void Presenter::onBinarySubmit(const QString &value) {
     }
 }
 
-void Presenter::onNumPadKeyPressed(NumPadKey key) {
+void MainPresenter::onNumPadKeyPressed(NumPadKey key) {
     if (key == NumPadKey::KEY_EQUAL) {
         onInputSubmit();
     } else {
@@ -254,21 +256,21 @@ void Presenter::onNumPadKeyPressed(NumPadKey key) {
     }
 }
 
-void Presenter::onBitViewKeyPressed(int bitIndex) {
+void MainPresenter::onBitViewKeyPressed(int bitIndex) {
     std::bitset<64> bits(currentValue);
     bits.flip(bitIndex);
     currentValue = bits.to_ulong();
     applyCurrentValue();
 }
 
-void Presenter::onSelectedVariableChanged(int index) {
+void MainPresenter::onSelectedVariableChanged(int index) {
     if (index == -1)
         currentVariable.clear();
     else
         currentVariable = variableMapping.at(index);
 }
 
-void Presenter::onVariableChanged(const std::string &name, const std::string &value) {
+void MainPresenter::onVariableChanged(const std::string &name, const std::string &value) {
     ArithmeticType convertedValue;
     try {
         convertedValue = fromDecimal(value);
@@ -349,14 +351,14 @@ void Presenter::onVariableChanged(const std::string &name, const std::string &va
     }
 }
 
-void Presenter::onSelectedConstantChanged(int index) {
+void MainPresenter::onSelectedConstantChanged(int index) {
     if (index == -1)
         currentConstant.clear();
     else
         currentConstant = constantMapping.at(index);
 }
 
-void Presenter::onConstantChanged(const std::string &name, const std::string &value) {
+void MainPresenter::onConstantChanged(const std::string &name, const std::string &value) {
     ArithmeticType convertedValue;
     try {
         convertedValue = fromDecimal(value);
@@ -434,7 +436,7 @@ void Presenter::onConstantChanged(const std::string &name, const std::string &va
     }
 }
 
-void Presenter::onSelectedFunctionChanged(int index) {
+void MainPresenter::onSelectedFunctionChanged(int index) {
     if (index == -1)
         currentFunction.clear();
     else
@@ -443,7 +445,7 @@ void Presenter::onSelectedFunctionChanged(int index) {
     applyCurrentFunction();
 }
 
-void Presenter::onFunctionNameChanged(const std::string &value) {
+void MainPresenter::onFunctionNameChanged(const std::string &value) {
     if (currentFunction.empty()) {
         //Create
         if (value.empty()) {
@@ -503,14 +505,14 @@ void Presenter::onFunctionNameChanged(const std::string &value) {
     }
 }
 
-void Presenter::onFunctionBodyChanged(const std::string &value) {
+void MainPresenter::onFunctionBodyChanged(const std::string &value) {
     assert(!currentFunction.empty());
     Function f = symbolTable.getFunctions().at(currentFunction);
     f.expression = value;
     symbolTable.setFunction(currentFunction, f);
 }
 
-void Presenter::onFunctionArgsChanged(const std::vector<std::string> &arguments) {
+void MainPresenter::onFunctionArgsChanged(const std::vector<std::string> &arguments) {
     assert(!currentFunction.empty());
     Function f = symbolTable.getFunctions().at(currentFunction);
     f.argumentNames = arguments;
@@ -518,7 +520,7 @@ void Presenter::onFunctionArgsChanged(const std::vector<std::string> &arguments)
     view.setFunctionArgs(arguments);
 }
 
-void Presenter::onSelectedScriptChanged(int index) {
+void MainPresenter::onSelectedScriptChanged(int index) {
     if (index == -1)
         currentScript.clear();
     else
@@ -527,7 +529,7 @@ void Presenter::onSelectedScriptChanged(int index) {
     applyCurrentScript();
 }
 
-void Presenter::onScriptNameChanged(const std::string &value) {
+void MainPresenter::onScriptNameChanged(const std::string &value) {
     if (currentScript.empty()) {
         //Create
         if (value.empty()) {
@@ -587,21 +589,21 @@ void Presenter::onScriptNameChanged(const std::string &value) {
     }
 }
 
-void Presenter::onScriptBodyChanged(const std::string &value) {
+void MainPresenter::onScriptBodyChanged(const std::string &value) {
     assert(!currentScript.empty());
     Script s = symbolTable.getScripts().at(currentScript);
     s.expression = value;
     symbolTable.setScript(currentScript, s);
 }
 
-void Presenter::onScriptEnableArgsChanged(bool value) {
+void MainPresenter::onScriptEnableArgsChanged(bool value) {
     assert(!currentScript.empty());
     Script s = symbolTable.getScripts().at(currentScript);
     s.enableArguments = value;
     symbolTable.setScript(currentScript, s);
 }
 
-void Presenter::onActionExit() {
+void MainPresenter::onActionExit() {
     try {
         saveSettings(settings);
     }
@@ -613,30 +615,30 @@ void Presenter::onActionExit() {
     view.quit();
 }
 
-void Presenter::onActionAbout() {
+void MainPresenter::onActionAbout() {
     view.showAboutDialog();
 }
 
-void Presenter::onActionSettings() {
+void MainPresenter::onActionSettings() {
     view.showSettingsDialog();
 }
 
-void Presenter::onActionShowKeyPad(bool show) {
+void MainPresenter::onActionShowKeyPad(bool show) {
     settings.showKeypad = show;
     view.setKeyPadVisibility(show);
 }
 
-void Presenter::onActionShowBitView(bool show) {
+void MainPresenter::onActionShowBitView(bool show) {
     settings.showBitView = show;
     view.setBitViewVisibility(show);
 }
 
-void Presenter::onActionShowDock(bool show) {
+void MainPresenter::onActionShowDock(bool show) {
     settings.showDock = show;
     view.setDockVisibility(show);
 }
 
-void Presenter::onActionImportSymbolTable() {
+void MainPresenter::onActionImportSymbolTable() {
     std::string filepath;
     if (view.showFileChooserDialog("Import symbol table", true, filepath)) {
         try {
@@ -661,7 +663,7 @@ void Presenter::onActionImportSymbolTable() {
     }
 }
 
-void Presenter::onActionExportSymbolTable() {
+void MainPresenter::onActionExportSymbolTable() {
     std::string filepath;
     if (view.showFileChooserDialog("Export symbol table", false, filepath)) {
         try {
@@ -678,11 +680,11 @@ void Presenter::onActionExportSymbolTable() {
     }
 }
 
-void Presenter::onDockTabChanged(int tabIndex) {
+void MainPresenter::onDockTabChanged(int tabIndex) {
     settings.dockActiveTab = tabIndex;
 }
 
-void Presenter::onDockVisibilityChanged(bool visible) {
+void MainPresenter::onDockVisibilityChanged(bool visible) {
     settings.showDock = visible;
 }
 
@@ -698,12 +700,12 @@ bool isValidArea(Qt::DockWidgetArea area) {
     }
 }
 
-void Presenter::onDockPositionChanged(Qt::DockWidgetArea area) {
+void MainPresenter::onDockPositionChanged(Qt::DockWidgetArea area) {
     if (isValidArea(area))
         settings.dockPosition = area;
 }
 
-void Presenter::applyCurrentValue() {
+void MainPresenter::applyCurrentValue() {
     view.setValueText(toDecimal(currentValue));
     view.setDecimalText(toDecimal(currentValue));
     view.setHexText(toHex(currentValue));
@@ -719,14 +721,14 @@ void Presenter::applyCurrentValue() {
     }
 }
 
-void Presenter::applySymbolTable() {
+void MainPresenter::applySymbolTable() {
     applyVariables();
     applyConstants();
     applyFunctions();
     applyScripts();
 }
 
-void Presenter::applyVariables() {
+void MainPresenter::applyVariables() {
     view.disconnectPresenter(*this);
 
     variableMapping.clear();
@@ -752,7 +754,7 @@ void Presenter::applyVariables() {
     view.connectPresenter(*this);
 }
 
-void Presenter::applyConstants() {
+void MainPresenter::applyConstants() {
     view.disconnectPresenter(*this);
 
     constantMapping.clear();
@@ -778,7 +780,7 @@ void Presenter::applyConstants() {
     view.connectPresenter(*this);
 }
 
-void Presenter::applyFunctions() {
+void MainPresenter::applyFunctions() {
     view.disconnectPresenter(*this);
 
     functionMapping.clear();
@@ -818,7 +820,7 @@ void Presenter::applyFunctions() {
     view.connectPresenter(*this);
 }
 
-void Presenter::applyCurrentFunction() {
+void MainPresenter::applyCurrentFunction() {
     view.disconnectPresenter(*this);
 
     int currentIndex = -1;
@@ -848,7 +850,7 @@ void Presenter::applyCurrentFunction() {
     view.connectPresenter(*this);
 }
 
-void Presenter::applyScripts() {
+void MainPresenter::applyScripts() {
     view.disconnectPresenter(*this);
 
     scriptMapping.clear();
@@ -887,7 +889,7 @@ void Presenter::applyScripts() {
     view.connectPresenter(*this);
 }
 
-void Presenter::applyCurrentScript() {
+void MainPresenter::applyCurrentScript() {
     view.disconnectPresenter(*this);
 
     int currentIndex = -1;

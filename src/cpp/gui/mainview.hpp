@@ -1,17 +1,17 @@
-#ifndef QCALC_VIEW_HPP
-#define QCALC_VIEW_HPP
+#ifndef QCALC_MAINVIEW_HPP
+#define QCALC_MAINVIEW_HPP
 
 #include <QObject>
 #include <string>
 #include <bitset>
 
-class Presenter;
+class MainPresenter;
 
-class View {
+class MainView {
 public:
-    virtual void connectPresenter(const Presenter &target) = 0;
+    virtual void connectPresenter(const MainPresenter &target) = 0;
 
-    virtual void disconnectPresenter(const Presenter &target) = 0;
+    virtual void disconnectPresenter(const MainPresenter &target) = 0;
 
     virtual void showAboutDialog() = 0;
 
@@ -93,4 +93,4 @@ public:
     virtual void setWindowSize(QSize size) = 0;
 };
 
-#endif //QCALC_VIEW_HPP
+#endif //QCALC_MAINVIEW_HPP

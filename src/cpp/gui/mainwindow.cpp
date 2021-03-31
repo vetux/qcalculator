@@ -73,8 +73,8 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
     presenter.onWindowResize(*event);
 }
 
-//+View
-void MainWindow::connectPresenter(const Presenter &target) {
+//+MainView
+void MainWindow::connectPresenter(const MainPresenter &target) {
     connect(ui->lineEdit_input, SIGNAL(returnPressed()), &target, SLOT(onInputSubmit()));
     connect(ui->lineEdit_input, SIGNAL(textChanged(const QString &)), &target, SLOT(onInputUpdate(const QString &)));
 
@@ -120,7 +120,7 @@ void MainWindow::connectPresenter(const Presenter &target) {
             SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
 }
 
-void MainWindow::disconnectPresenter(const Presenter &target) {
+void MainWindow::disconnectPresenter(const MainPresenter &target) {
     disconnect(ui->lineEdit_input, SIGNAL(returnPressed()), &target, SLOT(onInputSubmit()));
     disconnect(ui->lineEdit_input, SIGNAL(textChanged(const QString &)), &target, SLOT(onInputUpdate(const QString &)));
 
@@ -479,7 +479,7 @@ void MainWindow::setScriptEnableArgsEnabled(bool value) {
 void MainWindow::setWindowSize(QSize size) {
     resize(size);
 }
-//-View
+//-MainView
 
 //-SLOTS
 void MainWindow::onNumericSystemsFinishEditing() {

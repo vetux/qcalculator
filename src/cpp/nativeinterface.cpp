@@ -8,7 +8,7 @@
 
 #include "pyutil.hpp"
 
-View *NativeInterface::view = nullptr;
+MainView *NativeInterface::view = nullptr;
 
 static PyMethodDef MethodDef[] = {
         {"showDialog", NativeInterface::showDialog, METH_VARARGS, "Show dialog."},
@@ -28,7 +28,7 @@ static PyObject *PyInit_qci() {
     return PyModule_Create(&ModuleDef);
 }
 
-void NativeInterface::initialize(View &v) {
+void NativeInterface::initialize(MainView &v) {
     NativeInterface::view = &v;
     PyImport_AppendInittab("qci", PyInit_qci);
 }

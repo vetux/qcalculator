@@ -16,6 +16,8 @@ namespace PyUtil {
     void setModuleDirectories(std::vector<std::string> dirs);
 
     void addModuleDirectory(const std::string &directory);
+
+    std::string getError();
 }
 
 #endif //QCALC_PYUTIL_HPP

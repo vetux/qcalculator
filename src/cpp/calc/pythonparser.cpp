@@ -6,59 +6,11 @@
 
 #include "pyutil.hpp"
 
-std::string GetPythonErrorMessage() {
-    PyObject *pType, *pValue, *pTraceback;
-    PyErr_Fetch(&pType, &pValue, &pTraceback);
-
-    std::string error = "{ Type: ";
-    if (pType != PyNull) {
-        PyObject *pTypeStr = PyObject_Str(pType);
-        const char *pErrorType = PyUnicode_AsUTF8(pTypeStr);
-
-        error += pErrorType;
-
-        Py_DECREF(pTypeStr);
-        Py_DECREF(pType);
-    } else {
-        error += "NoType";
-    }
-
-    error += ", Value: ";
-    if (pValue != PyNull) {
-        PyObject *pValueStr = PyObject_Str(pValue);
-        const char *pErrorValue = PyUnicode_AsUTF8(pValueStr);
-
-        error += pErrorValue;
-
-        Py_DECREF(pValueStr);
-        Py_DECREF(pValue);
-    } else {
-        error += "NoValue";
-    }
-
-    error += ", Traceback: ";
-    if (pTraceback != PyNull) {
-        PyObject *pTracebackStr = PyObject_Str(pTraceback);
-        const char *pErrorTraceback = PyUnicode_AsUTF8(pTracebackStr);
-
-        error += pErrorTraceback;
-
-        Py_DECREF(pTracebackStr);
-        Py_DECREF(pTraceback);
-    } else {
-        error += "NoTraceback";
-    }
-
-    error += " }";
-
-    return error;
-}
-
 double PythonParser::run(const std::string &src, const std::vector<double> &args) {
     PyObject *qcModule = PyImport_ImportModule("qc");
 
     if (qcModule == PyNull) {
-        throw std::runtime_error(GetPythonErrorMessage());
+        throw std::runtime_error(PyUtil::getError());
     }
 
     PyObject *qcDict = PyModule_GetDict(qcModule);
@@ -78,7 +30,7 @@ double PythonParser::run(const std::string &src, const std::vector<double> &args
     PyObject *pyRunStringReturnValue = PyRun_String(src.c_str(), Py_file_input, globals, locals);
 
     if (pyRunStringReturnValue == PyNull) {
-        throw std::runtime_error(GetPythonErrorMessage());
+        throw std::runtime_error(PyUtil::getError());
     }
 
     PyObject *pyOutName = PyUnicode_FromString("outv");
