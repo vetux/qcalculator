@@ -1,8 +1,6 @@
 #ifndef QCALC_MAINPRESENTER_HPP
 #define QCALC_MAINPRESENTER_HPP
 
-#include "calc/expressionparser.hpp" //Has to be before qt includes because of python include.
-
 #include <QObject>
 #include <QCloseEvent>
 #include <QResizeEvent>
@@ -12,6 +10,10 @@
 #include "settings.hpp"
 #include "history.hpp"
 #include "nativeinterface.hpp"
+
+#include "calc/expressionparser.hpp"
+
+#include "gui/mainpresenter.hpp"
 
 class MainPresenter : public QObject {
 Q_OBJECT

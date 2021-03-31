@@ -1,5 +1,3 @@
-#include "mainpresenter.hpp"
-
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QDir>
@@ -8,116 +6,14 @@
 #include "fractiontest.hpp"
 #include "numberformat.hpp"
 #include "pyutil.hpp"
+#include "io.hpp"
+
+#include "gui/mainpresenter.hpp"
 
 #define SETTINGS_FILENAME "/settings.json"
 
 using namespace NumberFormat;
 using namespace FractionTest;
-
-QString getAppDir() {
-    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-}
-
-Settings loadSettings() {
-    QString fileName = getAppDir();
-    fileName.append(SETTINGS_FILENAME);
-    try {
-        QFile file(fileName);
-        if (file.exists()) {
-            file.open(QFile::ReadOnly);
-
-            QTextStream stream(&file);
-            QString settingsContents = stream.readAll();
-            stream.flush();
-
-            file.close();
-
-            return Serializer::deserializeSettings(settingsContents.toStdString());
-        } else {
-            return {};
-        }
-    }
-    catch (const std::exception &e) {
-        std::string error = "Failed to read settings file at ";
-        error += fileName.toStdString();
-        error += " Error: ";
-        error += e.what();
-        throw std::runtime_error(error);
-    }
-}
-
-void saveSettings(const Settings &settings) {
-    QString appDir = getAppDir();
-    QString fileName = appDir;
-    fileName.append(SETTINGS_FILENAME);
-    try {
-        if (!QDir(appDir).exists())
-            QDir().mkpath(appDir);
-
-        QFile file(fileName);
-
-        file.open(QFile::WriteOnly | QFile::Truncate);
-
-        QTextStream stream(&file);
-        QString str = Serializer::serializeSettings(settings).c_str();
-        stream << str;
-        stream.flush();
-
-        file.close();
-    }
-    catch (const std::exception &e) {
-        std::string error = "Failed to write settings file at ";
-        error += fileName.toStdString();
-        error += " Error: ";
-        error += e.what();
-        throw std::runtime_error(error);
-    }
-}
-
-SymbolTable loadSymbolTable(const std::string &filePath) {
-    QFile file(filePath.c_str());
-    if (!file.exists()) {
-        std::string error = "File ";
-        error += filePath;
-        error += " not found.";
-        throw std::runtime_error(error);
-    }
-
-    file.open(QFile::ReadOnly);
-
-    QTextStream stream(&file);
-    QString contents = stream.readAll();
-    stream.flush();
-
-    file.close();
-
-    return Serializer::deserializeTable(contents.toStdString());
-}
-
-void saveSymbolTable(const std::string &filePath, const SymbolTable &symbolTable) {
-    QFile file(filePath.c_str());
-    QFileInfo info(file);
-
-    //Failsafe, dont accept filepaths which point to an existing directory
-    //as overwriting an existing directory with a file would not make sense in this case.
-    if (info.isDir()) {
-        std::string error = "File ";
-        error += filePath;
-        error += " is a directory.";
-        throw std::runtime_error(error);
-    }
-
-    file.open(QFile::WriteOnly | QFile::Truncate);
-
-    QTextStream stream(&file);
-    QString contents = Serializer::serializeTable(symbolTable).c_str();
-    stream << contents;
-    stream.flush();
-
-    file.close();
-}
-
-#include "plugin.hpp"
 
 MainPresenter::MainPresenter(MainView &view)
         : view(view), currentValue(0) {
@@ -128,7 +24,7 @@ MainPresenter::MainPresenter(MainView &view)
 
 void MainPresenter::init() {
     try {
-        settings = loadSettings();
+        settings = IO::loadSettings(IO::getAppDirectory().append(SETTINGS_FILENAME));
     }
     catch (const std::exception &e) {
         settings = {};
@@ -152,7 +48,7 @@ void MainPresenter::init() {
 
 void MainPresenter::onWindowClose(const QCloseEvent &event) {
     try {
-        saveSettings(settings);
+        IO::saveSettings(IO::getAppDirectory().append(SETTINGS_FILENAME), settings);
     }
     catch (const std::exception &e) {
         std::string error = "Failed to save settings: ";
@@ -605,7 +501,7 @@ void MainPresenter::onScriptEnableArgsChanged(bool value) {
 
 void MainPresenter::onActionExit() {
     try {
-        saveSettings(settings);
+        IO::saveSettings(IO::getAppDirectory().append(SETTINGS_FILENAME), settings);
     }
     catch (const std::exception &e) {
         std::string error = "Failed to save settings: ";
@@ -642,7 +538,7 @@ void MainPresenter::onActionImportSymbolTable() {
     std::string filepath;
     if (view.showFileChooserDialog("Import symbol table", true, filepath)) {
         try {
-            symbolTable = loadSymbolTable(filepath);
+            symbolTable = IO::loadSymbolTable(filepath);
 
             currentVariable.clear();
             currentConstant.clear();
@@ -667,7 +563,7 @@ void MainPresenter::onActionExportSymbolTable() {
     std::string filepath;
     if (view.showFileChooserDialog("Export symbol table", false, filepath)) {
         try {
-            saveSymbolTable(filepath, symbolTable);
+            IO::saveSymbolTable(filepath, symbolTable);
             view.showInfoDialog("Export successful", "Successfully exported symbol table to " + filepath);
         }
         catch (const std::exception &e) {

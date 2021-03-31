@@ -1,8 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "mainpresenter.hpp" //Has to be the first include because python uses "slots" as a variable name and "slots" is a qt reserved word.
-
 #include <QMainWindow>
 #include <bitset>
 #include <QPushButton>
