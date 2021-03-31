@@ -15,18 +15,16 @@ struct ScriptFunction : public exprtk::ifunction<T> {
     using exprtk::ifunction<T>::operator();
 
     ScriptFunction()
-            : exprtk::ifunction<T>(0), pythonParser(nullptr) {}
+            : exprtk::ifunction<T>(0) {}
 
-    ScriptFunction(PythonParser &interpreter, std::string script)
-            : exprtk::ifunction<T>(0), pythonParser(&interpreter), script(std::move(script)) {}
+    explicit ScriptFunction(std::string script)
+            : exprtk::ifunction<T>(0), script(std::move(script)) {}
 
     inline T operator()() {
-        assert(pythonParser != nullptr);
-        return pythonParser->run(script, {});
+        return PythonParser::run(script, {});
     }
 
 private:
-    PythonParser *pythonParser;
     std::string script;
 };
 

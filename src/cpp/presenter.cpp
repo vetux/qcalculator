@@ -7,6 +7,7 @@
 #include "serializer.hpp"
 #include "fractiontest.hpp"
 #include "numberformat.hpp"
+#include "pyutil.hpp"
 
 #define SETTINGS_FILENAME "/settings.json"
 
@@ -118,6 +119,9 @@ void saveSymbolTable(const std::string &filePath, const SymbolTable &symbolTable
 
 Presenter::Presenter(View &view)
         : view(view), currentValue(0) {
+    NativeInterface::initialize(view);
+    PyUtil::initializePython();
+    PyUtil::addModuleDirectory("./plugins");
 }
 
 void Presenter::init() {

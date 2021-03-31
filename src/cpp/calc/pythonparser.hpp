@@ -14,14 +14,7 @@ typedef _object PyObject;
  */
 class PythonParser {
 public:
-    PythonParser();
-
-    ~PythonParser();
-
-    double run(const std::string &src, const std::vector<double> &args);
-
-private:
-    PyObject *qcModule;
+    static double run(const std::string &src, const std::vector<double> &args);
 };
 
 #endif //QCALC_PYTHONPARSER_HPP

@@ -4,14 +4,14 @@
 
 #include <Python.h>
 
-#define PyNULL NULL
+#include "pyutil.hpp"
 
 std::string GetPythonErrorMessage() {
     PyObject *pType, *pValue, *pTraceback;
     PyErr_Fetch(&pType, &pValue, &pTraceback);
 
     std::string error = "{ Type: ";
-    if (pType != PyNULL) {
+    if (pType != PyNull) {
         PyObject *pTypeStr = PyObject_Str(pType);
         const char *pErrorType = PyUnicode_AsUTF8(pTypeStr);
 
@@ -24,7 +24,7 @@ std::string GetPythonErrorMessage() {
     }
 
     error += ", Value: ";
-    if (pValue != PyNULL) {
+    if (pValue != PyNull) {
         PyObject *pValueStr = PyObject_Str(pValue);
         const char *pErrorValue = PyUnicode_AsUTF8(pValueStr);
 
@@ -37,7 +37,7 @@ std::string GetPythonErrorMessage() {
     }
 
     error += ", Traceback: ";
-    if (pTraceback != PyNULL) {
+    if (pTraceback != PyNull) {
         PyObject *pTracebackStr = PyObject_Str(pTraceback);
         const char *pErrorTraceback = PyUnicode_AsUTF8(pTracebackStr);
 
@@ -54,26 +54,14 @@ std::string GetPythonErrorMessage() {
     return error;
 }
 
-PythonParser::PythonParser() {
-    Py_Initialize();
-
-    PyObject *sys_path = PySys_GetObject("path");
-    PyList_Append(sys_path, PyUnicode_FromString("./plugins"));
-
-    qcModule = PyImport_ImportModule("qcalc");
-}
-
-PythonParser::~PythonParser() {
-    Py_DECREF(qcModule);
-    Py_Finalize();
-}
-
 double PythonParser::run(const std::string &src, const std::vector<double> &args) {
-    PyObject *qcDict = PyModule_GetDict(qcModule);
+    PyObject *qcModule = PyImport_ImportModule("qc");
 
-    if (qcModule == PyNULL) {
+    if (qcModule == PyNull) {
         throw std::runtime_error(GetPythonErrorMessage());
     }
+
+    PyObject *qcDict = PyModule_GetDict(qcModule);
 
     PyObject *pyArgsList = PyList_New(0);
     for (auto arg : args) {
@@ -89,7 +77,7 @@ double PythonParser::run(const std::string &src, const std::vector<double> &args
 
     PyObject *pyRunStringReturnValue = PyRun_String(src.c_str(), Py_file_input, globals, locals);
 
-    if (pyRunStringReturnValue == PyNULL) {
+    if (pyRunStringReturnValue == PyNull) {
         throw std::runtime_error(GetPythonErrorMessage());
     }
 
@@ -97,7 +85,7 @@ double PythonParser::run(const std::string &src, const std::vector<double> &args
     PyObject *pyOutValue = PyDict_GetItem(qcDict, pyOutName);
 
     double ret = 0;
-    if (pyOutValue != PyNULL) {
+    if (pyOutValue != PyNull) {
         ret = PyFloat_AsDouble(pyOutValue);
     }
 
@@ -110,6 +98,7 @@ double PythonParser::run(const std::string &src, const std::vector<double> &args
     Py_DECREF(globals);
     Py_DECREF(pyArgsName);
     Py_DECREF(pyArgsList);
+    Py_DECREF(qcModule);
 
     return ret;
 }

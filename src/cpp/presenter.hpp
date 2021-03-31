@@ -11,6 +11,7 @@
 #include "view.hpp"
 #include "settings.hpp"
 #include "history.hpp"
+#include "nativeinterface.hpp"
 
 class Presenter : public QObject {
 Q_OBJECT

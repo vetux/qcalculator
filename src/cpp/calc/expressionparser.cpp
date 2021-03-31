@@ -42,12 +42,12 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
         if (v.second.enableArguments) {
             int index = varArgScriptIndex++;
             assert(index < varArgScriptCount);
-            varArgScriptFunctions.at(index) = ScriptVarArgFunction<ArithmeticType>(pythonParser, v.second.expression);
+            varArgScriptFunctions.at(index) = ScriptVarArgFunction<ArithmeticType>(v.second.expression);
             symbols.add_function(v.first, varArgScriptFunctions.at(index));
         } else {
             int index = scriptIndex++;
             assert(index < scriptCount);
-            scriptFunctions.at(index) = ScriptFunction<ArithmeticType>(pythonParser, v.second.expression);
+            scriptFunctions.at(index) = ScriptFunction<ArithmeticType>(v.second.expression);
             symbols.add_function(v.first, scriptFunctions.at(index));
         }
     }
