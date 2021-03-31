@@ -3,9 +3,6 @@
 
 #include <string>
 
-struct _object;
-typedef _object PyObject;
-
 /**
  * A Plugin is a python module which defines lifecycle callbacks.
  *
@@ -15,22 +12,15 @@ typedef _object PyObject;
  */
 class Plugin {
 public:
-    Plugin();
-
-    Plugin(std::string moduleName);
-
     /**
      * Import the module and call the load function.
      */
-    void load();
+    static void load(const std::string &moduleName);
 
     /**
      * Import the module and call the unload function.
      */
-    void unload();
-
-private:
-    std::string moduleName;
+    static void unload(const std::string &moduleName);
 };
 
 #endif //QCALC_PLUGIN_HPP

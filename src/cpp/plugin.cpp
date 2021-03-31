@@ -8,11 +8,7 @@
 
 #include "pyutil.hpp"
 
-Plugin::Plugin() : moduleName() {}
-
-Plugin::Plugin(std::string moduleName) : moduleName(std::move(moduleName)) {}
-
-void Plugin::load() {
+void Plugin::load(const std::string &moduleName) {
     PyObject *mod = PyImport_ImportModule(moduleName.c_str());
     if (mod == PyNull) {
         throw std::runtime_error(PyUtil::getError());
@@ -35,7 +31,7 @@ void Plugin::load() {
     Py_DECREF(mod);
 }
 
-void Plugin::unload() {
+void Plugin::unload(const std::string &moduleName) {
     PyObject *mod = PyImport_ImportModule(moduleName.c_str());
     if (mod == PyNull) {
         throw std::runtime_error(PyUtil::getError());
