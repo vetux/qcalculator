@@ -6,7 +6,6 @@ find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
 find_package(Python COMPONENTS Interpreter Development)
-
 message("Python_FOUND:${Python_FOUND}")
 message("Python_VERSION:${Python_VERSION}")
 message("Python_Development_FOUND:${Python_Development_FOUND}")
@@ -24,8 +23,8 @@ endif(WIN32)
 file(GLOB_RECURSE SRC src/cpp/*.cpp)
 file(GLOB_RECURSE FORMS src/forms/*.ui)
 
-file(GLOB_RECURSE ADDON_SRC src/python/addon/*.py)
-file(GLOB_RECURSE SYSTEM_SRC src/python/system/*.py)
+file(GLOB_RECURSE ADDON_SRC src/python/sampleaddon.py)
+set(SYSTEM_SRC src/python/qcalc)
 
 file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy addon scripts
 file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/system) # Copy system scripts

@@ -219,7 +219,7 @@ bool MainWindow::showQuestionDialog(const std::string &title, const std::string 
 }
 
 void MainWindow::quit() {
-    exit(0);
+    assert(close());
 }
 
 void MainWindow::setInputText(const std::string &value) {

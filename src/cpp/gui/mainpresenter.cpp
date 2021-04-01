@@ -8,6 +8,7 @@
 #include "numberformat.hpp"
 #include "pyutil.hpp"
 #include "io.hpp"
+#include "addon.hpp"
 
 #include "gui/mainpresenter.hpp"
 
@@ -27,13 +28,16 @@ QString getAppDataDirectory() {
 
 MainPresenter::MainPresenter(MainView &view)
         : view(view), currentValue(0) {
+}
+
+void MainPresenter::init() {
     NativeInterface::initialize(view);
     PyUtil::initializePython();
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/addon").toStdString());
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/system").toStdString());
-}
 
-void MainPresenter::init() {
+    Addon::load("sampleaddon");
+
     try {
         settings = IO::loadSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString());
     }
@@ -58,6 +62,10 @@ void MainPresenter::init() {
 }
 
 void MainPresenter::onWindowClose(const QCloseEvent &event) {
+    view.disconnectPresenter(*this); //The exit action is invoked multiple times when closing the view for some reason.
+
+    Addon::unload("sampleaddon");
+
     try {
         IO::saveSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(), settings);
     }
@@ -66,7 +74,6 @@ void MainPresenter::onWindowClose(const QCloseEvent &event) {
         error += e.what();
         view.showWarningDialog("Error", error);
     }
-    view.quit();
 }
 
 void MainPresenter::onWindowResize(const QResizeEvent &event) {
@@ -511,14 +518,6 @@ void MainPresenter::onScriptEnableArgsChanged(bool value) {
 }
 
 void MainPresenter::onActionExit() {
-    try {
-        IO::saveSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(), settings);
-    }
-    catch (const std::exception &e) {
-        std::string error = "Failed to save settings: ";
-        error += e.what();
-        view.showWarningDialog("Error", error);
-    }
     view.quit();
 }
 

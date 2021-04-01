@@ -7,7 +7,7 @@
 #include "pyutil.hpp"
 
 double PythonParser::run(const std::string &src, const std::vector<double> &args) {
-    PyObject *qcModule = PyImport_ImportModule("qcs");
+    PyObject *qcModule = PyImport_ImportModule("qcalc.script");
 
     if (qcModule == PyNull) {
         throw std::runtime_error(PyUtil::getError());

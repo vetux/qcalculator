@@ -25,7 +25,15 @@ namespace Addon {
         PyObject *function = PyDict_GetItem(dict, key);
 
         if (function != PyNull) {
-            PyObject_CallNoArgs(function);
+            if (PyObject_CallNoArgs(function) == PyNull) {
+                Py_DECREF(key);
+                Py_DECREF(mod);
+                throw std::runtime_error(PyUtil::getError());
+            }
+        } else {
+            Py_DECREF(key);
+            Py_DECREF(mod);
+            throw std::runtime_error("load function not found in module");
         }
 
         Py_DECREF(key);
@@ -48,7 +56,15 @@ namespace Addon {
         PyObject *function = PyDict_GetItem(dict, key);
 
         if (function != PyNull) {
-            PyObject_CallNoArgs(function);
+            if (PyObject_CallNoArgs(function) == PyNull) {
+                Py_DECREF(key);
+                Py_DECREF(mod);
+                throw std::runtime_error(PyUtil::getError());
+            }
+        } else {
+            Py_DECREF(key);
+            Py_DECREF(mod);
+            throw std::runtime_error("unload function not found in module");
         }
 
         Py_DECREF(key);
