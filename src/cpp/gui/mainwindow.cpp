@@ -53,10 +53,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->lineEdit_functions_arg4, SIGNAL(editingFinished()), this, SLOT(onFunctionsArgEditingFinished()));
     connect(ui->textEdit_functions_body, SIGNAL(textChanged()), this, SLOT(onFunctionsBodyTextChanged()));
 
-    connect(ui->tableWidget_scripts, SIGNAL(itemSelectionChanged()), this, SLOT(onScriptsSelectionChanged()));
-    connect(ui->tableWidget_scripts, SIGNAL(cellChanged(int, int)), this, SLOT(onScriptsCellChanged(int, int)));
-    connect(ui->textEdit_scripts, SIGNAL(textChanged()), this, SLOT(onScriptsBodyTextChanged()));
-
     presenter.init();
 }
 
@@ -100,12 +96,6 @@ void MainWindow::connectPresenter(const MainPresenter &target) {
     connect(this, SIGNAL(signalFunctionArgsChanged(std::vector<std::string>)), &target,
             SLOT(onFunctionArgsChanged(std::vector<std::string>)));
 
-    connect(this, SIGNAL(signalSelectedScriptChanged(int)), &target, SLOT(onSelectedScriptChanged(int)));
-    connect(this, SIGNAL(signalScriptNameChanged(std::string)), &target, SLOT(onScriptNameChanged(std::string)));
-    connect(this, SIGNAL(signalScriptBodyChanged(std::string)), &target, SLOT(onScriptBodyChanged(std::string)));
-    connect(this, SIGNAL(signalScriptBodyChanged(std::string)), &target, SLOT(onScriptBodyChanged(std::string)));
-    connect(ui->checkBox_scripts_enableargs, SIGNAL(toggled(bool)), &target, SLOT(onScriptEnableArgsChanged(bool)));
-
     connect(ui->actionExit, SIGNAL(triggered(bool)), &target, SLOT(onActionExit()));
     connect(ui->actionAbout, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
     connect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
@@ -145,12 +135,6 @@ void MainWindow::disconnectPresenter(const MainPresenter &target) {
     disconnect(this, SIGNAL(signalFunctionBodyChanged(std::string)), &target, SLOT(onFunctionBodyChanged(std::string)));
     disconnect(this, SIGNAL(signalFunctionArgsChanged(std::vector<std::string>)), &target,
                SLOT(onFunctionArgsChanged(std::vector<std::string>)));
-
-    disconnect(this, SIGNAL(signalSelectedScriptChanged(int)), &target, SLOT(onSelectedScriptChanged(int)));
-    disconnect(this, SIGNAL(signalScriptNameChanged(std::string)), &target, SLOT(onScriptNameChanged(std::string)));
-    disconnect(this, SIGNAL(signalScriptBodyChanged(std::string)), &target, SLOT(onScriptBodyChanged(std::string)));
-    disconnect(this, SIGNAL(signalScriptBodyChanged(std::string)), &target, SLOT(onScriptBodyChanged(std::string)));
-    disconnect(ui->checkBox_scripts_enableargs, SIGNAL(toggled(bool)), &target, SLOT(onScriptEnableArgsChanged(bool)));
 
     disconnect(ui->actionExit, SIGNAL(triggered(bool)), &target, SLOT(onActionExit()));
     disconnect(ui->actionAbout, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
@@ -440,42 +424,6 @@ void MainWindow::setFunctionBodyEnabled(bool enabled) {
     ui->textEdit_functions_body->setEnabled(enabled);
 }
 
-void MainWindow::setScriptsListView(const std::vector<std::string> &value) {
-    int rows = ui->tableWidget_scripts->rowCount();
-    for (int i = 0; i < rows; i++) {
-        ui->tableWidget_scripts->removeRow(0);
-    }
-    ui->tableWidget_scripts->insertRow(0);
-    for (auto &name : value) {
-        int rowIndex = ui->tableWidget_scripts->rowCount();
-        ui->tableWidget_scripts->insertRow(rowIndex);
-        auto *nameItem = new QTableWidgetItem();
-        nameItem->setText(name.c_str());
-        ui->tableWidget_scripts->setItem(rowIndex, 0, nameItem);
-    }
-}
-
-void MainWindow::setSelectedScript(int index) {
-    if (index != -1)
-        ui->tableWidget_scripts->selectRow(index + 1);
-}
-
-void MainWindow::setScriptBody(const std::string &value) {
-    ui->textEdit_scripts->setText(value.c_str());
-}
-
-void MainWindow::setScriptBodyEnabled(bool enabled) {
-    ui->textEdit_scripts->setEnabled(enabled);
-}
-
-void MainWindow::setScriptEnableArgs(bool value) {
-    ui->checkBox_scripts_enableargs->setChecked(value);
-}
-
-void MainWindow::setScriptEnableArgsEnabled(bool value) {
-    ui->checkBox_scripts_enableargs->setEnabled(value);
-}
-
 void MainWindow::setWindowSize(QSize size) {
     resize(size);
 }
@@ -636,33 +584,6 @@ void MainWindow::onFunctionsArgEditingFinished() {
 
 void MainWindow::onFunctionsBodyTextChanged() {
     emit signalFunctionBodyChanged(ui->textEdit_functions_body->toPlainText().toStdString());
-}
-
-void MainWindow::onScriptsSelectionChanged() {
-    auto selection = ui->tableWidget_scripts->selectionModel()->selectedRows();
-    if (selection.empty()) {
-        emit signalSelectedScriptChanged(-1);
-    } else {
-        int row = selection[0].row();
-        emit signalSelectedScriptChanged(row == 0 ? -1 : row - 1);
-    }
-}
-
-void MainWindow::onScriptsCellChanged(int row, int column) {
-    QTableWidgetItem *nameItem = ui->tableWidget_scripts->item(row, 0);
-
-    std::string name;
-
-    if (nameItem != nullptr)
-        name = nameItem->text().toStdString();
-    else
-        name = "";
-
-    emit signalScriptNameChanged(name);
-}
-
-void MainWindow::onScriptsBodyTextChanged() {
-    emit signalScriptBodyChanged(ui->textEdit_scripts->toPlainText().toStdString());
 }
 //-SLOTS
 

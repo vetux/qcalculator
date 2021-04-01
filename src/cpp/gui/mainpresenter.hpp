@@ -68,15 +68,6 @@ public slots:
     void onFunctionArgsChanged(const std::vector<std::string> &arguments);
 
 
-    void onSelectedScriptChanged(int index);
-
-    void onScriptNameChanged(const std::string &value);
-
-    void onScriptBodyChanged(const std::string &value);
-
-    void onScriptEnableArgsChanged(bool value);
-
-
     void onActionExit();
 
     void onActionAbout();
@@ -101,6 +92,10 @@ public slots:
     void onDockPositionChanged(Qt::DockWidgetArea area);
     //-MainPresenter Interface
 
+    const SymbolTable& getSymbolTable();
+
+    void setSymbolTable(const SymbolTable& table);
+
 private:
     MainView &view;
 
@@ -118,12 +113,10 @@ private:
     std::string currentVariable;
     std::string currentConstant;
     std::string currentFunction;
-    std::string currentScript;
 
     std::map<int, std::string> variableMapping;
     std::map<int, std::string> constantMapping;
     std::map<int, std::string> functionMapping;
-    std::map<int, std::string> scriptMapping;
 
     void applyCurrentValue();
 

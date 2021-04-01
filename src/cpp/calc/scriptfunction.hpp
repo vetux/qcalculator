@@ -5,7 +5,10 @@
 
 #include "extern/exprtk.hpp"
 
-#include "calc/pythonparser.hpp"
+#include "calc/scripthandler.hpp"
+
+struct _object;
+typedef _object PyObject;
 
 /**
  * A exprtk function which executes a single python script.
@@ -15,17 +18,17 @@ struct ScriptFunction : public exprtk::ifunction<T> {
     using exprtk::ifunction<T>::operator();
 
     ScriptFunction()
-            : exprtk::ifunction<T>(0) {}
+            : exprtk::ifunction<T>(0), callback(nullptr) {}
 
-    explicit ScriptFunction(std::string script)
-            : exprtk::ifunction<T>(0), script(std::move(script)) {}
+    explicit ScriptFunction(PyObject *callback)
+            : exprtk::ifunction<T>(0), callback(callback) {}
 
     inline T operator()() {
-        return PythonParser::run(script, {});
+        return ScriptHandler::run(callback, {});
     }
 
 private:
-    std::string script;
+    PyObject *callback;
 };
 
 #endif //QCALC_SCRIPTFUNCTION_HPP

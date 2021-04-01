@@ -3,20 +3,20 @@
 
 #include <string>
 
-/**
- * A Script is a python script which can be called from an expression and can have input variables and one output scalar.
- */
+struct _object;
+typedef _object PyObject;
+
 struct Script {
-    std::string expression;
+    PyObject *callback = nullptr;
     bool enableArguments = false; //If true the script is wrapped by a vararg function otherwise a function with 0 arguments is used.
 
     Script() = default;
 
-    Script(std::string expression, bool enableArguments)
-            : expression(std::move(expression)), enableArguments(enableArguments) {}
+    Script(PyObject *callback, bool enableArguments)
+            : callback(callback), enableArguments(enableArguments) {}
 
     bool operator==(const Script &other) const {
-        return expression == other.expression && enableArguments == other.enableArguments;
+        return callback == other.callback && enableArguments == other.enableArguments;
     }
 };
 

@@ -78,18 +78,6 @@ public:
 
     virtual void setFunctionBodyEnabled(bool enabled) = 0;
 
-    virtual void setScriptsListView(const std::vector<std::string> &value) = 0;
-
-    virtual void setSelectedScript(int index) = 0;
-
-    virtual void setScriptBody(const std::string &value) = 0;
-
-    virtual void setScriptBodyEnabled(bool enabled) = 0;
-
-    virtual void setScriptEnableArgs(bool value) = 0;
-
-    virtual void setScriptEnableArgsEnabled(bool value) = 0;
-
     virtual void setWindowSize(QSize size) = 0;
 };
 

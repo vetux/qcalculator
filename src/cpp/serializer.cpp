@@ -35,16 +35,6 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     j["functions"] = tmp;
     tmp.clear();
 
-    for (auto &p : table.getScripts()) {
-        nlohmann::json t;
-        t["name"] = p.first;
-        t["expression"] = p.second.expression;
-        t["enableArguments"] = p.second.enableArguments;
-        tmp.emplace_back(t);
-    }
-    j["scripts"] = tmp;
-    tmp.clear();
-
     return nlohmann::to_string(j);
 }
 
@@ -74,16 +64,6 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
         f.expression = v["expression"];
         f.argumentNames = v["argumentNames"].get<std::vector<std::string>>();
         ret.setFunction(name, f);
-    }
-
-    tmp = j["scripts"].get<std::vector<nlohmann::json>>();
-    for (auto &v : tmp) {
-        std::string name;
-        name = v["name"];
-        Script s;
-        s.expression = v["expression"];
-        s.enableArguments = v["enableArguments"];
-        ret.setScript(name, s);
     }
 
     return ret;

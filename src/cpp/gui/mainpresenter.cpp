@@ -31,7 +31,7 @@ MainPresenter::MainPresenter(MainView &view)
 }
 
 void MainPresenter::init() {
-    NativeInterface::initialize(view);
+    NativeInterface::initialize(view, *this);
     PyUtil::initializePython();
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/addon").toStdString());
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/system").toStdString());
@@ -434,89 +434,6 @@ void MainPresenter::onFunctionArgsChanged(const std::vector<std::string> &argume
     view.setFunctionArgs(arguments);
 }
 
-void MainPresenter::onSelectedScriptChanged(int index) {
-    if (index == -1)
-        currentScript.clear();
-    else
-        currentScript = scriptMapping.at(index);
-
-    applyCurrentScript();
-}
-
-void MainPresenter::onScriptNameChanged(const std::string &value) {
-    if (currentScript.empty()) {
-        //Create
-        if (value.empty()) {
-            view.showWarningDialog("Error", "Script name cannot be empty.");
-        } else {
-            if (symbolTable.hasVariable(value)) {
-                view.showWarningDialog("Error",
-                                       "Variable with the name " + value + " already exists.");
-            } else if (symbolTable.hasConstant(value)) {
-                view.showWarningDialog("Error",
-                                       "Constant with the name " + value + " already exists.");
-            } else if (symbolTable.hasFunction(value)) {
-                view.showWarningDialog("Error",
-                                       "Function with the name " + value + " already exists.");
-            } else if (symbolTable.hasScript(value)) {
-                view.showWarningDialog("Error",
-                                       "Script with the name " + value + " already exists.");
-            } else {
-                symbolTable.setScript(value, {});
-                applyScripts();
-            }
-        }
-    } else {
-        if (value.empty()) {
-            //Delete
-            if (view.showQuestionDialog("Delete Script",
-                                        "Do you want to delete " + currentScript + " ?")) {
-                symbolTable.remove(currentScript);
-                currentScript.clear();
-                applyScripts();
-            }
-        } else {
-            //Update
-            if (currentScript != value) {
-                //Update name
-                if (symbolTable.hasVariable(value)) {
-                    view.showWarningDialog("Error",
-                                           "Variable with the name " + value + " already exists.");
-                } else if (symbolTable.hasConstant(value)) {
-                    view.showWarningDialog("Error",
-                                           "Constant with the name " + value + " already exists.");
-                } else if (symbolTable.hasFunction(value)) {
-                    view.showWarningDialog("Error",
-                                           "Function with the name " + value + " already exists.");
-                } else if (symbolTable.hasScript(value)) {
-                    view.showWarningDialog("Error",
-                                           "Script with the name " + value + " already exists.");
-                } else {
-                    Script s = symbolTable.getScripts().at(currentScript);
-                    symbolTable.remove(currentScript);
-                    symbolTable.setScript(value, s);
-                    currentScript = value;
-                }
-            }
-            applyScripts();
-        }
-    }
-}
-
-void MainPresenter::onScriptBodyChanged(const std::string &value) {
-    assert(!currentScript.empty());
-    Script s = symbolTable.getScripts().at(currentScript);
-    s.expression = value;
-    symbolTable.setScript(currentScript, s);
-}
-
-void MainPresenter::onScriptEnableArgsChanged(bool value) {
-    assert(!currentScript.empty());
-    Script s = symbolTable.getScripts().at(currentScript);
-    s.enableArguments = value;
-    symbolTable.setScript(currentScript, s);
-}
-
 void MainPresenter::onActionExit() {
     view.quit();
 }
@@ -553,7 +470,6 @@ void MainPresenter::onActionImportSymbolTable() {
             currentVariable.clear();
             currentConstant.clear();
             currentFunction.clear();
-            currentScript.clear();
 
             applySymbolTable();
 
@@ -625,6 +541,15 @@ void MainPresenter::applyCurrentValue() {
         view.setBitViewEnabled(true);
         view.setBitViewContents(std::bitset<64>(currentValue));
     }
+}
+
+const SymbolTable &MainPresenter::getSymbolTable() {
+    return symbolTable;
+}
+
+void MainPresenter::setSymbolTable(const SymbolTable &table) {
+    this->symbolTable = table;
+    applySymbolTable();
 }
 
 void MainPresenter::applySymbolTable() {
@@ -759,67 +684,11 @@ void MainPresenter::applyCurrentFunction() {
 void MainPresenter::applyScripts() {
     view.disconnectPresenter(*this);
 
-    scriptMapping.clear();
-
-    //Update mapping with indices into the vector passed to the view
-    std::vector<std::string> tmp;
-    int currentIndex = -1;
-
-    int i = 0;
-    for (auto &v : symbolTable.getScripts()) {
-        scriptMapping[i] = v.first;
-
-        if (currentScript == v.first)
-            currentIndex = i;
-
-        tmp.emplace_back(v.first);
-        i++;
-    }
-
-    view.setScriptsListView(tmp);
-    view.setSelectedScript(currentIndex);
-
-    if (currentScript.empty()) {
-        view.setScriptEnableArgsEnabled(false);
-        view.setScriptBodyEnabled(false);
-        view.setScriptEnableArgs(false);
-        view.setScriptBody("");
-    } else {
-        Script s = symbolTable.getScripts().at(currentScript);
-        view.setScriptEnableArgsEnabled(true);
-        view.setScriptBodyEnabled(true);
-        view.setScriptEnableArgs(s.enableArguments);
-        view.setScriptBody(s.expression);
-    }
-
     view.connectPresenter(*this);
 }
 
 void MainPresenter::applyCurrentScript() {
     view.disconnectPresenter(*this);
-
-    int currentIndex = -1;
-    for (auto &v : scriptMapping) {
-        if (v.second == currentScript) {
-            currentIndex = v.first;
-            break;
-        }
-    }
-
-    view.setSelectedScript(currentIndex);
-
-    if (currentScript.empty()) {
-        view.setScriptEnableArgsEnabled(false);
-        view.setScriptBodyEnabled(false);
-        view.setScriptEnableArgs(false);
-        view.setScriptBody("");
-    } else {
-        Script s = symbolTable.getScripts().at(currentScript);
-        view.setScriptEnableArgsEnabled(true);
-        view.setScriptBodyEnabled(true);
-        view.setScriptEnableArgs(s.enableArguments);
-        view.setScriptBody(s.expression);
-    }
 
     view.connectPresenter(*this);
 }

@@ -64,13 +64,6 @@ signals:
 
     void signalFunctionArgsChanged(const std::vector<std::string> &arguments);
 
-
-    void signalSelectedScriptChanged(int index);
-
-    void signalScriptNameChanged(const std::string &value);
-
-    void signalScriptBodyChanged(const std::string &value);
-
 public:
     explicit MainWindow(QWidget *parent = nullptr);
 
@@ -149,18 +142,6 @@ public:
 
     void setFunctionBodyEnabled(bool enabled) override;
 
-    void setScriptsListView(const std::vector<std::string> &value) override;
-
-    void setSelectedScript(int index) override;
-
-    void setScriptBody(const std::string &value) override;
-
-    void setScriptBodyEnabled(bool enabled) override;
-
-    void setScriptEnableArgs(bool value) override;
-
-    void setScriptEnableArgsEnabled(bool value) override;
-
     void setWindowSize(QSize size) override;
     //-MainView
 
@@ -193,13 +174,7 @@ private slots:
 
     void onFunctionsBodyTextChanged();
 
-
-    void onScriptsSelectionChanged();
-
-    void onScriptsCellChanged(int row, int column);
-
-    void onScriptsBodyTextChanged();
-
+    
 private:
     Ui::MainWindow *ui;
 

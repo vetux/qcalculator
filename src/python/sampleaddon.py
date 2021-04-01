@@ -1,4 +1,5 @@
 import qcalc.gui as gui
+import qcalc.symboltable as sym
 
 # We use PySide2 to create qt objects owned by python and integrate them into our native gui
 # by using the QtWidgets.QApplication.instance() reference.
@@ -20,6 +21,17 @@ def onclick():
     print("Question Response: " + str(QtWidgets.QMessageBox.question(gui.wnd, "Title", "Text")))
 
 
+# The script function callback which is invoked by the expression parser
+# when it encounters our symbol name in a expression.
+def evaluate(*args):
+    return 422
+
+
+# A script function callback which takes at least one argument
+def evaluate_args(*args):
+    return args[0]
+
+
 # Load is invoked by the native code when the addon is requested to be loaded by the user.
 def load():
     print("Loading sample module")
@@ -28,6 +40,8 @@ def load():
     menu = gui.menu.addMenu("Sample Addon Menu")
     action = menu.addAction("Sample Action")
     action.triggered.connect(onclick)
+    sym.register("pyTest", evaluate, False)
+    sym.register("pyTestArgs", evaluate_args, True)
 
 
 # Unload is invoked by the native code when the addon is requested to be unloaded by the user
@@ -38,6 +52,8 @@ def unload():
     print("Unloading sample module")
     menu.deleteLater()
     action.deleteLater()
+    sym.unregister("pyTest")
+    sym.unregister("pyTestArgs")
 
 
 # You can define logic at module level. This logic will be invoked when the module is imported.

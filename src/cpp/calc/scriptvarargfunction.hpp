@@ -6,7 +6,10 @@
 
 #include "extern/exprtk.hpp"
 
-#include "calc/pythonparser.hpp"
+#include "calc/scripthandler.hpp"
+
+struct _object;
+typedef _object PyObject;
 
 /**
  * A exprtk function which executes a single python script.
@@ -16,16 +19,16 @@ class ScriptVarArgFunction : public exprtk::ivararg_function<T> {
 public:
     ScriptVarArgFunction() = default;
 
-    explicit ScriptVarArgFunction(std::string script)
-            : script(std::move(script)) {}
+    explicit ScriptVarArgFunction(PyObject* callback)
+            : callback(callback) {}
 
     inline T operator()(const std::vector<T> &args) {
         std::vector<double> pyArgs{args.begin(), args.end()};
-        return PythonParser::run(script, pyArgs);
+        return ScriptHandler::run(callback, pyArgs);
     }
 
 private:
-    std::string script;
+    PyObject* callback = nullptr;
 };
 
 #endif //QCALC_SCRIPTVARARGFUNCTION_HPP
