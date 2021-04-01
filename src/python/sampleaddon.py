@@ -4,7 +4,7 @@ import qcalc.symboltable as sym
 # We use PySide2 to create qt objects owned by python and integrate them into our native gui
 # by using the QtWidgets.QApplication.instance() reference.
 # The gui module does the retrieval of the application instance as well as native gui elements for us.
-from PySide2 import QtWidgets
+from PySide2 import QtWidgets, QtCore
 
 # Gui objects which should exist throughout the lifetime of the addon
 # should be declared as global variables because otherwise the
@@ -37,9 +37,18 @@ def load():
     print("Loading sample module")
     global menu
     global action
-    menu = gui.menu.addMenu("Sample Addon Menu")
+
+    # !IMPORTANT! Instantiate all new qt objects on the python side otherwise memory leaks will happen!
+    menu = QtWidgets.QMenu()
+
+    menu.setTitle("Sample Menu")
+    gui.menu.addMenu(menu)
     action = menu.addAction("Sample Action")
-    action.triggered.connect(onclick)
+
+    # !IMPORTANT! Use QtCore.QObject.connect() to connect signals and slots, as the new way leaks memory.
+    QtCore.QObject.connect(action, QtCore.SIGNAL('triggered()'), onclick)  # USE THIS
+    # action.triggered.connect(onclick)  # NOT THIS, leaks memory.
+
     sym.register("pyTest", evaluate, False)
     sym.register("pyTestArgs", evaluate_args, True)
 
@@ -50,8 +59,15 @@ def load():
 # cpython does not offer a mechanism to unimport a module without tearing down the whole interpreter instance.
 def unload():
     print("Unloading sample module")
+    global menu
+    global action
+
+    # !IMPORTANT! Always remove actions from the native QMenu by using the menu action, otherwise memory leaks!
+    gui.menu.removeAction(menu.menuAction())
+
+    # !IMPORTANT! Call deleteLater() for qt objects created by python, otherwise memory leaks!
     menu.deleteLater()
-    action.deleteLater()
+
     sym.unregister("pyTest")
     sym.unregister("pyTestArgs")
 

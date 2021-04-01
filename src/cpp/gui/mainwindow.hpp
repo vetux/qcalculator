@@ -173,7 +173,6 @@ private slots:
     void onFunctionsArgEditingFinished();
 
     void onFunctionsBodyTextChanged();
-
     
 private:
     Ui::MainWindow *ui;

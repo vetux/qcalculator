@@ -16,12 +16,16 @@ double ScriptHandler::run(PyObject *c, const std::vector<double> &a) {
 
     PyObject *kwargs = PyNull;
 
-    PyObject *ret = PyObject_Call(c, args, kwargs);
+    PyObject *pyRet = PyObject_Call(c, args, kwargs);
     Py_DECREF(args);
 
-    if (ret == PyNull) {
+    if (pyRet == PyNull) {
         throw std::runtime_error(PyUtil::getError());
     }
 
-    return PyFloat_AsDouble(ret);
+    double ret = PyFloat_AsDouble(pyRet);
+
+    Py_DECREF(pyRet);
+
+    return ret;
 }

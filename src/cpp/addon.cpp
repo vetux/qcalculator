@@ -25,11 +25,13 @@ namespace Addon {
         PyObject *function = PyDict_GetItem(dict, key);
 
         if (function != PyNull) {
-            if (PyObject_CallNoArgs(function) == PyNull) {
+           PyObject *result = PyObject_CallNoArgs(function);
+            if (result == PyNull) {
                 Py_DECREF(key);
                 Py_DECREF(mod);
                 throw std::runtime_error(PyUtil::getError());
             }
+            Py_DECREF(result);
         } else {
             Py_DECREF(key);
             Py_DECREF(mod);
@@ -56,11 +58,13 @@ namespace Addon {
         PyObject *function = PyDict_GetItem(dict, key);
 
         if (function != PyNull) {
-            if (PyObject_CallNoArgs(function) == PyNull) {
+            PyObject *result = PyObject_CallNoArgs(function);
+            if (result == PyNull) {
                 Py_DECREF(key);
                 Py_DECREF(mod);
                 throw std::runtime_error(PyUtil::getError());
             }
+            Py_DECREF(result);
         } else {
             Py_DECREF(key);
             Py_DECREF(mod);
