@@ -17,6 +17,7 @@ action = QtWidgets.QAction
 # Our python side onclick callback
 def onclick():
     print("The action was invoked")
+    print("Question Response: " + str(QtWidgets.QMessageBox.question(gui.wnd, "Title", "Text")))
 
 
 # Load is invoked by the native code when the addon is requested to be loaded by the user.
