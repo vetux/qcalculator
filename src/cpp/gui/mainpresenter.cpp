@@ -31,12 +31,18 @@ MainPresenter::MainPresenter(MainView &view)
 }
 
 void MainPresenter::init() {
-    NativeInterface::initialize(view, *this);
+    SymbolTableModule::initialize(*this);
     PyUtil::initializePython();
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/addon").toStdString());
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/system").toStdString());
 
-    Addon::load("sampleaddon");
+    try {
+        Addon::load("sample_gui");
+        Addon::load("sample_sym");
+    }
+    catch (const std::runtime_error &e) {
+        view.showWarningDialog("Failed to load sample addon", e.what());
+    }
 
     try {
         settings = IO::loadSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString());
@@ -64,7 +70,13 @@ void MainPresenter::init() {
 void MainPresenter::onWindowClose(const QCloseEvent &event) {
     view.disconnectPresenter(*this); //The exit action is invoked multiple times when closing the view for some reason.
 
-    Addon::unload("sampleaddon");
+    try {
+        Addon::unload("sample_gui");
+        Addon::unload("sample_sym");
+    }
+    catch (const std::runtime_error &e) {
+        view.showWarningDialog("Failed to unload sample addons", e.what());
+    }
 
     try {
         IO::saveSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(), settings);
@@ -549,6 +561,9 @@ const SymbolTable &MainPresenter::getSymbolTable() {
 
 void MainPresenter::setSymbolTable(const SymbolTable &table) {
     this->symbolTable = table;
+    currentVariable.clear();
+    currentConstant.clear();
+    currentFunction.clear();
     applySymbolTable();
 }
 

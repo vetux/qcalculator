@@ -1,5 +1,4 @@
 import qcalc.gui as gui
-import qcalc.symboltable as sym
 
 # We use PySide2 to create qt objects owned by python and integrate them into our native gui
 # by using the QtWidgets.QApplication.instance() reference.
@@ -21,20 +20,9 @@ def onclick():
     print("Question Response: " + str(QtWidgets.QMessageBox.question(gui.wnd, "Title", "Text")))
 
 
-# The script function callback which is invoked by the expression parser
-# when it encounters our symbol name in a expression.
-def evaluate(*args):
-    return 422
-
-
-# A script function callback which takes at least one argument
-def evaluate_args(*args):
-    return args[0]
-
-
 # Load is invoked by the native code when the addon is requested to be loaded by the user.
 def load():
-    print("Loading sample module")
+    print("Loading sample gui module")
     global menu
     global action
 
@@ -49,16 +37,13 @@ def load():
     QtCore.QObject.connect(action, QtCore.SIGNAL('triggered()'), onclick)  # USE THIS
     # action.triggered.connect(onclick)  # NOT THIS, leaks memory.
 
-    sym.register("pyTest", evaluate, False)
-    sym.register("pyTestArgs", evaluate_args, True)
-
 
 # Unload is invoked by the native code when the addon is requested to be unloaded by the user
 # It should perform cleanup such as removing gui elements.
 # Note that the global scope of the module is currently still retained in memory after unload has been called because
 # cpython does not offer a mechanism to unimport a module without tearing down the whole interpreter instance.
 def unload():
-    print("Unloading sample module")
+    print("Unloading sample gui module")
     global menu
     global action
 
@@ -68,11 +53,8 @@ def unload():
     # !IMPORTANT! Call deleteLater() for qt objects created by python, otherwise memory leaks!
     menu.deleteLater()
 
-    sym.unregister("pyTest")
-    sym.unregister("pyTestArgs")
-
 
 # You can define logic at module level. This logic will be invoked when the module is imported.
 # This happens once for the lifetime of the application when the module is requested to be loaded by the user
 # and is immediately followed by a call to load().
-print("Sample Addon has been imported")
+print("Sample GUI Addon has been imported")

@@ -23,7 +23,7 @@ endif(WIN32)
 file(GLOB_RECURSE SRC src/cpp/*.cpp)
 file(GLOB_RECURSE FORMS src/forms/*.ui)
 
-file(GLOB_RECURSE ADDON_SRC src/python/sampleaddon.py)
+file(GLOB ADDON_SRC src/python/*.py)
 set(SYSTEM_SRC src/python/qcalc)
 
 file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy addon scripts

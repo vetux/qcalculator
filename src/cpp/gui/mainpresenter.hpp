@@ -9,10 +9,9 @@
 #include "mainview.hpp"
 #include "settings.hpp"
 #include "history.hpp"
-#include "nativeinterface.hpp"
 
+#include "pymodule/symboltablemodule.hpp"
 #include "calc/expressionparser.hpp"
-
 #include "gui/mainpresenter.hpp"
 
 class MainPresenter : public QObject {
