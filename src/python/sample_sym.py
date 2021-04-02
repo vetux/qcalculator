@@ -1,4 +1,4 @@
-import qcalc.sym as sym
+import qcalc.sym
 
 # ! IMPORTANT ! The user may import / export symbol tables, so handle variables, constants and functions with care
 # (eg. only in a registered script function.)
@@ -6,11 +6,12 @@ import qcalc.sym as sym
 # Scripts are not serialized.
 # The script will be unloaded before import and loaded again after import.
 
+sym = qcalc.sym.SymbolTable
+
 
 # The script function callback which is invoked by the expression parser
 # when it encounters our symbol name in a expression.
 def evaluate(*args):
-    sym.set_variable("runtimeVar", 41)
     return 422
 
 
@@ -22,24 +23,33 @@ def evaluate_args(*args):
 def load():
     print("Loading sample sym module")
 
+    global sym
+
+    sym = qcalc.sym.SymbolTable()
+
     sym.set_variable("pyVar", 42)
     sym.set_constant("pyConst", 3.141)
 
     # A native function with no arguments
-    sym.set_function("pyFunc", sym.Function("42 + sin(32)"))
+    sym.set_function("pyFunc", qcalc.sym.Function("42 + sin(32)"))
 
     # A native function with 1 argument called "arg1"
-    sym.set_function("pyFuncArgs", sym.Function("133 + cos(arg1)", {"arg1"}))
+    sym.set_function("pyFuncArgs", qcalc.sym.Function("133 + cos(arg1)", {"arg1"}))
 
     # A script function with no arguments
-    sym.set_script("pyScript", sym.ScriptFunction(evaluate))
+    sym.set_script("pyScript", qcalc.sym.ScriptFunction(evaluate))
 
     # A script function which accepts at least 1 argument
-    sym.set_script("pyScriptArgs", sym.ScriptFunction(evaluate_args, True))
+    sym.set_script("pyScriptArgs", qcalc.sym.ScriptFunction(evaluate_args, True))
+
+    sym.export_to_presenter()
 
 
 def unload():
     print("Unloading sample sym module")
+
+    global sym
+
     sym.remove("pyVar")
     sym.remove("pyConst")
     sym.remove("pyFunc")

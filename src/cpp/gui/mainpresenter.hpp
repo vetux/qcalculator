@@ -10,7 +10,6 @@
 #include "settings.hpp"
 #include "history.hpp"
 
-#include "pymodule/symboltablemodule.hpp"
 #include "calc/expressionparser.hpp"
 #include "gui/mainpresenter.hpp"
 

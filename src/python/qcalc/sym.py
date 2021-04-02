@@ -15,59 +15,57 @@ class ScriptFunction:
         self.enable_arguments = enable_arguments
 
 
-def remove(name):
-    return qcst.remove(name)
+class SymbolTable:
+    def __init__(self):
+        self.table = qcst.SymbolTable()
 
+    def export_to_presenter(self):
+        return self.table.exportToPresenter()
 
-def get_variable_names():
-    return qcst.getVariableNames()
+    def import_from_presenter(self):
+        return self.table.importFromPresenter()
 
+    def remove(self, name):
+        return self.table.removeSymbol(name)
 
-def get_variable(name):
-    return qcst.getVariable(name)
+    def get_variable_names(self):
+        return self.table.getVariableNames()
 
+    def get_variable(self, name):
+        return self.table.getVariable(name)
 
-def set_variable(name, value):
-    return qcst.setVariable(name, value)
+    def set_variable(self, name, value):
+        return self.table.setVariable(name, value)
 
+    def get_constant_names(self):
+        return self.table.getConstantNames()
 
-def get_constant_names():
-    return qcst.getConstantNames()
+    def get_constant(self, name):
+        return self.table.getConstant(name)
 
+    def set_constant(self, name, value):
+        return self.table.setConstant(name, value)
 
-def get_constant(name):
-    return qcst.getConstant(name)
+    def get_function_names(self):
+        return self.table.getFunctionNames()
 
+    def get_function(self, name):
+        ret = Function()
+        ret.expression = self.table.getFunctionExpression(name)
+        ret.argument_names = self.table.getFunctionArgumentNames(name)
+        return ret
 
-def set_constant(name, value):
-    return qcst.setConstant(name, value)
+    def set_function(self, name, func):
+        return self.table.setFunction(name, func.expression, func.argument_names)
 
+    def get_script_names(self):
+        return self.table.getScriptFunctionNames()
 
-def get_function_names():
-    return qcst.getFunctionNames()
+    def get_script(self, name):
+        ret = ScriptFunction
+        ret.callback = self.table.getScriptFunctionCallback(name)
+        ret.enable_arguments = self.table.getScriptFunctionEnableArguments(name)
+        return ret
 
-
-def get_function(name):
-    ret = Function()
-    ret.expression = qcst.getFunctionExpression(name)
-    ret.argument_names = qcst.getFunctionArgumentNames(name)
-    return ret
-
-
-def set_function(name, func):
-    return qcst.setFunction(name, func.expression, func.argument_names)
-
-
-def get_script_names():
-    return qcst.getScriptFunctionNames()
-
-
-def get_script(name):
-    ret = ScriptFunction
-    ret.callback = qcst.getScriptFunctionCallback(name)
-    ret.enable_arguments = qcst.getScriptFunctionEnableArguments(name)
-    return ret
-
-
-def set_script(name, script):
-    return qcst.setScriptFunction(name, script.callback, script.enable_arguments)
+    def set_script(self, name, script):
+        return self.table.setScriptFunction(name, script.callback, script.enable_arguments)

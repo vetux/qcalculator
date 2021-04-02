@@ -12,6 +12,8 @@
 
 #include "gui/mainpresenter.hpp"
 
+#include "pymodule/symboltablemodule.hpp"
+
 #define SETTINGS_FILENAME "/settings.json"
 
 using namespace NumberFormat;

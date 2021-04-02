@@ -1,12 +1,14 @@
 #define PY_SSIZE_T_CLEAN
 
 #include <Python.h>
+#include <structmember.h>
 
-#include "symboltablemodule.hpp"
+#include "gui/mainpresenter.hpp"
+
+#include "pymodule/symboltablemodule.hpp"
+#include "pymodule/moduletypes.hpp"
 
 #include "pyutil.hpp"
-
-#define MODULE_NAME "qc_native_symtable" //The name of the exported module accessible by python
 
 // Try / Catch macros used at the beginning and end of each function block invoked by the python interpreter.
 // This is needed because cpython is a c library which does not handle c++ exceptions,
@@ -15,46 +17,62 @@
 #define NATIVE_FUNC_TRY try {
 #define NATIVE_FUNC_CATCH } catch (const std::exception &e) { PyErr_SetString(PyExc_RuntimeError, e.what()); return PyNull; }
 
-MainPresenter *SymbolTableModule::presenter = nullptr;
+MainPresenter *presenter = nullptr;
 
-static PyMethodDef MethodDef[] = {
-        {"remove",                           SymbolTableModule::remove,                           METH_VARARGS, "."},
-        {"getVariableNames",                 SymbolTableModule::getVariableNames,                 METH_VARARGS, "."},
-        {"getVariable",                      SymbolTableModule::getVariable,                      METH_VARARGS, "."},
-        {"setVariable",                      SymbolTableModule::setVariable,                      METH_VARARGS, "."},
-        {"getConstantNames",                 SymbolTableModule::getConstantNames,                 METH_VARARGS, "."},
-        {"getConstant",                      SymbolTableModule::getConstant,                      METH_VARARGS, "."},
-        {"setConstant",                      SymbolTableModule::setConstant,                      METH_VARARGS, "."},
-        {"getFunctionNames",                 SymbolTableModule::getFunctionNames,                 METH_VARARGS, "."},
-        {"getFunctionExpression",            SymbolTableModule::getFunctionExpression,            METH_VARARGS, "."},
-        {"getFunctionArgumentNames",         SymbolTableModule::getFunctionArgumentNames,         METH_VARARGS, "."},
-        {"setFunction",                      SymbolTableModule::setFunction,                      METH_VARARGS, "."},
-        {"getScriptFunctionNames",           SymbolTableModule::getScriptFunctionNames,           METH_VARARGS, "."},
-        {"getScriptFunctionCallback",        SymbolTableModule::getScriptFunctionCallback,        METH_VARARGS, "."},
-        {"getScriptFunctionEnableArguments", SymbolTableModule::getScriptFunctionEnableArguments, METH_VARARGS, "."},
-        {"setScriptFunction",                SymbolTableModule::setScriptFunction,                METH_VARARGS, "."},
-        {PyNull, PyNull, 0, PyNull}
-};
+extern "C"
+{
 
-static PyModuleDef ModuleDef = {
-        PyModuleDef_HEAD_INIT,
-        MODULE_NAME,
-        PyNull,
-        -1,
-        MethodDef,
-        PyNull, PyNull, PyNull, PyNull
-};
-
-static PyObject *PyInit_qci() {
-    return PyModule_Create(&ModuleDef);
+static void PySymbolTable_dealloc(PySymbolTable *self) {
+    Py_TYPE(self)->tp_free((PyObject *) self);
 }
 
-void SymbolTableModule::initialize(MainPresenter &p) {
-    SymbolTableModule::presenter = &p;
-    PyImport_AppendInittab(MODULE_NAME, PyInit_qci);
+static PyObject *PySymbolTable_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
+    PySymbolTable *self;
+    self = (PySymbolTable *) type->tp_alloc(type, 0);
+    return (PyObject *) self;
 }
 
-PyObject *SymbolTableModule::remove(PyObject *self, PyObject *args) {
+static int PySymbolTable_init(PySymbolTable *self, PyObject *args, PyObject *kwds) {
+    if (!PyArg_ParseTuple(args, ":"))
+        return -1;
+    self->table = {};
+    return 0;
+}
+
+static PyMemberDef PySymbolTable_members[] = {
+        {PyNull}  /* Sentinel */
+};
+
+//Workaround for extension types seemingly not being able to be passed as arguments to extension functions.
+PyObject *exportToPresenter(PySymbolTable *self, PyObject *args) {
+    NATIVE_FUNC_TRY
+
+        if (!PyArg_ParseTuple(args, ":")) {
+            return PyNull;
+        }
+
+        presenter->setSymbolTable(self->table);
+
+        return PyLong_FromLong(0);
+
+    NATIVE_FUNC_CATCH
+}
+
+PyObject *importFromPresenter(PySymbolTable *self, PyObject *args) {
+    NATIVE_FUNC_TRY
+
+        if (!PyArg_ParseTuple(args, ":")) {
+            return PyNull;
+        }
+
+        self->table = presenter->getSymbolTable();
+
+        return PyLong_FromLong(0);
+
+    NATIVE_FUNC_CATCH
+}
+
+PyObject *removeSymbol(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *name;
@@ -63,17 +81,14 @@ PyObject *SymbolTableModule::remove(PyObject *self, PyObject *args) {
             return PyNull;
         }
 
-        SymbolTable table = presenter->getSymbolTable();
-        table.remove(name);
-
-        presenter->setSymbolTable(table);
+        self->table.remove(name);
 
         return PyLong_FromLong(0);
 
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::getVariableNames(PyObject *self, PyObject *args) {
+PyObject *getVariableNames(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         if (PyArg_ParseTuple(args, ":") == false) {
@@ -82,8 +97,8 @@ PyObject *SymbolTableModule::getVariableNames(PyObject *self, PyObject *args) {
 
         PyObject *list = PyList_New(0);
 
-        const SymbolTable &table = presenter->getSymbolTable();
-        for (const auto &var : table.getVariables()) {
+        const SymbolTable &t = self->table;
+        for (const auto &var : t.getVariables()) {
             PyList_Append(list, PyUnicode_FromString(var.first.c_str()));
         }
 
@@ -92,7 +107,7 @@ PyObject *SymbolTableModule::getVariableNames(PyObject *self, PyObject *args) {
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::getVariable(PyObject *self, PyObject *args) {
+PyObject *getVariable(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *name;
@@ -101,15 +116,14 @@ PyObject *SymbolTableModule::getVariable(PyObject *self, PyObject *args) {
             return PyNull;
         }
 
-        const SymbolTable &table = presenter->getSymbolTable();
+        const SymbolTable &t = self->table;
 
-        double ret = table.getVariables().at(name);
-        return PyFloat_FromDouble(ret);
+        return PyFloat_FromDouble(t.getVariables().at(name));
 
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::setVariable(PyObject *self, PyObject *args) {
+PyObject *setVariable(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *name;
@@ -119,18 +133,14 @@ PyObject *SymbolTableModule::setVariable(PyObject *self, PyObject *args) {
             return PyNull;
         }
 
-        SymbolTable table = presenter->getSymbolTable();
-
-        table.setVariable(name, value);
-
-        presenter->setSymbolTable(table);
+        self->table.setVariable(name, value);
 
         return PyLong_FromLong(0);
 
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::getConstantNames(PyObject *self, PyObject *args) {
+PyObject *getConstantNames(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         if (PyArg_ParseTuple(args, ":") == false) {
@@ -139,8 +149,8 @@ PyObject *SymbolTableModule::getConstantNames(PyObject *self, PyObject *args) {
 
         PyObject *list = PyList_New(0);
 
-        const SymbolTable &table = presenter->getSymbolTable();
-        for (const auto &var : table.getConstants()) {
+        const SymbolTable &t = self->table;
+        for (const auto &var : t.getConstants()) {
             PyList_Append(list, PyUnicode_FromString(var.first.c_str()));
         }
 
@@ -149,7 +159,7 @@ PyObject *SymbolTableModule::getConstantNames(PyObject *self, PyObject *args) {
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::getConstant(PyObject *self, PyObject *args) {
+PyObject *getConstant(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *name;
@@ -158,16 +168,14 @@ PyObject *SymbolTableModule::getConstant(PyObject *self, PyObject *args) {
             return PyNull;
         }
 
-        const SymbolTable &table = presenter->getSymbolTable();
+        const SymbolTable &t = self->table;
 
-        double ret = table.getConstants().at(name);
-
-        return PyFloat_FromDouble(ret);
+        return PyFloat_FromDouble(t.getConstants().at(name));
 
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::setConstant(PyObject *self, PyObject *args) {
+PyObject *setConstant(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *name;
@@ -177,18 +185,14 @@ PyObject *SymbolTableModule::setConstant(PyObject *self, PyObject *args) {
             return PyNull;
         }
 
-        SymbolTable table = presenter->getSymbolTable();
-
-        table.setConstant(name, value);
-
-        presenter->setSymbolTable(table);
+        self->table.setConstant(name, value);
 
         return PyLong_FromLong(0);
 
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::getFunctionNames(PyObject *self, PyObject *args) {
+PyObject *getFunctionNames(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         if (PyArg_ParseTuple(args, ":") == false) {
@@ -197,8 +201,8 @@ PyObject *SymbolTableModule::getFunctionNames(PyObject *self, PyObject *args) {
 
         PyObject *list = PyList_New(0);
 
-        const SymbolTable &table = presenter->getSymbolTable();
-        for (const auto &var : table.getFunctions()) {
+        const SymbolTable &t = self->table;
+        for (const auto &var : t.getFunctions()) {
             PyList_Append(list, PyUnicode_FromString(var.first.c_str()));
         }
 
@@ -207,7 +211,7 @@ PyObject *SymbolTableModule::getFunctionNames(PyObject *self, PyObject *args) {
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::getFunctionExpression(PyObject *self, PyObject *args) {
+PyObject *getFunctionExpression(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *name;
@@ -216,15 +220,15 @@ PyObject *SymbolTableModule::getFunctionExpression(PyObject *self, PyObject *arg
             return PyNull;
         }
 
-        const SymbolTable &table = presenter->getSymbolTable();
+        const SymbolTable &t = self->table;
 
-        Function ret = table.getFunctions().at(name);
+        Function ret = t.getFunctions().at(name);
         return PyUnicode_FromString(ret.expression.c_str());
 
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::getFunctionArgumentNames(PyObject *self, PyObject *args) {
+PyObject *getFunctionArgumentNames(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *name;
@@ -233,9 +237,9 @@ PyObject *SymbolTableModule::getFunctionArgumentNames(PyObject *self, PyObject *
             return PyNull;
         }
 
-        const SymbolTable &table = presenter->getSymbolTable();
+        const SymbolTable &t = self->table;
 
-        Function ret = table.getFunctions().at(name);
+        Function ret = t.getFunctions().at(name);
 
         PyObject *list = PyList_New(0);
         for (auto &arg : ret.argumentNames) {
@@ -247,7 +251,7 @@ PyObject *SymbolTableModule::getFunctionArgumentNames(PyObject *self, PyObject *
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::setFunction(PyObject *self, PyObject *args) {
+PyObject *setFunction(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *name;
@@ -284,18 +288,14 @@ PyObject *SymbolTableModule::setFunction(PyObject *self, PyObject *args) {
 
         Py_DECREF(argumentNames);
 
-        SymbolTable table = presenter->getSymbolTable();
-
-        table.setFunction(name, f);
-
-        presenter->setSymbolTable(table);
+        self->table.setFunction(name, f);
 
         return PyLong_FromLong(0);
 
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::getScriptFunctionNames(PyObject *self, PyObject *args) {
+PyObject *getScriptFunctionNames(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         if (PyArg_ParseTuple(args, ":") == false) {
@@ -304,8 +304,8 @@ PyObject *SymbolTableModule::getScriptFunctionNames(PyObject *self, PyObject *ar
 
         PyObject *list = PyList_New(0);
 
-        const SymbolTable &table = presenter->getSymbolTable();
-        for (const auto &var : table.getScripts()) {
+        const SymbolTable &t = self->table;
+        for (const auto &var : t.getScripts()) {
             PyList_Append(list, PyUnicode_FromString(var.first.c_str()));
         }
 
@@ -314,7 +314,7 @@ PyObject *SymbolTableModule::getScriptFunctionNames(PyObject *self, PyObject *ar
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::getScriptFunctionCallback(PyObject *self, PyObject *args) {
+PyObject *getScriptFunctionCallback(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *name;
@@ -323,21 +323,12 @@ PyObject *SymbolTableModule::getScriptFunctionCallback(PyObject *self, PyObject 
             return PyNull;
         }
 
-        const SymbolTable &table = presenter->getSymbolTable();
-
-        try {
-            Script ret = table.getScripts().at(name);
-
-            return ret.callback;
-        } catch (const std::runtime_error &e) {
-            PyErr_SetString(PyExc_RuntimeError, e.what());
-            return PyNull;
-        }
+        return self->table.getScripts().at(name).callback;
 
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::getScriptFunctionEnableArguments(PyObject *self, PyObject *args) {
+PyObject *getScriptFunctionEnableArguments(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *name;
@@ -346,16 +337,12 @@ PyObject *SymbolTableModule::getScriptFunctionEnableArguments(PyObject *self, Py
             return PyNull;
         }
 
-        const SymbolTable &table = presenter->getSymbolTable();
-
-        Script ret = table.getScripts().at(name);
-
-        return PyBool_FromLong(ret.enableArguments);
+        return PyBool_FromLong(self->table.getScripts().at(name).enableArguments);
 
     NATIVE_FUNC_CATCH
 }
 
-PyObject *SymbolTableModule::setScriptFunction(PyObject *self, PyObject *args) {
+PyObject *setScriptFunction(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
         const char *functionName;
@@ -366,15 +353,78 @@ PyObject *SymbolTableModule::setScriptFunction(PyObject *self, PyObject *args) {
             return PyNull;
         }
 
-        Script script(callback, enableArguments);
-
-        SymbolTable table = presenter->getSymbolTable();
-
-        table.setScript(functionName, script);
-
-        presenter->setSymbolTable(table);
+        self->table.setScript(functionName, {callback, static_cast<bool>(enableArguments)});
 
         return PyLong_FromLong(0);
 
     NATIVE_FUNC_CATCH
+}
+
+static PyMethodDef PySymbolTable_methods[] = {
+        {"exportToPresenter",                (PyCFunction) exportToPresenter,                METH_VARARGS, "."},
+        {"importFromPresenter",              (PyCFunction) importFromPresenter,              METH_VARARGS, "."},
+        {"removeSymbol",                     (PyCFunction) removeSymbol,                     METH_VARARGS, "."},
+        {"getVariableNames",                 (PyCFunction) getVariableNames,                 METH_VARARGS, "."},
+        {"getVariable",                      (PyCFunction) getVariable,                      METH_VARARGS, "."},
+        {"setVariable",                      (PyCFunction) setVariable,                      METH_VARARGS, "."},
+        {"getConstantNames",                 (PyCFunction) getConstantNames,                 METH_VARARGS, "."},
+        {"getConstant",                      (PyCFunction) getConstant,                      METH_VARARGS, "."},
+        {"setConstant",                      (PyCFunction) setConstant,                      METH_VARARGS, "."},
+        {"getFunctionNames",                 (PyCFunction) getFunctionNames,                 METH_VARARGS, "."},
+        {"getFunctionExpression",            (PyCFunction) getFunctionExpression,            METH_VARARGS, "."},
+        {"getFunctionArgumentNames",         (PyCFunction) getFunctionArgumentNames,         METH_VARARGS, "."},
+        {"setFunction",                      (PyCFunction) setFunction,                      METH_VARARGS, "."},
+        {"getScriptFunctionNames",           (PyCFunction) getScriptFunctionNames,           METH_VARARGS, "."},
+        {"getScriptFunctionCallback",        (PyCFunction) getScriptFunctionCallback,        METH_VARARGS, "."},
+        {"getScriptFunctionEnableArguments", (PyCFunction) getScriptFunctionEnableArguments, METH_VARARGS, "."},
+        {"setScriptFunction",                (PyCFunction) setScriptFunction,                METH_VARARGS, "."},
+        {PyNull, PyNull, 0, PyNull}
+};
+
+static PyTypeObject PySymbolTableType = {
+        PyVarObject_HEAD_INIT(PyNull, 0)
+        .tp_name = "qc_native_symtable.SymbolTable",
+        .tp_basicsize = sizeof(PySymbolTable),
+        .tp_itemsize = 0,
+        .tp_dealloc = (destructor) PySymbolTable_dealloc,
+        .tp_flags = Py_TPFLAGS_DEFAULT,
+        .tp_doc = "Symbol Table",
+        .tp_methods = PySymbolTable_methods,
+        .tp_members = PySymbolTable_members,
+        .tp_init = (initproc) PySymbolTable_init,
+        .tp_new = PySymbolTable_new,
+};
+
+static PyModuleDef PySymbolTableModule = {
+        PyModuleDef_HEAD_INIT,
+        .m_name = "qc_native_symtable",
+        .m_doc = "",
+        .m_size = -1,
+};
+
+static PyObject *PyInit() {
+    PyObject *m;
+    if (PyType_Ready(&PySymbolTableType) < 0)
+        return PyNull;
+
+    m = PyModule_Create(&PySymbolTableModule);
+    if (m == PyNull)
+        return PyNull;
+
+    Py_INCREF(&PySymbolTableType);
+
+    if (PyModule_AddObject(m, "SymbolTable", (PyObject *) &PySymbolTableType) < 0) {
+        Py_DECREF(&PySymbolTableType);
+        Py_DECREF(m);
+        return PyNull;
+    }
+
+    return m;
+}
+
+void SymbolTableModule::initialize(MainPresenter &p) {
+    presenter = &p;
+    PyImport_AppendInittab("qc_native_symtable", PyInit);
+}
+
 }
