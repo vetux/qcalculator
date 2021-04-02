@@ -13,6 +13,7 @@
 #include "gui/mainpresenter.hpp"
 
 #include "pymodule/symboltablemodule.hpp"
+#include "pymodule/presentermodule.hpp"
 
 #define SETTINGS_FILENAME "/settings.json"
 
@@ -33,7 +34,8 @@ MainPresenter::MainPresenter(MainView &view)
 }
 
 void MainPresenter::init() {
-    SymbolTableModule::initialize(*this);
+    SymbolTableModule::initialize();
+    PresenterModule::initialize(*this);
     PyUtil::initializePython();
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/addon").toStdString());
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/system").toStdString());

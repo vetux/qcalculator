@@ -12,7 +12,7 @@ public:
      * Register a new native python module.
      * Should be called once before initializing python.
      */
-    static void initialize(MainPresenter &presenter);
+    static void initialize();
 };
 
 #endif //QCALC_SYMBOLTABLEMODULE_HPP

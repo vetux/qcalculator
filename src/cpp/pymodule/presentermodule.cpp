@@ -30,9 +30,9 @@ PyObject *setSymbolTable(PyObject *self, PyObject *args) {
             return PyNull;
         }
 
-        //TODO: Find a way to pass an extension type instance as argument.
+        p->setSymbolTable(o->table);
 
-        throw std::runtime_error("Not Implemented");
+        return PyLong_FromLong(0);
 
     NATIVE_FUNC_CATCH
 }

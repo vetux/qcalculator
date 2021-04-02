@@ -17,8 +17,6 @@
 #define NATIVE_FUNC_TRY try {
 #define NATIVE_FUNC_CATCH } catch (const std::exception &e) { PyErr_SetString(PyExc_RuntimeError, e.what()); return PyNull; }
 
-MainPresenter *presenter = nullptr;
-
 extern "C"
 {
 
@@ -42,35 +40,6 @@ static int PySymbolTable_init(PySymbolTable *self, PyObject *args, PyObject *kwd
 static PyMemberDef PySymbolTable_members[] = {
         {PyNull}  /* Sentinel */
 };
-
-//Workaround for extension types seemingly not being able to be passed as arguments to extension functions.
-PyObject *exportToPresenter(PySymbolTable *self, PyObject *args) {
-    NATIVE_FUNC_TRY
-
-        if (!PyArg_ParseTuple(args, ":")) {
-            return PyNull;
-        }
-
-        presenter->setSymbolTable(self->table);
-
-        return PyLong_FromLong(0);
-
-    NATIVE_FUNC_CATCH
-}
-
-PyObject *importFromPresenter(PySymbolTable *self, PyObject *args) {
-    NATIVE_FUNC_TRY
-
-        if (!PyArg_ParseTuple(args, ":")) {
-            return PyNull;
-        }
-
-        self->table = presenter->getSymbolTable();
-
-        return PyLong_FromLong(0);
-
-    NATIVE_FUNC_CATCH
-}
 
 PyObject *removeSymbol(PySymbolTable *self, PyObject *args) {
     NATIVE_FUNC_TRY
@@ -361,8 +330,6 @@ PyObject *setScriptFunction(PySymbolTable *self, PyObject *args) {
 }
 
 static PyMethodDef PySymbolTable_methods[] = {
-        {"exportToPresenter",                (PyCFunction) exportToPresenter,                METH_VARARGS, "."},
-        {"importFromPresenter",              (PyCFunction) importFromPresenter,              METH_VARARGS, "."},
         {"removeSymbol",                     (PyCFunction) removeSymbol,                     METH_VARARGS, "."},
         {"getVariableNames",                 (PyCFunction) getVariableNames,                 METH_VARARGS, "."},
         {"getVariable",                      (PyCFunction) getVariable,                      METH_VARARGS, "."},
@@ -383,7 +350,7 @@ static PyMethodDef PySymbolTable_methods[] = {
 
 static PyTypeObject PySymbolTableType = {
         PyVarObject_HEAD_INIT(PyNull, 0)
-        .tp_name = "qc_native_symtable.SymbolTable",
+        .tp_name = "qc_native_symtable.NativeSymbolTable",
         .tp_basicsize = sizeof(PySymbolTable),
         .tp_itemsize = 0,
         .tp_dealloc = (destructor) PySymbolTable_dealloc,
@@ -413,7 +380,7 @@ static PyObject *PyInit() {
 
     Py_INCREF(&PySymbolTableType);
 
-    if (PyModule_AddObject(m, "SymbolTable", (PyObject *) &PySymbolTableType) < 0) {
+    if (PyModule_AddObject(m, "NativeSymbolTable", (PyObject *) &PySymbolTableType) < 0) {
         Py_DECREF(&PySymbolTableType);
         Py_DECREF(m);
         return PyNull;
@@ -422,8 +389,7 @@ static PyObject *PyInit() {
     return m;
 }
 
-void SymbolTableModule::initialize(MainPresenter &p) {
-    presenter = &p;
+void SymbolTableModule::initialize() {
     PyImport_AppendInittab("qc_native_symtable", PyInit);
 }
 

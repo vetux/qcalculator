@@ -1,4 +1,5 @@
 import qcalc.sym
+import qcalc.mvp
 
 # ! IMPORTANT ! The user may import / export symbol tables, so handle variables, constants and functions with care
 # (eg. only in a registered script function.)
@@ -42,7 +43,7 @@ def load():
     # A script function which accepts at least 1 argument
     sym.set_script("pyScriptArgs", qcalc.sym.ScriptFunction(evaluate_args, True))
 
-    sym.export_to_presenter()
+    qcalc.mvp.set_presenter_symboltable(sym)
 
 
 def unload():

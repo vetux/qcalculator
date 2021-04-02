@@ -16,14 +16,11 @@ class ScriptFunction:
 
 
 class SymbolTable:
-    def __init__(self):
-        self.table = qcst.SymbolTable()
-
-    def export_to_presenter(self):
-        return self.table.exportToPresenter()
-
-    def import_from_presenter(self):
-        return self.table.importFromPresenter()
+    def __init__(self, table = None):
+        if table is None:
+            self.table = qcst.NativeSymbolTable()
+        else:
+            self.table = table
 
     def remove(self, name):
         return self.table.removeSymbol(name)
