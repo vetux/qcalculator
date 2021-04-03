@@ -46,9 +46,6 @@ SettingsDialogState SettingsDialog::getDialogState() {
 void SettingsDialog::onModuleEnableChanged(bool enabled) {
     auto &s = dynamic_cast<AddonItemWidget &>(*sender());
     std::string name = s.getModuleName().toStdString();
-
-    printf("On addon change %s %d\n", name.c_str(), enabled);
-
     addonState.at(name) = enabled;
 }
 

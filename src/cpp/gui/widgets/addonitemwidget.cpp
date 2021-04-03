@@ -19,7 +19,9 @@ QString AddonItemWidget::getModuleName() {
 }
 
 void AddonItemWidget::setModuleEnabled(bool enabled) {
+    disconnect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChange(int)));
     checkbox->setChecked(enabled);
+    connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChange(int)));
 }
 
 bool AddonItemWidget::getModuleEnabled() {
