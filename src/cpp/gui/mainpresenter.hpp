@@ -10,11 +10,12 @@
 #include "settings.hpp"
 #include "history.hpp"
 #include "addonmanager.hpp"
+#include "addonmanagerlistener.hpp"
 
 #include "calc/expressionparser.hpp"
 #include "gui/mainpresenter.hpp"
 
-class MainPresenter : public QObject {
+class MainPresenter : public QObject, public AddonManagerListener {
 Q_OBJECT
 public:
     explicit MainPresenter(MainView &view);
@@ -91,9 +92,14 @@ public slots:
     void onDockPositionChanged(Qt::DockWidgetArea area);
     //-MainPresenter Interface
 
+public:
     const SymbolTable& getSymbolTable();
 
     void setSymbolTable(const SymbolTable& table);
+
+    void onAddonLoadFail(const std::string &moduleName, const std::string &error) override;
+
+    void onAddonUnloadFail(const std::string &moduleName, const std::string &error) override;
 
 private:
     MainView &view;
@@ -133,8 +139,6 @@ private:
     void applyScripts();
 
     void applyCurrentScript();
-
-    void onAddonFail(std::string module, std::string error);
 };
 
 #endif //QCALC_MAINPRESENTER_HPP

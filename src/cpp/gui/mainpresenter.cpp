@@ -35,8 +35,7 @@ QString getAppDataDirectory() {
 }
 
 MainPresenter::MainPresenter(MainView &view)
-        : view(view), currentValue(0) {
-}
+        : view(view), currentValue(0), addonManager(*this) {}
 
 void MainPresenter::init() {
     PresenterModule::initialize(*this);
@@ -65,11 +64,7 @@ void MainPresenter::init() {
     applyCurrentValue();
     applySymbolTable();
 
-    addonManager.setActiveAddons(settings.enabledAddonModules,
-                                 std::bind(&MainPresenter::onAddonFail,
-                                           this,
-                                           std::placeholders::_1,
-                                           std::placeholders::_2));
+    addonManager.setActiveAddons(settings.enabledAddonModules);
 }
 
 void MainPresenter::onWindowClose(const QCloseEvent &event) {
@@ -82,10 +77,7 @@ void MainPresenter::onWindowClose(const QCloseEvent &event) {
         view.showWarningDialog("Error", error);
     }
 
-    addonManager.setActiveAddons({}, std::bind(&MainPresenter::onAddonFail,
-                                               this,
-                                               std::placeholders::_1,
-                                               std::placeholders::_2));
+    addonManager.setActiveAddons({});
 
     // Because an addon can have a pending deleteLater waiting to be processed
     // and qt does not offer a way to force deleteLater events to be processed
@@ -476,10 +468,7 @@ void MainPresenter::onActionSettings() {
                 enabledAddons.insert(pair.first);
             }
         }
-        addonManager.setActiveAddons(enabledAddons, std::bind(&MainPresenter::onAddonFail,
-                                                              this,
-                                                              std::placeholders::_1,
-                                                              std::placeholders::_2));
+        addonManager.setActiveAddons(enabledAddons);
         settings.enabledAddonModules = enabledAddons;
     }
 }
@@ -503,10 +492,7 @@ void MainPresenter::onActionImportSymbolTable() {
     std::string filepath;
     if (view.showFileChooserDialog("Import symbol table", true, filepath)) {
         try {
-            addonManager.setActiveAddons({}, std::bind(&MainPresenter::onAddonFail,
-                                                       this,
-                                                       std::placeholders::_1,
-                                                       std::placeholders::_2));
+            addonManager.setActiveAddons({});
 
             symbolTable = IO::loadSymbolTable(filepath);
 
@@ -514,10 +500,7 @@ void MainPresenter::onActionImportSymbolTable() {
             currentConstant.clear();
             currentFunction.clear();
 
-            addonManager.setActiveAddons(settings.enabledAddonModules, std::bind(&MainPresenter::onAddonFail,
-                                                                                 this,
-                                                                                 std::placeholders::_1,
-                                                                                 std::placeholders::_2));
+            addonManager.setActiveAddons(settings.enabledAddonModules);
 
             applySymbolTable();
 
@@ -601,6 +584,14 @@ void MainPresenter::setSymbolTable(const SymbolTable &table) {
     currentConstant.clear();
     currentFunction.clear();
     applySymbolTable();
+}
+
+void MainPresenter::onAddonLoadFail(const std::string &moduleName, const std::string &error) {
+    view.showWarningDialog("Error", "Failed to load addon (" + moduleName + ") Error: " + error);
+}
+
+void MainPresenter::onAddonUnloadFail(const std::string &moduleName, const std::string &error) {
+    view.showWarningDialog("Error", "Failed to unload addon (" + moduleName + ") Error: " + error);
 }
 
 void MainPresenter::applySymbolTable() {
@@ -742,8 +733,4 @@ void MainPresenter::applyCurrentScript() {
     view.disconnectPresenter(*this);
 
     view.connectPresenter(*this);
-}
-
-void MainPresenter::onAddonFail(std::string module, std::string error) {
-    view.showWarningDialog("Error", "Failed to load / unload addon " + module + " Error: " + error);
 }

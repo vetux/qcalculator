@@ -5,8 +5,12 @@
 #include <string>
 #include <functional>
 
+#include "addonmanagerlistener.hpp"
+
 class AddonManager {
 public:
+    AddonManager(AddonManagerListener &listener);
+
     /**
      * This function ensures that the addon modules in the passed set are currently loaded,
      * and unloads any modules which are not contained in the set.
@@ -15,8 +19,7 @@ public:
      * @param errorCallback The callback to invoke when a addon fails to load / unload.
      * The first argument is the module name and the second argument the error message.
      */
-    void setActiveAddons(const std::set<std::string> &addons,
-                         const std::function<void(std::string, std::string)>& errorCallback);
+    void setActiveAddons(const std::set<std::string> &addons);
 
     /**
      * @return The set of currently loaded modules.
@@ -24,6 +27,7 @@ public:
     std::set<std::string> getActiveAddons();
 
 private:
+    AddonManagerListener &listener;
     std::set<std::string> loadedModules; //The collection of module names which are currently loaded.
 };
 
