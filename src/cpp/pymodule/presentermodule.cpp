@@ -2,8 +2,8 @@
 
 #include <Python.h>
 
-#include "pymodule/moduletypes.hpp"
 #include "pymodule/presentermodule.hpp"
+#include "pymodule/pysymboltable.hpp"
 
 #include "pyutil.hpp"
 
@@ -24,13 +24,17 @@ extern "C"
 PyObject *setSymbolTable(PyObject *self, PyObject *args) {
     NATIVE_FUNC_TRY
 
-        PySymbolTable *o;
+        PyObject *o;
 
         if (!PyArg_ParseTuple(args, "O:", &o)) {
             return PyNull;
         }
 
-        p->setSymbolTable(o->table);
+        SymbolTable t = PySymbolTable::Convert(o);
+
+        PySymbolTable::Cleanup(p->getSymbolTable());
+
+        p->setSymbolTable(t);
 
         return PyLong_FromLong(0);
 
@@ -43,9 +47,7 @@ PyObject *getSymbolTable(PyObject *self, PyObject *args) {
         if (!PyArg_ParseTuple(args, ":"))
             return PyNull;
 
-        //TODO: Find a way to instantiate an extension type in c++.
-
-        throw std::runtime_error("Not Implemented");
+        return PySymbolTable::New(p->getSymbolTable());
 
     NATIVE_FUNC_CATCH
 }

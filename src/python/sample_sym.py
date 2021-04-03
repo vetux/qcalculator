@@ -43,6 +43,8 @@ def load():
     # A script function which accepts at least 1 argument
     sym.set_script("pyScriptArgs", qcalc.sym.ScriptFunction(evaluate_args, True))
 
+    sym.set_script_noargs("pyScriptTest", evaluate)
+
     qcalc.mvp.set_presenter_symboltable(sym)
 
 

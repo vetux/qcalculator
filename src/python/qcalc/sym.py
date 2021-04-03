@@ -1,6 +1,3 @@
-import qc_native_symtable as qcst
-
-
 class Function:
     def __init__(self, expression=None, argument_names=None):
         if argument_names is None:
@@ -16,53 +13,58 @@ class ScriptFunction:
 
 
 class SymbolTable:
-    def __init__(self, table = None):
-        if table is None:
-            self.table = qcst.NativeSymbolTable()
-        else:
-            self.table = table
+    def __init__(self, variables=None, constants=None, functions=None, scripts=None):
+        if variables is None:
+            variables = {}
+        if constants is None:
+            constants = {}
+        if functions is None:
+            functions = {}
+        if scripts is None:
+            scripts = {}
+        self.variables = variables
+        self.constants = constants
+        self.functions = functions
+        self.scripts = scripts
 
     def remove(self, name):
-        return self.table.removeSymbol(name)
+        return self.variables.pop(name, None)
 
     def get_variable_names(self):
-        return self.table.getVariableNames()
+        return self.variables.keys()
 
     def get_variable(self, name):
-        return self.table.getVariable(name)
+        return self.variables[name]
 
     def set_variable(self, name, value):
-        return self.table.setVariable(name, value)
+        self.variables[name] = value
 
     def get_constant_names(self):
-        return self.table.getConstantNames()
+        return self.constants.keys()
 
     def get_constant(self, name):
-        return self.table.getConstant(name)
+        return self.constants[name]
 
     def set_constant(self, name, value):
-        return self.table.setConstant(name, value)
+        self.constants[name] = value
 
     def get_function_names(self):
-        return self.table.getFunctionNames()
+        return self.functions.keys()
 
     def get_function(self, name):
-        ret = Function()
-        ret.expression = self.table.getFunctionExpression(name)
-        ret.argument_names = self.table.getFunctionArgumentNames(name)
-        return ret
+        return self.functions[name]
 
     def set_function(self, name, func):
-        return self.table.setFunction(name, func.expression, func.argument_names)
+        self.functions[name] = func
 
     def get_script_names(self):
-        return self.table.getScriptFunctionNames()
+        return self.scripts.keys()
 
     def get_script(self, name):
-        ret = ScriptFunction
-        ret.callback = self.table.getScriptFunctionCallback(name)
-        ret.enable_arguments = self.table.getScriptFunctionEnableArguments(name)
-        return ret
+        return self.scripts[name]
 
     def set_script(self, name, script):
-        return self.table.setScriptFunction(name, script.callback, script.enable_arguments)
+        self.scripts[name] = script
+
+    def set_script_noargs(self, name, callback):
+        self.scripts[name] = ScriptFunction(callback, False)
