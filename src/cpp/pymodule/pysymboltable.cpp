@@ -11,9 +11,21 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
     }
 
     PyObject *symDict = PyModule_GetDict(symModule);
+
     PyObject *symClass = PyDict_GetItemString(symDict, "SymbolTable");
+    if (symClass == PyNull) {
+        throw std::runtime_error("Failed to get SymbolTable class object");
+    }
+
     PyObject *funcClass = PyDict_GetItemString(symDict, "Function");
-    PyObject *scriptClass = PyDict_GetItemString(symDict, "Script");
+    if (funcClass == PyNull) {
+        throw std::runtime_error("Failed to get Function class object");
+    }
+
+    PyObject *scriptClass = PyDict_GetItemString(symDict, "ScriptFunction");
+    if (scriptClass == PyNull) {
+        throw std::runtime_error("Failed to get ScriptFunction class object");
+    }
 
     PyObject *symInstance = PyObject_CallNoArgs(symClass);
 

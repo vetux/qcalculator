@@ -7,8 +7,6 @@ import qcalc.mvp
 # Scripts are not exported / imported by user interaction.
 # The addons will be unloaded before import and loaded again after import.
 
-sym = qcalc.sym.SymbolTable
-
 
 # Our script function callback which is invoked by the expression parser
 # when it encounters the defined symbol name in a expression.
@@ -32,10 +30,9 @@ test = Test
 def load():
     print("Loading sym sample addon")
 
-    global sym
     global test
 
-    sym = qcalc.sym.SymbolTable()
+    sym = qcalc.mvp.get_presenter_symboltable()
 
     sym.set_variable("pyVar", 42)
     sym.set_constant("pyConst", 3.141)
@@ -65,7 +62,7 @@ def load():
 def unload():
     print("Unloading sym sample addon")
 
-    global sym
+    sym = qcalc.mvp.get_presenter_symboltable()
 
     sym.remove("pyVar")
     sym.remove("pyConst")
