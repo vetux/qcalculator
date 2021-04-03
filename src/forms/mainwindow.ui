@@ -4279,6 +4279,8 @@ QPushButton:hover {
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionSettings"/>
+    <addaction name="separator"/>
     <addaction name="actionImport_Symbols"/>
     <addaction name="actionExport_Symbols"/>
     <addaction name="separator"/>
@@ -4954,6 +4956,11 @@ QPushButton:hover {
   <action name="actionExport_Symbols">
    <property name="text">
     <string>Export Symbols...</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>

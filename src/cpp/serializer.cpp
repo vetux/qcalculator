@@ -116,6 +116,7 @@ std::string Serializer::serializeSettings(const Settings &settings) {
     j["dockTab"] = clampTabIndex(settings.dockActiveTab);
     j["windowWidth"] = settings.windowSize.width();
     j["windowHeight"] = settings.windowSize.height();
+    j["addons"] = settings.enabledAddonModules;
     return nlohmann::to_string(j);
 }
 
@@ -129,5 +130,10 @@ Settings Serializer::deserializeSettings(const std::string &str) {
     ret.dockPosition = convertIntToDockArea(j["dockPosition"]);
     ret.dockActiveTab = clampTabIndex(j["dockTab"]);
     ret.windowSize = {j["windowWidth"], j["windowHeight"]};
+    try {
+        ret.enabledAddonModules = j["addons"].get<std::set<std::string>>();
+    } catch (const std::exception &e) {
+        ret.enabledAddonModules = {};
+    }
     return ret;
 }

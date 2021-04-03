@@ -12,6 +12,8 @@
 #include "numberformat.hpp"
 #include "fractiontest.hpp"
 
+#include "gui/settingsdialog.hpp"
+
 #define OBJECT_NAME_PREFIX_BITS "pushButton_bit_"
 #define OBJECT_NAME_PREFIX_KEYPAD "pushButton_kp_"
 
@@ -96,6 +98,7 @@ void MainWindow::connectPresenter(const MainPresenter &target) {
     connect(this, SIGNAL(signalFunctionArgsChanged(std::vector<std::string>)), &target,
             SLOT(onFunctionArgsChanged(std::vector<std::string>)));
 
+    connect(ui->actionSettings, SIGNAL(triggered(bool)), &target, SLOT(onActionSettings()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), &target, SLOT(onActionExit()));
     connect(ui->actionAbout, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
     connect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
@@ -136,6 +139,7 @@ void MainWindow::disconnectPresenter(const MainPresenter &target) {
     disconnect(this, SIGNAL(signalFunctionArgsChanged(std::vector<std::string>)), &target,
                SLOT(onFunctionArgsChanged(std::vector<std::string>)));
 
+    disconnect(ui->actionSettings, SIGNAL(triggered(bool)), &target, SLOT(onActionSettings()));
     disconnect(ui->actionExit, SIGNAL(triggered(bool)), &target, SLOT(onActionExit()));
     disconnect(ui->actionAbout, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
     disconnect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
@@ -166,8 +170,13 @@ Powered by:
 )LLL"));
 }
 
-void MainWindow::showSettingsDialog() {
-
+bool MainWindow::showSettingsDialog(const SettingsDialogState &input, SettingsDialogState &outputData) {
+    SettingsDialog dialog;
+    dialog.setDialogState(input);
+    dialog.show();
+    bool ret = dialog.exec() == QDialog::Accepted;
+    outputData = dialog.getDialogState();
+    return ret;
 }
 
 void MainWindow::showWarningDialog(const std::string &title, const std::string &text) {

@@ -9,6 +9,7 @@
 #include "mainview.hpp"
 #include "settings.hpp"
 #include "history.hpp"
+#include "addonmanager.hpp"
 
 #include "calc/expressionparser.hpp"
 #include "gui/mainpresenter.hpp"
@@ -97,6 +98,8 @@ public slots:
 private:
     MainView &view;
 
+    AddonManager addonManager;
+
     SymbolTable symbolTable;
 
     Settings settings;
@@ -130,6 +133,8 @@ private:
     void applyScripts();
 
     void applyCurrentScript();
+
+    void onAddonFail(std::string module, std::string error);
 };
 
 #endif //QCALC_MAINPRESENTER_HPP

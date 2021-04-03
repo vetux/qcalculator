@@ -4,6 +4,9 @@
 #include <QDockWidget>
 #include <QSize>
 
+#include <set>
+#include <string>
+
 struct Settings {
     bool showKeypad = false;
     bool showBitView = false;
@@ -15,6 +18,8 @@ struct Settings {
     int dockActiveTab = 0;
 
     QSize windowSize = {};
+
+    std::set<std::string> enabledAddonModules; // A set of module names which have been enabled by the user.
 };
 
 #endif //QCALC_SETTINGS_HPP

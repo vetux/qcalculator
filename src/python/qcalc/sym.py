@@ -28,7 +28,10 @@ class SymbolTable:
         self.scripts = scripts
 
     def remove(self, name):
-        return self.variables.pop(name, None)
+        self.variables.pop(name, None)
+        self.constants.pop(name, None)
+        self.functions.pop(name, None)
+        self.scripts.pop(name, None)
 
     def get_variable_names(self):
         return self.variables.keys()

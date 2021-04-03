@@ -1,4 +1,3 @@
-import qcalc.sym
 import qc_native_presenter as qcpr
 
 

@@ -8,7 +8,7 @@
 #include "numberformat.hpp"
 #include "pyutil.hpp"
 #include "io.hpp"
-#include "addon.hpp"
+#include "addonhelper.hpp"
 
 #include "gui/mainpresenter.hpp"
 
@@ -20,6 +20,10 @@
 
 using namespace NumberFormat;
 using namespace FractionTest;
+
+QString getAddonModulesDirectory() {
+    return QCoreApplication::applicationDirPath().append("/addon");
+}
 
 QString getAppDataDirectory() {
     QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -38,17 +42,8 @@ void MainPresenter::init() {
     PresenterModule::initialize(*this);
     ExprtkModule::initialize();
     PyUtil::initializePython();
-    PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/addon").toStdString());
+    PyUtil::addModuleDirectory(getAddonModulesDirectory().toStdString());
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/system").toStdString());
-
-    try {
-        Addon::load("sample_gui");
-        Addon::load("sample_sym");
-        Addon::load("sample_exprtk");
-    }
-    catch (const std::runtime_error &e) {
-        view.showWarningDialog("Failed to load sample addon", e.what());
-    }
 
     try {
         settings = IO::loadSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString());
@@ -70,21 +65,14 @@ void MainPresenter::init() {
     applyCurrentValue();
     applySymbolTable();
 
-    view.connectPresenter(*this);
+    addonManager.setActiveAddons(settings.enabledAddonModules,
+                                 std::bind(&MainPresenter::onAddonFail,
+                                           this,
+                                           std::placeholders::_1,
+                                           std::placeholders::_2));
 }
 
 void MainPresenter::onWindowClose(const QCloseEvent &event) {
-    view.disconnectPresenter(*this); //The exit action is invoked multiple times when closing the view for some reason.
-
-    try {
-        Addon::unload("sample_gui");
-        Addon::unload("sample_sym");
-        Addon::unload("sample_exprtk");
-    }
-    catch (const std::runtime_error &e) {
-        view.showWarningDialog("Failed to unload sample addons", e.what());
-    }
-
     try {
         IO::saveSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(), settings);
     }
@@ -93,6 +81,11 @@ void MainPresenter::onWindowClose(const QCloseEvent &event) {
         error += e.what();
         view.showWarningDialog("Error", error);
     }
+
+    addonManager.setActiveAddons({}, std::bind(&MainPresenter::onAddonFail,
+                                               this,
+                                               std::placeholders::_1,
+                                               std::placeholders::_2));
 
     // Because an addon can have a pending deleteLater waiting to be processed
     // and qt does not offer a way to force deleteLater events to be processed
@@ -467,7 +460,28 @@ void MainPresenter::onActionAbout() {
 }
 
 void MainPresenter::onActionSettings() {
-    view.showSettingsDialog();
+    SettingsDialogState state;
+
+    state.addonMetadata = AddonHelper::getAvailableAddons(getAddonModulesDirectory().toStdString());
+    for (auto &pair : state.addonMetadata) {
+        state.addonState[pair.first] = std::find(settings.enabledAddonModules.begin(),
+                                                 settings.enabledAddonModules.end(),
+                                                 pair.first) != settings.enabledAddonModules.end();
+    }
+
+    if (view.showSettingsDialog(state, state)) {
+        std::set<std::string> enabledAddons;
+        for (auto &pair : state.addonState) {
+            if (pair.second) {
+                enabledAddons.insert(pair.first);
+            }
+        }
+        addonManager.setActiveAddons(enabledAddons, std::bind(&MainPresenter::onAddonFail,
+                                                              this,
+                                                              std::placeholders::_1,
+                                                              std::placeholders::_2));
+        settings.enabledAddonModules = enabledAddons;
+    }
 }
 
 void MainPresenter::onActionShowKeyPad(bool show) {
@@ -489,11 +503,21 @@ void MainPresenter::onActionImportSymbolTable() {
     std::string filepath;
     if (view.showFileChooserDialog("Import symbol table", true, filepath)) {
         try {
+            addonManager.setActiveAddons({}, std::bind(&MainPresenter::onAddonFail,
+                                                       this,
+                                                       std::placeholders::_1,
+                                                       std::placeholders::_2));
+
             symbolTable = IO::loadSymbolTable(filepath);
 
             currentVariable.clear();
             currentConstant.clear();
             currentFunction.clear();
+
+            addonManager.setActiveAddons(settings.enabledAddonModules, std::bind(&MainPresenter::onAddonFail,
+                                                                                 this,
+                                                                                 std::placeholders::_1,
+                                                                                 std::placeholders::_2));
 
             applySymbolTable();
 
@@ -718,4 +742,8 @@ void MainPresenter::applyCurrentScript() {
     view.disconnectPresenter(*this);
 
     view.connectPresenter(*this);
+}
+
+void MainPresenter::onAddonFail(std::string module, std::string error) {
+    view.showWarningDialog("Error", "Failed to load / unload addon " + module + " Error: " + error);
 }

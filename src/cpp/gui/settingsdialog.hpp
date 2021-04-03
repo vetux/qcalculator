@@ -3,6 +3,10 @@
 
 #include <QDialog>
 
+#include <map>
+
+#include "gui/settingsdialogstate.hpp"
+
 namespace Ui {
     class SettingsDialog;
 }
@@ -15,14 +19,22 @@ public:
 
     ~SettingsDialog() override;
 
+    void setDialogState(const SettingsDialogState &state);
+
+    SettingsDialogState getDialogState();
+
 private slots:
 
-    void on_pushButton_resetstate_pressed();
+    void onModuleEnableChanged(bool enabled);
 
-    void on_checkBox_toggled(bool arg1);
+    void onDialogAccepted();
+
+    void onDialogRejected();
 
 private:
     Ui::SettingsDialog *ui;
+
+    std::map<std::string, bool> addonState; // The names of available addon modules and their enable state.
 };
 
 #endif // SETTINGSDIALOG_HPP

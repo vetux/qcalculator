@@ -9,13 +9,13 @@
 #include <set>
 #include <string>
 
-#include "addon.hpp"
+#include "addonhelper.hpp"
 
 class AddonTester : public QDialog {
 Q_OBJECT
 public:
     explicit AddonTester(QWidget *parent = nullptr) : QDialog(parent) {
-        setWindowTitle("Addon Tester");
+        setWindowTitle("AddonHelper Tester");
         label = new QLabel("Running leak check...\nClose dialog to cancel.", this);
         resize(250, 150);
         connect(&timer, SIGNAL(timeout()), SLOT(leakCheck()));
@@ -28,8 +28,8 @@ private slots:
 
     void leakCheck() {
         for (auto &module : modulesToBeTested) {
-            Addon::load(module);
-            Addon::unload(module);
+            AddonHelper::load(module);
+            AddonHelper::unload(module);
         }
     }
 
