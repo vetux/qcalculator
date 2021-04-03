@@ -112,6 +112,7 @@ SymbolTable PySymbolTable::Convert(PyObject *o) {
             throw e;
         }
     }
+    Py_DECREF(keys);
     Py_DECREF(attr);
 
     if (!PyObject_HasAttrString(o, "constants")) {
@@ -160,6 +161,7 @@ SymbolTable PySymbolTable::Convert(PyObject *o) {
             throw e;
         }
     }
+    Py_DECREF(keys);
     Py_DECREF(attr);
 
     if (!PyObject_HasAttrString(o, "functions")) {
@@ -289,6 +291,7 @@ SymbolTable PySymbolTable::Convert(PyObject *o) {
             throw e;
         }
     }
+    Py_DECREF(keys);
     Py_DECREF(attr);
 
     if (!PyObject_HasAttrString(o, "scripts")) {
@@ -361,7 +364,7 @@ SymbolTable PySymbolTable::Convert(PyObject *o) {
             throw e;
         }
     }
-
+    Py_DECREF(keys);
     Py_DECREF(attr);
 
     return ret;

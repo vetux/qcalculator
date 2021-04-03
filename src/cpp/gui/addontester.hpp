@@ -17,6 +17,7 @@ public:
     explicit AddonTester(QWidget *parent = nullptr) : QDialog(parent) {
         setWindowTitle("Addon Tester");
         label = new QLabel("Running leak check...\nClose dialog to cancel.", this);
+        resize(250, 150);
         connect(&timer, SIGNAL(timeout()), SLOT(leakCheck()));
         modulesToBeTested.insert("sample_gui");
         modulesToBeTested.insert("sample_sym");
