@@ -55,13 +55,7 @@ void MainPresenter::init() {
         view.showWarningDialog("Error", error);
     }
 
-    view.setKeyPadVisibility(settings.showKeypad);
-    view.setBitViewVisibility(settings.showBitView);
-    view.setDockPosition(settings.dockPosition);
-    view.setDockVisibility(settings.showDock);
-    view.setActiveDockTab(settings.dockActiveTab);
-    view.setWindowSize(settings.windowSize);
-
+    applySettings();
     applyCurrentValue();
     applySymbolTable();
 
@@ -456,22 +450,14 @@ void MainPresenter::onActionAbout() {
 void MainPresenter::onActionSettings() {
     SettingsDialogState state;
 
+    state.settings = settings;
+
     state.addonMetadata = AddonHelper::getAvailableAddons(getAddonModulesDirectory().toStdString());
-    for (auto &pair : state.addonMetadata) {
-        state.addonState[pair.first] = std::find(settings.enabledAddonModules.begin(),
-                                                 settings.enabledAddonModules.end(),
-                                                 pair.first) != settings.enabledAddonModules.end();
-    }
 
     if (view.showSettingsDialog(state, state)) {
-        std::set<std::string> enabledAddons;
-        for (auto &pair : state.addonState) {
-            if (pair.second) {
-                enabledAddons.insert(pair.first);
-            }
-        }
-        addonManager.setActiveAddons(enabledAddons);
-        settings.enabledAddonModules = enabledAddons;
+        addonManager.setActiveAddons(state.settings.enabledAddonModules);
+        settings = state.settings;
+        applySettings();
     }
 }
 
@@ -594,6 +580,19 @@ void MainPresenter::onAddonLoadFail(const std::string &moduleName, const std::st
 
 void MainPresenter::onAddonUnloadFail(const std::string &moduleName, const std::string &error) {
     view.showWarningDialog("Error", "Failed to unload addon (" + moduleName + ") Error: " + error);
+}
+
+void MainPresenter::applySettings() {
+    view.disconnectPresenter(*this);
+
+    view.setKeyPadVisibility(settings.showKeypad);
+    view.setBitViewVisibility(settings.showBitView);
+    view.setDockPosition(settings.dockPosition);
+    view.setDockVisibility(settings.showDock);
+    view.setActiveDockTab(settings.dockActiveTab);
+    view.setWindowSize(settings.windowSize);
+
+    view.connectPresenter(*this);
 }
 
 void MainPresenter::applySymbolTable() {

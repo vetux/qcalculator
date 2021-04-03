@@ -117,23 +117,41 @@ std::string Serializer::serializeSettings(const Settings &settings) {
     j["windowWidth"] = settings.windowSize.width();
     j["windowHeight"] = settings.windowSize.height();
     j["addons"] = settings.enabledAddonModules;
+    j["settingsTab"] = settings.settingsTab;
     return nlohmann::to_string(j);
 }
 
 Settings Serializer::deserializeSettings(const std::string &str) {
     nlohmann::json j = nlohmann::json::parse(str);
+
     Settings ret;
-    ret.showKeypad = j["showKeypad"];
-    ret.showBitView = j["showBitView"];
-    ret.showDock = j["showDock"];
-    ret.historyLimit = j["historyLimit"];
-    ret.dockPosition = convertIntToDockArea(j["dockPosition"]);
-    ret.dockActiveTab = clampTabIndex(j["dockTab"]);
-    ret.windowSize = {j["windowWidth"], j["windowHeight"]};
-    if (j.contains("addons")) {
+
+    if (j.contains("showKeypad"))
+        ret.showKeypad = j["showKeypad"];
+
+    if (j.contains("showBitView"))
+        ret.showBitView = j["showBitView"];
+
+    if (j.contains("showDock"))
+        ret.showDock = j["showDock"];
+
+    if (j.contains("historyLimit"))
+        ret.historyLimit = j["historyLimit"];
+
+    if (j.contains("dockPosition"))
+        ret.dockPosition = convertIntToDockArea(j["dockPosition"]);
+
+    if (j.contains("dockTab"))
+        ret.dockActiveTab = clampTabIndex(j["dockTab"]);
+
+    if (j.contains("windowWidth") && j.contains("windowHeight"))
+        ret.windowSize = {j["windowWidth"], j["windowHeight"]};
+
+    if (j.contains("addons"))
         ret.enabledAddonModules = j["addons"].get<std::set<std::string>>();
-    } else {
-        ret.enabledAddonModules = {};
-    }
+
+    if (j.contains("settingsTab"))
+        ret.settingsTab = j["settingsTab"];
+
     return ret;
 }

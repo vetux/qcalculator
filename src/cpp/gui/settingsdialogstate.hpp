@@ -5,10 +5,12 @@
 #include <string>
 
 #include "addonmetadata.hpp"
+#include "settings.hpp"
 
 struct SettingsDialogState {
-    std::map<std::string, bool> addonState;
     std::map<std::string, AddonMetadata> addonMetadata;
+
+    Settings settings;
 };
 
 #endif //QCALC_SETTINGSDIALOGSTATE_HPP

@@ -20,6 +20,8 @@ struct Settings {
     QSize windowSize = {};
 
     std::set<std::string> enabledAddonModules; // A set of module names which have been enabled by the user.
+
+    int settingsTab = 0;
 };
 
 #endif //QCALC_SETTINGS_HPP

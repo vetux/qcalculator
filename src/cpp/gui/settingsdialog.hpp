@@ -31,10 +31,16 @@ private slots:
 
     void onDialogRejected();
 
+    void onResetSettingsPressed();
+
+    void onSettingsTabChanged(int tab);
+
 private:
     Ui::SettingsDialog *ui;
 
-    std::map<std::string, bool> addonState; // The names of available addon modules and their enable state.
+    SettingsDialogState state;
+
+    void applyAddonState(const std::map<std::string, bool> &addonState, const std::map<std::string, AddonMetadata>& addonMetadata);
 };
 
 #endif // SETTINGSDIALOG_HPP
