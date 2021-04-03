@@ -34,95 +34,53 @@ namespace IO {
         return ret;
     }
 
-    Settings loadSettings(const std::string &fileName) {
+    std::string fileReadAllText(const std::string &filePath) {
         try {
-            QFile file(fileName.c_str());
+            QFile file(filePath.c_str());
             if (file.exists()) {
                 file.open(QFile::ReadOnly);
 
                 QTextStream stream(&file);
-                QString settingsContents = stream.readAll();
+                QString fileContents = stream.readAll();
                 stream.flush();
 
                 file.close();
 
-                return Serializer::deserializeSettings(settingsContents.toStdString());
+                return fileContents.toStdString();
             } else {
                 return {};
             }
         }
         catch (const std::exception &e) {
-            std::string error = "Failed to read settings file at ";
-            error += fileName;
+            std::string error = "Failed to read file at ";
+            error += filePath;
             error += " Error: ";
             error += e.what();
             throw std::runtime_error(error);
         }
     }
 
-    void saveSettings(const std::string &fileName, const Settings &settings) {
+    void fileWriteAllText(const std::string &filePath, const std::string &contents) {
         try {
-            QFile file(fileName.c_str());
+            QFile file(filePath.c_str());
 
             file.open(QFile::WriteOnly | QFile::Truncate);
 
             QTextStream stream(&file);
-            QString str = Serializer::serializeSettings(settings).c_str();
-            stream << str;
+
+            QString tmp(contents.c_str());
+            stream << tmp;
+
             stream.flush();
 
             file.close();
         }
         catch (const std::exception &e) {
-            std::string error = "Failed to write settings file at ";
-            error += fileName;
+            std::string error = "Failed to write file at ";
+            error += filePath;
             error += " Error: ";
             error += e.what();
             throw std::runtime_error(error);
         }
-    }
-
-
-    SymbolTable loadSymbolTable(const std::string &filePath) {
-        QFile file(filePath.c_str());
-        if (!file.exists()) {
-            std::string error = "File ";
-            error += filePath;
-            error += " not found.";
-            throw std::runtime_error(error);
-        }
-
-        file.open(QFile::ReadOnly);
-
-        QTextStream stream(&file);
-        QString contents = stream.readAll();
-        stream.flush();
-
-        file.close();
-
-        return Serializer::deserializeTable(contents.toStdString());
-    }
-
-    void saveSymbolTable(const std::string &filePath, const SymbolTable &symbolTable) {
-        QFile file(filePath.c_str());
-        QFileInfo info(file);
-
-        //Failsafe, dont accept filepaths which point to an existing directory
-        //as overwriting an existing directory with a file would not make sense in this case.
-        if (info.isDir()) {
-            std::string error = "File ";
-            error += filePath;
-            error += " is a directory.";
-            throw std::runtime_error(error);
-        }
-
-        file.open(QFile::WriteOnly | QFile::Truncate);
-
-        QTextStream stream(&file);
-        QString contents = Serializer::serializeTable(symbolTable).c_str();
-        stream << contents;
-        stream.flush();
-
-        file.close();
     }
 }

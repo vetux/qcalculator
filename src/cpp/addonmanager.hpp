@@ -15,9 +15,9 @@ public:
      * This function ensures that the addon modules in the passed set are currently loaded,
      * and unloads any modules which are not contained in the set.
      *
+     * If an addon fails to load / unload it is still considered "loaded".
+     *
      * @param addons The set of module names which should currently be loaded.
-     * @param errorCallback The callback to invoke when a addon fails to load / unload.
-     * The first argument is the module name and the second argument the error message.
      */
     void setActiveAddons(const std::set<std::string> &addons);
 

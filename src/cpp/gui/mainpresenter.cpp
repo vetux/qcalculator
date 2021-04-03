@@ -45,7 +45,8 @@ void MainPresenter::init() {
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/system").toStdString());
 
     try {
-        settings = IO::loadSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString());
+        settings = Serializer::deserializeSettings(
+                IO::fileReadAllText(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString()));
     }
     catch (const std::exception &e) {
         settings = {};
@@ -69,7 +70,8 @@ void MainPresenter::init() {
 
 void MainPresenter::onWindowClose(const QCloseEvent &event) {
     try {
-        IO::saveSettings(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(), settings);
+        IO::fileWriteAllText(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(),
+                             Serializer::serializeSettings(settings));
     }
     catch (const std::exception &e) {
         std::string error = "Failed to save settings: ";
@@ -494,7 +496,7 @@ void MainPresenter::onActionImportSymbolTable() {
         try {
             addonManager.setActiveAddons({});
 
-            symbolTable = IO::loadSymbolTable(filepath);
+            symbolTable = Serializer::deserializeTable(IO::fileReadAllText(filepath));
 
             currentVariable.clear();
             currentConstant.clear();
@@ -520,7 +522,7 @@ void MainPresenter::onActionExportSymbolTable() {
     std::string filepath;
     if (view.showFileChooserDialog("Export symbol table", false, filepath)) {
         try {
-            IO::saveSymbolTable(filepath, symbolTable);
+            IO::fileWriteAllText(filepath, Serializer::serializeTable(symbolTable));
             view.showInfoDialog("Export successful", "Successfully exported symbol table to " + filepath);
         }
         catch (const std::exception &e) {

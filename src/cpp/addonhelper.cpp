@@ -3,10 +3,9 @@
 #include "pythoninclude.hpp"
 
 #include <stdexcept>
-#include <QFile>
+
 #include <QFileInfo>
 #include <QDir>
-#include <QTextStream>
 
 #include "pyutil.hpp"
 #include "io.hpp"
@@ -38,18 +37,9 @@ namespace AddonHelper {
             if (metadataFile.exists()) {
                 //Has metadata file
                 try {
-                    QFile file(metadataFile.absoluteFilePath());
-
-                    file.open(QFile::ReadOnly);
-
-                    QTextStream stream(&file);
-                    QString contents = stream.readAll();
-                    stream.flush();
-
-                    file.close();
-
-                    metadata = deserializeMetadata(contents.toStdString());
-                } catch (const std::exception &e) {
+                    metadata = deserializeMetadata(IO::fileReadAllText(metadataFile.absoluteFilePath().toStdString()));
+                }
+                catch (const std::exception &e) {
                     //Ignore exception and set default metadata
                     metadata.displayName = moduleName;
                     metadata.description = "No Description";
