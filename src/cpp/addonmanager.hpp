@@ -9,7 +9,7 @@
 
 class AddonManager {
 public:
-    AddonManager(AddonManagerListener &listener);
+    explicit AddonManager(AddonManagerListener &listener);
 
     /**
      * This function ensures that the addon modules in the passed set are currently loaded,
