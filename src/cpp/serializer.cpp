@@ -130,9 +130,9 @@ Settings Serializer::deserializeSettings(const std::string &str) {
     ret.dockPosition = convertIntToDockArea(j["dockPosition"]);
     ret.dockActiveTab = clampTabIndex(j["dockTab"]);
     ret.windowSize = {j["windowWidth"], j["windowHeight"]};
-    try {
+    if (j.contains("addons")) {
         ret.enabledAddonModules = j["addons"].get<std::set<std::string>>();
-    } catch (const std::exception &e) {
+    } else {
         ret.enabledAddonModules = {};
     }
     return ret;
