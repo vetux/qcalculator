@@ -21,10 +21,19 @@ def evaluate_args(*args):
     return args[0]
 
 
+class Test:
+    def evaluate(self):
+        pass
+
+
+test = Test
+
+
 def load():
     print("Loading sample sym module")
 
     global sym
+    global test
 
     sym = qcalc.sym.SymbolTable()
 
@@ -43,7 +52,12 @@ def load():
     # A script function which accepts at least 1 argument
     sym.set_script("pyScriptArgs", qcalc.sym.ScriptFunction(evaluate_args, True))
 
-    sym.set_script_noargs("pyScriptTest", evaluate)
+    test = Test()
+
+    # Use a member function of a class instance to test cleanup, because a static module function
+    # object is never destroyed and therefore no memory is leaked even
+    # without decrementing the reference to the callback on the native side.
+    sym.set_script_noargs("pyScriptTest", test.evaluate)
 
     qcalc.mvp.set_presenter_symboltable(sym)
 
@@ -59,6 +73,9 @@ def unload():
     sym.remove("pyFuncArgs")
     sym.remove("pyScript")
     sym.remove("pyScriptArgs")
+    sym.remove("pyScriptTest")
+
+    qcalc.mvp.set_presenter_symboltable(sym)
 
 
 print("Sample SYM Addon has been imported")
