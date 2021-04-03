@@ -1,4 +1,4 @@
-#include "mainwindow.hpp"
+#include "gui/mainwindow.hpp"
 
 #include <QScrollBar>
 #include <QMessageBox>
