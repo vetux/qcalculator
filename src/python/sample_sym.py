@@ -4,19 +4,19 @@ import qcalc.mvp
 # ! IMPORTANT ! The user may import / export symbol tables, so handle variables, constants and functions with care
 # (eg. only in a registered script function.)
 # Also the user is able to modify the symbol table through the gui.
-# Scripts are not serialized.
-# The script will be unloaded before import and loaded again after import.
+# Scripts are not exported / imported by user interaction.
+# The addons will be unloaded before import and loaded again after import.
 
 sym = qcalc.sym.SymbolTable
 
 
-# The script function callback which is invoked by the expression parser
-# when it encounters our symbol name in a expression.
+# Our script function callback which is invoked by the expression parser
+# when it encounters the defined symbol name in a expression.
 def evaluate(*args):
     return 422
 
 
-# A script function callback which takes at least one argument
+# Our script function callback which takes at least one argument
 def evaluate_args(*args):
     return args[0]
 
@@ -30,7 +30,7 @@ test = Test
 
 
 def load():
-    print("Loading sample sym module")
+    print("Loading sym sample addon")
 
     global sym
     global test
@@ -63,7 +63,7 @@ def load():
 
 
 def unload():
-    print("Unloading sample sym module")
+    print("Unloading sym sample addon")
 
     global sym
 
@@ -78,4 +78,4 @@ def unload():
     qcalc.mvp.set_presenter_symboltable(sym)
 
 
-print("Sample SYM Addon has been imported")
+print("Importing sym sample addon")

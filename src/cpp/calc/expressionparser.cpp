@@ -3,10 +3,6 @@
 #include "calc/scriptfunction.hpp"
 #include "calc/scriptvarargfunction.hpp"
 
-ExpressionParser::ExpressionParser() = default;
-
-ExpressionParser::~ExpressionParser() = default;
-
 /**
  * Evaluate the arithmetic expression using the defined symbol table.
  *

@@ -1,6 +1,4 @@
-#define PY_SSIZE_T_CLEAN
-
-#include <Python.h>
+#include "pythoninclude.hpp"
 
 #include "pymodule/pysymboltable.hpp"
 
@@ -9,7 +7,7 @@
 PyObject *PySymbolTable::New(const SymbolTable &table) {
     PyObject *symModule = PyImport_ImportModule("qcalc.sym");
     if (symModule == PyNull) {
-        throw std::runtime_error("Failed to import module");
+        throw std::runtime_error("Failed to import qcalc.sym module");
     }
 
     PyObject *symDict = PyModule_GetDict(symModule);

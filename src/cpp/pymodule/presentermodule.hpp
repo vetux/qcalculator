@@ -3,9 +3,8 @@
 
 #include "gui/mainpresenter.hpp"
 
-class PresenterModule {
-public:
-    static void initialize(MainPresenter &presenter);
-};
+namespace PresenterModule {
+    void initialize(MainPresenter &presenter);
+}
 
 #endif //QCALC_PRESENTERMODULE_HPP

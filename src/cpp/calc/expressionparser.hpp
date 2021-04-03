@@ -7,7 +7,7 @@
 #include "calc/arithmetictype.hpp"
 
 /**
- * The expression expressionParser evaluates expressions in string form using an optionally supplied symbol table.
+ * The expression parser evaluates expressions in string form using an optionally supplied symbol table.
  *
  * The symbol table defines variables, constants, functions and scripts.
  *
@@ -15,12 +15,7 @@
  * Functions are implemented using exprtk's function_compositor.
  * Scripts are implemented as a custom exprtk function.
  */
-class ExpressionParser {
-public:
-    ExpressionParser();
-
-    ~ExpressionParser();
-
+namespace ExpressionParser {
     /**
      * Evaluate the arithmetic expression using the defined symbol table.
      *
@@ -32,6 +27,6 @@ public:
     ArithmeticType evaluate(const std::string &expr, SymbolTable &symbolTable);
 
     ArithmeticType evaluate(const std::string &expr);
-};
+}
 
 #endif // QCALC_EXPRESSIONPARSER_HPP

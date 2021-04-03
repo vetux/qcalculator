@@ -14,6 +14,7 @@
 
 #include "pymodule/pysymboltable.hpp"
 #include "pymodule/presentermodule.hpp"
+#include "pymodule/exprtkmodule.hpp"
 
 #define SETTINGS_FILENAME "/settings.json"
 
@@ -35,6 +36,7 @@ MainPresenter::MainPresenter(MainView &view)
 
 void MainPresenter::init() {
     PresenterModule::initialize(*this);
+    ExprtkModule::initialize();
     PyUtil::initializePython();
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/addon").toStdString());
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/system").toStdString());
@@ -42,6 +44,7 @@ void MainPresenter::init() {
     try {
         Addon::load("sample_gui");
         Addon::load("sample_sym");
+        Addon::load("sample_exprtk");
     }
     catch (const std::runtime_error &e) {
         view.showWarningDialog("Failed to load sample addon", e.what());
@@ -76,6 +79,7 @@ void MainPresenter::onWindowClose(const QCloseEvent &event) {
     try {
         Addon::unload("sample_gui");
         Addon::unload("sample_sym");
+        Addon::unload("sample_exprtk");
     }
     catch (const std::runtime_error &e) {
         view.showWarningDialog("Failed to unload sample addons", e.what());
@@ -89,6 +93,11 @@ void MainPresenter::onWindowClose(const QCloseEvent &event) {
         error += e.what();
         view.showWarningDialog("Error", error);
     }
+
+    // Because an addon can have a pending deleteLater waiting to be processed
+    // and qt does not offer a way to force deleteLater events to be processed
+    // calling finalizePython here results in a segfault.
+    // PyUtil::finalizePython();
 }
 
 void MainPresenter::onWindowResize(const QResizeEvent &event) {
@@ -97,7 +106,7 @@ void MainPresenter::onWindowResize(const QResizeEvent &event) {
 
 void MainPresenter::onInputSubmit() {
     try {
-        currentValue = expressionParser.evaluate(inputText, symbolTable);
+        currentValue = ExpressionParser::evaluate(inputText, symbolTable);
         history.add(inputText, currentValue);
         inputText = toDecimal(currentValue);
     } catch (const std::exception &e) {

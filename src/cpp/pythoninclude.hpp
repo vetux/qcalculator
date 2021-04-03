@@ -1,0 +1,8 @@
+#ifndef QCALC_PYTHONINCLUDE_HPP
+#define QCALC_PYTHONINCLUDE_HPP
+
+#define PY_SSIZE_T_CLEAN
+
+#include <Python.h>
+
+#endif //QCALC_PYTHONINCLUDE_HPP

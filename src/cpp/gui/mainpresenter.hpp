@@ -97,7 +97,6 @@ public slots:
 private:
     MainView &view;
 
-    ExpressionParser expressionParser;
     SymbolTable symbolTable;
 
     Settings settings;

@@ -1,8 +1,6 @@
 #include "calc/scripthandler.hpp"
 
-#define PY_SSIZE_T_CLEAN
-
-#include <Python.h>
+#include "pythoninclude.hpp"
 
 #include "pyutil.hpp"
 
