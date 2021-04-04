@@ -10,12 +10,10 @@
 struct Settings {
     bool showKeypad = false;
     bool showBitView = false;
-    bool showDock = false;
 
     int historyLimit = 0;
 
-    Qt::DockWidgetArea dockPosition = Qt::DockWidgetArea::BottomDockWidgetArea;
-    int dockActiveTab = 0;
+    int activeTab = 0;
 
     QSize windowSize = {250, 150};
 

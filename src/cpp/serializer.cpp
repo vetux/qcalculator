@@ -69,51 +69,12 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
     return ret;
 }
 
-int convertDockAreaToInt(Qt::DockWidgetArea area) {
-    switch (area) {
-        case Qt::DockWidgetArea::LeftDockWidgetArea:
-            return Qt::DockWidgetArea::LeftDockWidgetArea;
-        case Qt::DockWidgetArea::TopDockWidgetArea:
-            return Qt::DockWidgetArea::TopDockWidgetArea;
-        case Qt::DockWidgetArea::RightDockWidgetArea:
-            return Qt::DockWidgetArea::RightDockWidgetArea;
-        case Qt::DockWidgetArea::BottomDockWidgetArea:
-        default:
-            return Qt::DockWidgetArea::BottomDockWidgetArea;
-    }
-}
-
-Qt::DockWidgetArea convertIntToDockArea(int i) {
-    switch (i) {
-        case Qt::DockWidgetArea::LeftDockWidgetArea:
-            return Qt::DockWidgetArea::LeftDockWidgetArea;
-        case Qt::DockWidgetArea::TopDockWidgetArea:
-            return Qt::DockWidgetArea::TopDockWidgetArea;
-        case Qt::DockWidgetArea::RightDockWidgetArea:
-            return Qt::DockWidgetArea::RightDockWidgetArea;
-        case Qt::DockWidgetArea::BottomDockWidgetArea:
-        default:
-            return Qt::DockWidgetArea::BottomDockWidgetArea;
-    }
-}
-
-int clampTabIndex(int index) {
-    if (index > 4)
-        return 4;
-    else if (index < 0)
-        return 0;
-    else
-        return index;
-}
-
 std::string Serializer::serializeSettings(const Settings &settings) {
     nlohmann::json j;
     j["showKeypad"] = settings.showKeypad;
     j["showBitView"] = settings.showBitView;
-    j["showDock"] = settings.showDock;
     j["historyLimit"] = settings.historyLimit;
-    j["dockPosition"] = convertDockAreaToInt(settings.dockPosition);
-    j["dockTab"] = clampTabIndex(settings.dockActiveTab);
+    j["activeTab"] = settings.activeTab;
     j["windowWidth"] = settings.windowSize.width();
     j["windowHeight"] = settings.windowSize.height();
     j["addons"] = settings.enabledAddonModules;
@@ -133,17 +94,11 @@ Settings Serializer::deserializeSettings(const std::string &str) {
     if (j.contains("showBitView"))
         ret.showBitView = j["showBitView"];
 
-    if (j.contains("showDock"))
-        ret.showDock = j["showDock"];
-
     if (j.contains("historyLimit"))
         ret.historyLimit = j["historyLimit"];
 
-    if (j.contains("dockPosition"))
-        ret.dockPosition = convertIntToDockArea(j["dockPosition"]);
-
-    if (j.contains("dockTab"))
-        ret.dockActiveTab = clampTabIndex(j["dockTab"]);
+    if (j.contains("activeTab"))
+        ret.activeTab = j["activeTab"];
 
     if (j.contains("windowWidth") && j.contains("windowHeight"))
         ret.windowSize = {j["windowWidth"], j["windowHeight"]};

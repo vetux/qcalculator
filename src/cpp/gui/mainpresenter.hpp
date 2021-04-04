@@ -78,18 +78,12 @@ public slots:
 
     void onActionShowBitView(bool show);
 
-    void onActionShowDock(bool show);
-
     void onActionImportSymbolTable();
 
     void onActionExportSymbolTable();
 
+    void onActiveTabChanged(int tab);
 
-    void onDockTabChanged(int tabIndex);
-
-    void onDockVisibilityChanged(bool visible);
-
-    void onDockPositionChanged(Qt::DockWidgetArea area);
     //-MainPresenter Interface
 
 public:

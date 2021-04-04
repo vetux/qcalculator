@@ -475,11 +475,6 @@ void MainPresenter::onActionShowBitView(bool show) {
     view.setBitViewVisibility(show);
 }
 
-void MainPresenter::onActionShowDock(bool show) {
-    settings.showDock = show;
-    view.setDockVisibility(show);
-}
-
 void MainPresenter::onActionImportSymbolTable() {
     std::string filepath;
     if (view.showFileChooserDialog("Import symbol table", true, filepath)) {
@@ -525,29 +520,8 @@ void MainPresenter::onActionExportSymbolTable() {
     }
 }
 
-void MainPresenter::onDockTabChanged(int tabIndex) {
-    settings.dockActiveTab = tabIndex;
-}
-
-void MainPresenter::onDockVisibilityChanged(bool visible) {
-    settings.showDock = visible;
-}
-
-bool isValidArea(Qt::DockWidgetArea area) {
-    switch (area) {
-        case Qt::DockWidgetArea::LeftDockWidgetArea:
-        case Qt::DockWidgetArea::TopDockWidgetArea:
-        case Qt::DockWidgetArea::RightDockWidgetArea:
-        case Qt::DockWidgetArea::BottomDockWidgetArea:
-            return true;
-        default:
-            return false;
-    }
-}
-
-void MainPresenter::onDockPositionChanged(Qt::DockWidgetArea area) {
-    if (isValidArea(area))
-        settings.dockPosition = area;
+void MainPresenter::onActiveTabChanged(int tab) {
+    settings.activeTab = tab;
 }
 
 void MainPresenter::applyCurrentValue() {
@@ -603,9 +577,7 @@ void MainPresenter::applySettings() {
 
     view.setKeyPadVisibility(settings.showKeypad);
     view.setBitViewVisibility(settings.showBitView);
-    view.setDockPosition(settings.dockPosition);
-    view.setDockVisibility(settings.showDock);
-    view.setActiveDockTab(settings.dockActiveTab);
+    view.setActiveTab(settings.activeTab);
     view.setWindowSize(settings.windowSize);
 
     view.connectPresenter(*this);

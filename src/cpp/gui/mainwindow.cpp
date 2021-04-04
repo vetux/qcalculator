@@ -104,14 +104,10 @@ void MainWindow::connectPresenter(const MainPresenter &target) {
     connect(ui->actionAbout, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
     connect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
     connect(ui->actionShow_Bitview, SIGNAL(toggled(bool)), &target, SLOT(onActionShowBitView(bool)));
-    connect(ui->actionShow_Dock, SIGNAL(toggled(bool)), &target, SLOT(onActionShowDock(bool)));
     connect(ui->actionImport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionImportSymbolTable()));
     connect(ui->actionExport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionExportSymbolTable()));
 
-    connect(ui->tabWidget_dock, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
-    connect(ui->dockWidget, SIGNAL(visibilityChanged(bool)), &target, SLOT(onDockVisibilityChanged(bool)));
-    connect(ui->dockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), &target,
-            SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
+    connect(ui->tabWidget_main, SIGNAL(currentChanged(int)), &target, SLOT(onActiveTabChanged(int)));
 }
 
 void MainWindow::disconnectPresenter(const MainPresenter &target) {
@@ -145,14 +141,10 @@ void MainWindow::disconnectPresenter(const MainPresenter &target) {
     disconnect(ui->actionAbout, SIGNAL(triggered(bool)), &target, SLOT(onActionAbout()));
     disconnect(ui->actionShow_Keypad, SIGNAL(toggled(bool)), &target, SLOT(onActionShowKeyPad(bool)));
     disconnect(ui->actionShow_Bitview, SIGNAL(toggled(bool)), &target, SLOT(onActionShowBitView(bool)));
-    disconnect(ui->actionShow_Dock, SIGNAL(toggled(bool)), &target, SLOT(onActionShowDock(bool)));
     disconnect(ui->actionImport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionImportSymbolTable()));
     disconnect(ui->actionExport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionExportSymbolTable()));
 
-    disconnect(ui->tabWidget_dock, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
-    disconnect(ui->dockWidget, SIGNAL(visibilityChanged(bool)), &target, SLOT(onDockVisibilityChanged(bool)));
-    disconnect(ui->dockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), &target,
-               SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
+    disconnect(ui->tabWidget_main, SIGNAL(currentChanged(int)), &target, SLOT(onActiveTabChanged(int)));
 }
 
 void MainWindow::showAboutDialog() {
@@ -216,6 +208,10 @@ void MainWindow::quit() {
     assert(close());
 }
 
+void MainWindow::setActiveTab(int tab) {
+    ui->tabWidget_main->setCurrentIndex(tab);
+}
+
 void MainWindow::setInputText(const std::string &value) {
     if (ui->lineEdit_input->text() != value.c_str())
         ui->lineEdit_input->setText(value.c_str());
@@ -232,22 +228,6 @@ void MainWindow::setKeyPadVisibility(bool visible) {
 void MainWindow::setBitViewVisibility(bool visible) {
     ui->widget_bits->setVisible(visible);
     ui->actionShow_Bitview->setChecked(visible);
-}
-
-void MainWindow::setDockVisibility(bool visible) {
-    ui->dockWidget->setVisible(visible);
-    ui->actionShow_Dock->setChecked(visible);
-}
-
-void MainWindow::setActiveDockTab(int tab) {
-    ui->tabWidget_dock->setCurrentIndex(tab);
-}
-
-void MainWindow::setDockPosition(Qt::DockWidgetArea position) {
-    if (dockWidgetArea(ui->dockWidget) == position)
-        return;
-    removeDockWidget(ui->dockWidget);
-    addDockWidget(position, ui->dockWidget);
 }
 
 void MainWindow::setBitViewContents(const std::bitset<64> &value) {
@@ -375,6 +355,7 @@ void MainWindow::setFunctionArgs(const std::vector<std::string> &value) {
     //Use switch to avoid unnecessary hiding (which makes the line edit loose focus)
     switch (numberOfArguments) {
         case 0:
+            ui->horizontalSpacer_functionargs->changeSize(0, 0, QSizePolicy::Expanding);
             ui->lineEdit_functions_arg0->setVisible(false);
             ui->lineEdit_functions_arg0->setSizePolicy(QSizePolicy::Policy::Ignored, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg0->setText("");
@@ -401,23 +382,24 @@ void MainWindow::setFunctionArgs(const std::vector<std::string> &value) {
     switch (numberOfArguments) {
         case 5:
             ui->lineEdit_functions_arg4->setVisible(true);
-            ui->lineEdit_functions_arg4->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+            ui->lineEdit_functions_arg4->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg4->setText(value[4].c_str());
         case 4:
             ui->lineEdit_functions_arg3->setVisible(true);
-            ui->lineEdit_functions_arg3->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+            ui->lineEdit_functions_arg3->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg3->setText(value[3].c_str());
         case 3:
             ui->lineEdit_functions_arg2->setVisible(true);
-            ui->lineEdit_functions_arg2->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+            ui->lineEdit_functions_arg2->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg2->setText(value[2].c_str());
         case 2:
             ui->lineEdit_functions_arg1->setVisible(true);
-            ui->lineEdit_functions_arg1->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+            ui->lineEdit_functions_arg1->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg1->setText(value[1].c_str());
         case 1:
+            ui->horizontalSpacer_functionargs->changeSize(0, 0, QSizePolicy::Ignored);
             ui->lineEdit_functions_arg0->setVisible(true);
-            ui->lineEdit_functions_arg0->setSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Fixed);
+            ui->lineEdit_functions_arg0->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Fixed);
             ui->lineEdit_functions_arg0->setText(value[0].c_str());
         default:
             break;

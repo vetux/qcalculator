@@ -92,6 +92,8 @@ public:
 
     void quit() override;
 
+    void setActiveTab(int tab) override;
+
     void setInputText(const std::string &value) override;
 
     void setValueText(const std::string &value) override;
@@ -99,12 +101,6 @@ public:
     void setKeyPadVisibility(bool visible) override;
 
     void setBitViewVisibility(bool visible) override;
-
-    void setDockVisibility(bool visible) override;
-
-    void setActiveDockTab(int tab) override;
-
-    void setDockPosition(Qt::DockWidgetArea position) override;
 
     void setBitViewContents(const std::bitset<64> &value) override;
 

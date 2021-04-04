@@ -38,11 +38,7 @@ public:
 
     virtual void setBitViewVisibility(bool visible) = 0;
 
-    virtual void setDockVisibility(bool visible) = 0;
-
-    virtual void setActiveDockTab(int tab) = 0;
-
-    virtual void setDockPosition(Qt::DockWidgetArea position) = 0;
+    virtual void setActiveTab(int tab) = 0;
 
     virtual void setBitViewContents(const std::bitset<64> &value) = 0;
 
