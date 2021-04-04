@@ -17,7 +17,7 @@ struct Settings {
     Qt::DockWidgetArea dockPosition = Qt::DockWidgetArea::BottomDockWidgetArea;
     int dockActiveTab = 0;
 
-    QSize windowSize = {};
+    QSize windowSize = {250, 150};
 
     std::set<std::string> enabledAddonModules; // A set of module names which have been enabled by the user.
 
