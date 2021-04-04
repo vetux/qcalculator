@@ -41,7 +41,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget_main">
         <property name="styleSheet">
-         <string notr="true"/>
+         <string notr="true">QTabWidget::pane { left:-1px;right:-1px;top:-2px;}</string>
         </property>
         <property name="currentIndex">
          <number>0</number>
@@ -59,6 +59,9 @@
          <bool>true</bool>
         </property>
         <widget class="QWidget" name="tab_history">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <attribute name="title">
           <string>History</string>
          </attribute>
@@ -67,16 +70,16 @@
            <number>6</number>
           </property>
           <property name="leftMargin">
-           <number>3</number>
+           <number>0</number>
           </property>
           <property name="topMargin">
-           <number>3</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>3</number>
+           <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>3</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QListWidget" name="listWidget_history">
@@ -371,16 +374,16 @@
            <number>6</number>
           </property>
           <property name="leftMargin">
-           <number>3</number>
+           <number>0</number>
           </property>
           <property name="topMargin">
-           <number>3</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>3</number>
+           <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>3</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QTableWidget" name="tableWidget_variables">
@@ -454,16 +457,16 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_8">
           <property name="leftMargin">
-           <number>3</number>
+           <number>0</number>
           </property>
           <property name="topMargin">
-           <number>3</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>3</number>
+           <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>3</number>
+           <number>0</number>
           </property>
           <item>
            <widget class="QTableWidget" name="tableWidget_constants">
@@ -534,24 +537,27 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <property name="spacing">
-           <number>3</number>
+           <number>6</number>
           </property>
           <property name="leftMargin">
-           <number>3</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
-           <number>3</number>
+           <number>6</number>
           </property>
           <property name="rightMargin">
-           <number>3</number>
+           <number>6</number>
           </property>
           <property name="bottomMargin">
-           <number>3</number>
+           <number>6</number>
           </property>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
             <property name="spacing">
              <number>3</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
             </property>
             <item>
              <widget class="QTableWidget" name="tableWidget_functions">
@@ -652,6 +658,12 @@
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_18">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QSpinBox" name="spinBox_functions_argcount">
                 <property name="sizePolicy">
