@@ -21,5 +21,11 @@ def widgets():
 
 
 app = QtWidgets.QApplication.instance()
+
 wnd = widget("MainWindow")
 menu = widget("menubar")
+
+dock = widget("dockWidget")
+tabs = widget("tabWidget_dock")
+
+root = widget("layout_root")

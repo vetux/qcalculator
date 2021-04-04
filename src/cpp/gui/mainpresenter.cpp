@@ -108,6 +108,7 @@ void MainPresenter::onInputSubmit() {
 
 void MainPresenter::onInputUpdate(const QString &value) {
     inputText = value.toStdString();
+    autoUpdateValueFromInputText();
 }
 
 void MainPresenter::onDecimalSubmit(const QString &value) {
@@ -172,6 +173,7 @@ void MainPresenter::onNumPadKeyPressed(NumPadKey key) {
     } else {
         inputText += convertNumPadKeyToString(key);
         view.setInputText(inputText);
+        autoUpdateValueFromInputText();
     }
 }
 
@@ -180,6 +182,8 @@ void MainPresenter::onBitViewKeyPressed(int bitIndex) {
     bits.flip(bitIndex);
     currentValue = bits.to_ulong();
     applyCurrentValue();
+    inputText = toDecimal(currentValue);
+    view.setInputText(inputText);
 }
 
 void MainPresenter::onSelectedVariableChanged(int index) {
@@ -580,6 +584,18 @@ void MainPresenter::onAddonLoadFail(const std::string &moduleName, const std::st
 
 void MainPresenter::onAddonUnloadFail(const std::string &moduleName, const std::string &error) {
     view.showWarningDialog("Error", "Failed to unload addon (" + moduleName + ") Error: " + error);
+}
+
+void MainPresenter::autoUpdateValueFromInputText() {
+    // Attempt to evaluate the current input text without symbol table and if successful set current value without
+    // receiving input submit. When input submit is received the expression is evaluated with the symbol table
+    // and added to the history.
+    try {
+        double v = ExpressionParser::evaluate(inputText);
+        currentValue = v;
+        applyCurrentValue();
+    }
+    catch (const std::runtime_error &e) {}
 }
 
 void MainPresenter::applySettings() {

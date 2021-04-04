@@ -124,6 +124,8 @@ private:
     std::map<int, std::string> constantMapping;
     std::map<int, std::string> functionMapping;
 
+    void autoUpdateValueFromInputText();
+
     void applySettings();
 
     void applyCurrentValue();

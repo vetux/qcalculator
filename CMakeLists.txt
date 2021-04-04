@@ -13,12 +13,12 @@ message("Python_LIBRARIES:${Python_LIBRARIES}")
 message("Python_INCLUDE_DIRS:${Python_INCLUDE_DIRS}")
 
 if (UNIX)
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11")
-endif(UNIX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif (UNIX)
 
 if (WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
-endif(WIN32)
+endif (WIN32)
 
 file(GLOB_RECURSE SRC src/cpp/*.cpp)
 file(GLOB_RECURSE FORMS src/forms/*.ui)
@@ -31,7 +31,12 @@ file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy add
 file(COPY ${ADDON_META} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy addon metadata
 file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/system) # Copy system scripts
 
-set(HDR_GUI src/cpp/gui/mainwindow.hpp src/cpp/gui/settingsdialog.hpp src/cpp/gui/mainpresenter.hpp src/cpp/gui/addontester.hpp src/cpp/gui/widgets/addonitemwidget.hpp)
+set(HDR_GUI src/cpp/gui/mainwindow.hpp
+        src/cpp/gui/settingsdialog.hpp
+        src/cpp/gui/mainpresenter.hpp
+        src/cpp/gui/addontester.hpp
+        src/cpp/gui/widgets/addonitemwidget.hpp
+        src/cpp/gui/widgets/historyitemwidget.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
 qt5_wrap_ui(WRAP_UI ${FORMS}) # Seems to output into CMAKE_CURRENT_BINARY_DIR

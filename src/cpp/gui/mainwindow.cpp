@@ -13,6 +13,7 @@
 #include "fractiontest.hpp"
 
 #include "gui/settingsdialog.hpp"
+#include "gui/widgets/historyitemwidget.hpp"
 
 #define OBJECT_NAME_PREFIX_BITS "pushButton_bit_"
 #define OBJECT_NAME_PREFIX_KEYPAD "pushButton_kp_"
@@ -107,7 +108,7 @@ void MainWindow::connectPresenter(const MainPresenter &target) {
     connect(ui->actionImport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionImportSymbolTable()));
     connect(ui->actionExport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionExportSymbolTable()));
 
-    connect(ui->tabWidget_2, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
+    connect(ui->tabWidget_dock, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
     connect(ui->dockWidget, SIGNAL(visibilityChanged(bool)), &target, SLOT(onDockVisibilityChanged(bool)));
     connect(ui->dockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), &target,
             SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
@@ -148,7 +149,7 @@ void MainWindow::disconnectPresenter(const MainPresenter &target) {
     disconnect(ui->actionImport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionImportSymbolTable()));
     disconnect(ui->actionExport_Symbols, SIGNAL(triggered(bool)), &target, SLOT(onActionExportSymbolTable()));
 
-    disconnect(ui->tabWidget_2, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
+    disconnect(ui->tabWidget_dock, SIGNAL(currentChanged(int)), &target, SLOT(onDockTabChanged(int)));
     disconnect(ui->dockWidget, SIGNAL(visibilityChanged(bool)), &target, SLOT(onDockVisibilityChanged(bool)));
     disconnect(ui->dockWidget, SIGNAL(dockLocationChanged(Qt::DockWidgetArea)), &target,
                SLOT(onDockPositionChanged(Qt::DockWidgetArea)));
@@ -221,7 +222,6 @@ void MainWindow::setInputText(const std::string &value) {
 }
 
 void MainWindow::setValueText(const std::string &value) {
-    ui->label_lastResult->setText(value.c_str());
 }
 
 void MainWindow::setKeyPadVisibility(bool visible) {
@@ -240,7 +240,7 @@ void MainWindow::setDockVisibility(bool visible) {
 }
 
 void MainWindow::setActiveDockTab(int tab) {
-    ui->tabWidget_2->setCurrentIndex(tab);
+    ui->tabWidget_dock->setCurrentIndex(tab);
 }
 
 void MainWindow::setDockPosition(Qt::DockWidgetArea position) {
@@ -286,17 +286,20 @@ void MainWindow::setBinaryText(const std::string &value) {
 }
 
 void MainWindow::setHistory(const std::vector<std::pair<std::string, std::string>> &value) {
-    std::string text;
-    for (auto it = value.begin(); it != value.end(); it++) {
-        text.append(it->first);
-        text.append(" = ");
-        text.append(it->second);
-        if (it + 1 != value.end())
-            text.append("\n");
+    ui->listWidget_history->clear();
+    for (auto &p : value) {
+        auto *widget = new HistoryItemWidget(ui->listWidget_history);
+        auto *item = new QListWidgetItem();
+        item->setSizeHint(widget->sizeHint());
+
+        ui->listWidget_history->addItem(item);
+        ui->listWidget_history->setItemWidget(item, widget);
+
+        ui->listWidget_history->update();
+
+        widget->setContents(p.first, p.second);
     }
-    ui->textEdit_history->setText(text.c_str());
-    ui->textEdit_history->verticalScrollBar()->setValue(ui->textEdit_history->verticalScrollBar()->maximum());
-    ui->textEdit_history->horizontalScrollBar()->setValue(ui->textEdit_history->horizontalScrollBar()->minimum());
+    ui->listWidget_history->scrollToBottom();
 }
 
 void MainWindow::setVariableListView(const std::vector<std::pair<std::string, std::string>> &value) {
