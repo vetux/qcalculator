@@ -115,7 +115,7 @@ void SettingsDialog::applyAddonState(const std::map<std::string, bool> &addonSta
         itemWidget->setModuleName(addon.first.c_str());
         itemWidget->setModuleEnabled(addon.second);
         itemWidget->setModuleDisplayName(addonMetadata.at(addon.first).displayName.c_str());
-        itemWidget->setModuleDescription(addonMetadata.at(addon.first).description.c_str());
+        itemWidget->setModuleDescription((addonMetadata.at(addon.first).description + " ( " + addon.first + " )").c_str());
 
         auto *item = new QListWidgetItem();
         item->setSizeHint(itemWidget->minimumSizeHint());
