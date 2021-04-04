@@ -1,6 +1,7 @@
 #include "ui_settingsdialog.h"
 
 #include <QSettings>
+#include <QMessageBox>
 
 #include "gui/settingsdialog.hpp"
 
@@ -25,7 +26,8 @@ void SettingsDialog::setDialogState(const SettingsDialogState &s) {
     state = s;
     std::map<std::string, bool> addonState;
     for (auto &pair : state.addonMetadata) {
-        addonState[pair.first] = state.settings.enabledAddonModules.find(pair.first) != state.settings.enabledAddonModules.end();
+        addonState[pair.first] =
+                state.settings.enabledAddonModules.find(pair.first) != state.settings.enabledAddonModules.end();
     }
     applyAddonState(addonState, state.addonMetadata);
     ui->tabWidget->setCurrentIndex(state.settings.settingsTab);
@@ -37,17 +39,48 @@ SettingsDialogState SettingsDialog::getDialogState() {
 
 void SettingsDialog::onModuleEnableChanged(bool enabled) {
     auto &s = dynamic_cast<AddonItemWidget &>(*sender());
-    std::string name = s.getModuleName().toStdString();
 
-    auto it = state.settings.enabledAddonModules.find(name);
-    if (it != state.settings.enabledAddonModules.end()) {
-        if (!enabled) {
-            state.settings.enabledAddonModules.erase(name);
+    bool load = true;
+    if (enabled && state.settings.showAddonWarning) {
+        auto *checkBox = new QCheckBox();
+        checkBox->setText("Dont show this dialog again");
+
+        QMessageBox messageBox;
+        messageBox.setWindowTitle("Addons Information");
+        messageBox.setText(
+                "Make sure to verify the addon source code before enabling it. Running an addon is equivalent to running any other python script. Do you want to enable the addon?");
+        messageBox.setIcon(QMessageBox::Icon::Question);
+        messageBox.addButton(QMessageBox::Ok);
+        messageBox.addButton(QMessageBox::Cancel);
+        messageBox.setDefaultButton(QMessageBox::Cancel);
+        messageBox.setCheckBox(checkBox);
+
+        QObject::connect(checkBox, &QCheckBox::stateChanged, [this](int s) {
+            if (static_cast<Qt::CheckState>(s) == Qt::CheckState::Checked) {
+                state.settings.showAddonWarning = false;
+            }
+        });
+
+        messageBox.exec();
+
+        load = messageBox.result() == QMessageBox::Ok;
+    }
+
+    if (load) {
+        std::string name = s.getModuleName().toStdString();
+
+        auto it = state.settings.enabledAddonModules.find(name);
+        if (it != state.settings.enabledAddonModules.end()) {
+            if (!enabled) {
+                state.settings.enabledAddonModules.erase(name);
+            }
+        } else {
+            if (enabled) {
+                state.settings.enabledAddonModules.insert(name);
+            }
         }
     } else {
-        if (enabled) {
-            state.settings.enabledAddonModules.insert(name);
-        }
+        s.setModuleEnabled(false);
     }
 }
 
@@ -64,7 +97,8 @@ void SettingsDialog::onResetSettingsPressed() {
 
     std::map<std::string, bool> addonState;
     for (auto &pair : state.addonMetadata) {
-        addonState[pair.first] = state.settings.enabledAddonModules.find(pair.first) != state.settings.enabledAddonModules.end();
+        addonState[pair.first] =
+                state.settings.enabledAddonModules.find(pair.first) != state.settings.enabledAddonModules.end();
     }
     applyAddonState(addonState, state.addonMetadata);
 }

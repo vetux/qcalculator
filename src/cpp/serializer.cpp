@@ -118,6 +118,7 @@ std::string Serializer::serializeSettings(const Settings &settings) {
     j["windowHeight"] = settings.windowSize.height();
     j["addons"] = settings.enabledAddonModules;
     j["settingsTab"] = settings.settingsTab;
+    j["showAddonWarning"] = settings.showAddonWarning;
     return nlohmann::to_string(j);
 }
 
@@ -152,6 +153,9 @@ Settings Serializer::deserializeSettings(const std::string &str) {
 
     if (j.contains("settingsTab"))
         ret.settingsTab = j["settingsTab"];
+
+    if (j.contains("showAddonWarning"))
+        ret.showAddonWarning = j["showAddonWarning"];
 
     return ret;
 }
