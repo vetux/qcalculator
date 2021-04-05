@@ -41,7 +41,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget_main">
         <property name="styleSheet">
-         <string notr="true">QTabWidget::pane { left:-1px;right:-1px;top:-2px;}</string>
+         <string notr="true"/>
         </property>
         <property name="currentIndex">
          <number>0</number>
@@ -70,16 +70,16 @@
            <number>6</number>
           </property>
           <property name="leftMargin">
-           <number>0</number>
+           <number>3</number>
           </property>
           <property name="topMargin">
-           <number>6</number>
+           <number>3</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>3</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>4</number>
           </property>
           <item>
            <widget class="QListWidget" name="listWidget_history">
@@ -374,16 +374,16 @@
            <number>6</number>
           </property>
           <property name="leftMargin">
-           <number>0</number>
+           <number>3</number>
           </property>
           <property name="topMargin">
-           <number>6</number>
+           <number>3</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>3</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>4</number>
           </property>
           <item>
            <widget class="QTableWidget" name="tableWidget_variables">
@@ -456,17 +456,20 @@
           <string>Constants</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_8">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
+          <property name="spacing">
            <number>6</number>
           </property>
+          <property name="leftMargin">
+           <number>3</number>
+          </property>
+          <property name="topMargin">
+           <number>3</number>
+          </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>3</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>4</number>
           </property>
           <item>
            <widget class="QTableWidget" name="tableWidget_constants">
@@ -540,21 +543,21 @@
            <number>6</number>
           </property>
           <property name="leftMargin">
-           <number>6</number>
+           <number>3</number>
           </property>
           <property name="topMargin">
-           <number>6</number>
+           <number>3</number>
           </property>
           <property name="rightMargin">
-           <number>6</number>
+           <number>3</number>
           </property>
           <property name="bottomMargin">
-           <number>6</number>
+           <number>4</number>
           </property>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
             <property name="spacing">
-             <number>3</number>
+             <number>6</number>
             </property>
             <property name="rightMargin">
              <number>0</number>
@@ -656,8 +659,14 @@
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="spacing">
+             <number>3</number>
+            </property>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_18">
+              <property name="spacing">
+               <number>6</number>
+              </property>
               <property name="leftMargin">
                <number>0</number>
               </property>
