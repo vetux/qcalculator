@@ -205,7 +205,7 @@ bool MainWindow::showQuestionDialog(const std::string &title, const std::string 
 }
 
 void MainWindow::quit() {
-    assert(close());
+    QCoreApplication::quit();
 }
 
 void MainWindow::setActiveTab(int tab) {

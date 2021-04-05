@@ -45,7 +45,11 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}) # Include for generated ui head
 include_directories(src/cpp/)
 include_directories(${Python_INCLUDE_DIRS}) # Python
 
-add_executable(qcalc ${SRC} ${WRAP_CPP} ${WRAP_UI})
+if (WIN32)
+    add_executable(qcalc WIN32 ${SRC} ${WRAP_CPP} ${WRAP_UI})
+else ()
+    add_executable(qcalc ${SRC} ${WRAP_CPP} ${WRAP_UI})
+endif ()
 
 target_link_libraries(qcalc Qt5::Core Qt5::Widgets)
 target_link_libraries(qcalc ${Python_LIBRARIES}) # Python
