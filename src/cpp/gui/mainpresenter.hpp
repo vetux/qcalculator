@@ -118,6 +118,8 @@ private:
     std::map<int, std::string> constantMapping;
     std::map<int, std::string> functionMapping;
 
+    void exitRoutine();
+
     void autoUpdateValueFromInputText();
 
     void applySettings();

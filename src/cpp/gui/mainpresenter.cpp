@@ -28,7 +28,7 @@ QString getAddonModulesDirectory() {
 QString getAppDataDirectory() {
     QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
-    if (QDir(dirPath).exists())
+    if (!QDir(dirPath).exists())
         QDir().mkpath(dirPath);
 
     return dirPath;
@@ -44,15 +44,18 @@ void MainPresenter::init() {
     PyUtil::addModuleDirectory(getAddonModulesDirectory().toStdString());
     PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/system").toStdString());
 
-    try {
-        settings = Serializer::deserializeSettings(
-                IO::fileReadAllText(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString()));
-    }
-    catch (const std::exception &e) {
-        settings = {};
-        std::string error = "Failed to load settings: ";
-        error += e.what();
-        view.showWarningDialog("Error", error);
+    QString settingsFile = getAppDataDirectory().append(SETTINGS_FILENAME);
+    if (QFile(settingsFile).exists()) {
+        try {
+            settings = Serializer::deserializeSettings(
+                    IO::fileReadAllText(settingsFile.toStdString()));
+        }
+        catch (const std::exception &e) {
+            settings = {};
+            std::string error = "Failed to load settings: ";
+            error += e.what();
+            view.showWarningDialog("Error", error);
+        }
     }
 
     applySettings();
@@ -63,22 +66,7 @@ void MainPresenter::init() {
 }
 
 void MainPresenter::onWindowClose(const QCloseEvent &event) {
-    try {
-        IO::fileWriteAllText(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(),
-                             Serializer::serializeSettings(settings));
-    }
-    catch (const std::exception &e) {
-        std::string error = "Failed to save settings: ";
-        error += e.what();
-        view.showWarningDialog("Error", error);
-    }
-
-    addonManager.setActiveAddons({});
-
-    // Because an addon can have a pending deleteLater waiting to be processed
-    // and qt does not offer a way to force deleteLater events to be processed
-    // calling finalizePython here results in a segfault.
-    // PyUtil::finalizePython();
+    exitRoutine();
 }
 
 void MainPresenter::onWindowResize(const QResizeEvent &event) {
@@ -443,7 +431,27 @@ void MainPresenter::onFunctionArgsChanged(const std::vector<std::string> &argume
     view.setFunctionArgs(arguments);
 }
 
+void MainPresenter::exitRoutine() {
+    try {
+        IO::fileWriteAllText(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(),
+                             Serializer::serializeSettings(settings));
+    }
+    catch (const std::exception &e) {
+        std::string error = "Failed to save settings: ";
+        error += e.what();
+        view.showWarningDialog("Error", error);
+    }
+
+    addonManager.setActiveAddons({});
+
+    // Because an addon can have a pending deleteLater waiting to be processed
+    // and qt does not offer a way to force deleteLater events to be processed
+    // calling finalizePython here results in a segfault.
+    // PyUtil::finalizePython();
+}
+
 void MainPresenter::onActionExit() {
+    exitRoutine();
     view.quit();
 }
 

@@ -48,7 +48,7 @@ namespace IO {
 
                 return fileContents.toStdString();
             } else {
-                return {};
+                throw std::runtime_error("File not found.");
             }
         }
         catch (const std::exception &e) {
