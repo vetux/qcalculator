@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
     a.setOrganizationName("Xenotux");
     a.setApplicationName("qcalc");
     a.setApplicationDisplayName("QCalculator");
-    a.setApplicationVersion("v0.2.0");
+    a.setApplicationVersion("v0.3.0");
 
     MainWindow w;
     w.show();
