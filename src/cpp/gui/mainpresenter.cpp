@@ -1,8 +1,3 @@
-#include <QStandardPaths>
-#include <QTextStream>
-#include <QDir>
-#include <QCoreApplication>
-
 #include "serializer.hpp"
 #include "fractiontest.hpp"
 #include "numberformat.hpp"
