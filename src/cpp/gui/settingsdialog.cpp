@@ -64,11 +64,15 @@ void SettingsDialog::onModuleEnableChanged(bool enabled) {
         messageBox.setDefaultButton(QMessageBox::Cancel);
         messageBox.setCheckBox(checkBox);
 
+        QObject::connect(checkBox, &QCheckBox::stateChanged, [this](int s) {
+            if (static_cast<Qt::CheckState>(s) == Qt::CheckState::Checked) {
+                settings.showAddonWarning = false;
+            }
+        });
+
         messageBox.exec();
 
         load = messageBox.result() == QMessageBox::Ok;
-
-        settings.showAddonWarning = checkBox->isChecked();
     }
 
     if (load) {
