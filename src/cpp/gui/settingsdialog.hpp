@@ -5,7 +5,9 @@
 
 #include <map>
 
-#include "gui/settingsdialogstate.hpp"
+#include "settings.hpp"
+
+#include "addonmetadata.hpp"
 
 namespace Ui {
     class SettingsDialog;
@@ -19,9 +21,9 @@ public:
 
     ~SettingsDialog() override;
 
-    void setDialogState(const SettingsDialogState &state);
+    void setSettings(const Settings &state);
 
-    SettingsDialogState getDialogState();
+    Settings getSettings();
 
 private slots:
 
@@ -35,10 +37,14 @@ private slots:
 
     void onSettingsTabChanged(int tab);
 
+    void onRefreshAddonsPressed();
+
+    void onInstallAddonPressed();
+
 private:
     Ui::SettingsDialog *ui;
 
-    SettingsDialogState state;
+    Settings settings;
 
     void applyAddonState(const std::map<std::string, bool> &addonState, const std::map<std::string, AddonMetadata>& addonMetadata);
 };

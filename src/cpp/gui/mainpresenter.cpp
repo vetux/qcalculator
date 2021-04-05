@@ -16,23 +16,12 @@
 #include "pymodule/presentermodule.hpp"
 #include "pymodule/exprtkmodule.hpp"
 
+#include "paths.hpp"
+
 #define SETTINGS_FILENAME "/settings.json"
 
 using namespace NumberFormat;
 using namespace FractionTest;
-
-QString getAddonModulesDirectory() {
-    return QCoreApplication::applicationDirPath().append("/addon");
-}
-
-QString getAppDataDirectory() {
-    QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-
-    if (!QDir(dirPath).exists())
-        QDir().mkpath(dirPath);
-
-    return dirPath;
-}
 
 MainPresenter::MainPresenter(MainView &view)
         : view(view), currentValue(0), addonManager(*this) {}
@@ -41,10 +30,10 @@ void MainPresenter::init() {
     PresenterModule::initialize(*this);
     ExprtkModule::initialize();
     PyUtil::initializePython();
-    PyUtil::addModuleDirectory(getAddonModulesDirectory().toStdString());
-    PyUtil::addModuleDirectory(QCoreApplication::applicationDirPath().append("/system").toStdString());
+    PyUtil::addModuleDirectory(Paths::getAddonDirectory());
+    PyUtil::addModuleDirectory(Paths::getSystemDirectory());
 
-    QString settingsFile = getAppDataDirectory().append(SETTINGS_FILENAME);
+    QString settingsFile = Paths::getAppDataDirectory().append(SETTINGS_FILENAME).c_str();
     if (QFile(settingsFile).exists()) {
         try {
             settings = Serializer::deserializeSettings(
@@ -56,6 +45,18 @@ void MainPresenter::init() {
             error += e.what();
             view.showWarningDialog("Error", error);
         }
+    }
+
+    //Check for enabled addon modules which are not present anymore and remove them from the settings.
+    auto availableAddons = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
+    std::set<std::string> modulesThatDontExistAnymore;
+    for (auto &s : settings.enabledAddonModules) {
+        if (availableAddons.find(s) == availableAddons.end())
+            modulesThatDontExistAnymore.insert(s);
+    }
+
+    for (auto &s : modulesThatDontExistAnymore) {
+        settings.enabledAddonModules.erase(s);
     }
 
     applySettings();
@@ -433,7 +434,7 @@ void MainPresenter::onFunctionArgsChanged(const std::vector<std::string> &argume
 
 void MainPresenter::exitRoutine() {
     try {
-        IO::fileWriteAllText(getAppDataDirectory().append(SETTINGS_FILENAME).toStdString(),
+        IO::fileWriteAllText(Paths::getAppDataDirectory().append(SETTINGS_FILENAME),
                              Serializer::serializeSettings(settings));
     }
     catch (const std::exception &e) {
@@ -460,15 +461,11 @@ void MainPresenter::onActionAbout() {
 }
 
 void MainPresenter::onActionSettings() {
-    SettingsDialogState state;
+    Settings settingsCopy = settings;
 
-    state.settings = settings;
-
-    state.addonMetadata = AddonHelper::getAvailableAddons(getAddonModulesDirectory().toStdString());
-
-    if (view.showSettingsDialog(state, state)) {
-        addonManager.setActiveAddons(state.settings.enabledAddonModules);
-        settings = state.settings;
+    if (view.showSettingsDialog(settingsCopy)) {
+        addonManager.setActiveAddons(settingsCopy.enabledAddonModules);
+        settings = settingsCopy;
         applySettings();
     }
 }

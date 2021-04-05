@@ -80,7 +80,7 @@ public:
 
     void showAboutDialog() override;
 
-    bool showSettingsDialog(const SettingsDialogState &input, SettingsDialogState &outputData) override;
+    bool showSettingsDialog(Settings &settings) override;
 
     void showWarningDialog(const std::string &title, const std::string &text) override;
 

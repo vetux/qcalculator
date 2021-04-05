@@ -163,12 +163,12 @@ Powered by:
 )LLL"));
 }
 
-bool MainWindow::showSettingsDialog(const SettingsDialogState &input, SettingsDialogState &outputData) {
+bool MainWindow::showSettingsDialog(Settings &settings) {
     SettingsDialog dialog;
-    dialog.setDialogState(input);
+    dialog.setSettings(settings);
     dialog.show();
     bool ret = dialog.exec() == QDialog::Accepted;
-    outputData = dialog.getDialogState();
+    settings = dialog.getSettings();
     return ret;
 }
 

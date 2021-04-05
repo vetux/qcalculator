@@ -5,7 +5,7 @@
 #include <string>
 #include <bitset>
 
-#include "gui/settingsdialogstate.hpp"
+#include "settings.hpp"
 
 class MainPresenter;
 
@@ -17,7 +17,7 @@ public:
 
     virtual void showAboutDialog() = 0;
 
-    virtual bool showSettingsDialog(const SettingsDialogState &input, SettingsDialogState &outputData) = 0;
+    virtual bool showSettingsDialog(Settings &settings) = 0;
 
     virtual void showWarningDialog(const std::string &title, const std::string &text) = 0;
 

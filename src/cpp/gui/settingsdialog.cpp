@@ -7,6 +7,9 @@
 
 #include "gui/widgets/addonitemwidget.hpp"
 
+#include "addonhelper.hpp"
+#include "paths.hpp"
+
 SettingsDialog::SettingsDialog(QWidget *parent) :
         QDialog(parent),
         ui(new Ui::SettingsDialog) {
@@ -16,32 +19,38 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(onDialogRejected()));
     connect(ui->pushButton_resetSettings, SIGNAL(pressed()), this, SLOT(onResetSettingsPressed()));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onSettingsTabChanged(int)));
+    connect(ui->pushButton_installAddon, SIGNAL(pressed()), this, SLOT(onInstallAddonPressed()));
+    connect(ui->pushButton_refreshAddons, SIGNAL(pressed()), this, SLOT(onRefreshAddonsPressed()));
 }
 
 SettingsDialog::~SettingsDialog() {
     delete ui;
 }
 
-void SettingsDialog::setDialogState(const SettingsDialogState &s) {
-    state = s;
+void SettingsDialog::setSettings(const Settings &s) {
+    settings = s;
+
+    std::map<std::string, AddonMetadata> metadata = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
+
     std::map<std::string, bool> addonState;
-    for (auto &pair : state.addonMetadata) {
-        addonState[pair.first] =
-                state.settings.enabledAddonModules.find(pair.first) != state.settings.enabledAddonModules.end();
+    for (auto &pair : metadata) {
+        addonState[pair.first] = settings.enabledAddonModules.find(pair.first) != settings.enabledAddonModules.end();
     }
-    applyAddonState(addonState, state.addonMetadata);
-    ui->tabWidget->setCurrentIndex(state.settings.settingsTab);
+
+    applyAddonState(addonState, metadata);
+
+    ui->tabWidget->setCurrentIndex(settings.settingsTab);
 }
 
-SettingsDialogState SettingsDialog::getDialogState() {
-    return state;
+Settings SettingsDialog::getSettings() {
+    return settings;
 }
 
 void SettingsDialog::onModuleEnableChanged(bool enabled) {
     auto &s = dynamic_cast<AddonItemWidget &>(*sender());
 
     bool load = true;
-    if (enabled && state.settings.showAddonWarning) {
+    if (enabled && settings.showAddonWarning) {
         auto *checkBox = new QCheckBox();
         checkBox->setText("Dont show this dialog again");
 
@@ -55,28 +64,24 @@ void SettingsDialog::onModuleEnableChanged(bool enabled) {
         messageBox.setDefaultButton(QMessageBox::Cancel);
         messageBox.setCheckBox(checkBox);
 
-        QObject::connect(checkBox, &QCheckBox::stateChanged, [this](int s) {
-            if (static_cast<Qt::CheckState>(s) == Qt::CheckState::Checked) {
-                state.settings.showAddonWarning = false;
-            }
-        });
-
         messageBox.exec();
 
         load = messageBox.result() == QMessageBox::Ok;
+
+        settings.showAddonWarning = checkBox->isChecked();
     }
 
     if (load) {
         std::string name = s.getModuleName().toStdString();
 
-        auto it = state.settings.enabledAddonModules.find(name);
-        if (it != state.settings.enabledAddonModules.end()) {
+        auto it = settings.enabledAddonModules.find(name);
+        if (it != settings.enabledAddonModules.end()) {
             if (!enabled) {
-                state.settings.enabledAddonModules.erase(name);
+                settings.enabledAddonModules.erase(name);
             }
         } else {
             if (enabled) {
-                state.settings.enabledAddonModules.insert(name);
+                settings.enabledAddonModules.insert(name);
             }
         }
     } else {
@@ -93,18 +98,32 @@ void SettingsDialog::onDialogRejected() {
 }
 
 void SettingsDialog::onResetSettingsPressed() {
-    state.settings = {};
+    settings = {};
 
+    std::map<std::string, AddonMetadata> metadata = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
     std::map<std::string, bool> addonState;
-    for (auto &pair : state.addonMetadata) {
-        addonState[pair.first] =
-                state.settings.enabledAddonModules.find(pair.first) != state.settings.enabledAddonModules.end();
+    for (auto &pair : metadata) {
+        addonState[pair.first] = settings.enabledAddonModules.find(pair.first) != settings.enabledAddonModules.end();
     }
-    applyAddonState(addonState, state.addonMetadata);
+
+    applyAddonState(addonState, metadata);
 }
 
 void SettingsDialog::onSettingsTabChanged(int tab) {
-    state.settings.settingsTab = tab;
+    settings.settingsTab = tab;
+}
+
+void SettingsDialog::onRefreshAddonsPressed() {
+    std::map<std::string, AddonMetadata> metadata = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
+    std::map<std::string, bool> addonState;
+    for (auto &pair : metadata) {
+        addonState[pair.first] = settings.enabledAddonModules.find(pair.first) != settings.enabledAddonModules.end();
+    }
+
+    applyAddonState(addonState, metadata);
+}
+
+void SettingsDialog::onInstallAddonPressed() {
 }
 
 void SettingsDialog::applyAddonState(const std::map<std::string, bool> &addonState,
@@ -115,7 +134,8 @@ void SettingsDialog::applyAddonState(const std::map<std::string, bool> &addonSta
         itemWidget->setModuleName(addon.first.c_str());
         itemWidget->setModuleEnabled(addon.second);
         itemWidget->setModuleDisplayName(addonMetadata.at(addon.first).displayName.c_str());
-        itemWidget->setModuleDescription((addonMetadata.at(addon.first).description + " ( " + addon.first + " )").c_str());
+        itemWidget->setModuleDescription(
+                (addonMetadata.at(addon.first).description + " ( " + addon.first + " )").c_str());
 
         auto *item = new QListWidgetItem();
         item->setSizeHint(itemWidget->minimumSizeHint());
