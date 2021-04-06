@@ -33,6 +33,7 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
     for (auto &var : table.getVariables()) {
         PyObject *o = PyFloat_FromDouble(var.second);
         PyDict_SetItemString(vars, var.first.c_str(), o);
+        Py_DECREF(o);
     }
     Py_DECREF(vars);
 
@@ -40,6 +41,7 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
     for (auto &var : table.getConstants()) {
         PyObject *o = PyFloat_FromDouble(var.second);
         PyDict_SetItemString(vars, var.first.c_str(), o);
+        Py_DECREF(o);
     }
     Py_DECREF(vars);
 
@@ -51,6 +53,7 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
         for (auto &argName : var.second.argumentNames) {
             PyObject *o = PyUnicode_FromString(argName.c_str());
             PyList_Append(argList, o);
+            Py_DECREF(o);
         }
 
         PyObject *o = PyUnicode_FromString(var.second.expression.c_str());
@@ -59,6 +62,10 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
         PyObject_SetAttrString(funcInstance, "argument_names", argList);
 
         PyDict_SetItemString(vars, var.first.c_str(), funcInstance);
+
+        Py_DECREF(o);
+        Py_DECREF(argList);
+        Py_DECREF(funcInstance);
     }
     Py_DECREF(vars);
 
@@ -66,12 +73,18 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
     for (auto &var : table.getScripts()) {
         PyObject *scriptInstance = PyObject_CallNoArgs(scriptClass);
 
+        // PyObject_SetAttrString increments reference on passed object, we dont decrement because the returned
+        // symbol table holds a new reference to the callback and therefore
+        // has to be cleaned up by calling PySymbolTable::Cleanup
         PyObject_SetAttrString(scriptInstance, "callback", var.second.callback);
 
         PyObject *o = PyBool_FromLong(var.second.enableArguments);
         PyObject_SetAttrString(scriptInstance, "enable_arguments", o);
 
         PyDict_SetItemString(vars, var.first.c_str(), scriptInstance);
+
+        Py_DECREF(o);
+        Py_DECREF(scriptInstance);
     }
     Py_DECREF(vars);
 
