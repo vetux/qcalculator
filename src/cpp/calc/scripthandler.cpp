@@ -5,6 +5,11 @@
 #include "pyutil.hpp"
 
 double ScriptHandler::run(PyObject *c, const std::vector<double> &a) {
+    if (c == PyNull) {
+        // Should never happen
+        throw std::runtime_error("Null callback in script handler");
+    }
+
     PyObject *args = PyTuple_New(a.size());
     for (size_t i = 0; i < a.size(); i++) {
         auto &v = a.at(i);

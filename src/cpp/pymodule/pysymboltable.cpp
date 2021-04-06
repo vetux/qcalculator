@@ -409,8 +409,10 @@ SymbolTable PySymbolTable::Cleanup(const SymbolTable &table) {
     for (auto &script : ret.getScripts()) {
         scriptKeys.emplace_back(script.first);
 
-        if (script.second.callback == PyNull)
-            throw std::runtime_error("Encountered script callback with null value");
+        if (script.second.callback == PyNull) {
+            // Should never happen
+            throw std::runtime_error("Null callback in cleanup");
+        }
 
         Py_DECREF(script.second.callback);
     }
