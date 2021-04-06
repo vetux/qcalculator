@@ -1,5 +1,5 @@
-#ifndef QCALC_ADDONTESTER_HPP
-#define QCALC_ADDONTESTER_HPP
+#ifndef QCALC_ADDONTESTERDIALOG_HPP
+#define QCALC_ADDONTESTERDIALOG_HPP
 
 #include <QDialog>
 #include <QTimer>
@@ -11,10 +11,10 @@
 
 #include "addonhelper.hpp"
 
-class AddonTester : public QDialog {
+class AddonTesterDialog : public QDialog {
 Q_OBJECT
 public:
-    explicit AddonTester(QWidget *parent = nullptr) : QDialog(parent) {
+    explicit AddonTesterDialog(QWidget *parent = nullptr) : QDialog(parent) {
         setWindowTitle("AddonHelper Tester");
         label = new QLabel("Running leak check...\nClose dialog to cancel.", this);
         resize(250, 150);
@@ -41,4 +41,4 @@ private:
     QLabel *label;
 };
 
-#endif //QCALC_ADDONTESTER_HPP
+#endif //QCALC_ADDONTESTERDIALOG_HPP

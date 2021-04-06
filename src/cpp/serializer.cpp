@@ -70,47 +70,20 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
 }
 
 std::string Serializer::serializeSettings(const Settings &settings) {
-    nlohmann::json j;
-    j["showKeypad"] = settings.showKeypad;
-    j["showBitView"] = settings.showBitView;
-    j["historyLimit"] = settings.historyLimit;
-    j["activeTab"] = settings.activeTab;
-    j["windowWidth"] = settings.windowSize.width();
-    j["windowHeight"] = settings.windowSize.height();
-    j["addons"] = settings.enabledAddonModules;
-    j["settingsTab"] = settings.settingsTab;
-    j["showAddonWarning"] = settings.showAddonWarning;
-    return nlohmann::to_string(j);
+    throw std::runtime_error("not implemented");
 }
 
 Settings Serializer::deserializeSettings(const std::string &str) {
+    throw std::runtime_error("not implemented");
+}
+
+std::string Serializer::serializeSet(const std::set<std::string> &set) {
+    nlohmann::json j;
+    j["data"] = set;
+    return nlohmann::to_string(j);
+}
+
+std::set<std::string> Serializer::deserializeSet(const std::string &str) {
     nlohmann::json j = nlohmann::json::parse(str);
-
-    Settings ret;
-
-    if (j.contains("showKeypad"))
-        ret.showKeypad = j["showKeypad"];
-
-    if (j.contains("showBitView"))
-        ret.showBitView = j["showBitView"];
-
-    if (j.contains("historyLimit"))
-        ret.historyLimit = j["historyLimit"];
-
-    if (j.contains("activeTab"))
-        ret.activeTab = j["activeTab"];
-
-    if (j.contains("windowWidth") && j.contains("windowHeight"))
-        ret.windowSize = {j["windowWidth"], j["windowHeight"]};
-
-    if (j.contains("addons"))
-        ret.enabledAddonModules = j["addons"].get<std::set<std::string>>();
-
-    if (j.contains("settingsTab"))
-        ret.settingsTab = j["settingsTab"];
-
-    if (j.contains("showAddonWarning"))
-        ret.showAddonWarning = j["showAddonWarning"];
-
-    return ret;
+    return j["data"];
 }

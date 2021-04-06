@@ -6,22 +6,19 @@
 
 #include <set>
 #include <string>
+#include <map>
 
-struct Settings {
-    bool showKeypad = false;
-    bool showBitView = false;
+/**
+ * The settings object should store arbitrary data identified by key value pairs.
+ *
+ * Addons will get this exposed so that addons can define persistent state which will all be saved in one batch
+ * when the main window exits.
+ *
+ * This way the addons dont have to care about how, when and where the settings are stored.
+ */
+class Settings {
+public:
 
-    int historyLimit = 0;
-
-    int activeTab = 0;
-
-    QSize windowSize = {250, 150};
-
-    std::set<std::string> enabledAddonModules; // A set of module names which have been enabled by the user.
-
-    int settingsTab = 0;
-
-    bool showAddonWarning = true;
 };
 
 #endif //QCALC_SETTINGS_HPP

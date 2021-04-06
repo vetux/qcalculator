@@ -3,9 +3,8 @@
 
 #include <QDialog>
 
-#include <map>
-
-#include "settings.hpp"
+#include <set>
+#include <string>
 
 #include "addonmetadata.hpp"
 
@@ -21,9 +20,9 @@ public:
 
     ~SettingsDialog() override;
 
-    void setSettings(const Settings &state);
+    void setEnabledAddons(const std::set<std::string> &addons);
 
-    Settings getSettings();
+    std::set<std::string> getEnabledAddons();
 
 private slots:
 
@@ -44,7 +43,7 @@ private slots:
 private:
     Ui::SettingsDialog *ui;
 
-    Settings settings;
+    std::set<std::string> enabledAddons;
 
     void applyAddonState(const std::map<std::string, bool> &addonState, const std::map<std::string, AddonMetadata>& addonMetadata);
 };

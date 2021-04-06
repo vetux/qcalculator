@@ -131,6 +131,6 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr) {
     if (parser.compile(expr, expression)) {
         return expression.value();
     } else {
-        throw std::runtime_error("Failed to compile expression");
+        throw std::runtime_error(parser.error());
     }
 }

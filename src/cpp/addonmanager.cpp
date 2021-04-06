@@ -2,9 +2,9 @@
 
 #include "addonhelper.hpp"
 
-AddonManager::AddonManager(AddonManagerListener &listener) : listener(listener) {}
+std::set<std::string> loadedModules;
 
-void AddonManager::setActiveAddons(const std::set<std::string> &addons) {
+void AddonManager::setActiveAddons(const std::set<std::string> &addons, AddonManagerListener &listener) {
     for (auto &module : loadedModules) {
         if (addons.find(module) == addons.end()) {
             try {

@@ -27,69 +27,37 @@ SettingsDialog::~SettingsDialog() {
     delete ui;
 }
 
-void SettingsDialog::setSettings(const Settings &s) {
-    settings = s;
+void SettingsDialog::setEnabledAddons(const std::set<std::string> &addons) {
+    enabledAddons = addons;
 
     std::map<std::string, AddonMetadata> metadata = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
 
     std::map<std::string, bool> addonState;
     for (auto &pair : metadata) {
-        addonState[pair.first] = settings.enabledAddonModules.find(pair.first) != settings.enabledAddonModules.end();
+        addonState[pair.first] = enabledAddons.find(pair.first) != enabledAddons.end();
     }
 
     applyAddonState(addonState, metadata);
-
-    ui->tabWidget->setCurrentIndex(settings.settingsTab);
 }
 
-Settings SettingsDialog::getSettings() {
-    return settings;
+std::set<std::string> SettingsDialog::getEnabledAddons() {
+    return enabledAddons;
 }
 
 void SettingsDialog::onModuleEnableChanged(bool enabled) {
     auto &s = dynamic_cast<AddonItemWidget &>(*sender());
 
-    bool load = true;
-    if (enabled && settings.showAddonWarning) {
-        auto *checkBox = new QCheckBox();
-        checkBox->setText("Dont show this dialog again");
+    std::string name = s.getModuleName().toStdString();
 
-        QMessageBox messageBox;
-        messageBox.setWindowTitle("Addons Information");
-        messageBox.setText(
-                "Make sure to verify the addon source code before enabling it. Running an addon is equivalent to running any other python script. Do you want to enable the addon?");
-        messageBox.setIcon(QMessageBox::Icon::Question);
-        messageBox.addButton(QMessageBox::Ok);
-        messageBox.addButton(QMessageBox::Cancel);
-        messageBox.setDefaultButton(QMessageBox::Cancel);
-        messageBox.setCheckBox(checkBox);
-
-        QObject::connect(checkBox, &QCheckBox::stateChanged, [this](int s) {
-            if (static_cast<Qt::CheckState>(s) == Qt::CheckState::Checked) {
-                settings.showAddonWarning = false;
-            }
-        });
-
-        messageBox.exec();
-
-        load = messageBox.result() == QMessageBox::Ok;
-    }
-
-    if (load) {
-        std::string name = s.getModuleName().toStdString();
-
-        auto it = settings.enabledAddonModules.find(name);
-        if (it != settings.enabledAddonModules.end()) {
-            if (!enabled) {
-                settings.enabledAddonModules.erase(name);
-            }
-        } else {
-            if (enabled) {
-                settings.enabledAddonModules.insert(name);
-            }
+    auto it = enabledAddons.find(name);
+    if (it != enabledAddons.end()) {
+        if (!enabled) {
+            enabledAddons.erase(name);
         }
     } else {
-        s.setModuleEnabled(false);
+        if (enabled) {
+            enabledAddons.insert(name);
+        }
     }
 }
 
@@ -102,26 +70,25 @@ void SettingsDialog::onDialogRejected() {
 }
 
 void SettingsDialog::onResetSettingsPressed() {
-    settings = {};
+    enabledAddons = {};
 
     std::map<std::string, AddonMetadata> metadata = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
     std::map<std::string, bool> addonState;
     for (auto &pair : metadata) {
-        addonState[pair.first] = settings.enabledAddonModules.find(pair.first) != settings.enabledAddonModules.end();
+        addonState[pair.first] = false;
     }
 
     applyAddonState(addonState, metadata);
 }
 
 void SettingsDialog::onSettingsTabChanged(int tab) {
-    settings.settingsTab = tab;
 }
 
 void SettingsDialog::onRefreshAddonsPressed() {
     std::map<std::string, AddonMetadata> metadata = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
     std::map<std::string, bool> addonState;
     for (auto &pair : metadata) {
-        addonState[pair.first] = settings.enabledAddonModules.find(pair.first) != settings.enabledAddonModules.end();
+        addonState[pair.first] = enabledAddons.find(pair.first) != enabledAddons.end();
     }
 
     applyAddonState(addonState, metadata);

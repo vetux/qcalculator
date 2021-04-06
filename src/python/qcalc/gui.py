@@ -1,17 +1,15 @@
-# Instead of using shiboken we will interact with the gui through QtWidgets.QApplication.instance()
-# and expose other functionality by hand.
+# The GUI module exposes the minimal native provided gui, which is only a main window instance which contains
+# a menubar, a root widget with vertical layout and a line edit.
 
-# All native provided gui should be referenced through the global variables defined in this module
-# as their object names may change.
-
+# All other gui is provided via python addons.
 
 from PySide2 import QtWidgets
 
 
-def widget(objectname):
+def widget(object_name):
     ws = widgets()
     for w in ws:
-        if w.objectName() == objectname:
+        if w.objectName() == object_name:
             return w
 
 
@@ -24,7 +22,5 @@ app = QtWidgets.QApplication.instance()
 
 wnd = widget("MainWindow")
 menu = widget("menubar")
-
-root = widget("layout_root")
-
-tab_widget = widget("tabWidget_main")
+root = widget("rootWidget")
+input_field = widget("lineEdit_input")

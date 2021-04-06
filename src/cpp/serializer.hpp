@@ -7,15 +7,18 @@
 
 #include "calc/symboltable.hpp"
 
-class Serializer {
-public:
-    static std::string serializeTable(const SymbolTable &table);
+namespace Serializer {
+    std::string serializeTable(const SymbolTable &table);
 
-    static SymbolTable deserializeTable(const std::string &str);
+    SymbolTable deserializeTable(const std::string &str);
 
-    static std::string serializeSettings(const Settings &settings);
+    std::string serializeSettings(const Settings &settings);
 
-    static Settings deserializeSettings(const std::string &str);
-};
+    Settings deserializeSettings(const std::string &str);
+
+    std::string serializeSet(const std::set<std::string> &set);
+
+    std::set<std::string> deserializeSet(const std::string &str);
+}
 
 #endif //QT_CALC_SERIALIZER_HPP

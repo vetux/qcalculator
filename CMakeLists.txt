@@ -33,10 +33,8 @@ file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/system) # Copy s
 
 set(HDR_GUI src/cpp/gui/mainwindow.hpp
         src/cpp/gui/settingsdialog.hpp
-        src/cpp/gui/mainpresenter.hpp
-        src/cpp/gui/addontester.hpp
-        src/cpp/gui/widgets/addonitemwidget.hpp
-        src/cpp/gui/widgets/historyitemwidget.hpp)
+        src/cpp/gui/addontesterdialog.hpp
+        src/cpp/gui/widgets/addonitemwidget.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
 qt5_wrap_ui(WRAP_UI ${FORMS}) # Seems to output into CMAKE_CURRENT_BINARY_DIR

@@ -5,9 +5,9 @@
 #include "pyutil.hpp"
 
 PyObject *PySymbolTable::New(const SymbolTable &table) {
-    PyObject *symModule = PyImport_ImportModule("qcalc.sym");
+    PyObject *symModule = PyImport_ImportModule("qcalc.exprtk");
     if (symModule == PyNull) {
-        throw std::runtime_error("Failed to import qcalc.sym module");
+        throw std::runtime_error("Failed to import qcalc.exprtk module");
     }
 
     PyObject *symDict = PyModule_GetDict(symModule);
