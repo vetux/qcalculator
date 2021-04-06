@@ -1,4 +1,5 @@
 import qcalc.gui as gui
+import qcalc.exprtk as exprtk
 
 # We use PySide2 to create qt objects owned by python and integrate them into our native gui
 # by using the QtWidgets.QApplication.instance() reference.
@@ -14,12 +15,23 @@ from PySide2 import QtWidgets, QtCore
 # the interpreter is only started up and torn down with application start / exit.
 menu = QtWidgets.QMenu
 action = QtWidgets.QAction
+input_text = ""
 
 
 # Our python side onclick callback
 def onclick():
     print("The action was invoked")
     print("Question Response: " + str(QtWidgets.QMessageBox.question(gui.wnd, "Title", "Text")))
+
+
+def input_changed(text):
+    global input_text
+    input_text = text
+
+
+def return_pressed():
+    global input_text
+    gui.input_field.setText(str(exprtk.evaluate(input_text)))
 
 
 # Load is invoked by the native code when the addon is requested to be loaded by the user.
@@ -39,6 +51,13 @@ def load():
     QtCore.QObject.connect(action, QtCore.SIGNAL('triggered()'), onclick)  # USE THIS
     # action.triggered.connect(onclick)  # NOT THIS, leaks memory.
 
+    # Disconnect existing slots to the MainWindow instance
+    gui.input_field.disconnect(gui.wnd)
+
+    # Register our own text changed listener
+    QtCore.QObject.connect(gui.input_field, QtCore.SIGNAL("returnPressed()"), return_pressed)
+    QtCore.QObject.connect(gui.input_field, QtCore.SIGNAL("textChanged(QString)"), input_changed)
+
 
 # Unload is invoked by the native code when the addon is requested to be unloaded by the user
 # It should perform cleanup such as removing gui elements.
@@ -54,6 +73,13 @@ def unload():
 
     # !IMPORTANT! Call deleteLater() for qt objects created by python, otherwise memory leaks!
     menu.deleteLater()
+
+    # Disconnect our slot
+    gui.input_field.disconnect(input_changed)
+
+    # Reconnect to the original slots on the main window instance
+    QtCore.QObject.connect(gui.input_field, QtCore.SIGNAL("returnPressed()"), gui.wnd, QtCore.SLOT("onInputReturnPressed()"))
+    QtCore.QObject.connect(gui.input_field, QtCore.SIGNAL("textChanged(QString)"), gui.wnd, QtCore.SLOT("onInputTextChanged(QString)"))
 
 
 # You can define logic at module level. This logic will be invoked when the module is imported.
