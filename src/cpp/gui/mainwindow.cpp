@@ -18,7 +18,7 @@
 
 #include "pymodule/exprtkmodule.hpp"
 
-#define ADDONS_FILE "/enabledAddons.json"
+#define ADDONS_FILE "/addons.json"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow()) {
     ui->setupUi(this);
@@ -103,7 +103,7 @@ void MainWindow::onActionSettings() {
 
             try {
                 std::string dataDir = Paths::getAppDataDirectory();
-                
+
                 if (!QDir(dataDir.c_str()).exists())
                     QDir().mkpath(dataDir.c_str());
 
