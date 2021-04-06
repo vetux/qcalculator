@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QCheckBox>
 #include <QLabel>
+#include <QPushButton>
 
 class AddonItemWidget : public QWidget {
 Q_OBJECT
@@ -32,10 +33,13 @@ private:
     QHBoxLayout *layout;
     QCheckBox *checkbox;
     QLabel *label;
+    QPushButton *button;
 
 private slots:
 
     void onCheckBoxStateChange(int state);
+
+    void onButtonPressed();
 };
 
 #endif //QCALC_ADDONITEMWIDGET_HPP

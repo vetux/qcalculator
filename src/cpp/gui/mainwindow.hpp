@@ -11,6 +11,7 @@
 #include "numpadkey.hpp"
 #include "addonmanagerlistener.hpp"
 
+#include "calc/arithmetictype.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -47,12 +48,37 @@ public:
     void onAddonUnloadFail(const std::string &moduleName, const std::string &error) override;
 
 signals:
+
+    /**
+     * Emitted whenever the input text for the main window changed.
+     * This is emitted after evaluating an expression and is per default connected to the line edit set text slot.
+     *
+     * @param text
+     */
     void signalInputTextChange(const QString &text);
+
+    /**
+     * Emitted whenever a expression was evaluated by the main window.
+     * Does not have any default connections.
+     *
+     * @param expression
+     * @param value
+     */
+    void signalExpressionEvaluated(const QString &expression, double value);
 
 public slots:
 
+    /**
+     * This slot updates the main window internal input text when invoked.
+     * This is done to avoid using the line edit pointer to retrieve input.
+     *
+     * @param text
+     */
     void onInputTextChanged(const QString &text);
 
+    /**
+     * This slot evaluates the input text when invoked.
+     */
     void onInputReturnPressed();
 
     void onActionSettings();

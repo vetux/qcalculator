@@ -15,29 +15,39 @@ class AddonTesterDialog : public QDialog {
 Q_OBJECT
 public:
     explicit AddonTesterDialog(QWidget *parent = nullptr) : QDialog(parent) {
-        setWindowTitle("AddonHelper Tester");
-        label = new QLabel("Running leak check...\nClose dialog to cancel.", this);
+        setWindowTitle("Addon Tester");
+        label = new QLabel("Running memory leak check...\nClose dialog to cancel.", this);
         resize(250, 150);
         connect(&timer, SIGNAL(timeout()), SLOT(leakCheck()));
-        modulesToBeTested.insert("sample_gui");
-        modulesToBeTested.insert("sample_sym");
+    }
+
+    void setModule(const std::string &m, bool isLoaded) {
+        module = m;
+        moduleLoaded = isLoaded;
+    }
+
+    int exec() override {
+        if (moduleLoaded)
+            AddonHelper::unload(module);
         timer.start();
+        int ret = QDialog::exec();
+        if (moduleLoaded)
+            AddonHelper::load(module);
+        return ret;
     }
 
 private slots:
 
     void leakCheck() {
-        for (auto &module : modulesToBeTested) {
-            AddonHelper::load(module);
-            AddonHelper::unload(module);
-        }
+        AddonHelper::load(module);
+        AddonHelper::unload(module);
     }
 
 private:
-    std::set<std::string> modulesToBeTested;
+    std::string module;
+    bool moduleLoaded;
 
     QTimer timer;
-
     QLabel *label;
 };
 

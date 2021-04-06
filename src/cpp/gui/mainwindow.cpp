@@ -81,8 +81,10 @@ void MainWindow::onInputTextChanged(const QString &text) {
 
 void MainWindow::onInputReturnPressed() {
     try {
-        emit signalInputTextChange(
-                NumberFormat::toDecimal(ExpressionParser::evaluate(inputText.toStdString())).c_str());
+        ArithmeticType value = ExpressionParser::evaluate(inputText.toStdString());
+        emit signalExpressionEvaluated(inputText, value);
+        inputText = NumberFormat::toDecimal(value).c_str();
+        emit signalInputTextChange(inputText);
     }
     catch (const std::runtime_error &e) {
         QMessageBox::warning(this, "Failed to evaluate expression", e.what());

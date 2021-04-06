@@ -1,13 +1,25 @@
 #include "gui/widgets/addonitemwidget.hpp"
 
+#include <QPushButton>
+
+#include "gui/addontesterdialog.hpp"
+
+#include "addonmanager.hpp"
+
 AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent), layout(nullptr), checkbox(nullptr),
                                                     label(nullptr) {
     layout = new QHBoxLayout(this);
     checkbox = new QCheckBox(this);
     label = new QLabel(this);
+    button = new QPushButton(this);
     layout->addWidget(checkbox);
     layout->addWidget(label);
+
     connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChange(int)));
+
+    connect(button, SIGNAL(pressed()), this, SLOT(onButtonPressed()));
+    layout->addWidget(button);
+    button->setText("Run Test");
 }
 
 void AddonItemWidget::setModuleName(const QString &name) {
@@ -38,4 +50,11 @@ void AddonItemWidget::setModuleDescription(const QString &description) {
 
 void AddonItemWidget::onCheckBoxStateChange(int state) {
     emit onModuleEnabledChanged(state == Qt::Checked);
+}
+
+void AddonItemWidget::onButtonPressed() {
+    AddonTesterDialog dialog;
+    std::set<std::string> mods = AddonManager::getActiveAddons();
+    dialog.setModule(moduleName.toStdString(), mods.find(moduleName.toStdString()) != mods.end());
+    dialog.exec();
 }

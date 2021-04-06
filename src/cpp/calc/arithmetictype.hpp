@@ -2,13 +2,15 @@
 #define QCALC_ARITHMETICTYPE_HPP
 
 /**
-* The fundamental type used for arithmetic.
-*
-* More sophisticated implementation may use different fundamental types or implement custom number encodings to achieve strongest possible accuracy.
-*
-* With most long double implementations accuracy problems are generally only visible for very small fractions
-* or very large numbers which could not be represented with language provided integer encodings.
+ * The fundamental type used for arithmetic.
+ *
+ * For now we will use double to match the cpython float implementation.
+ *
+ * To achieve perfect precision a arbitrary precision number format has to be implemented.
+ *
+ * This could then be exposed to python with a custom type,
+ * and would also have to be integrated with exprtk.
 */
-typedef long double ArithmeticType;
+typedef double ArithmeticType;
 
 #endif //QCALC_ARITHMETICTYPE_HPP
