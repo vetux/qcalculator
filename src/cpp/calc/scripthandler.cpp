@@ -12,9 +12,7 @@ double ScriptHandler::run(PyObject *c, const std::vector<double> &a) {
         PyTuple_SetItem(args, i, f);
     }
 
-    PyObject *kwargs = PyNull;
-
-    PyObject *pyRet = PyObject_Call(c, args, kwargs);
+    PyObject *pyRet = PyObject_Call(c, args, PyNull);
     Py_DECREF(args);
 
     if (pyRet == PyNull) {
@@ -22,6 +20,10 @@ double ScriptHandler::run(PyObject *c, const std::vector<double> &a) {
     }
 
     double ret = PyFloat_AsDouble(pyRet);
+
+    if (PyErr_Occurred() != PyNull) {
+        throw std::runtime_error(PyUtil::getError());
+    }
 
     Py_DECREF(pyRet);
 

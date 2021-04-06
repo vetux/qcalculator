@@ -36,6 +36,8 @@ PyObject *evaluate(PyObject *self, PyObject *args) {
         PyTuple_SetItem(ret, 0, PyFloat_FromDouble(value));
         PyTuple_SetItem(ret, 1, PySymbolTable::New(symTable));
 
+        PySymbolTable::Cleanup(symTable);
+
         return ret;
 
     MODULE_FUNC_CATCH

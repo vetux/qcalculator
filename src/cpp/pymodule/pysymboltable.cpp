@@ -7,7 +7,7 @@
 PyObject *PySymbolTable::New(const SymbolTable &table) {
     PyObject *symModule = PyImport_ImportModule("qcalc.exprtk");
     if (symModule == PyNull) {
-        throw std::runtime_error("Failed to import qcalc.exprtk module");
+        throw std::runtime_error("Failed to import qcalc.exprtk module, Error: " + PyUtil::getError());
     }
 
     PyObject *symDict = PyModule_GetDict(symModule);
@@ -31,13 +31,15 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
 
     PyObject *vars = PyObject_GetAttrString(symInstance, "variables");
     for (auto &var : table.getVariables()) {
-        PyDict_SetItemString(vars, var.first.c_str(), PyFloat_FromDouble(var.second));
+        PyObject *o = PyFloat_FromDouble(var.second);
+        PyDict_SetItemString(vars, var.first.c_str(), o);
     }
     Py_DECREF(vars);
 
     vars = PyObject_GetAttrString(symInstance, "constants");
     for (auto &var : table.getConstants()) {
-        PyDict_SetItemString(vars, var.first.c_str(), PyFloat_FromDouble(var.second));
+        PyObject *o = PyFloat_FromDouble(var.second);
+        PyDict_SetItemString(vars, var.first.c_str(), o);
     }
     Py_DECREF(vars);
 
@@ -47,10 +49,13 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
 
         PyObject *argList = PyList_New(0);
         for (auto &argName : var.second.argumentNames) {
-            PyList_Append(argList, PyUnicode_FromString(argName.c_str()));
+            PyObject *o = PyUnicode_FromString(argName.c_str());
+            PyList_Append(argList, o);
         }
 
-        PyObject_SetAttrString(funcInstance, "expression", PyUnicode_FromString(var.second.expression.c_str()));
+        PyObject *o = PyUnicode_FromString(var.second.expression.c_str());
+
+        PyObject_SetAttrString(funcInstance, "expression", o);
         PyObject_SetAttrString(funcInstance, "argument_names", argList);
 
         PyDict_SetItemString(vars, var.first.c_str(), funcInstance);
@@ -62,7 +67,9 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
         PyObject *scriptInstance = PyObject_CallNoArgs(scriptClass);
 
         PyObject_SetAttrString(scriptInstance, "callback", var.second.callback);
-        PyObject_SetAttrString(scriptInstance, "enable_arguments", PyBool_FromLong(var.second.enableArguments));
+
+        PyObject *o = PyBool_FromLong(var.second.enableArguments);
+        PyObject_SetAttrString(scriptInstance, "enable_arguments", o);
 
         PyDict_SetItemString(vars, var.first.c_str(), scriptInstance);
     }
@@ -375,6 +382,7 @@ SymbolTable PySymbolTable::Convert(PyObject *o) {
         }
     }
     Py_DECREF(keys);
+
     Py_DECREF(attr);
 
     return ret;
@@ -387,6 +395,10 @@ SymbolTable PySymbolTable::Cleanup(const SymbolTable &table) {
 
     for (auto &script : ret.getScripts()) {
         scriptKeys.emplace_back(script.first);
+
+        if (script.second.callback == PyNull)
+            throw std::runtime_error("Encountered script callback with null value");
+
         Py_DECREF(script.second.callback);
     }
 
