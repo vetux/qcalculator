@@ -7,6 +7,7 @@
 
 #include "pyutil.hpp"
 #include "addonmanager.hpp"
+#include "addonhelper.hpp"
 #include "paths.hpp"
 #include "serializer.hpp"
 #include "io.hpp"
@@ -15,6 +16,7 @@
 #include "calc/expressionparser.hpp"
 
 #include "gui/settingsdialog.hpp"
+#include "gui/widgets/historywidget.hpp"
 
 #include "pymodule/exprtkmodule.hpp"
 
@@ -22,6 +24,10 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow()) {
     ui->setupUi(this);
+
+    auto *history = new HistoryWidget(this);
+
+    ui->tab_history->layout()->addWidget(history);
 
     connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
@@ -31,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->lineEdit_input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
     connect(this, SIGNAL(signalInputTextChange(const QString &)), ui->lineEdit_input, SLOT(setText(const QString &)));
+
+    connect(this, SIGNAL(signalExpressionEvaluated(const QPair<QString, QString> &)), history,
+            SLOT(addContent(const QPair<QString, QString> &)));
 
     ExprtkModule::initialize();
 
@@ -51,7 +60,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         }
     }
 
-    AddonManager::setActiveAddons(enabledAddons, *this);
+    //Check for enabled addons which dont exist anymore.
+    std::set<std::string> availableAddons;
+    auto addons = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
+    for (auto &addon : enabledAddons) {
+        if (addons.find(addon) != addons.end())
+            availableAddons.insert(addon);
+    }
+
+    AddonManager::setActiveAddons(availableAddons, *this);
 }
 
 MainWindow::~MainWindow() {
@@ -82,7 +99,7 @@ void MainWindow::onInputTextChanged(const QString &text) {
 void MainWindow::onInputReturnPressed() {
     try {
         ArithmeticType value = ExpressionParser::evaluate(inputText.toStdString());
-        emit signalExpressionEvaluated(inputText, value);
+        emit signalExpressionEvaluated(QPair<QString, QString>(inputText, NumberFormat::toDecimal(value).c_str()));
         inputText = NumberFormat::toDecimal(value).c_str();
         emit signalInputTextChange(inputText);
     }

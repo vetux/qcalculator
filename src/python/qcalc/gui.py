@@ -1,7 +1,5 @@
-# The GUI module exposes the minimal native provided gui, which is only a main window instance which contains
-# a menubar, a root widget with vertical layout and a line edit.
+# The GUI module exposes the minimal native provided gui to the addons.
 
-# All other gui is provided via python addons.
 
 from PySide2 import QtWidgets
 
@@ -22,5 +20,17 @@ app = QtWidgets.QApplication.instance()
 
 wnd = widget("MainWindow")
 menu = widget("menubar")
-root = widget("rootWidget")
-input_field = widget("lineEdit_input")
+statusbar = widget("statusbar")
+
+menu_file = widget("menuFile")
+menu_help = widget("menuHelp")
+
+action_settings = widget("actionSettings")
+action_exit = widget("actionExit")
+action_about = widget("actionAbout")
+
+root = widget("root_widget")
+tabs = widget("tabWidget_main")
+tab_history = widget("tab_history")
+history = widget("widget_history")
+input_line_edit = widget("lineEdit_input")

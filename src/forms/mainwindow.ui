@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>384</width>
-    <height>98</height>
+    <width>640</width>
+    <height>518</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,20 +19,55 @@
   <property name="windowTitle">
    <string/>
   </property>
-  <widget class="QWidget" name="rootWidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <property name="leftMargin">
-     <number>6</number>
-    </property>
-    <property name="topMargin">
-     <number>6</number>
-    </property>
-    <property name="rightMargin">
-     <number>6</number>
-    </property>
-    <property name="bottomMargin">
-     <number>6</number>
-    </property>
+  <widget class="QWidget" name="widget_root">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QTabWidget" name="tabWidget_main">
+      <property name="styleSheet">
+       <string notr="true">QTabWidget::pane { margin: 0px,0px,0px,0px }</string>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="documentMode">
+       <bool>false</bool>
+      </property>
+      <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="movable">
+       <bool>false</bool>
+      </property>
+      <property name="tabBarAutoHide">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="tab_history">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <attribute name="title">
+        <string>History</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
+     </widget>
+    </item>
     <item>
      <widget class="QLineEdit" name="lineEdit_input">
       <property name="minimumSize">
@@ -56,7 +91,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>384</width>
+     <width>640</width>
      <height>22</height>
     </rect>
    </property>
@@ -65,6 +100,7 @@
      <string>File</string>
     </property>
     <addaction name="actionSettings"/>
+    <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>

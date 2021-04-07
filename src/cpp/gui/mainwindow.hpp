@@ -59,12 +59,14 @@ signals:
 
     /**
      * Emitted whenever a expression was evaluated by the main window.
-     * Does not have any default connections.
+     * This is emitted after evaluating an expression and is per default connected to the history widget addContent slot.
+     *
+     * pair.first is the expression and pair.second is the result in decimal string form.
      *
      * @param expression
      * @param value
      */
-    void signalExpressionEvaluated(const QString &expression, double value);
+    void signalExpressionEvaluated(const QPair<QString, QString> &pair);
 
 public slots:
 
