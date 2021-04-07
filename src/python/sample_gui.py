@@ -24,7 +24,7 @@ class SampleInputWidget(QtWidgets.QWidget):
         self.text = text
 
     def return_pressed(self):
-        gui.input_field.setText(str(exprtk.evaluate(self.text)))
+        gui.input_line_edit.setText(str(exprtk.evaluate(self.text)))
 
 
 sample_widget = SampleInputWidget
@@ -56,18 +56,18 @@ def load():
     sample_widget = SampleInputWidget()
 
     # Store existing text in our sample widget
-    sample_widget.text = gui.input_field.text()
+    sample_widget.text = gui.input_line_edit.text()
 
     # Disconnect the input field from the MainWindow
-    gui.input_field.disconnect(gui.wnd)
+    gui.input_line_edit.disconnect(gui.wnd)
 
     # Register our own text changed and return pressed listener
-    QtCore.QObject.connect(gui.input_field,
+    QtCore.QObject.connect(gui.input_line_edit,
                            QtCore.SIGNAL("returnPressed()"),
                            sample_widget,
                            QtCore.SLOT("return_pressed()"))
 
-    QtCore.QObject.connect(gui.input_field,
+    QtCore.QObject.connect(gui.input_line_edit,
                            QtCore.SIGNAL("textChanged(QString)"),
                            sample_widget,
                            QtCore.SLOT("input_changed(QString)"))
@@ -90,14 +90,14 @@ def unload():
     menu.deleteLater()
 
     # Disconnect our widget
-    gui.input_field.disconnect(sample_widget)
+    gui.input_line_edit.disconnect(sample_widget)
 
     # Reconnect the input field to the MainWindow
-    QtCore.QObject.connect(gui.input_field,
+    QtCore.QObject.connect(gui.input_line_edit,
                            QtCore.SIGNAL("returnPressed()"),
                            gui.wnd,
                            QtCore.SLOT("onInputReturnPressed()"))
-    QtCore.QObject.connect(gui.input_field,
+    QtCore.QObject.connect(gui.input_line_edit,
                            QtCore.SIGNAL("textChanged(QString)"),
                            gui.wnd,
                            QtCore.SLOT("onInputTextChanged(QString)"))
