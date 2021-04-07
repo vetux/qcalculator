@@ -24,13 +24,13 @@
     <item>
      <widget class="QTabWidget" name="tabWidget_main">
       <property name="styleSheet">
-       <string notr="true">QTabWidget::pane { margin: 0px,0px,0px,0px }</string>
+       <string notr="true"/>
       </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
       <property name="documentMode">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="tabsClosable">
        <bool>false</bool>
@@ -43,7 +43,8 @@
       </property>
       <widget class="QWidget" name="tab_history">
        <property name="styleSheet">
-        <string notr="true"/>
+        <string notr="true">
+</string>
        </property>
        <attribute name="title">
         <string>History</string>
