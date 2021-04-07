@@ -15,15 +15,15 @@ public slots:
     void setContent(const QList<QPair<QString, QString>> &c) {
         clear();
         for (auto &pair : c) {
-            addContent(pair);
+            addContent(pair.first, pair.second);
         }
     }
 
-    void addContent(const QPair<QString, QString> &c) {
+    void addContent(const QString &expression, const QString &value) {
         auto *widget = new HistoryItemWidget(this);
         auto *item = new QListWidgetItem(this);
 
-        widget->setContents(c.first, c.second);
+        widget->setContents(expression, value);
 
         item->setSizeHint(widget->sizeHint());
 

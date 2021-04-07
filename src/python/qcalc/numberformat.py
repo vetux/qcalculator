@@ -1,6 +1,5 @@
 def to_decimal(number, decimal_spaces=32):
-    ret = ("{:." + str(decimal_spaces) + "f}").format(number)
-    return remove_decimal_spaces(ret)
+    return ("{:." + str(decimal_spaces) + "f}").format(number)
 
 
 # Strip zeroes from decimal number because the str builtin either returns scientific notation or fixed decimal spaces,

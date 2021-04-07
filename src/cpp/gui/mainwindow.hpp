@@ -66,7 +66,7 @@ signals:
      * @param expression
      * @param value
      */
-    void signalExpressionEvaluated(const QPair<QString, QString> &pair);
+    void signalExpressionEvaluated(const QString &expression, const QString &value);
 
 public slots:
 

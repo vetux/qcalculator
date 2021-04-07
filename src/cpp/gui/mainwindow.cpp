@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
 
     auto *history = new HistoryWidget(this);
+    history->setObjectName("widget_history");
 
     ui->tab_history->layout()->addWidget(history);
 
@@ -33,13 +34,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
     connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
 
-    connect(ui->lineEdit_input, SIGNAL(textChanged(const QString &)), this, SLOT(onInputTextChanged(const QString &)));
+    connect(ui->lineEdit_input,
+            SIGNAL(textChanged(const QString &)),
+            this,
+            SLOT(onInputTextChanged(const QString &)));
+
     connect(ui->lineEdit_input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
-    connect(this, SIGNAL(signalInputTextChange(const QString &)), ui->lineEdit_input, SLOT(setText(const QString &)));
+    connect(this,
+            SIGNAL(signalInputTextChange(const QString &)),
+            ui->lineEdit_input,
+            SLOT(setText(const QString &)));
 
-    connect(this, SIGNAL(signalExpressionEvaluated(const QPair<QString, QString> &)), history,
-            SLOT(addContent(const QPair<QString, QString> &)));
+    connect(this,
+            SIGNAL(signalExpressionEvaluated(const QString &, const QString &)),
+            history,
+            SLOT(addContent(const QString &, const QString &)));
 
     ExprtkModule::initialize();
 
@@ -99,7 +109,7 @@ void MainWindow::onInputTextChanged(const QString &text) {
 void MainWindow::onInputReturnPressed() {
     try {
         ArithmeticType value = ExpressionParser::evaluate(inputText.toStdString());
-        emit signalExpressionEvaluated(QPair<QString, QString>(inputText, NumberFormat::toDecimal(value).c_str()));
+        emit signalExpressionEvaluated(inputText, NumberFormat::toDecimal(value).c_str());
         inputText = NumberFormat::toDecimal(value).c_str();
         emit signalInputTextChange(inputText);
     }
