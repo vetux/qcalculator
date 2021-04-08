@@ -92,7 +92,9 @@ void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
 }
 
 void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
-    if (symbolTable.hasVariable(name.toStdString())) {
+    if (name.isEmpty()) {
+        QMessageBox::warning(this, "Failed to add variable", "The variable name cannot be empty.");
+    } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add variable", "A variable with the name already exists.");
     } else if (symbolTable.hasConstant(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add variable", "A constant with the name already exists.");
@@ -119,7 +121,13 @@ void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
 }
 
 void SymbolsEditor::onVariableNameChanged(const QString &originalName, const QString &name) {
-    if (symbolTable.hasVariable(name.toStdString())) {
+    if (name.isEmpty()) {
+        if (QMessageBox::question(this, "Delete variable",
+                                  "Do you want to delete the variable " + originalName + " ?")) {
+            symbolTable.remove(originalName.toStdString());
+        }
+        emit onSymbolsChanged(symbolTable);
+    } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to changed variable name", "A variable with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasConstant(name.toStdString())) {
@@ -154,7 +162,9 @@ void SymbolsEditor::onVariableValueChanged(const QString &name, const QString &v
 }
 
 void SymbolsEditor::onConstantAdded(const QString &name, const QString &value) {
-    if (symbolTable.hasVariable(name.toStdString())) {
+    if (name.isEmpty()) {
+        QMessageBox::warning(this, "Failed to add constant", "The constant name cannot be empty.");
+    } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add constant", "A variable with the name already exists.");
     } else if (symbolTable.hasConstant(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add constant", "A constant with the name already exists.");
@@ -181,7 +191,13 @@ void SymbolsEditor::onConstantAdded(const QString &name, const QString &value) {
 }
 
 void SymbolsEditor::onConstantNameChanged(const QString &originalName, const QString &name) {
-    if (symbolTable.hasVariable(name.toStdString())) {
+    if (name.isEmpty()) {
+        if (QMessageBox::question(this, "Delete constant",
+                                  "Do you want to delete the constant " + originalName + " ?")) {
+            symbolTable.remove(originalName.toStdString());
+        }
+        emit onSymbolsChanged(symbolTable);
+    } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change constant name", "A variable with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasConstant(name.toStdString())) {
@@ -216,7 +232,9 @@ void SymbolsEditor::onConstantValueChanged(const QString &name, const QString &v
 }
 
 void SymbolsEditor::onFunctionAdded(const QString &name) {
-    if (symbolTable.hasVariable(name.toStdString())) {
+    if (name.isEmpty()) {
+        QMessageBox::warning(this, "Failed to add function", "The function name cannot be empty.");
+    } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add function", "A variable with the name already exists.");
     } else if (symbolTable.hasConstant(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add function", "A constant with the name already exists.");
@@ -231,7 +249,13 @@ void SymbolsEditor::onFunctionAdded(const QString &name) {
 }
 
 void SymbolsEditor::onFunctionNameChanged(const QString &originalName, const QString &name) {
-    if (symbolTable.hasVariable(name.toStdString())) {
+    if (name.isEmpty()) {
+        if (QMessageBox::question(this, "Delete function",
+                                  "Do you want to delete the function " + originalName + " ?")) {
+            symbolTable.remove(originalName.toStdString());
+        }
+        emit onSymbolsChanged(symbolTable);
+    } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change function name", "A variable with the name already exists.");
         functionsEditor->setFunctions(symbolTable.getFunctions());
         functionsEditor->setCurrentFunction(currentFunction);
