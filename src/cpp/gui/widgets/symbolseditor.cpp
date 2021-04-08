@@ -17,7 +17,7 @@ std::map<QString, QString> convertMap(std::map<std::string, ArithmeticType> map)
 SymbolsEditor::SymbolsEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout(this));
 
-    layout()->setContentsMargins(0, 0, 0, 0);
+    layout()->setContentsMargins(3, 3, 3, 3);
 
     auto *tabs = new QTabWidget(this);
 
@@ -93,21 +93,25 @@ void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
 
 void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
     if (symbolTable.hasVariable(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add variable", "A variable with the name already exists.");
     } else if (symbolTable.hasConstant(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add variable", "A constant with the name already exists.");
     } else if (symbolTable.hasFunction(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add variable", "A function with the name already exists.");
     } else if (symbolTable.hasScript(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add variable", "A script with the name already exists.");
     } else {
         ArithmeticType valueConverted;
-        try {
-            valueConverted = NumberFormat::fromDecimal(value.toStdString());
-        }
-        catch (const std::exception &e) {
+        if (value.isEmpty()) {
             valueConverted = 0;
-            QMessageBox::warning(this, "Error", "Error");
+        } else {
+            try {
+                valueConverted = NumberFormat::fromDecimal(value.toStdString());
+            }
+            catch (const std::exception &e) {
+                valueConverted = 0;
+                QMessageBox::warning(this, "Failed to convert value", "Failed to parse value as decimal.");
+            }
         }
         symbolTable.setVariable(name.toStdString(), valueConverted);
         emit onSymbolsChanged(symbolTable);
@@ -116,16 +120,16 @@ void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
 
 void SymbolsEditor::onVariableNameChanged(const QString &originalName, const QString &name) {
     if (symbolTable.hasVariable(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to changed variable name", "A variable with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasConstant(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to changed variable name", "A constant with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasFunction(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to changed variable name", "A function with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasScript(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to changed variable name", "A script with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else {
         ArithmeticType value = symbolTable.getVariables().at(originalName.toStdString());
@@ -143,7 +147,7 @@ void SymbolsEditor::onVariableValueChanged(const QString &name, const QString &v
     }
     catch (const std::exception &e) {
         newValue = originalValue;
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to convert value", "Failed to parse value as decimal.");
     }
     symbolTable.setVariable(name.toStdString(), newValue);
     emit onSymbolsChanged(symbolTable);
@@ -151,21 +155,25 @@ void SymbolsEditor::onVariableValueChanged(const QString &name, const QString &v
 
 void SymbolsEditor::onConstantAdded(const QString &name, const QString &value) {
     if (symbolTable.hasVariable(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add constant", "A variable with the name already exists.");
     } else if (symbolTable.hasConstant(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add constant", "A constant with the name already exists.");
     } else if (symbolTable.hasFunction(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add constant", "A function with the name already exists.");
     } else if (symbolTable.hasScript(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add constant", "A script with the name already exists.");
     } else {
         ArithmeticType valueConverted;
-        try {
-            valueConverted = NumberFormat::fromDecimal(value.toStdString());
-        }
-        catch (const std::exception &e) {
+        if (value.isEmpty()) {
             valueConverted = 0;
-            QMessageBox::warning(this, "Error", "Error");
+        } else {
+            try {
+                valueConverted = NumberFormat::fromDecimal(value.toStdString());
+            }
+            catch (const std::exception &e) {
+                valueConverted = 0;
+                QMessageBox::warning(this, "Failed to convert value", "Failed to parse value as decimal.");
+            }
         }
         symbolTable.setConstant(name.toStdString(), valueConverted);
         emit onSymbolsChanged(symbolTable);
@@ -174,16 +182,16 @@ void SymbolsEditor::onConstantAdded(const QString &name, const QString &value) {
 
 void SymbolsEditor::onConstantNameChanged(const QString &originalName, const QString &name) {
     if (symbolTable.hasVariable(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to change constant name", "A variable with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasConstant(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to change constant name", "A constant with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasFunction(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to change constant name", "A function with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasScript(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to change constant name", "A script with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else {
         ArithmeticType value = symbolTable.getConstants().at(originalName.toStdString());
@@ -201,7 +209,7 @@ void SymbolsEditor::onConstantValueChanged(const QString &name, const QString &v
     }
     catch (const std::exception &e) {
         newValue = originalValue;
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to convert value", "Failed to parse value as decimal.");
     }
     symbolTable.setConstant(name.toStdString(), newValue);
     emit onSymbolsChanged(symbolTable);
@@ -209,13 +217,13 @@ void SymbolsEditor::onConstantValueChanged(const QString &name, const QString &v
 
 void SymbolsEditor::onFunctionAdded(const QString &name) {
     if (symbolTable.hasVariable(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add function", "A variable with the name already exists.");
     } else if (symbolTable.hasConstant(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add function", "A constant with the name already exists.");
     } else if (symbolTable.hasFunction(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add function", "A function with the name already exists.");
     } else if (symbolTable.hasScript(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to add function", "A script with the name already exists.");
     } else {
         symbolTable.setFunction(name.toStdString(), {});
         emit onSymbolsChanged(symbolTable);
@@ -224,19 +232,19 @@ void SymbolsEditor::onFunctionAdded(const QString &name) {
 
 void SymbolsEditor::onFunctionNameChanged(const QString &originalName, const QString &name) {
     if (symbolTable.hasVariable(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to change function name", "A variable with the name already exists.");
         functionsEditor->setFunctions(symbolTable.getFunctions());
         functionsEditor->setCurrentFunction(currentFunction);
     } else if (symbolTable.hasConstant(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to change function name", "A constant with the name already exists.");
         functionsEditor->setFunctions(symbolTable.getFunctions());
         functionsEditor->setCurrentFunction(currentFunction);
     } else if (symbolTable.hasFunction(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to change function name", "A function with the name already exists.");
         functionsEditor->setFunctions(symbolTable.getFunctions());
         functionsEditor->setCurrentFunction(currentFunction);
     } else if (symbolTable.hasScript(name.toStdString())) {
-        QMessageBox::warning(this, "Error", "Error");
+        QMessageBox::warning(this, "Failed to change function name", "A script with the name already exists.");
         functionsEditor->setFunctions(symbolTable.getFunctions());
         functionsEditor->setCurrentFunction(currentFunction);
     } else {
