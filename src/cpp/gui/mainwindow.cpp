@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDir>
 #include <QMessageBox>
+#include <QFileDialog>
 
 #include "pyutil.hpp"
 #include "addonmanager.hpp"
@@ -34,13 +35,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     symbolsEditor = new SymbolsEditor(this);
     symbolsEditor->setObjectName("widget_symtable_editor");
 
-    connect(symbolsEditor, SIGNAL(onSymbolsChanged(const SymbolTable &)), this, SLOT(onSymbolTableChanged(const SymbolTable &)));
+    connect(symbolsEditor, SIGNAL(onSymbolsChanged(const SymbolTable &)), this,
+            SLOT(onSymbolTableChanged(const SymbolTable &)));
 
     ui->tab_symbols->layout()->addWidget(symbolsEditor);
 
     connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
     connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
+    connect(ui->actionImport_Symbols, SIGNAL(triggered(bool)), this, SLOT(onActionImportSymbolTable()));
+    connect(ui->actionExport_Symbols, SIGNAL(triggered(bool)), this, SLOT(onActionExportSymbolTable()));
 
     connect(ui->lineEdit_input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
@@ -181,7 +185,69 @@ Powered by:
 }
 
 void MainWindow::onActionImportSymbolTable() {
+    QFileDialog dialog(this);
+    dialog.setWindowTitle("Import Symbols...");
+    dialog.setFileMode(QFileDialog::ExistingFile);
+
+    if (!dialog.exec()) {
+        return;
+    }
+
+    QStringList list = dialog.selectedFiles();
+
+    if (list.size() != 1) {
+        return;
+    }
+
+    std::string filepath = list[0].toStdString();
+
+    std::set<std::string> addons = AddonManager::getActiveAddons();
+    AddonManager::setActiveAddons({}, *this);
+
+    try {
+        symbolTable = Serializer::deserializeTable(IO::fileReadAllText(filepath));
+        symbolsEditor->setSymbols(symbolTable);
+        QMessageBox::information(this, "Import successful", ("Successfully imported symbols from " + filepath).c_str());
+    }
+    catch (const std::exception &e) {
+        std::string error = "Failed to import symbols from ";
+        error += filepath;
+        error += " Error: ";
+        error += e.what();
+        QMessageBox::warning(this, "Import failed", error.c_str());
+    }
+
+    AddonManager::setActiveAddons(addons, *this);
 }
 
 void MainWindow::onActionExportSymbolTable() {
+    QFileDialog dialog(this);
+    dialog.setWindowTitle("Import Symbols...");
+    dialog.setFileMode(QFileDialog::AnyFile);
+
+    if (!dialog.exec()) {
+        return;
+    }
+
+    QStringList list = dialog.selectedFiles();
+
+    if (list.size() != 1) {
+        return;
+    }
+
+    std::string filepath = list[0].toStdString();
+
+    try {
+        IO::fileWriteAllText(filepath, Serializer::serializeTable(symbolTable));
+        QMessageBox::information(this,
+                                 "Export successful",
+                                 ("Successfully exported symbols to " + filepath).c_str());
+    }
+    catch (const std::exception &e) {
+        std::string error = "Failed to export symbols to ";
+        error += filepath;
+        error += " Error: ";
+        error += e.what();
+        QMessageBox::warning(this, "Export failed", error.c_str());
+    }
 }
