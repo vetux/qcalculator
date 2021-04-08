@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->tab_symbols->layout()->addWidget(symbolsEditor);
 
+    symbolsEditor->setSymbols(symbolTable);
+
     connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
     connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));

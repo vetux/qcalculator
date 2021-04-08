@@ -34,15 +34,23 @@ void NamedValueItemWidget::setValue(const QString &value) {
 }
 
 void NamedValueItemWidget::onNameEditingFinished() {
+    if (!nameEdit->isModified())
+        return;
+
     QString content = nameEdit->text();
     if (nameText != content) {
+        nameEdit->setModified(false);
         emit onNameChanged(content);
     }
 }
 
 void NamedValueItemWidget::onValueEditingFinished() {
+    if (!valueEdit->isModified())
+        return;
+
     QString content = valueEdit->text();
     if (valueText != content) {
+        valueEdit->setModified(false);
         emit onValueChanged(content);
     }
 }

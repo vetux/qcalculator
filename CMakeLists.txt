@@ -41,7 +41,8 @@ set(HDR_GUI src/cpp/gui/mainwindow.hpp
         src/cpp/gui/widgets/namedvalueeditor.hpp
         src/cpp/gui/widgets/namedvalueitemwidget.hpp
         src/cpp/gui/widgets/scriptseditor.hpp
-        src/cpp/gui/widgets/symbolseditor.hpp)
+        src/cpp/gui/widgets/symbolseditor.hpp
+        src/cpp/gui/widgets/functionitemwidget.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
 qt5_wrap_ui(WRAP_UI ${FORMS}) # Seems to output into CMAKE_CURRENT_BINARY_DIR

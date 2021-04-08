@@ -56,6 +56,27 @@ SymbolsEditor::SymbolsEditor(QWidget *parent) : QWidget(parent) {
             SIGNAL(onValueChanged(const QString &, const QString &)),
             this,
             SLOT(onConstantValueChanged(const QString &, const QString &)));
+
+    connect(functionsEditor,
+            SIGNAL(onFunctionAdded(const QString &)),
+            this,
+            SLOT(onFunctionAdded(const QString &)));
+    connect(functionsEditor,
+            SIGNAL(onFunctionNameChanged(const QString &, const QString &)),
+            this,
+            SLOT(onFunctionNameChanged(const QString &, const QString &)));
+    connect(functionsEditor,
+            SIGNAL(onFunctionBodyChanged(const QString &, const QString &)),
+            this,
+            SLOT(onFunctionBodyChanged(const QString &, const QString &)));
+    connect(functionsEditor,
+            SIGNAL(onFunctionArgsChanged(const QString &, const std::vector<std::string> &)),
+            this,
+            SLOT(onFunctionArgsChanged(const QString &, const std::vector<std::string> &)));
+    connect(functionsEditor,
+            SIGNAL(onCurrentFunctionChanged(const QString &)),
+            this,
+            SLOT(onCurrentFunctionChanged(const QString &)));
 }
 
 void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
@@ -64,6 +85,7 @@ void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
     variablesEditor->setValues(convertMap(symtable.getVariables()));
     constantsEditor->setValues(convertMap(symtable.getConstants()));
     functionsEditor->setFunctions(symtable.getFunctions());
+    functionsEditor->setCurrentFunction(currentFunction);
     scriptsEditor->setScripts(symtable.getScripts());
 }
 
@@ -181,4 +203,62 @@ void SymbolsEditor::onConstantValueChanged(const QString &name, const QString &v
     }
     symbolTable.setConstant(name.toStdString(), newValue);
     emit onSymbolsChanged(symbolTable);
+}
+
+void SymbolsEditor::onFunctionAdded(const QString &name) {
+    if (symbolTable.hasVariable(name.toStdString())) {
+        QMessageBox::warning(this, "Error", "Error");
+    } else if (symbolTable.hasConstant(name.toStdString())) {
+        QMessageBox::warning(this, "Error", "Error");
+    } else if (symbolTable.hasFunction(name.toStdString())) {
+        QMessageBox::warning(this, "Error", "Error");
+    } else if (symbolTable.hasScript(name.toStdString())) {
+        QMessageBox::warning(this, "Error", "Error");
+    } else {
+        symbolTable.setFunction(name.toStdString(), {});
+        emit onSymbolsChanged(symbolTable);
+    }
+}
+
+void SymbolsEditor::onFunctionNameChanged(const QString &originalName, const QString &name) {
+    if (symbolTable.hasVariable(name.toStdString())) {
+        QMessageBox::warning(this, "Error", "Error");
+        functionsEditor->setFunctions(symbolTable.getFunctions());
+        functionsEditor->setCurrentFunction(currentFunction);
+    } else if (symbolTable.hasConstant(name.toStdString())) {
+        QMessageBox::warning(this, "Error", "Error");
+        functionsEditor->setFunctions(symbolTable.getFunctions());
+        functionsEditor->setCurrentFunction(currentFunction);
+    } else if (symbolTable.hasFunction(name.toStdString())) {
+        QMessageBox::warning(this, "Error", "Error");
+        functionsEditor->setFunctions(symbolTable.getFunctions());
+        functionsEditor->setCurrentFunction(currentFunction);
+    } else if (symbolTable.hasScript(name.toStdString())) {
+        QMessageBox::warning(this, "Error", "Error");
+        functionsEditor->setFunctions(symbolTable.getFunctions());
+        functionsEditor->setCurrentFunction(currentFunction);
+    } else {
+        Function f = symbolTable.getFunctions().at(originalName.toStdString());
+        symbolTable.remove(originalName.toStdString());
+        symbolTable.setFunction(name.toStdString(), f);
+        emit onSymbolsChanged(symbolTable);
+    }
+}
+
+void SymbolsEditor::onFunctionBodyChanged(const QString &name, const QString &body) {
+    Function f = symbolTable.getFunctions().at(name.toStdString());
+    f.expression = body.toStdString();
+    symbolTable.setFunction(name.toStdString(), f);
+    emit onSymbolsChanged(symbolTable);
+}
+
+void SymbolsEditor::onFunctionArgsChanged(const QString &name, const std::vector<std::string> &args) {
+    Function f = symbolTable.getFunctions().at(name.toStdString());
+    f.argumentNames = args;
+    symbolTable.setFunction(name.toStdString(), f);
+    emit onSymbolsChanged(symbolTable);
+}
+
+void SymbolsEditor::onCurrentFunctionChanged(const QString &name) {
+    currentFunction = name;
 }
