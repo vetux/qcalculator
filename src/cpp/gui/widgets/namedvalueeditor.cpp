@@ -1,13 +1,15 @@
 #include "gui/widgets/namedvalueeditor.hpp"
 
-#include <QListWidget>
 #include <QVBoxLayout>
-
-#include "gui/widgets/namedvalueitemwidget.hpp"
+#include <QHeaderView>
 
 NamedValueEditor::NamedValueEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
-    list = new QListWidget(this);
+    list = new QTableWidget(this);
+
+    list->horizontalHeader()->hide();
+    list->verticalHeader()->hide();
+    list->horizontalHeader()->setStretchLastSection(true);
 
     addLineEditName = new QLineEdit(this);
     addLineEditValue = new QLineEdit(this);
@@ -22,55 +24,59 @@ NamedValueEditor::NamedValueEditor(QWidget *parent) : QWidget(parent) {
     widgetAdd->layout()->addWidget(addLineEditName);
     widgetAdd->layout()->addWidget(addLineEditValue);
     widgetAdd->layout()->addWidget(addPushButton);
+    widgetAdd->layout()->setContentsMargins(0, 0, 0, 0);
 
     layout()->addWidget(widgetAdd);
     layout()->addWidget(list);
+
+    connect(list, SIGNAL(cellChanged(int, int)), this, SLOT(onTableCellChanged(int, int)));
 }
 
 void NamedValueEditor::setValues(const std::map<QString, QString> &values) {
+    disconnect(list, SIGNAL(cellChanged(int, int)), this, SLOT(onTableCellChanged(int, int)));
+
     addLineEditName->setText("");
     addLineEditValue->setText("");
 
     list->clear();
 
+    list->setColumnCount(2);
+    list->setRowCount(values.size());
+
+    mapping.clear();
+
+    int i = 0;
     for (auto &p : values) {
-        auto *widget = new NamedValueItemWidget(list);
-        auto *item = new QListWidgetItem(list);
+        auto *itemName = new QTableWidgetItem(p.first);
+        auto *itemValue = new QTableWidgetItem(p.second);
 
-        widget->setName(p.first);
-        widget->setValue(p.second);
-
-        item->setSizeHint(widget->sizeHint());
-
-        connect(widget, SIGNAL(onNameChanged(const QString &)), this, SLOT(onNameChanged(const QString &)));
-        connect(widget, SIGNAL(onValueChanged(const QString &)), this, SLOT(onValueChanged(const QString &)));
-
-        list->addItem(item);
-        list->setItemWidget(item, widget);
-
+        list->setItem(i, 0, itemName);
+        list->setItem(i, 1, itemValue);
         list->update();
+
+        mapping[i] = p.first.toStdString();
+
+        i++;
     }
+
+    connect(list, SIGNAL(cellChanged(int, int)), this, SLOT(onTableCellChanged(int, int)));
 }
 
 void NamedValueEditor::onAddPressed() {
     emit onNamedValueAdded(addLineEditName->text(), addLineEditValue->text());
 }
 
-void NamedValueEditor::onNameChanged(const QString &name) {
-    auto &widget = dynamic_cast<NamedValueItemWidget &>(*sender());
+void NamedValueEditor::onTableCellChanged(int row, int column) {
+    auto *nameItem = list->item(row, 0);
+    auto *valueItem = list->item(row, 1);
 
-    QString originalName = widget.getName();
+    std::string originalName = mapping.at(row);
 
-    if (name != originalName)
-            emit onNameChanged(originalName, name);
-}
-
-void NamedValueEditor::onValueChanged(const QString &value) {
-    auto &widget = dynamic_cast<NamedValueItemWidget &>(*sender());
-
-    QString originalName = widget.getName();
-    QString originalValue = widget.getValue();
-
-    if (value != originalValue)
-            emit onValueChanged(originalName, value);
+    if (column == 0) {
+        if (nameItem->text().toStdString() != originalName) {
+            emit onNameChanged(originalName.c_str(), nameItem->text());
+        }
+    } else {
+        emit onValueChanged(nameItem->text(), valueItem->text());
+    }
 }

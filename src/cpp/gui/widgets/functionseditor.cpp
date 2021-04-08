@@ -2,13 +2,12 @@
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-
-#include "gui/widgets/functionitemwidget.hpp"
+#include <QHeaderView>
 
 FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
 
-    list = new QListWidget(this);
+    list = new QTableWidget(this);
 
     addLineEdit = new QLineEdit(this);
     addPushButton = new QPushButton(this);
@@ -22,10 +21,15 @@ FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
 
     expressionEdit = new QTextEdit(this);
 
+    list->horizontalHeader()->hide();
+    list->horizontalHeader()->setStretchLastSection(true);
+    list->verticalHeader()->hide();
+
     auto *widgetAdd = new QWidget(this);
     widgetAdd->setLayout(new QHBoxLayout());
     widgetAdd->layout()->addWidget(addLineEdit);
     widgetAdd->layout()->addWidget(addPushButton);
+    widgetAdd->layout()->setContentsMargins(0, 0, 0, 0);
 
     auto *widgetArgs = new QWidget(this);
     widgetArgs->setLayout(new QHBoxLayout());
@@ -36,16 +40,19 @@ FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     widgetArgs->layout()->addWidget(argEdit2);
     widgetArgs->layout()->addWidget(argEdit3);
     widgetArgs->layout()->addWidget(argEdit4);
+    widgetArgs->layout()->setContentsMargins(0, 0, 0, 0);
 
     auto *widgetLeft = new QWidget(this);
     widgetLeft->setLayout(new QVBoxLayout());
     widgetLeft->layout()->addWidget(widgetAdd);
     widgetLeft->layout()->addWidget(list);
+    widgetLeft->layout()->setContentsMargins(0, 0, 0, 0);
 
     auto *widgetTop = new QWidget(this);
     widgetTop->setLayout(new QHBoxLayout());
     widgetTop->layout()->addWidget(widgetLeft);
     widgetTop->layout()->addWidget(expressionEdit);
+    widgetTop->layout()->setContentsMargins(0, 0, 0, 0);
 
     layout()->addWidget(widgetTop);
     layout()->addWidget(widgetArgs);
@@ -55,6 +62,7 @@ FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     argsSpinBox->setMaximum(5);
 
     connect(addPushButton, SIGNAL(pressed()), this, SLOT(onFunctionAddPressed()));
+
     connect(argEdit0, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
     connect(argEdit1, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
     connect(argEdit2, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
@@ -62,18 +70,26 @@ FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     connect(argEdit4, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
 
     connect(argsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onFunctionArgsSpinBoxChanged(int)));
-    connect(list, SIGNAL(currentItemChanged(QListWidgetItem * , QListWidgetItem * )), this,
-            SLOT(onListWidgetItemChanged(QListWidgetItem * , QListWidgetItem * )));
     connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionExpressionChanged()));
+
+    connect(list, SIGNAL(cellClicked(int, int)), this, SLOT(onTableCellActivated(int, int)));
+    connect(list, SIGNAL(cellChanged(int, int)), this, SLOT(onTableCellChanged(int, int)));
 }
 
-void FunctionsEditor::setFunctions(const std::map<std::string, Function> &functions) {
-    disconnect(list, SIGNAL(currentItemChanged(QListWidgetItem * , QListWidgetItem * )), this,
-               SLOT(onListWidgetItemChanged(QListWidgetItem * , QListWidgetItem * )));
-    disconnect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionExpressionChanged()));
-    disconnect(argsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onFunctionArgsSpinBoxChanged(int)));
+void FunctionsEditor::setFunctions(const std::map<std::string, Function> &f) {
+    disconnect(list, SIGNAL(cellClicked(int, int)), this, SLOT(onTableCellActivated(int, int)));
+    disconnect(list, SIGNAL(cellChanged(int, int)), this, SLOT(onTableCellChanged(int, int)));
 
-    this->functions = functions;
+    disconnect(argsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onFunctionArgsSpinBoxChanged(int)));
+    disconnect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionExpressionChanged()));
+
+    disconnect(argEdit0, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
+    disconnect(argEdit1, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
+    disconnect(argEdit2, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
+    disconnect(argEdit3, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
+    disconnect(argEdit4, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
+
+    this->functions = f;
     addLineEdit->setText("");
 
     applyArgs({});
@@ -84,35 +100,36 @@ void FunctionsEditor::setFunctions(const std::map<std::string, Function> &functi
     argsSpinBox->setEnabled(false);
     argsSpinBox->setValue(0);
 
-    widgets.clear();
-
+    rowMapping.clear();
     list->clear();
+    list->setColumnCount(1);
+    list->setRowCount(functions.size());
+    int i = 0;
     for (auto &p : functions) {
-        auto *widget = new FunctionItemWidget(list);
-        auto *item = new QListWidgetItem(list);
-
-        widget->setName(p.first.c_str());
-
-        item->setSizeHint(widget->sizeHint());
-
-        connect(widget, SIGNAL(editingFinished()), this, SLOT(onFunctionNameEditingFinished()));
-
-        list->addItem(item);
-        list->setItemWidget(item, widget);
-
-        widgets[p.first] = item;
+        rowMapping[p.first] = i;
+        auto *item = new QTableWidgetItem(p.first.c_str());
+        list->setItem(i++, 0, item);
     }
 
-    connect(list, SIGNAL(currentItemChanged(QListWidgetItem * , QListWidgetItem * )), this,
-            SLOT(onListWidgetItemChanged(QListWidgetItem * , QListWidgetItem * )));
+    connect(list, SIGNAL(cellClicked(int, int)), this, SLOT(onTableCellActivated(int, int)));
+    connect(list, SIGNAL(cellChanged(int, int)), this, SLOT(onTableCellChanged(int, int)));
+
     connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionExpressionChanged()));
     connect(argsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onFunctionArgsSpinBoxChanged(int)));
+
+    connect(argEdit0, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
+    connect(argEdit1, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
+    connect(argEdit2, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
+    connect(argEdit3, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
+    connect(argEdit4, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
 }
 
 void FunctionsEditor::setCurrentFunction(const QString &name) {
     currentFunction = name.toStdString();
-    if (widgets.find(currentFunction) != widgets.end())
-        list->setCurrentItem(widgets.at(currentFunction));
+    if (rowMapping.find(currentFunction) != rowMapping.end()) {
+        list->setCurrentCell(rowMapping.at(currentFunction), 0);
+        list->cellClicked(rowMapping.at(currentFunction), 0);
+    }
 }
 
 void FunctionsEditor::onFunctionAddPressed() {
@@ -142,50 +159,36 @@ void FunctionsEditor::onFunctionArgsSpinBoxChanged(int value) {
     emit onFunctionArgsChanged(currentFunction.c_str(), func.argumentNames);
 }
 
-void FunctionsEditor::onListWidgetItemChanged(QListWidgetItem *current, QListWidgetItem *previous) {
-    if (current == nullptr) {
-        disconnect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionExpressionChanged()));
-        expressionEdit->setEnabled(false);
-        expressionEdit->setText("");
-        connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionExpressionChanged()));
+void FunctionsEditor::onTableCellActivated(int row, int column) {
+    currentFunction = list->item(row, column)->text().toStdString();
 
-        disconnect(argsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onFunctionArgsSpinBoxChanged(int)));
-        argsSpinBox->setEnabled(false);
-        argsSpinBox->setValue(0);
-        connect(argsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onFunctionArgsSpinBoxChanged(int)));
+    Function func = functions.at(currentFunction);
 
-        applyArgs({});
+    disconnect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionExpressionChanged()));
+    expressionEdit->setEnabled(true);
+    expressionEdit->setText(func.expression.c_str());
+    connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionExpressionChanged()));
 
-        emit onCurrentFunctionChanged("");
-    } else if (current != previous) {
-        auto &widget = dynamic_cast<FunctionItemWidget&>(*list->itemWidget(current));
-        currentFunction = widget.getName().toStdString();
-        Function func = functions.at(currentFunction);
+    disconnect(argsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onFunctionArgsSpinBoxChanged(int)));
+    argsSpinBox->setEnabled(true);
+    argsSpinBox->setValue(func.argumentNames.size());
+    connect(argsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onFunctionArgsSpinBoxChanged(int)));
 
-        disconnect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionExpressionChanged()));
-        expressionEdit->setEnabled(true);
-        expressionEdit->setText(func.expression.c_str());
-        connect(expressionEdit, SIGNAL(textChanged()), this, SLOT(onFunctionExpressionChanged()));
+    applyArgs(func.argumentNames);
 
-        disconnect(argsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onFunctionArgsSpinBoxChanged(int)));
-        argsSpinBox->setEnabled(true);
-        argsSpinBox->setValue(func.argumentNames.size());
-        connect(argsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(onFunctionArgsSpinBoxChanged(int)));
-
-        applyArgs(func.argumentNames);
-
-        emit onCurrentFunctionChanged(currentFunction.c_str());
-    }
+    emit onCurrentFunctionChanged(currentFunction.c_str());
 }
 
-void FunctionsEditor::onFunctionNameEditingFinished() {
-    auto &edit = dynamic_cast<FunctionItemWidget &>(*sender());
-    if (!edit.isModified())
-        return;
-    if (edit.getName() != edit.text()) {
-        edit.setModified(false);
-        emit onFunctionNameChanged(edit.getName(), edit.text());
+void FunctionsEditor::onTableCellChanged(int row, int column) {
+    std::string originalName;
+    for (auto &p : rowMapping) {
+        if (p.second == row) {
+            originalName = p.first;
+            break;
+        }
     }
+
+    emit onFunctionNameChanged(originalName.c_str(), list->item(row, column)->text());
 }
 
 void FunctionsEditor::onFunctionExpressionChanged() {

@@ -17,6 +17,8 @@ std::map<QString, QString> convertMap(std::map<std::string, ArithmeticType> map)
 SymbolsEditor::SymbolsEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout(this));
 
+    layout()->setContentsMargins(0, 0, 0, 0);
+
     auto *tabs = new QTabWidget(this);
 
     variablesEditor = new NamedValueEditor(tabs);

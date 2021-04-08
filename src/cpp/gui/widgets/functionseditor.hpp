@@ -2,7 +2,7 @@
 #define QCALC_FUNCTIONSEDITOR_HPP
 
 #include <QWidget>
-#include <QListWidget>
+#include <QTableWidget>
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QPushButton>
@@ -41,9 +41,9 @@ private slots:
 
     void onFunctionArgsSpinBoxChanged(int value);
 
-    void onListWidgetItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+    void onTableCellActivated(int row, int column);
 
-    void onFunctionNameEditingFinished();
+    void onTableCellChanged(int row ,int column);
 
     void onFunctionExpressionChanged();
 
@@ -52,11 +52,11 @@ private:
 
     std::map<std::string, Function> functions;
 
-    std::map<std::string, QListWidgetItem *> widgets;
+    std::map<std::string, int> rowMapping;
 
     std::string currentFunction;
-    
-    QListWidget *list;
+
+    QTableWidget *list;
 
     QLineEdit *addLineEdit;
     QPushButton *addPushButton;

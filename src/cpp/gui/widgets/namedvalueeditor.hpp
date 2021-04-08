@@ -2,8 +2,9 @@
 #define QCALC_NAMEDVALUEEDITOR_HPP
 
 #include <QWidget>
-#include <QListWidget>
+#include <QTableWidget>
 #include <QPushButton>
+#include <QLineEdit>
 
 #include <map>
 
@@ -27,15 +28,15 @@ signals:
 private slots:
     void onAddPressed();
 
-    void onNameChanged(const QString &name);
-
-    void onValueChanged(const QString &value);
+    void onTableCellChanged(int row, int column);
 
 private:
-    QListWidget *list;
+    QTableWidget *list;
     QLineEdit *addLineEditName;
     QLineEdit *addLineEditValue;
     QPushButton *addPushButton;
+
+    std::map<int, std::string> mapping;
 };
 
 #endif //QCALC_NAMEDVALUEEDITOR_HPP
