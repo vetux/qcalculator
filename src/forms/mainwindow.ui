@@ -43,8 +43,7 @@
       </property>
       <widget class="QWidget" name="tab_history">
        <property name="styleSheet">
-        <string notr="true">
-</string>
+        <string notr="true"/>
        </property>
        <attribute name="title">
         <string>History</string>
@@ -66,6 +65,12 @@
          <number>0</number>
         </property>
        </layout>
+      </widget>
+      <widget class="QWidget" name="tab_symbols">
+       <attribute name="title">
+        <string>Symbols</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3"/>
       </widget>
      </widget>
     </item>
@@ -102,6 +107,8 @@
     </property>
     <addaction name="actionSettings"/>
     <addaction name="separator"/>
+    <addaction name="actionImport_Symbols"/>
+    <addaction name="actionExport_Symbols"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -128,6 +135,16 @@
   <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionImport_Symbols">
+   <property name="text">
+    <string>Import Symbols...</string>
+   </property>
+  </action>
+  <action name="actionExport_Symbols">
+   <property name="text">
+    <string>Export Symbols...</string>
    </property>
   </action>
  </widget>

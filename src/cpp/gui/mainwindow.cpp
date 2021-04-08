@@ -17,6 +17,7 @@
 
 #include "gui/settingsdialog.hpp"
 #include "gui/widgets/historywidget.hpp"
+#include "gui/widgets/symbolseditor.hpp"
 
 #include "pymodule/exprtkmodule.hpp"
 
@@ -25,19 +26,21 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow()) {
     ui->setupUi(this);
 
-    auto *history = new HistoryWidget(this);
+    history = new HistoryWidget(this);
     history->setObjectName("widget_history");
 
     ui->tab_history->layout()->addWidget(history);
 
+    symbolsEditor = new SymbolsEditor(this);
+    symbolsEditor->setObjectName("widget_symtable_editor");
+
+    connect(symbolsEditor, SIGNAL(onSymbolsChanged(const SymbolTable &)), this, SLOT(onSymbolTableChanged(const SymbolTable &)));
+
+    ui->tab_symbols->layout()->addWidget(symbolsEditor);
+
     connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
     connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
-
-    connect(ui->lineEdit_input,
-            SIGNAL(textChanged(const QString &)),
-            this,
-            SLOT(onInputTextChanged(const QString &)));
 
     connect(ui->lineEdit_input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
@@ -102,20 +105,27 @@ void MainWindow::onAddonUnloadFail(const std::string &moduleName, const std::str
                          ("Module " + moduleName + " failed to unload, Error: " + error).c_str());
 }
 
-void MainWindow::onInputTextChanged(const QString &text) {
-    inputText = text;
-}
-
 void MainWindow::onInputReturnPressed() {
     try {
-        ArithmeticType value = ExpressionParser::evaluate(inputText.toStdString());
-        emit signalExpressionEvaluated(inputText, NumberFormat::toDecimal(value).c_str());
-        inputText = NumberFormat::toDecimal(value).c_str();
-        emit signalInputTextChange(inputText);
+        std::string inputText = ui->lineEdit_input->text().toStdString();
+        ArithmeticType value = ExpressionParser::evaluate(inputText, symbolTable);
+
+        symbolsEditor->setSymbols(symbolTable);
+
+        emit signalExpressionEvaluated(inputText.c_str(), NumberFormat::toDecimal(value).c_str());
+
+        inputText = NumberFormat::toDecimal(value);
+
+        emit signalInputTextChange(inputText.c_str());
     }
     catch (const std::runtime_error &e) {
         QMessageBox::warning(this, "Failed to evaluate expression", e.what());
     }
+}
+
+void MainWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
+    this->symbolTable = symbolTableArg;
+    symbolsEditor->setSymbols(symbolTable);
 }
 
 void MainWindow::onActionSettings() {
@@ -168,4 +178,10 @@ Powered by:
     https://github.com/python/cpython
     https://github.com/qt
 )LLL"));
+}
+
+void MainWindow::onActionImportSymbolTable() {
+}
+
+void MainWindow::onActionExportSymbolTable() {
 }

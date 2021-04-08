@@ -11,7 +11,10 @@
 #include "numpadkey.hpp"
 #include "addonmanagerlistener.hpp"
 
-#include "calc/arithmetictype.hpp"
+#include "calc/symboltable.hpp"
+
+#include "gui/widgets/symbolseditor.hpp"
+#include "gui/widgets/historywidget.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -69,19 +72,12 @@ signals:
     void signalExpressionEvaluated(const QString &expression, const QString &value);
 
 public slots:
-
-    /**
-     * This slot updates the main window internal input text when invoked.
-     * This is done to avoid using the line edit pointer to retrieve input.
-     *
-     * @param text
-     */
-    void onInputTextChanged(const QString &text);
-
     /**
      * This slot evaluates the input text when invoked.
      */
     void onInputReturnPressed();
+
+    void onSymbolTableChanged(const SymbolTable &symbolTable);
 
     void onActionSettings();
 
@@ -89,10 +85,18 @@ public slots:
 
     void onActionAbout();
 
+    void onActionImportSymbolTable();
+
+    void onActionExportSymbolTable();
+
 private:
     Ui::MainWindow *ui;
 
-    QString inputText;
+    HistoryWidget *history;
+
+    SymbolsEditor *symbolsEditor;
+
+    SymbolTable symbolTable;
 };
 
 #endif // MAINWINDOW_H
