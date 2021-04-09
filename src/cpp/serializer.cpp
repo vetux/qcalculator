@@ -97,18 +97,13 @@ Settings Serializer::deserializeSettings(const std::string &str) {
     nlohmann::json j = nlohmann::json::parse(str);
     for (auto &entry : j.items()) {
         const std::string &key = entry.key();
-        switch (entry.value().type()) {
-            case nlohmann::detail::value_t::number_integer:
-                ret.setValue(key, entry.value().get<int>());
-                break;
-            case nlohmann::detail::value_t::number_float:
-                ret.setValue(key, entry.value().get<float>());
-                break;
-            case nlohmann::detail::value_t::string:
-                ret.setValue(key, entry.value().get<std::string>());
-                break;
-            default: //Ignore other types.
-                break;
+        const auto &value = entry.value();
+        if (value.is_number_integer()) {
+            ret.setValue(key, entry.value().get<int>());
+        } else if (value.is_number_float()) {
+            ret.setValue(key, entry.value().get<float>());
+        } else if (value.is_string()) {
+            ret.setValue(key, entry.value().get<std::string>());
         }
     }
     return ret;
