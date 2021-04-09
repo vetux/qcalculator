@@ -16,13 +16,21 @@ public:
 
 public slots:
 
-    void setSymbols(const SymbolTable &symbolTable, int decimalSpaces);
+    void setSymbols(const SymbolTable &symbolTable);
+
+    /**
+     * Set the precision to use when converting user input to ArithmeticType instances.
+     *
+     * @param precision
+     */
+    void setConversionPrecision(int precision);
 
 signals:
 
     void onSymbolsChanged(const SymbolTable &symbolTable);
 
 private slots:
+
     void onVariableAdded(const QString &name, const QString &value);
 
     void onVariableNameChanged(const QString &originalName, const QString &name);
@@ -47,7 +55,8 @@ private slots:
 
 private:
     SymbolTable symbolTable;
-    int precision;
+
+    int convertPrecision;
 
     NamedValueEditor *variablesEditor;
     NamedValueEditor *constantsEditor;

@@ -12,7 +12,7 @@ std::string NumberFormat::toHex(const ArithmeticType &v, int decimalSpaces) {
     return v.toString("%." + std::to_string(decimalSpaces) + "Ra");
 }
 
-std::string NumberFormat::toOctal(const ArithmeticType &v) {
+std::string NumberFormat::toOctal(const ArithmeticType &v, int decimalSpaces) {
     if (v < 0) {
         throw std::runtime_error("Cannot convert negative number to octal");
     } else if (hasFraction(v)) {
@@ -27,7 +27,7 @@ std::string NumberFormat::toOctal(const ArithmeticType &v) {
     }
 }
 
-std::string NumberFormat::toBinary(const ArithmeticType &v) {
+std::string NumberFormat::toBinary(const ArithmeticType &v, int decimalSpaces) {
     if (v < 0) {
         throw std::runtime_error("Cannot convert negative number to binary");
     } else if (hasFraction(v)) {
@@ -46,19 +46,19 @@ std::string NumberFormat::toBinary(const ArithmeticType &v) {
     }
 }
 
-ArithmeticType NumberFormat::fromDecimal(const std::string &s) {
-    return mpfr::mpreal(s);
+ArithmeticType NumberFormat::fromDecimal(const std::string &s, int decimalSpaces) {
+    return mpfr::mpreal(s, mpfr::digits2bits(decimalSpaces));
 }
 
-ArithmeticType NumberFormat::fromHex(const std::string &s) {
-    return mpfr::mpreal(s, mpfr::mpreal::get_default_prec(), 16);
+ArithmeticType NumberFormat::fromHex(const std::string &s, int decimalSpaces) {
+    return mpfr::mpreal(s, mpfr::digits2bits(decimalSpaces), 16);
 }
 
-ArithmeticType NumberFormat::fromOctal(const std::string &s) {
-    return mpfr::mpreal(s, mpfr::mpreal::get_default_prec(), 8);
+ArithmeticType NumberFormat::fromOctal(const std::string &s, int decimalSpaces) {
+    return mpfr::mpreal(s, mpfr::digits2bits(decimalSpaces), 8);
 }
 
-ArithmeticType NumberFormat::fromBinary(const std::string &s) {
+ArithmeticType NumberFormat::fromBinary(const std::string &s, int decimalSpaces) {
     if (s.size() > 63)
         throw std::runtime_error("Maximum 64 bits can be converted from string");
     return std::bitset<64>(s).to_ullong();

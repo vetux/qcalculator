@@ -75,10 +75,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     int precision = settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt();
 
-    // Apply the user configurable precision.
     mpfr::mpreal::set_default_prec(mpfr::digits2bits(precision));
 
-    symbolsEditor->setSymbols(symbolTable, precision);
+    symbolsEditor->setSymbols(symbolTable);
+
+    symbolsEditor->setConversionPrecision(precision);
 
     ExprtkModule::initialize();
 
@@ -136,11 +137,10 @@ void MainWindow::onInputReturnPressed() {
         std::string inputText = ui->lineEdit_input->text().toStdString();
         ArithmeticType value = ExpressionParser::evaluate(inputText, symbolTable);
 
-        int precision = settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt();
+        symbolsEditor->setSymbols(symbolTable);
 
-        symbolsEditor->setSymbols(symbolTable, precision);
-
-        std::string resultText = NumberFormat::toDecimal(value, precision);
+        std::string resultText = NumberFormat::toDecimal(value, settings.value(SETTING_KEY_PRECISION,
+                                                                               PRECISION_DEFAULT).toInt());
 
         emit signalExpressionEvaluated(inputText.c_str(), resultText.c_str());
 
@@ -155,14 +155,38 @@ void MainWindow::onInputReturnPressed() {
 
 void MainWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
     this->symbolTable = symbolTableArg;
-    symbolsEditor->setSymbols(symbolTable, settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt());
+    symbolsEditor->setSymbols(symbolTable);
 }
 
 void MainWindow::onActionSettings() {
     SettingsDialog dialog;
+    dialog.setPrecision(settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt());
     dialog.setEnabledAddons(AddonManager::getActiveAddons());
     dialog.show();
     if (dialog.exec() == QDialog::Accepted) {
+        int precision = dialog.getPrecision();
+        settings.setValue(SETTING_KEY_PRECISION, precision);
+
+        mpfr::mpreal::set_default_prec(mpfr::digits2bits(precision));
+
+        symbolsEditor->setConversionPrecision(precision);
+
+        //Set the precision of all symbol table variables and constants (In the future this should be more fine grained eg. different precision for every symbol)
+        auto copy = symbolTable.getVariables();
+        for (auto &p : copy) {
+            p.second.setPrecision(mpfr::digits2bits(precision));
+            symbolTable.remove(p.first);
+            symbolTable.setVariable(p.first, p.second);
+        }
+        copy = symbolTable.getConstants();
+        for (auto &p : copy) {
+            p.second.setPrecision(mpfr::digits2bits(precision));
+            symbolTable.remove(p.first);
+            symbolTable.setConstant(p.first, p.second);
+        }
+
+        symbolsEditor->setSymbols(symbolTable);
+
         std::set<std::string> addons = dialog.getEnabledAddons();
 
         AddonManager::setActiveAddons(addons, *this);
@@ -225,7 +249,7 @@ void MainWindow::onActionImportSymbolTable() {
 
     try {
         symbolTable = Serializer::deserializeTable(IO::fileReadAllText(filepath));
-        symbolsEditor->setSymbols(symbolTable, settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt());
+        symbolsEditor->setSymbols(symbolTable);
         QMessageBox::information(this, "Import successful", ("Successfully imported symbols from " + filepath).c_str());
     }
     catch (const std::exception &e) {

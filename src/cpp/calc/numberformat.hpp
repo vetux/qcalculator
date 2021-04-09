@@ -16,17 +16,17 @@ namespace NumberFormat {
 
     std::string toHex(const ArithmeticType &v, int decimalSpaces);
 
-    std::string toOctal(const ArithmeticType &v);
+    std::string toOctal(const ArithmeticType &v, int decimalSpaces);
 
-    std::string toBinary(const ArithmeticType &v);
+    std::string toBinary(const ArithmeticType &v, int decimalSpaces);
 
-    ArithmeticType fromDecimal(const std::string &s);
+    ArithmeticType fromDecimal(const std::string &s, int decimalSpaces);
 
-    ArithmeticType fromHex(const std::string &s);
+    ArithmeticType fromHex(const std::string &s, int decimalSpaces);
 
-    ArithmeticType fromOctal(const std::string &s);
+    ArithmeticType fromOctal(const std::string &s, int decimalSpaces);
 
-    ArithmeticType fromBinary(const std::string &s);
+    ArithmeticType fromBinary(const std::string &s, int decimalSpaces);
 }
 
 #endif // NUMBERFORMAT_HPP

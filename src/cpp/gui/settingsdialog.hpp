@@ -24,6 +24,10 @@ public:
 
     std::set<std::string> getEnabledAddons();
 
+    void setPrecision(int precision);
+
+    int getPrecision();
+
 private slots:
 
     void onModuleEnableChanged(bool enabled);

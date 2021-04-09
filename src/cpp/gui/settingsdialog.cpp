@@ -44,6 +44,14 @@ std::set<std::string> SettingsDialog::getEnabledAddons() {
     return enabledAddons;
 }
 
+void SettingsDialog::setPrecision(int precision) {
+    ui->spinBox_precision->setValue(precision);
+}
+
+int SettingsDialog::getPrecision() {
+    return ui->spinBox_precision->value();
+}
+
 void SettingsDialog::onModuleEnableChanged(bool enabled) {
     auto &s = dynamic_cast<AddonItemWidget &>(*sender());
 
