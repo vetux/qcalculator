@@ -1,8 +1,8 @@
-#include "calc/scripthandler.hpp"
+#include "math/scripthandler.hpp"
 
-#include "pythoninclude.hpp"
+#include "cpython/pythoninclude.hpp"
 
-#include "pyutil.hpp"
+#include "cpython/pyutil.hpp"
 
 double ScriptHandler::run(PyObject *c, const std::vector<double> &a) {
     if (c == PyNull) {

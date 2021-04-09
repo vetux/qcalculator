@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "calc/symboltable.hpp"
+#include "math/symboltable.hpp"
 
 #include "gui/widgets/namedvalueeditor.hpp"
 #include "gui/widgets/functionseditor.hpp"

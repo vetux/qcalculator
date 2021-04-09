@@ -1,11 +1,11 @@
-#include "pymodule/exprtkmodule.hpp"
-#include "pymodule/modulecommon.hpp"
+#include "exprtkmodule.hpp"
+#include "modulecommon.hpp"
 
-#include "calc/expressionparser.hpp"
+#include "math/expressionparser.hpp"
 
-#include "pyutil.hpp"
-#include "pythoninclude.hpp"
-#include "pymodule/pysymboltable.hpp"
+#include "cpython/pyutil.hpp"
+#include "cpython/pythoninclude.hpp"
+#include "cpython/symboltableconverter.hpp"
 
 #define MODULE_NAME "qc_native_exprtk"
 
@@ -27,16 +27,16 @@ PyObject *evaluate(PyObject *self, PyObject *args) {
             return PyNull;
         }
 
-        SymbolTable symTable = PySymbolTable::Convert(pySymTable);
+        SymbolTable symTable = SymbolTableConverter::Convert(pySymTable);
 
         ArithmeticType value = ExpressionParser::evaluate(expression, symTable);
 
         PyObject *ret = PyTuple_New(2);
 
         PyTuple_SetItem(ret, 0, PyFloat_FromDouble(value.toDouble()));
-        PyTuple_SetItem(ret, 1, PySymbolTable::New(symTable));
+        PyTuple_SetItem(ret, 1, SymbolTableConverter::New(symTable));
 
-        PySymbolTable::Cleanup(symTable);
+        SymbolTableConverter::Cleanup(symTable);
 
         return ret;
 

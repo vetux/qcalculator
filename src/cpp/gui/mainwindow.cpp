@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
-#include "pyutil.hpp"
+#include "cpython/pyutil.hpp"
 #include "addonmanager.hpp"
 #include "addonhelper.hpp"
 #include "paths.hpp"
@@ -14,14 +14,14 @@
 #include "io.hpp"
 #include "settingkeys.hpp"
 
-#include "calc/numberformat.hpp"
-#include "calc/expressionparser.hpp"
+#include "math/numberformat.hpp"
+#include "math/expressionparser.hpp"
 
 #include "gui/settingsdialog.hpp"
 #include "gui/widgets/historywidget.hpp"
 #include "gui/widgets/symbolseditor.hpp"
 
-#include "pymodule/exprtkmodule.hpp"
+#include "cpython/modules/exprtkmodule.hpp"
 
 #define ADDONS_FILE "/addons.json"
 #define SETTINGS_FILE "/settings.json"

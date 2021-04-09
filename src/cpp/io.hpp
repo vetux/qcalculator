@@ -2,10 +2,7 @@
 #define QCALC_IO_HPP
 
 #include <string>
-
-#include "settings.hpp"
-
-#include "calc/symboltable.hpp"
+#include <vector>
 
 namespace IO {
     /**

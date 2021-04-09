@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "calc/symboltable.hpp"
-#include "calc/arithmetictype.hpp"
+#include "math/symboltable.hpp"
+#include "math/arithmetictype.hpp"
 
 /**
  * The expression parser evaluates expressions in string form using an optionally supplied symbol table.

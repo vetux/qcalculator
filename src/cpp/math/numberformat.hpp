@@ -9,7 +9,7 @@
 #include <bitset>
 #include <iomanip>
 
-#include "calc/arithmetictype.hpp"
+#include "math/arithmetictype.hpp"
 
 namespace NumberFormat {
     std::string toDecimal(const ArithmeticType &v, int decimalSpaces);

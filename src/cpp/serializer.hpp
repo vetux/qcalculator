@@ -6,7 +6,7 @@
 
 #include "settings.hpp"
 
-#include "calc/symboltable.hpp"
+#include "math/symboltable.hpp"
 
 namespace Serializer {
     std::string serializeTable(const SymbolTable &table);

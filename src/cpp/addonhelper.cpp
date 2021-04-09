@@ -1,13 +1,13 @@
 #include "addonhelper.hpp"
 
-#include "pythoninclude.hpp"
+#include "cpython/pythoninclude.hpp"
 
 #include <stdexcept>
 
 #include <QFileInfo>
 #include <QDir>
 
-#include "pyutil.hpp"
+#include "cpython/pyutil.hpp"
 #include "io.hpp"
 #include "extern/json.hpp"
 

@@ -4,9 +4,9 @@
 #include <map>
 #include <string>
 
-#include "calc/function.hpp"
-#include "calc/script.hpp"
-#include "calc/arithmetictype.hpp"
+#include "math/function.hpp"
+#include "math/script.hpp"
+#include "math/arithmetictype.hpp"
 
 /**
  * The symbol table is responsible for managing 4 map objects.

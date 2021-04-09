@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "calc/script.hpp"
+#include "math/script.hpp"
 
 class ScriptsEditor : public QWidget {
 Q_OBJECT

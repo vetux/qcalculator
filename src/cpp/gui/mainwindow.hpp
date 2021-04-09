@@ -9,12 +9,12 @@
 
 #include <set>
 
-#include "numeralsystem.hpp"
+#include "math/numeralsystem.hpp"
 #include "numpadkey.hpp"
 #include "addonmanagerlistener.hpp"
 #include "settings.hpp"
 
-#include "calc/symboltable.hpp"
+#include "math/symboltable.hpp"
 
 #include "gui/widgets/symbolseditor.hpp"
 #include "gui/widgets/historywidget.hpp"
@@ -27,15 +27,6 @@ QT_END_NAMESPACE
  * MainWindow is Presenter.
  *
  * QT Widgets are View.
- *
- * The main window is now just a simple container which only provides a single line edit for expression parser input.
- *
- * All other features will be implemented via addons.
- *
- * The main window will not reference the native ui elements after the constructor has run.
- *
- * The linkage between the native ui and the main window are now just signals and slots which can be changed
- * from python.
  */
 class MainWindow : public QMainWindow, public AddonManagerListener {
 Q_OBJECT

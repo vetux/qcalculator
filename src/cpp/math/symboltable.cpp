@@ -1,4 +1,4 @@
-#include "calc/symboltable.hpp"
+#include "math/symboltable.hpp"
 
 SymbolTable::SymbolTable() = default;
 

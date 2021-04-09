@@ -8,7 +8,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 
-#include "calc/function.hpp"
+#include "math/function.hpp"
 
 class FunctionsEditor : public QWidget {
 Q_OBJECT

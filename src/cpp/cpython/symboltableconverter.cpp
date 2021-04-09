@@ -1,10 +1,10 @@
 #include "pythoninclude.hpp"
 
-#include "pymodule/pysymboltable.hpp"
+#include "cpython/symboltableconverter.hpp"
 
 #include "pyutil.hpp"
 
-PyObject *PySymbolTable::New(const SymbolTable &table) {
+PyObject *SymbolTableConverter::New(const SymbolTable &table) {
     PyObject *symModule = PyImport_ImportModule("qcalc.exprtk");
     if (symModule == PyNull) {
         throw std::runtime_error("Failed to import qcalc.exprtk module, Error: " + PyUtil::getError());
@@ -75,7 +75,7 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
 
         // PyObject_SetAttrString increments reference on passed object, we dont decrement because the returned
         // symbol table holds a new reference to the callback and therefore
-        // has to be cleaned up by calling PySymbolTable::Cleanup
+        // has to be cleaned up by calling SymbolTableConverter::Cleanup
         PyObject_SetAttrString(scriptInstance, "callback", var.second.callback);
 
         PyObject *o = PyBool_FromLong(var.second.enableArguments);
@@ -93,7 +93,7 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
     return symInstance;
 }
 
-SymbolTable PySymbolTable::Convert(PyObject *o) {
+SymbolTable SymbolTableConverter::Convert(PyObject *o) {
     SymbolTable ret;
 
     if (!PyObject_HasAttrString(o, "variables")) {
@@ -401,7 +401,7 @@ SymbolTable PySymbolTable::Convert(PyObject *o) {
     return ret;
 }
 
-SymbolTable PySymbolTable::Cleanup(const SymbolTable &table) {
+SymbolTable SymbolTableConverter::Cleanup(const SymbolTable &table) {
     SymbolTable ret = table;
 
     std::vector<std::string> scriptKeys;

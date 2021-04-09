@@ -1,11 +1,11 @@
-#include "calc/expressionparser.hpp"
+#include "math/expressionparser.hpp"
 
 #include "extern/exprtk_mpfr_adaptor.hpp"
 
 #include "extern/exprtk.hpp"
 
-#include "calc/scriptfunction.hpp"
-#include "calc/scriptvarargfunction.hpp"
+#include "math/scriptfunction.hpp"
+#include "math/scriptvarargfunction.hpp"
 
 ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &symbolTable) {
     exprtk::parser<ArithmeticType> parser;

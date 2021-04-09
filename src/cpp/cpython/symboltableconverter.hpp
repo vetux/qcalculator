@@ -1,10 +1,10 @@
-#ifndef QCALC_PYSYMBOLTABLE_HPP
-#define QCALC_PYSYMBOLTABLE_HPP
+#ifndef QCALC_SYMBOLTABLECONVERTER_HPP
+#define QCALC_SYMBOLTABLECONVERTER_HPP
 
 struct _object;
 typedef _object PyObject;
 
-#include "calc/symboltable.hpp"
+#include "math/symboltable.hpp"
 
 /**
  * Some helper functions for working with symbol table type on the python side.
@@ -12,7 +12,7 @@ typedef _object PyObject;
  * we will convert between some python object which has the required attributes and
  * our c++ symbol table.
  */
-namespace PySymbolTable {
+namespace SymbolTableConverter {
     /**
      * Throws on error and does NOT touch python errors in any way.
      *
@@ -54,4 +54,4 @@ namespace PySymbolTable {
     SymbolTable Cleanup(const SymbolTable &table);
 }
 
-#endif //QCALC_PYSYMBOLTABLE_HPP
+#endif //QCALC_SYMBOLTABLECONVERTER_HPP
