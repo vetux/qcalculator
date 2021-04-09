@@ -1,20 +1,18 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef QCALC_MAINWINDOW_HPP
+#define QCALC_MAINWINDOW_HPP
 
 #include <QMainWindow>
-#include <bitset>
 #include <QPushButton>
-#include <QSettings>
 #include <QTableWidget>
 
+#include <bitset>
 #include <set>
 
-#include "math/numeralsystem.hpp"
-#include "numpadkey.hpp"
 #include "addonmanagerlistener.hpp"
 #include "settings.hpp"
 
 #include "math/symboltable.hpp"
+#include "math/numeralsystem.hpp"
 
 #include "gui/widgets/symbolseditor.hpp"
 #include "gui/widgets/historywidget.hpp"
@@ -23,11 +21,6 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-/**
- * MainWindow is Presenter.
- *
- * QT Widgets are View.
- */
 class MainWindow : public QMainWindow, public AddonManagerListener {
 Q_OBJECT
 
@@ -98,4 +91,4 @@ private:
     Settings settings;
 };
 
-#endif // MAINWINDOW_H
+#endif // QCALC_MAINWINDOW_HPP

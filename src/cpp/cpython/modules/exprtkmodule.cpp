@@ -1,11 +1,11 @@
-#include "exprtkmodule.hpp"
-#include "modulecommon.hpp"
-
-#include "math/expressionparser.hpp"
+#include "cpython/modules/exprtkmodule.hpp"
 
 #include "cpython/pyutil.hpp"
 #include "cpython/pythoninclude.hpp"
 #include "cpython/symboltableconverter.hpp"
+#include "cpython/modules/modulecommon.hpp"
+
+#include "math/expressionparser.hpp"
 
 #define MODULE_NAME "qc_native_exprtk"
 

@@ -4,9 +4,9 @@
 #include <string>
 #include <set>
 
-#include "settings.hpp"
-
 #include "math/symboltable.hpp"
+
+#include "settings.hpp"
 
 namespace Serializer {
     std::string serializeTable(const SymbolTable &table);

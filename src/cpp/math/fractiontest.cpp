@@ -1,4 +1,4 @@
-#include "fractiontest.hpp"
+#include "math/fractiontest.hpp"
 
 bool FractionTest::hasFraction(long double v) {
     long double intPart = 0;

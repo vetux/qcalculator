@@ -4,8 +4,6 @@
 #include <QDir>
 #include <QTextStream>
 
-#include "serializer.hpp"
-
 namespace IO {
     std::vector<std::string> findFilesInDirectory(const std::string &directory,
                                                   const std::string &suffix,

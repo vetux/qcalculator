@@ -1,9 +1,8 @@
+#include "gui/settingsdialog.hpp"
 #include "ui_settingsdialog.h"
 
 #include <QSettings>
 #include <QMessageBox>
-
-#include "gui/settingsdialog.hpp"
 
 #include "gui/widgets/addonitemwidget.hpp"
 

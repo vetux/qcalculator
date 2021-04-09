@@ -1,7 +1,6 @@
 #include "math/expressionparser.hpp"
 
 #include "extern/exprtk_mpfr_adaptor.hpp"
-
 #include "extern/exprtk.hpp"
 
 #include "math/scriptfunction.hpp"

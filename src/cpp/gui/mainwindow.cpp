@@ -6,7 +6,6 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
-#include "cpython/pyutil.hpp"
 #include "addonmanager.hpp"
 #include "addonhelper.hpp"
 #include "paths.hpp"
@@ -22,6 +21,7 @@
 #include "gui/widgets/symbolseditor.hpp"
 
 #include "cpython/modules/exprtkmodule.hpp"
+#include "cpython/pyutil.hpp"
 
 #define ADDONS_FILE "/addons.json"
 #define SETTINGS_FILE "/settings.json"

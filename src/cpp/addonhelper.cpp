@@ -2,14 +2,14 @@
 
 #include "cpython/pythoninclude.hpp"
 
-#include <stdexcept>
-
 #include <QFileInfo>
 #include <QDir>
 
+#include <stdexcept>
+
 #include "cpython/pyutil.hpp"
-#include "io.hpp"
 #include "extern/json.hpp"
+#include "io.hpp"
 
 namespace AddonHelper {
     AddonMetadata deserializeMetadata(const std::string &text) {

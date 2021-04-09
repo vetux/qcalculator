@@ -1,7 +1,6 @@
 #include "gui/widgets/functionseditor.hpp"
 
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QHeaderView>
 
 FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {

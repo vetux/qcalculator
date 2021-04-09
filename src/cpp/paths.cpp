@@ -3,7 +3,6 @@
 #include <QStandardPaths>
 #include <QCoreApplication>
 
-
 std::string Paths::getAppDataDirectory() {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString();
 }

@@ -1,8 +1,8 @@
-#include "pyutil.hpp"
-
-#include "pythoninclude.hpp"
+#include "cpython/pyutil.hpp"
 
 #include <stdexcept>
+
+#include "cpython/pythoninclude.hpp"
 
 void PyUtil::initializePython() {
     Py_Initialize();

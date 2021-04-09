@@ -1,8 +1,7 @@
-#include "pythoninclude.hpp"
-
 #include "cpython/symboltableconverter.hpp"
 
-#include "pyutil.hpp"
+#include "cpython/pythoninclude.hpp"
+#include "cpython/pyutil.hpp"
 
 PyObject *SymbolTableConverter::New(const SymbolTable &table) {
     PyObject *symModule = PyImport_ImportModule("qcalc.exprtk");

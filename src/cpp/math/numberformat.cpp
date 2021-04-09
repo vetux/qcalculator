@@ -1,6 +1,6 @@
-#include "numberformat.hpp"
+#include "math/numberformat.hpp"
 
-#include "fractiontest.hpp"
+#include "math/fractiontest.hpp"
 
 using namespace FractionTest;
 

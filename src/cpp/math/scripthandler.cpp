@@ -1,7 +1,6 @@
 #include "math/scripthandler.hpp"
 
 #include "cpython/pythoninclude.hpp"
-
 #include "cpython/pyutil.hpp"
 
 double ScriptHandler::run(PyObject *c, const std::vector<double> &a) {

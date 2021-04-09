@@ -1,5 +1,5 @@
-#ifndef SETTINGSDIALOG_HPP
-#define SETTINGSDIALOG_HPP
+#ifndef QCALC_SETTINGSDIALOG_HPP
+#define QCALC_SETTINGSDIALOG_HPP
 
 #include <QDialog>
 
@@ -52,4 +52,4 @@ private:
     void applyAddonState(const std::map<std::string, bool> &addonState, const std::map<std::string, AddonMetadata>& addonMetadata);
 };
 
-#endif // SETTINGSDIALOG_HPP
+#endif // QCALC_SETTINGSDIALOG_HPP
