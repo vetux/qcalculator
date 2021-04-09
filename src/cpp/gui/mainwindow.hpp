@@ -96,7 +96,6 @@ public slots:
 private:
     void exitRoutine();
 
-
     Ui::MainWindow *ui;
 
     HistoryWidget *history;

@@ -16,7 +16,7 @@ public:
 
 public slots:
 
-    void setSymbols(const SymbolTable &symbolTable);
+    void setSymbols(const SymbolTable &symbolTable, int decimalSpaces);
 
 signals:
 
@@ -47,6 +47,8 @@ private slots:
 
 private:
     SymbolTable symbolTable;
+    int precision;
+
     NamedValueEditor *variablesEditor;
     NamedValueEditor *constantsEditor;
     FunctionsEditor *functionsEditor;

@@ -12,9 +12,9 @@
 #include "calc/arithmetictype.hpp"
 
 namespace NumberFormat {
-    std::string toDecimal(const ArithmeticType &v, int floatPrecision = 32);
+    std::string toDecimal(const ArithmeticType &v, int decimalSpaces);
 
-    std::string toHex(const ArithmeticType &v, int floatPrecision = 32);
+    std::string toHex(const ArithmeticType &v, int decimalSpaces);
 
     std::string toOctal(const ArithmeticType &v);
 

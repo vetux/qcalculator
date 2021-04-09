@@ -4,12 +4,12 @@
 
 using namespace FractionTest;
 
-std::string NumberFormat::toDecimal(const ArithmeticType &v, int floatPrecision) {
-    return v.toString("%." + std::to_string(floatPrecision) + "Rf");
+std::string NumberFormat::toDecimal(const ArithmeticType &v, int decimalSpaces) {
+    return v.toString("%." + std::to_string(decimalSpaces) + "Rf");
 }
 
-std::string NumberFormat::toHex(const ArithmeticType &v, int floatPrecision) {
-    return v.toString("%." + std::to_string(floatPrecision) + "Ra");
+std::string NumberFormat::toHex(const ArithmeticType &v, int decimalSpaces) {
+    return v.toString("%." + std::to_string(decimalSpaces) + "Ra");
 }
 
 std::string NumberFormat::toOctal(const ArithmeticType &v) {

@@ -26,6 +26,8 @@
 #define ADDONS_FILE "/addons.json"
 #define SETTINGS_FILE "/settings.json"
 
+#define PRECISION_DEFAULT 9
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow()) {
     ui->setupUi(this);
 
@@ -41,8 +43,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             SLOT(onSymbolTableChanged(const SymbolTable &)));
 
     ui->tab_symbols->layout()->addWidget(symbolsEditor);
-
-    symbolsEditor->setSymbols(symbolTable);
 
     connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
@@ -73,8 +73,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         }
     }
 
+    int precision = settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt();
+
     // Apply the user configurable precision.
-    mpfr::mpreal::set_default_prec(mpfr::digits2bits(settings.value(SETTING_KEY_PRECISION, 32).toInt()));
+    mpfr::mpreal::set_default_prec(mpfr::digits2bits(precision));
+
+    symbolsEditor->setSymbols(symbolTable, precision);
 
     ExprtkModule::initialize();
 
@@ -132,11 +136,15 @@ void MainWindow::onInputReturnPressed() {
         std::string inputText = ui->lineEdit_input->text().toStdString();
         ArithmeticType value = ExpressionParser::evaluate(inputText, symbolTable);
 
-        symbolsEditor->setSymbols(symbolTable);
+        int precision = settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt();
 
-        emit signalExpressionEvaluated(inputText.c_str(), NumberFormat::toDecimal(value).c_str());
+        symbolsEditor->setSymbols(symbolTable, precision);
 
-        inputText = NumberFormat::toDecimal(value);
+        std::string resultText = NumberFormat::toDecimal(value, precision);
+
+        emit signalExpressionEvaluated(inputText.c_str(), resultText.c_str());
+
+        inputText = resultText;
 
         emit signalInputTextChange(inputText.c_str());
     }
@@ -147,7 +155,7 @@ void MainWindow::onInputReturnPressed() {
 
 void MainWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
     this->symbolTable = symbolTableArg;
-    symbolsEditor->setSymbols(symbolTable);
+    symbolsEditor->setSymbols(symbolTable, settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt());
 }
 
 void MainWindow::onActionSettings() {
@@ -217,7 +225,7 @@ void MainWindow::onActionImportSymbolTable() {
 
     try {
         symbolTable = Serializer::deserializeTable(IO::fileReadAllText(filepath));
-        symbolsEditor->setSymbols(symbolTable);
+        symbolsEditor->setSymbols(symbolTable, settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt());
         QMessageBox::information(this, "Import successful", ("Successfully imported symbols from " + filepath).c_str());
     }
     catch (const std::exception &e) {
