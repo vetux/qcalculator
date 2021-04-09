@@ -21,7 +21,7 @@
 
 
 #include <string>
-#include <mpreal.h>
+#include "extern/mpreal.h"
 
 
 namespace exprtk
