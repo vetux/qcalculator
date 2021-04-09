@@ -1,0 +1,6 @@
+#ifndef QCALC_SETTINGKEYS_HPP
+#define QCALC_SETTINGKEYS_HPP
+
+#define SETTING_KEY_PRECISION "_qcalc_precision"
+
+#endif //QCALC_SETTINGKEYS_HPP

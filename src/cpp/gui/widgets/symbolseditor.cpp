@@ -4,7 +4,7 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 
-#include "numberformat.hpp"
+#include "calc/numberformat.hpp"
 
 std::map<QString, QString> convertMap(std::map<std::string, ArithmeticType> map) {
     std::map<QString, QString> ret;

@@ -31,7 +31,7 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
 
     PyObject *vars = PyObject_GetAttrString(symInstance, "variables");
     for (auto &var : table.getVariables()) {
-        PyObject *o = PyFloat_FromDouble(var.second);
+        PyObject *o = PyFloat_FromDouble(var.second.toDouble());
         PyDict_SetItemString(vars, var.first.c_str(), o);
         Py_DECREF(o);
     }
@@ -39,7 +39,7 @@ PyObject *PySymbolTable::New(const SymbolTable &table) {
 
     vars = PyObject_GetAttrString(symInstance, "constants");
     for (auto &var : table.getConstants()) {
-        PyObject *o = PyFloat_FromDouble(var.second);
+        PyObject *o = PyFloat_FromDouble(var.second.toDouble());
         PyDict_SetItemString(vars, var.first.c_str(), o);
         Py_DECREF(o);
     }

@@ -7,9 +7,12 @@
 #include <QSettings>
 #include <QTableWidget>
 
+#include <set>
+
 #include "numeralsystem.hpp"
 #include "numpadkey.hpp"
 #include "addonmanagerlistener.hpp"
+#include "settings.hpp"
 
 #include "calc/symboltable.hpp"
 
@@ -72,6 +75,7 @@ signals:
     void signalExpressionEvaluated(const QString &expression, const QString &value);
 
 public slots:
+
     /**
      * This slot evaluates the input text when invoked.
      */
@@ -90,6 +94,9 @@ public slots:
     void onActionExportSymbolTable();
 
 private:
+    void exitRoutine();
+
+
     Ui::MainWindow *ui;
 
     HistoryWidget *history;
@@ -97,6 +104,8 @@ private:
     SymbolsEditor *symbolsEditor;
 
     SymbolTable symbolTable;
+
+    Settings settings;
 };
 
 #endif // MAINWINDOW_H

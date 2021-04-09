@@ -57,3 +57,4 @@ endif ()
 
 target_link_libraries(qcalc Qt5::Core Qt5::Widgets)
 target_link_libraries(qcalc ${Python_LIBRARIES}) # Python
+target_link_libraries(qcalc mpfr gmp) # MPFR

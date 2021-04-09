@@ -12,8 +12,9 @@
 #include "paths.hpp"
 #include "serializer.hpp"
 #include "io.hpp"
-#include "numberformat.hpp"
+#include "settingkeys.hpp"
 
+#include "calc/numberformat.hpp"
 #include "calc/expressionparser.hpp"
 
 #include "gui/settingsdialog.hpp"
@@ -23,6 +24,7 @@
 #include "pymodule/exprtkmodule.hpp"
 
 #define ADDONS_FILE "/addons.json"
+#define SETTINGS_FILE "/settings.json"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow()) {
     ui->setupUi(this);
@@ -60,6 +62,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             history,
             SLOT(addContent(const QString &, const QString &)));
 
+    std::string settingsFilePath = Paths::getAppDataDirectory().append(SETTINGS_FILE);
+    if (QFile(settingsFilePath.c_str()).exists()) {
+        try {
+            settings = Serializer::deserializeSettings(IO::fileReadAllText(settingsFilePath));
+        }
+        catch (const std::runtime_error &e) {
+            QMessageBox::warning(this, "Failed to load settings", e.what());
+            settings = {};
+        }
+    }
+
+    // Apply the user configurable precision.
+    mpfr::mpreal::set_default_prec(mpfr::digits2bits(settings.value(SETTING_KEY_PRECISION, 32).toInt()));
+
     ExprtkModule::initialize();
 
     PyUtil::initializePython();
@@ -74,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             enabledAddons = Serializer::deserializeSet(IO::fileReadAllText(enabledAddonsFilePath));
         }
         catch (const std::runtime_error &e) {
-            QMessageBox::warning(this, "Failed to read enabled addons file", e.what());
+            QMessageBox::warning(this, "Failed to load enabled addons", e.what());
             enabledAddons.clear();
         }
     }
@@ -95,7 +111,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    AddonManager::setActiveAddons({}, *this);
+    exitRoutine();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
@@ -144,28 +160,21 @@ void MainWindow::onActionSettings() {
         AddonManager::setActiveAddons(addons, *this);
 
         try {
-            std::string serializedAddons = Serializer::serializeSet(addons);
+            std::string dataDir = Paths::getAppDataDirectory();
 
-            try {
-                std::string dataDir = Paths::getAppDataDirectory();
+            if (!QDir(dataDir.c_str()).exists())
+                QDir().mkpath(dataDir.c_str());
 
-                if (!QDir(dataDir.c_str()).exists())
-                    QDir().mkpath(dataDir.c_str());
-
-                IO::fileWriteAllText(dataDir.append(ADDONS_FILE), serializedAddons);
-            }
-            catch (const std::runtime_error &e) {
-                QMessageBox::warning(this, "Failed to write enabled addons file", e.what());
-            }
+            IO::fileWriteAllText(dataDir.append(ADDONS_FILE), Serializer::serializeSet(addons));
         }
         catch (const std::runtime_error &e) {
-            QMessageBox::warning(this, "Failed to serialize enabled addons", e.what());
+            QMessageBox::warning(this, "Failed to save enabled addons", e.what());
         }
     }
 }
 
 void MainWindow::onActionExit() {
-    AddonManager::setActiveAddons({}, *this);
+    exitRoutine();
     QCoreApplication::quit();
 }
 
@@ -251,5 +260,22 @@ void MainWindow::onActionExportSymbolTable() {
         error += " Error: ";
         error += e.what();
         QMessageBox::warning(this, "Export failed", error.c_str());
+    }
+}
+
+void MainWindow::exitRoutine() {
+    AddonManager::setActiveAddons({}, *this);
+
+    try {
+        std::string dataDir = Paths::getAppDataDirectory();
+
+        if (!QDir(dataDir.c_str()).exists())
+            QDir().mkpath(dataDir.c_str());
+
+        IO::fileWriteAllText(dataDir.append(SETTINGS_FILE),
+                             Serializer::serializeSettings(settings));
+    }
+    catch (const std::exception &e) {
+        QMessageBox::warning(this, "Failed to save settings", e.what());
     }
 }

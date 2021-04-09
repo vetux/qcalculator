@@ -12,13 +12,13 @@
 #include "calc/arithmetictype.hpp"
 
 namespace NumberFormat {
-    std::string toDecimal(ArithmeticType v, int floatPrecision = 32);
+    std::string toDecimal(const ArithmeticType &v, int floatPrecision = 32);
 
-    std::string toHex(ArithmeticType v);
+    std::string toHex(const ArithmeticType &v, int floatPrecision = 32);
 
-    std::string toOctal(ArithmeticType v);
+    std::string toOctal(const ArithmeticType &v);
 
-    std::string toBinary(ArithmeticType v);
+    std::string toBinary(const ArithmeticType &v);
 
     ArithmeticType fromDecimal(const std::string &s);
 

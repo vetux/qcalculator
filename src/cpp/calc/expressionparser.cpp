@@ -1,16 +1,12 @@
 #include "calc/expressionparser.hpp"
 
+#include "extern/exprtk_mpfr_adaptor.hpp"
+
+#include "extern/exprtk.hpp"
+
 #include "calc/scriptfunction.hpp"
 #include "calc/scriptvarargfunction.hpp"
 
-/**
- * Evaluate the arithmetic expression using the defined symbol table.
- *
- * @param expr The mathematical expression which may contain symbols defined in the table.
- * @param symbolTable The symbol table to use when evaluating the expression.
- *
- * @return The value of the expression.
- */
 ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &symbolTable) {
     exprtk::parser<ArithmeticType> parser;
     exprtk::function_compositor<ArithmeticType> compositor;

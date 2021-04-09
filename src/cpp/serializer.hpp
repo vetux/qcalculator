@@ -2,6 +2,7 @@
 #define QT_CALC_SERIALIZER_HPP
 
 #include <string>
+#include <set>
 
 #include "settings.hpp"
 

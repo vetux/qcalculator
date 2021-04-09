@@ -33,7 +33,7 @@ PyObject *evaluate(PyObject *self, PyObject *args) {
 
         PyObject *ret = PyTuple_New(2);
 
-        PyTuple_SetItem(ret, 0, PyFloat_FromDouble(value));
+        PyTuple_SetItem(ret, 0, PyFloat_FromDouble(value.toDouble()));
         PyTuple_SetItem(ret, 1, PySymbolTable::New(symTable));
 
         PySymbolTable::Cleanup(symTable);
