@@ -9,6 +9,10 @@
 #include "gui/widgets/functionseditor.hpp"
 #include "gui/widgets/scriptseditor.hpp"
 
+/**
+ * The symbols editor exposes and parses the variable and constant values with
+ * a fixed precision of 100 digits (The maximum user configurable precision).
+ */
 class SymbolsEditor : public QWidget {
 Q_OBJECT
 public:
@@ -17,13 +21,6 @@ public:
 public slots:
 
     void setSymbols(const SymbolTable &symbolTable);
-
-    /**
-     * Set the precision to use when converting user input to ArithmeticType instances.
-     *
-     * @param precision
-     */
-    void setConversionPrecision(int precision);
 
 signals:
 
@@ -55,8 +52,6 @@ private slots:
 
 private:
     SymbolTable symbolTable;
-
-    int convertPrecision;
 
     NamedValueEditor *variablesEditor;
     NamedValueEditor *constantsEditor;

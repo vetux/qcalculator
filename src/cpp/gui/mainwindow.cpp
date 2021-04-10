@@ -75,17 +75,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mpfr_rnd_t rounding = Serializer::deserializeRoundingMode(
             settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt());
 
-    // Do bounds checking on the deserialized precision to avoid crashing by having an invalid settings file.
-    if (precision <= 0 || precision >= 999) {
-        settings.setValue(SETTING_KEY_PRECISION, precision);
+    //Do bounds checking on the deserialized precision
+    if (precision < 0 || precision > 100) {
         precision = 0;
+        settings.setValue(SETTING_KEY_PRECISION, precision);
     }
 
-    mpfr::mpreal::set_default_prec(mpfr::digits2bits(precision));
+    //Use fixed precision internally (1000 digits) and utilize the user configured precision only when converting to string.
+    mpfr::mpreal::set_default_prec(mpfr::digits2bits(1000));
     mpfr::mpreal::set_default_rnd(rounding);
 
     symbolsEditor->setSymbols(symbolTable);
-    symbolsEditor->setConversionPrecision(precision);
 
     ExprtkModule::initialize();
 
@@ -179,24 +179,7 @@ void MainWindow::onActionSettings() {
         mpfr_rnd_t rounding = dialog.getRoundingMode();
         settings.setValue(SETTING_KEY_ROUNDING, Serializer::serializeRoundingMode(rounding));
 
-        mpfr::mpreal::set_default_prec(mpfr::digits2bits(precision));
         mpfr::mpreal::set_default_rnd(rounding);
-
-        symbolsEditor->setConversionPrecision(precision);
-
-        //Set the precision of all symbol table variables and constants (In the future this should be more fine grained eg. different precision for every symbol)
-        auto copy = symbolTable.getVariables();
-        for (auto &p : copy) {
-            p.second.setPrecision(mpfr::digits2bits(precision));
-            symbolTable.remove(p.first);
-            symbolTable.setVariable(p.first, p.second);
-        }
-        copy = symbolTable.getConstants();
-        for (auto &p : copy) {
-            p.second.setPrecision(mpfr::digits2bits(precision));
-            symbolTable.remove(p.first);
-            symbolTable.setConstant(p.first, p.second);
-        }
 
         symbolsEditor->setSymbols(symbolTable);
 

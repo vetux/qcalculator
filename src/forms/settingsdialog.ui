@@ -52,10 +52,10 @@
           <item>
            <widget class="QSpinBox" name="spinBox_precision">
             <property name="minimum">
-             <number>1</number>
+             <number>0</number>
             </property>
             <property name="maximum">
-             <number>999</number>
+             <number>100</number>
             </property>
            </widget>
           </item>

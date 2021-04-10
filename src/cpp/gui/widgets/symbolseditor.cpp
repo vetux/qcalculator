@@ -9,8 +9,7 @@
 std::map<QString, QString> convertMap(const std::map<std::string, ArithmeticType> &map) {
     std::map<QString, QString> ret;
     for (auto &p : map) {
-        ret[QString(p.first.c_str())] = NumberFormat::toDecimal(p.second,
-                                                                mpfr::bits2digits(p.second.getPrecision())).c_str();
+        ret[QString(p.first.c_str())] = NumberFormat::toDecimal(p.second, 100).c_str();
     }
     return ret;
 }
@@ -92,10 +91,6 @@ void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
     scriptsEditor->setScripts(symtable.getScripts());
 }
 
-void SymbolsEditor::setConversionPrecision(int precision) {
-    convertPrecision = precision;
-}
-
 void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
     if (name.isEmpty()) {
         QMessageBox::warning(this, "Failed to add variable", "The variable name cannot be empty.");
@@ -113,7 +108,7 @@ void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
             valueConverted = 0;
         } else {
             try {
-                valueConverted = NumberFormat::fromDecimal(value.toStdString(), convertPrecision);
+                valueConverted = NumberFormat::fromDecimal(value.toStdString());
             }
             catch (const std::exception &e) {
                 valueConverted = 0;
@@ -156,7 +151,7 @@ void SymbolsEditor::onVariableValueChanged(const QString &name, const QString &v
     ArithmeticType originalValue = symbolTable.getVariables().at(name.toStdString());
     ArithmeticType newValue;
     try {
-        newValue = NumberFormat::fromDecimal(value.toStdString(), convertPrecision);
+        newValue = NumberFormat::fromDecimal(value.toStdString());
     }
     catch (const std::exception &e) {
         newValue = originalValue;
@@ -183,7 +178,7 @@ void SymbolsEditor::onConstantAdded(const QString &name, const QString &value) {
             valueConverted = 0;
         } else {
             try {
-                valueConverted = NumberFormat::fromDecimal(value.toStdString(), convertPrecision);
+                valueConverted = NumberFormat::fromDecimal(value.toStdString());
             }
             catch (const std::exception &e) {
                 valueConverted = 0;
@@ -226,7 +221,7 @@ void SymbolsEditor::onConstantValueChanged(const QString &name, const QString &v
     ArithmeticType originalValue = symbolTable.getConstants().at(name.toStdString());
     ArithmeticType newValue;
     try {
-        newValue = NumberFormat::fromDecimal(value.toStdString(), convertPrecision);
+        newValue = NumberFormat::fromDecimal(value.toStdString());
     }
     catch (const std::exception &e) {
         newValue = originalValue;
