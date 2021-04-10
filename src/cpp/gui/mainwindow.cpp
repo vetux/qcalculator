@@ -146,7 +146,8 @@ void MainWindow::onInputReturnPressed() {
         symbolsEditor->setSymbols(symbolTable);
 
         std::string resultText = NumberFormat::toDecimal(value, settings.value(SETTING_KEY_PRECISION,
-                                                                               SETTING_DEFAULT_PRECISION).toInt());
+                                                                               SETTING_DEFAULT_PRECISION).toInt(),
+                                                         mpfr::mpreal::get_default_rnd());
 
         emit signalExpressionEvaluated(inputText.c_str(), resultText.c_str());
 

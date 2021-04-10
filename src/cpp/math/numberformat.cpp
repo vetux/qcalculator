@@ -20,10 +20,10 @@ std::string getRoundingFormatChar(mpfr_rnd_t mode) {
     }
 }
 
-std::string NumberFormat::toDecimal(const ArithmeticType &v, int decimalSpaces) {
+std::string NumberFormat::toDecimal(const ArithmeticType &v, int decimalSpaces, mpfr_rnd_t rounding) {
     std::string ret = v.toString("%."
                                  + std::to_string(decimalSpaces)
-                                 + "R" + getRoundingFormatChar(mpfr::mpreal::get_default_rnd())
+                                 + "R" + getRoundingFormatChar(rounding)
                                  + "f");
     if (ret.empty() || ret.find('.') == std::string::npos) {
         return ret;
@@ -43,14 +43,14 @@ std::string NumberFormat::toDecimal(const ArithmeticType &v, int decimalSpaces) 
     }
 }
 
-std::string NumberFormat::toHex(const ArithmeticType &v, int decimalSpaces) {
+std::string NumberFormat::toHex(const ArithmeticType &v, int decimalSpaces, mpfr_rnd_t rounding) {
     return v.toString("%."
                       + std::to_string(decimalSpaces)
-                      + "R" + getRoundingFormatChar(mpfr::mpreal::get_default_rnd())
+                      + "R" + getRoundingFormatChar(rounding)
                       + "a");
 }
 
-std::string NumberFormat::toOctal(const ArithmeticType &v, int decimalSpaces) {
+std::string NumberFormat::toOctal(const ArithmeticType &v, int decimalSpaces, mpfr_rnd_t rounding) {
     if (v < 0) {
         throw std::runtime_error("Cannot convert negative number to octal");
     } else if (hasFraction(v)) {
@@ -65,7 +65,7 @@ std::string NumberFormat::toOctal(const ArithmeticType &v, int decimalSpaces) {
     }
 }
 
-std::string NumberFormat::toBinary(const ArithmeticType &v, int decimalSpaces) {
+std::string NumberFormat::toBinary(const ArithmeticType &v, int decimalSpaces, mpfr_rnd_t rounding) {
     if (v < 0) {
         throw std::runtime_error("Cannot convert negative number to binary");
     } else if (hasFraction(v)) {
@@ -84,20 +84,20 @@ std::string NumberFormat::toBinary(const ArithmeticType &v, int decimalSpaces) {
     }
 }
 
-ArithmeticType NumberFormat::fromDecimal(const std::string &s) {
+ArithmeticType NumberFormat::fromDecimal(const std::string &s, mpfr_rnd_t rounding) {
     return mpfr::mpreal(s);
 }
 
-ArithmeticType NumberFormat::fromHex(const std::string &s) {
-    return mpfr::mpreal(s, mpfr::mpreal::get_default_prec(), 16);
+ArithmeticType NumberFormat::fromHex(const std::string &s, mpfr_rnd_t rounding) {
+    return mpfr::mpreal(s, mpfr::mpreal::get_default_prec(), 16, rounding);
 }
 
-ArithmeticType NumberFormat::fromOctal(const std::string &s) {
-    return mpfr::mpreal(s, mpfr::mpreal::get_default_prec(), 8);
+ArithmeticType NumberFormat::fromOctal(const std::string &s, mpfr_rnd_t rounding) {
+    return mpfr::mpreal(s, mpfr::mpreal::get_default_prec(), 8, rounding);
 }
 
-ArithmeticType NumberFormat::fromBinary(const std::string &s) {
+ArithmeticType NumberFormat::fromBinary(const std::string &s, mpfr_rnd_t rounding) {
     if (s.size() > 63)
         throw std::runtime_error("Maximum 64 bits can be converted from string");
-    return mpfr::mpreal(std::bitset<64>(s).to_ullong());
+    return mpfr::mpreal(std::bitset<64>(s).to_ullong(), mpfr::mpreal::get_default_prec(), rounding);
 }

@@ -11,7 +11,8 @@
 
 /**
  * The symbols editor exposes and parses the variable and constant values with
- * a fixed precision of 100 digits (The maximum user configurable precision).
+ * a fixed precision of 100 digits (The maximum user configurable precision),
+ * and always with nearest rounding.
  */
 class SymbolsEditor : public QWidget {
 Q_OBJECT
