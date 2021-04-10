@@ -119,3 +119,25 @@ std::set<std::string> Serializer::deserializeSet(const std::string &str) {
     nlohmann::json j = nlohmann::json::parse(str);
     return j["data"];
 }
+
+int Serializer::serializeRoundingMode(mpfr_rnd_t mode) {
+    return (int) mode;
+}
+
+mpfr_rnd_t Serializer::deserializeRoundingMode(int mode) {
+    switch (mode) {
+        default:
+        case (int) MPFR_RNDN:
+            return MPFR_RNDN;
+        case (int) MPFR_RNDZ:
+            return MPFR_RNDZ;
+        case (int) MPFR_RNDU:
+            return MPFR_RNDU;
+        case (int) MPFR_RNDD:
+            return MPFR_RNDD;
+        case (int) MPFR_RNDA:
+            return MPFR_RNDA;
+        case (int) MPFR_RNDF:
+            return MPFR_RNDF;
+    }
+}

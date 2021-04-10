@@ -9,6 +9,38 @@
 #include "addonhelper.hpp"
 #include "paths.hpp"
 
+int getIndexFromRoundingMode(mpfr_rnd_t mode) {
+    switch (mode) {
+        default:
+        case MPFR_RNDN:
+            return 0;
+        case MPFR_RNDZ:
+            return 1;
+        case MPFR_RNDU:
+            return 2;
+        case MPFR_RNDD:
+            return 3;
+        case MPFR_RNDA:
+            return 4;
+    }
+}
+
+mpfr_rnd_t getRoundingModeFromIndex(int index) {
+    switch (index) {
+        default:
+        case 0:
+            return MPFR_RNDN;
+        case 1:
+            return MPFR_RNDZ;
+        case 2:
+            return MPFR_RNDU;
+        case 3:
+            return MPFR_RNDD;
+        case 4:
+            return MPFR_RNDA;
+    }
+}
+
 SettingsDialog::SettingsDialog(QWidget *parent) :
         QDialog(parent),
         ui(new Ui::SettingsDialog) {
@@ -49,6 +81,14 @@ void SettingsDialog::setPrecision(int precision) {
 
 int SettingsDialog::getPrecision() {
     return ui->spinBox_precision->value();
+}
+
+void SettingsDialog::setRoundingMode(mpfr_rnd_t rounding) {
+    ui->comboBox_rounding->setCurrentIndex(getIndexFromRoundingMode(rounding));
+}
+
+mpfr_rnd_t SettingsDialog::getRoundingMode() {
+    return getRoundingModeFromIndex(ui->comboBox_rounding->currentIndex());
 }
 
 void SettingsDialog::onModuleEnableChanged(bool enabled) {

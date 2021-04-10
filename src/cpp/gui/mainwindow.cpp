@@ -11,7 +11,7 @@
 #include "paths.hpp"
 #include "serializer.hpp"
 #include "io.hpp"
-#include "settingkeys.hpp"
+#include "settingconstants.hpp"
 
 #include "math/numberformat.hpp"
 #include "math/expressionparser.hpp"
@@ -25,8 +25,6 @@
 
 #define ADDONS_FILE "/addons.json"
 #define SETTINGS_FILE "/settings.json"
-
-#define PRECISION_DEFAULT 9
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow()) {
     ui->setupUi(this);
@@ -73,12 +71,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         }
     }
 
-    int precision = settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt();
+    int precision = settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt();
+    mpfr_rnd_t rounding = Serializer::deserializeRoundingMode(
+            settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt());
+
+    // Do bounds checking on the deserialized precision to avoid crashing by having an invalid settings file.
+    if (precision <= 0 || precision >= 999) {
+        settings.setValue(SETTING_KEY_PRECISION, precision);
+        precision = 0;
+    }
 
     mpfr::mpreal::set_default_prec(mpfr::digits2bits(precision));
+    mpfr::mpreal::set_default_rnd(rounding);
 
     symbolsEditor->setSymbols(symbolTable);
-
     symbolsEditor->setConversionPrecision(precision);
 
     ExprtkModule::initialize();
@@ -140,7 +146,7 @@ void MainWindow::onInputReturnPressed() {
         symbolsEditor->setSymbols(symbolTable);
 
         std::string resultText = NumberFormat::toDecimal(value, settings.value(SETTING_KEY_PRECISION,
-                                                                               PRECISION_DEFAULT).toInt());
+                                                                               SETTING_DEFAULT_PRECISION).toInt());
 
         emit signalExpressionEvaluated(inputText.c_str(), resultText.c_str());
 
@@ -160,14 +166,21 @@ void MainWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
 
 void MainWindow::onActionSettings() {
     SettingsDialog dialog;
-    dialog.setPrecision(settings.value(SETTING_KEY_PRECISION, PRECISION_DEFAULT).toInt());
+    dialog.setPrecision(settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt());
+    dialog.setRoundingMode(
+            Serializer::deserializeRoundingMode(
+                    settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt()));
     dialog.setEnabledAddons(AddonManager::getActiveAddons());
     dialog.show();
     if (dialog.exec() == QDialog::Accepted) {
         int precision = dialog.getPrecision();
         settings.setValue(SETTING_KEY_PRECISION, precision);
 
+        mpfr_rnd_t rounding = dialog.getRoundingMode();
+        settings.setValue(SETTING_KEY_ROUNDING, Serializer::serializeRoundingMode(rounding));
+
         mpfr::mpreal::set_default_prec(mpfr::digits2bits(precision));
+        mpfr::mpreal::set_default_rnd(rounding);
 
         symbolsEditor->setConversionPrecision(precision);
 

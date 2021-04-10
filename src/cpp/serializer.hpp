@@ -20,6 +20,10 @@ namespace Serializer {
     std::string serializeSet(const std::set<std::string> &set);
 
     std::set<std::string> deserializeSet(const std::string &str);
+
+    int serializeRoundingMode(mpfr_rnd_t mode);
+
+    mpfr_rnd_t deserializeRoundingMode(int mode);
 }
 
 #endif //QT_CALC_SERIALIZER_HPP

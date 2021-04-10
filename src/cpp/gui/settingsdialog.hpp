@@ -8,6 +8,8 @@
 
 #include "addonmetadata.hpp"
 
+#include <mpfr.h>
+
 namespace Ui {
     class SettingsDialog;
 }
@@ -27,6 +29,10 @@ public:
     void setPrecision(int precision);
 
     int getPrecision();
+
+    void setRoundingMode(mpfr_rnd_t rounding);
+
+    mpfr_rnd_t getRoundingMode();
 
 private slots:
 
@@ -49,7 +55,8 @@ private:
 
     std::set<std::string> enabledAddons;
 
-    void applyAddonState(const std::map<std::string, bool> &addonState, const std::map<std::string, AddonMetadata>& addonMetadata);
+    void applyAddonState(const std::map<std::string, bool> &addonState,
+                         const std::map<std::string, AddonMetadata> &addonMetadata);
 };
 
 #endif // QCALC_SETTINGSDIALOG_HPP
