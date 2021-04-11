@@ -2,6 +2,18 @@ import qc_native_exprtk
 
 mpreal = qc_native_exprtk.mpreal
 
+
+class RoundingMode:
+    def __init__(self):
+        pass
+
+    ROUND_NEAREST = 0
+    ROUND_TOWARD_ZERO = 1
+    ROUND_TOWARD_INFINITY = 2
+    ROUND_TOWARD_INFINITY_NEGATIVE = 3
+    ROUND_AWAY_FROM_ZERO = 4
+
+
 class Function:
     def __init__(self, expression=None, argument_names=None):
         if argument_names is None:

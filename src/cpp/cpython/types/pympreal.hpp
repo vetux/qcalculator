@@ -5,6 +5,8 @@
 
 #include "extern/mpreal.h"
 
+#include "math/numberformat.hpp"
+
 typedef struct {
     PyObject_HEAD
     mpfr::mpreal *mpreal; //Store a pointer to our c++ object because cpython does not like c++ constructors / destructors.
@@ -50,7 +52,25 @@ int mpreal_init(PyObject *self, PyObject *args, PyObject *kwds);
 
 PyObject *mpreal_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
+PyObject *mpreal_setprecision(PyMpRealObject *self, PyObject *args);
+
+PyObject *mpreal_getprecision(PyMpRealObject *self, PyObject *args);
+
+PyObject *mpreal_set_default_precision(PyMpRealObject *self, PyObject *args);
+
+PyObject *mpreal_get_default_precision(PyMpRealObject *self, PyObject *args);
+
+PyObject *mpreal_set_default_rounding(PyMpRealObject *self, PyObject *args);
+
+PyObject *mpreal_get_default_rounding(PyMpRealObject *self, PyObject *args);
+
 static PyMethodDef mpreal_methods[] = {
+        {"set_precision", (PyCFunction) mpreal_setprecision, METH_VARARGS},
+        {"get_precision", (PyCFunction) mpreal_getprecision, METH_VARARGS},
+        {"set_default_precision", (PyCFunction) mpreal_set_default_precision, METH_VARARGS | METH_STATIC},
+        {"get_default_precision", (PyCFunction) mpreal_get_default_precision, METH_VARARGS | METH_STATIC},
+        {"set_default_rounding", (PyCFunction) mpreal_set_default_rounding, METH_VARARGS | METH_STATIC},
+        {"get_default_rounding", (PyCFunction) mpreal_get_default_rounding, METH_VARARGS | METH_STATIC},
         {PyNull, PyNull}           /* sentinel */
 };
 
@@ -295,7 +315,9 @@ void mpreal_dealloc(PyMpRealObject *op) {
 }
 
 PyObject *mpreal_str(PyObject *self) {
-    return PyUnicode_FromString(((PyMpRealObject *) self)->mpreal->toString().c_str());
+    const mpfr::mpreal &v = *((PyMpRealObject *) self)->mpreal;
+    return PyUnicode_FromString(
+            NumberFormat::toDecimal(v, mpfr::bits2digits(v.getPrecision()), mpfr::mpreal::get_default_rnd()).c_str());
 }
 
 int mpreal_init(PyObject *self, PyObject *args, PyObject *kwds) {
@@ -327,6 +349,64 @@ PyObject *mpreal_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
         self->mpreal = nullptr; //Store nullptr in new and allocate the c++ object in the init callback.
     }
     return (PyObject *) self;
+}
+
+PyObject *mpreal_setprecision(PyMpRealObject *self, PyObject *args) {
+    int precision;
+    if (!PyArg_ParseTuple(args, "i:", &precision)) {
+        return PyNull;
+    }
+    self->mpreal->setPrecision(mpfr::digits2bits(precision));
+    return PyLong_FromLong(0);
+}
+
+PyObject *mpreal_getprecision(PyMpRealObject *self, PyObject *args) {
+    if (!PyArg_ParseTuple(args, ":")) {
+        return PyNull;
+    }
+    return PyLong_FromLong(mpfr::bits2digits(self->mpreal->getPrecision()));
+}
+
+PyObject *mpreal_set_default_precision(PyMpRealObject *self, PyObject *args) {
+    int precision;
+    if (!PyArg_ParseTuple(args, "i:", &precision)) {
+        return PyNull;
+    }
+    mpfr::mpreal::set_default_prec(mpfr::digits2bits(precision));
+    return PyLong_FromLong(0);
+}
+
+PyObject *mpreal_get_default_precision(PyMpRealObject *self, PyObject *args) {
+    if (!PyArg_ParseTuple(args, ":")) {
+        return PyNull;
+    }
+    return PyLong_FromLong(mpfr::bits2digits(mpfr::mpreal::get_default_prec()));
+}
+
+PyObject *mpreal_set_default_rounding(PyMpRealObject *self, PyObject *args) {
+    int rounding;
+    if (!PyArg_ParseTuple(args, "i:", &rounding)) {
+        return PyNull;
+    }
+    switch (rounding) {
+        case (int) MPFR_RNDN:
+        case (int) MPFR_RNDZ:
+        case (int) MPFR_RNDU:
+        case (int) MPFR_RNDD:
+        case (int) MPFR_RNDA:
+            mpfr::mpreal::set_default_rnd((mpfr_rnd_t) rounding);
+            return PyLong_FromLong(0);
+        default:
+            PyErr_BadArgument();
+            return PyNull;
+    }
+}
+
+PyObject *mpreal_get_default_rounding(PyMpRealObject *self, PyObject *args) {
+    if (!PyArg_ParseTuple(args, ":")) {
+        return PyNull;
+    }
+    return PyLong_FromLong(mpfr::mpreal::get_default_rnd());
 }
 
 #endif //QCALC_PYMPREAL_HPP

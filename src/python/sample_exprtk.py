@@ -21,10 +21,26 @@ callbacks = CustomCallbacks
 def load():
     print("Loading exprtk sample addon")
 
-    t = mpreal(50.422)
-    v = mpreal(40.122)
+    # When setting the default precision or rounding through a script
+    # this also affects the normally hardcoded native default precision ( But not the output formatting precision.) and
+    # user configured rounding mode,
+    # and should therefore be reset to the original value before returning control to the native side.
+    original_precision = mpreal.get_default_precision()
+    original_rounding = mpreal.get_default_rounding()
 
-    print("MpReal Value: " + str((t + v) / mpreal(30) * mpreal(12)))
+    mpreal.set_default_precision(42)
+    mpreal.set_default_rounding(RoundingMode.ROUND_AWAY_FROM_ZERO)
+
+    x = mpreal(1)
+    y = mpreal(3)
+
+    z = x / y
+    z.set_precision(3)
+
+    print("MpReal Value: " + str(z))
+
+    mpreal.set_default_precision(original_precision)
+    mpreal.set_default_rounding(original_rounding)
 
     global callbacks
 
