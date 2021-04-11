@@ -28,7 +28,7 @@ def load():
     original_precision = mpreal.get_default_precision()
     original_rounding = mpreal.get_default_rounding()
 
-    mpreal.set_default_precision(42)
+    mpreal.set_default_precision(9)
     mpreal.set_default_rounding(RoundingMode.ROUND_AWAY_FROM_ZERO)
 
     x = mpreal(1)
@@ -38,9 +38,6 @@ def load():
     z.set_precision(3)
 
     print("MpReal Value: " + str(z))
-
-    mpreal.set_default_precision(original_precision)
-    mpreal.set_default_rounding(original_rounding)
 
     global callbacks
 
@@ -67,6 +64,9 @@ def load():
                                         sym)
 
     print("Variable: " + str(result[1].get_variable("pyVar")))
+
+    mpreal.set_default_precision(original_precision)
+    mpreal.set_default_rounding(original_rounding)
 
 
 def unload():

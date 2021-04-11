@@ -2,6 +2,7 @@
 
 #include "cpython/pythoninclude.hpp"
 #include "cpython/pyutil.hpp"
+#include "cpython/types/pympreal.hpp"
 
 PyObject *SymbolTableConverter::New(const SymbolTable &table) {
     PyObject *symModule = PyImport_ImportModule("qcalc.exprtk");
@@ -30,7 +31,7 @@ PyObject *SymbolTableConverter::New(const SymbolTable &table) {
 
     PyObject *vars = PyObject_GetAttrString(symInstance, "variables");
     for (auto &var : table.getVariables()) {
-        PyObject *o = PyFloat_FromDouble(var.second.toDouble());
+        PyObject *o = PyMpReal_FromMpReal(var.second);
         PyDict_SetItemString(vars, var.first.c_str(), o);
         Py_DECREF(o);
     }
@@ -38,7 +39,7 @@ PyObject *SymbolTableConverter::New(const SymbolTable &table) {
 
     vars = PyObject_GetAttrString(symInstance, "constants");
     for (auto &var : table.getConstants()) {
-        PyObject *o = PyFloat_FromDouble(var.second.toDouble());
+        PyObject *o = PyMpReal_FromMpReal(var.second);
         PyDict_SetItemString(vars, var.first.c_str(), o);
         Py_DECREF(o);
     }
@@ -123,8 +124,10 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
             throw std::runtime_error(PyUtil::getError());
         }
 
-        double v;
-        if (PyFloat_Check(value)) {
+        mpfr::mpreal v;
+        if (PyMpReal_Check(value)) {
+            v = PyMpReal_AsMpReal(value);
+        } else if (PyFloat_Check(value)) {
             v = PyFloat_AsDouble(value);
         } else if (PyLong_Check(value)) {
             v = PyLong_AsDouble(value);
@@ -172,8 +175,10 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
             throw std::runtime_error(PyUtil::getError());
         }
 
-        double v;
-        if (PyFloat_Check(value)) {
+        mpfr::mpreal v;
+        if (PyMpReal_Check(value)) {
+            v = PyMpReal_AsMpReal(value);
+        } else if (PyFloat_Check(value)) {
             v = PyFloat_AsDouble(value);
         } else if (PyLong_Check(value)) {
             v = PyLong_AsDouble(value);

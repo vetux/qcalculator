@@ -10,9 +10,6 @@
 
 #define MODULE_NAME "qc_native_exprtk"
 
-extern "C"
-{
-
 PyObject *evaluate(PyObject *self, PyObject *args) {
     MODULE_FUNC_TRY
 
@@ -60,24 +57,17 @@ static PyModuleDef ModuleDef = {
 
 static PyObject *PyInit() {
     PyObject *m;
-    if (PyType_Ready(&PyMpReal_Type) < 0)
-        return PyNull;
 
     m = PyModule_Create(&ModuleDef);
     if (m == PyNull)
         return PyNull;
 
-    Py_INCREF(&PyMpReal_Type);
-
-    if (PyModule_AddObject(m, "mpreal", (PyObject *) &PyMpReal_Type) < 0) {
-        Py_DECREF(&PyMpReal_Type);
+    if (PyMpReal_Initialize(m) == PyNull) {
         Py_DECREF(m);
         return PyNull;
     }
 
     return m;
-}
-
 }
 
 void ExprtkModule::initialize() {
