@@ -40,13 +40,13 @@ int mpreal_bool(PyMpRealObject *v);
 
 PyObject *mpreal_float(PyObject *v);
 
-void mpreal_dealloc(PyMpRealObject *op);
-
 PyObject *mpreal_str(PyObject *self);
+
+PyObject *mpreal_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
 int mpreal_init(PyObject *self, PyObject *args, PyObject *kwds);
 
-PyObject *mpreal_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
+void mpreal_dealloc(PyMpRealObject *op);
 
 PyObject *mpreal_setprecision(PyMpRealObject *self, PyObject *args);
 
@@ -321,15 +321,18 @@ PyObject *mpreal_float(PyObject *v) {
     return PyFloat_FromDouble(((PyMpRealObject *) v)->mpreal->toDouble());
 }
 
-void mpreal_dealloc(PyMpRealObject *op) {
-    delete op->mpreal; // Invoke c++ destructor on our pointer.
-    Py_TYPE(op)->tp_free((PyObject *) op);
-}
-
 PyObject *mpreal_str(PyObject *self) {
     const mpfr::mpreal &v = *((PyMpRealObject *) self)->mpreal;
     return PyUnicode_FromString(
             NumberFormat::toDecimal(v, mpfr::bits2digits(v.getPrecision()), mpfr::mpreal::get_default_rnd()).c_str());
+}
+
+PyObject *mpreal_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
+    auto *self = (PyMpRealObject *) type->tp_alloc(type, 0);
+    if (self != PyNull) {
+        self->mpreal = nullptr; //Store nullptr in new and allocate the c++ object in the init callback.
+    }
+    return (PyObject *) self;
 }
 
 int mpreal_init(PyObject *self, PyObject *args, PyObject *kwds) {
@@ -355,12 +358,9 @@ int mpreal_init(PyObject *self, PyObject *args, PyObject *kwds) {
     return 0;
 }
 
-PyObject *mpreal_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-    auto *self = (PyMpRealObject *) type->tp_alloc(type, 0);
-    if (self != PyNull) {
-        self->mpreal = nullptr; //Store nullptr in new and allocate the c++ object in the init callback.
-    }
-    return (PyObject *) self;
+void mpreal_dealloc(PyMpRealObject *op) {
+    delete op->mpreal; // Invoke c++ destructor on our pointer.
+    Py_TYPE(op)->tp_free((PyObject *) op);
 }
 
 PyObject *mpreal_setprecision(PyMpRealObject *self, PyObject *args) {
