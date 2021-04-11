@@ -322,9 +322,14 @@ PyObject *mpreal_float(PyObject *v) {
 }
 
 PyObject *mpreal_str(PyObject *self) {
+    if (!PyMpReal_Check(self)) {
+        PyErr_BadInternalCall(); // Should never happen.
+        return PyNull;
+    }
     const mpfr::mpreal &v = *((PyMpRealObject *) self)->mpreal;
-    return PyUnicode_FromString(
-            NumberFormat::toDecimal(v, mpfr::bits2digits(v.getPrecision()), mpfr::mpreal::get_default_rnd()).c_str());
+    return PyUnicode_FromString(NumberFormat::toDecimal(v,
+                                                        mpfr::bits2digits(v.getPrecision()),
+                                                        mpfr::mpreal::get_default_rnd()).c_str());
 }
 
 PyObject *mpreal_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
