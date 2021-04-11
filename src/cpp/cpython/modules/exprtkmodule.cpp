@@ -62,7 +62,7 @@ static PyObject *PyInit() {
     if (m == PyNull)
         return PyNull;
 
-    if (PyMpReal_Initialize(m) == PyNull) {
+    if (!PyMpReal_Initialize(m)) {
         Py_DECREF(m);
         return PyNull;
     }

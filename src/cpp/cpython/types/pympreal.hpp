@@ -8,7 +8,7 @@ namespace mpfr {
 struct _object;
 typedef _object PyObject;
 
-PyObject *PyMpReal_Initialize(PyObject *module);
+bool PyMpReal_Initialize(PyObject *module);
 
 PyObject *PyMpReal_FromMpReal(const mpfr::mpreal &val);
 

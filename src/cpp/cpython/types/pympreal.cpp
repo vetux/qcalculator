@@ -175,19 +175,19 @@ bool PyMpReal_Check(PyObject *op) {
     return PyObject_TypeCheck(op, &PyMpReal_Type);
 }
 
-PyObject *PyMpReal_Initialize(PyObject *module) {
+bool PyMpReal_Initialize(PyObject *module) {
     if (PyType_Ready(&PyMpReal_Type) < 0) {
-        return PyNull;
+        return false;
     }
 
     Py_INCREF(&PyMpReal_Type);
 
     if (PyModule_AddObject(module, "mpreal", (PyObject *) &PyMpReal_Type) < 0) {
         Py_DECREF(&PyMpReal_Type);
-        return PyNull;
+        return false;
     }
 
-    return module;
+    return true;
 }
 
 PyObject *mpreal_richcompare(PyObject *v, PyObject *w, int op) {
