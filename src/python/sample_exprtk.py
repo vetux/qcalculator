@@ -1,4 +1,4 @@
-import qcalc.exprtk
+from qcalc.exprtk import *
 
 
 class CustomCallbacks:
@@ -21,29 +21,34 @@ callbacks = CustomCallbacks
 def load():
     print("Loading exprtk sample addon")
 
+    t = mpreal(50.422)
+    v = mpreal(40.122)
+
+    print("MpReal Value: " + str((t + v) / mpreal(30) * mpreal(12)))
+
     global callbacks
 
     callbacks = CustomCallbacks()
 
-    sym = qcalc.exprtk.SymbolTable()
+    sym = SymbolTable()
 
     sym.set_variable("pyVar", 0)
     sym.set_constant("pyConst", 3.141)
 
     # A native function with no arguments
-    sym.set_function("pyFunc", qcalc.exprtk.Function("42 + sin(32)"))
+    sym.set_function("pyFunc", Function("42 + sin(32)"))
 
     # A native function with 1 argument called "arg1"
-    sym.set_function("pyFuncArgs", qcalc.exprtk.Function("133 + cos(arg1)", {"arg1"}))
+    sym.set_function("pyFuncArgs", Function("133 + cos(arg1)", {"arg1"}))
 
     # A script function with no arguments
     sym.set_script_noargs("pyScript", callbacks.evaluate)
 
     # A script function which accepts at least 1 argument
-    sym.set_script("pyScriptArgs", qcalc.exprtk.ScriptFunction(callbacks.evaluate_args, True))
+    sym.set_script("pyScriptArgs", ScriptFunction(callbacks.evaluate_args, True))
 
-    result = qcalc.exprtk.evaluate_with_side_effects(
-        "pyVar := pyConst / pyFunc + pyFuncArgs(42) + pyScript + pyScriptArgs(42, 13)", sym)
+    result = evaluate_with_side_effects("pyVar := pyConst / pyFunc + pyFuncArgs(42) + pyScript + pyScriptArgs(42, 13)",
+                                        sym)
 
     print("Variable: " + str(result[1].get_variable("pyVar")))
 

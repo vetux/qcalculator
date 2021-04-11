@@ -1,5 +1,6 @@
 import qc_native_exprtk
 
+mpreal = qc_native_exprtk.mpreal
 
 class Function:
     def __init__(self, expression=None, argument_names=None):

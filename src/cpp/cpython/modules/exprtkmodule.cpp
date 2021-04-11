@@ -59,7 +59,23 @@ static PyModuleDef ModuleDef = {
 };
 
 static PyObject *PyInit() {
-    return PyModule_Create(&ModuleDef);
+    PyObject *m;
+    if (PyType_Ready(&PyMpReal_Type) < 0)
+        return PyNull;
+
+    m = PyModule_Create(&ModuleDef);
+    if (m == PyNull)
+        return PyNull;
+
+    Py_INCREF(&PyMpReal_Type);
+
+    if (PyModule_AddObject(m, "mpreal", (PyObject *) &PyMpReal_Type) < 0) {
+        Py_DECREF(&PyMpReal_Type);
+        Py_DECREF(m);
+        return PyNull;
+    }
+
+    return m;
 }
 
 }
