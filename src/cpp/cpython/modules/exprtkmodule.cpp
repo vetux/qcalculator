@@ -4,6 +4,7 @@
 #include "cpython/pythoninclude.hpp"
 #include "cpython/symboltableconverter.hpp"
 #include "cpython/modules/modulecommon.hpp"
+#include "cpython/types/pympreal.hpp"
 
 #include "math/expressionparser.hpp"
 
