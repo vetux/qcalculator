@@ -5,12 +5,14 @@
 #include <stdexcept>
 #include <vector>
 
+#include "math/arithmetictype.hpp"
+
 struct _object;
 typedef _object PyObject;
 
 class ScriptHandler {
 public:
-    static double run(PyObject *callback, const std::vector<double> &args);
+    static ArithmeticType run(PyObject *callback, const std::vector<ArithmeticType> &args);
 };
 
 #endif //QCALC_SCRIPTHANDLER_HPP

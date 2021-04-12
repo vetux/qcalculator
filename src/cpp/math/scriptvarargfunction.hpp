@@ -23,8 +23,7 @@ public:
             : callback(callback) {}
 
     inline T operator()(const std::vector<T> &args) {
-        std::vector<double> pyArgs{args.begin(), args.end()};
-        return ScriptHandler::run(callback, pyArgs);
+        return ScriptHandler::run(callback, args);
     }
 
 private:

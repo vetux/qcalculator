@@ -7,6 +7,8 @@ class CustomCallbacks:
 
     # Our script function callback which is invoked by the expression parser
     # when it encounters the defined symbol name in a expression.
+    # The arguments are a tuple of mpreal instances.
+    # Allowed return values are: float, long and mpreal
     def evaluate(self, *args):
         return 422
 
@@ -22,7 +24,7 @@ def load():
     print("Loading exprtk sample addon")
 
     # When setting the default precision or rounding through a script
-    # this also affects the normally hardcoded native default precision ( But not the output formatting precision.) and
+    # this also affects the native precision ( But not the output formatting precision.) and
     # user configured rounding mode,
     # and should therefore be reset to the original value before returning control to the native side.
     original_precision = mpreal.get_default_precision()
