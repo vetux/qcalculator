@@ -11,7 +11,7 @@
 namespace Serializer {
     std::string serializeTable(const SymbolTable &table);
 
-    SymbolTable deserializeTable(const std::string &str);
+    SymbolTable deserializeTable(const std::string &str, int precision);
 
     std::string serializeSettings(const Settings &settings);
 

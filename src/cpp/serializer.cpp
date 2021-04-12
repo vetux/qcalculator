@@ -2,8 +2,6 @@
 
 #include "extern/json.hpp"
 
-// When serializing symbol tables doubles are used for the mpreal types instead of the mpfr string routines
-// to avoid possible security problems as the std double string routines should be more robust.
 std::string Serializer::serializeTable(const SymbolTable &table) {
     nlohmann::json j;
     j["version"] = 0;
@@ -12,7 +10,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     for (auto &p : table.getVariables()) {
         nlohmann::json t;
         t["name"] = p.first;
-        t["value"] = p.second.toDouble();
+        t["value"] = p.second.toString();
         tmp.emplace_back(t);
     }
     j["variables"] = tmp;
@@ -21,7 +19,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     for (auto &p : table.getConstants()) {
         nlohmann::json t;
         t["name"] = p.first;
-        t["value"] = p.second.toDouble();
+        t["value"] = p.second.toString();
         tmp.emplace_back(t);
     }
     j["constants"] = tmp;
@@ -40,22 +38,30 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     return nlohmann::to_string(j);
 }
 
-SymbolTable Serializer::deserializeTable(const std::string &str) {
+SymbolTable Serializer::deserializeTable(const std::string &str, int precision) {
     nlohmann::json j = nlohmann::json::parse(str);
     SymbolTable ret;
 
     std::vector<nlohmann::json> tmp = j["variables"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
         std::string name = v["name"];
-        ArithmeticType value(v["value"].get<double>());
-        ret.setVariable(name, 0);
+        ArithmeticType value;
+        if (v["value"].is_string())
+            value = mpfr::mpreal(v["value"].get<std::string>(), precision, 10, MPFR_RNDN);
+        else
+            value = mpfr::mpreal(v["value"].get<double>(), precision, MPFR_RNDN); //Backwards compat
+        ret.setVariable(name, value);
     }
 
     tmp = j["constants"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
         std::string name = v["name"];
-        ArithmeticType value = v["value"].get<double>();
-        ret.setConstant(name, 0);
+        ArithmeticType value;
+        if (v["value"].is_string())
+            value = mpfr::mpreal(v["value"].get<std::string>(), precision, 10, MPFR_RNDN);
+        else
+            value = mpfr::mpreal(v["value"].get<double>(), precision, MPFR_RNDN); //Backwards compat
+        ret.setConstant(name, value);
     }
 
     tmp = j["functions"].get<std::vector<nlohmann::json>>();

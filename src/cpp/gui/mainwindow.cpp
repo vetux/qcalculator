@@ -230,7 +230,7 @@ void MainWindow::onActionSettings() {
         }
 
         tmp = symbolTable.getConstants();
-        for (auto& v : tmp) {
+        for (auto &v : tmp) {
             v.second.setPrecision(symbolsPrecision, MPFR_RNDN);
             symbolTable.remove(v.first);
             symbolTable.setConstant(v.first, v.second);
@@ -299,7 +299,9 @@ void MainWindow::onActionImportSymbolTable() {
     AddonManager::setActiveAddons({}, *this);
 
     try {
-        symbolTable = Serializer::deserializeTable(IO::fileReadAllText(filepath));
+        symbolTable = Serializer::deserializeTable(IO::fileReadAllText(filepath),
+                                                   settings.value(SETTING_KEY_SYMBOLS_PRECISION,
+                                                                  SETTING_DEFAULT_SYMBOLS_PRECISION).toInt());
         symbolsEditor->setSymbols(symbolTable);
         QMessageBox::information(this, "Import successful", ("Successfully imported symbols from " + filepath).c_str());
     }
