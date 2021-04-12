@@ -382,7 +382,11 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QListWidget" name="listWidget_addons"/>
+           <widget class="QListWidget" name="listWidget_addons">
+            <property name="verticalScrollMode">
+             <enum>QAbstractItemView::ScrollPerPixel</enum>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

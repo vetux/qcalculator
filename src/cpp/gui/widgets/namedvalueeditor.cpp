@@ -7,6 +7,8 @@ NamedValueEditor::NamedValueEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
     list = new QTableWidget(this);
 
+    list->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+
     list->horizontalHeader()->hide();
     list->verticalHeader()->hide();
     list->horizontalHeader()->setStretchLastSection(true);

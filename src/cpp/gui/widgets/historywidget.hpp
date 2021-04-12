@@ -8,7 +8,11 @@
 class HistoryWidget : public QListWidget {
 Q_OBJECT
 public:
-    explicit HistoryWidget(QWidget *parent = nullptr) : QListWidget(parent) {}
+    explicit HistoryWidget(QWidget *parent = nullptr) : QListWidget(parent) {
+        setSelectionMode(QAbstractItemView::NoSelection);
+        setVerticalScrollMode(ScrollPerPixel);
+        setFocusPolicy(Qt::NoFocus);
+    }
 
 public slots:
 
@@ -31,6 +35,8 @@ public slots:
         setItemWidget(item, widget);
 
         update();
+
+        scrollToBottom();
     }
 };
 

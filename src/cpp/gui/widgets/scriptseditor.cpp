@@ -22,6 +22,7 @@ private:
 ScriptsEditor::ScriptsEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
     list = new QListWidget(this);
+    list->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     layout()->addWidget(list);
 }
 

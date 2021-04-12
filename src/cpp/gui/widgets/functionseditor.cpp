@@ -8,6 +8,8 @@ FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
 
     list = new QTableWidget(this);
 
+    list->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+
     addLineEdit = new QLineEdit(this);
     addPushButton = new QPushButton(this);
 
