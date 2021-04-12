@@ -75,7 +75,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                                              SETTING_DEFAULT_FORMATTING_PRECISION).toInt();
 
     //Do bounds checking on the deserialized formatting precision
-    if (formattingPrecision < 0 || formattingPrecision > 100) {
+    if (formattingPrecision < 0 || formattingPrecision > 1000) {
         formattingPrecision = 0;
         settings.setValue(SETTING_KEY_FORMATTING_PRECISION, formattingPrecision);
     }
