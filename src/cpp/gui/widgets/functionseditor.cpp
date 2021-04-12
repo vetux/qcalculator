@@ -197,10 +197,14 @@ void FunctionsEditor::onTableCellChanged(int row, int column) {
 
 void FunctionsEditor::onFunctionExpressionChanged() {
     if (!currentFunction.empty()) {
-        auto cursor = expressionEdit->textCursor();
+        // QTextCursor seems to have an internal reference to the text edit therefore we take the position
+        // and call setPosition on the cursor object returned after setting the text.
+        int cursorPos = expressionEdit->textCursor().position();
         emit onFunctionBodyChanged(currentFunction.c_str(), expressionEdit->toPlainText());
-        expressionEdit->setTextCursor(cursor);
         expressionEdit->setFocus();
+        auto cursor = expressionEdit->textCursor();
+        cursor.setPosition(cursorPos);
+        expressionEdit->setTextCursor(cursor);
     }
 }
 
