@@ -84,20 +84,20 @@ std::string NumberFormat::toBinary(const ArithmeticType &v, int decimalSpaces, m
     }
 }
 
-ArithmeticType NumberFormat::fromDecimal(const std::string &s, mpfr_rnd_t rounding) {
-    return mpfr::mpreal(s);
+ArithmeticType NumberFormat::fromDecimal(const std::string &s, int precision, mpfr_rnd_t rounding) {
+    return mpfr::mpreal(s, precision, 10, rounding);
 }
 
-ArithmeticType NumberFormat::fromHex(const std::string &s, mpfr_rnd_t rounding) {
-    return mpfr::mpreal(s, mpfr::mpreal::get_default_prec(), 16, rounding);
+ArithmeticType NumberFormat::fromHex(const std::string &s, int precision, mpfr_rnd_t rounding) {
+    return mpfr::mpreal(s, precision, 16, rounding);
 }
 
-ArithmeticType NumberFormat::fromOctal(const std::string &s, mpfr_rnd_t rounding) {
-    return mpfr::mpreal(s, mpfr::mpreal::get_default_prec(), 8, rounding);
+ArithmeticType NumberFormat::fromOctal(const std::string &s, int precision, mpfr_rnd_t rounding) {
+    return mpfr::mpreal(s, precision, 8, rounding);
 }
 
-ArithmeticType NumberFormat::fromBinary(const std::string &s, mpfr_rnd_t rounding) {
+ArithmeticType NumberFormat::fromBinary(const std::string &s, int precision, mpfr_rnd_t rounding) {
     if (s.size() > 63)
         throw std::runtime_error("Maximum 64 bits can be converted from string");
-    return mpfr::mpreal(std::bitset<64>(s).to_ullong(), mpfr::mpreal::get_default_prec(), rounding);
+    return mpfr::mpreal(std::bitset<64>(s).to_ullong(), precision, rounding);
 }

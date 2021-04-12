@@ -34,6 +34,18 @@ public:
 
     mpfr_rnd_t getRoundingMode();
 
+    void setFormattingPrecision(int precision);
+
+    int getFormattingPrecision();
+
+    void setFormattingRoundingMode(mpfr_rnd_t rounding);
+
+    mpfr_rnd_t getFormattingRoundingMode();
+
+    void setSymbolsPrecision(int precision);
+
+    int getSymbolsPrecision();
+
 private slots:
 
     void onModuleEnableChanged(bool enabled);
@@ -41,8 +53,6 @@ private slots:
     void onDialogAccepted();
 
     void onDialogRejected();
-
-    void onResetSettingsPressed();
 
     void onSettingsTabChanged(int tab);
 

@@ -20,13 +20,13 @@ namespace NumberFormat {
 
     std::string toBinary(const ArithmeticType &v, int decimalSpaces, mpfr_rnd_t rounding);
 
-    ArithmeticType fromDecimal(const std::string &s, mpfr_rnd_t rounding);
+    ArithmeticType fromDecimal(const std::string &s, int precision, mpfr_rnd_t rounding);
 
-    ArithmeticType fromHex(const std::string &s, mpfr_rnd_t rounding);
+    ArithmeticType fromHex(const std::string &s, int precision, mpfr_rnd_t rounding);
 
-    ArithmeticType fromOctal(const std::string &s, mpfr_rnd_t rounding);
+    ArithmeticType fromOctal(const std::string &s, int precision, mpfr_rnd_t rounding);
 
-    ArithmeticType fromBinary(const std::string &s, mpfr_rnd_t rounding);
+    ArithmeticType fromBinary(const std::string &s, int precision, mpfr_rnd_t rounding);
 }
 
 #endif // NUMBERFORMAT_HPP

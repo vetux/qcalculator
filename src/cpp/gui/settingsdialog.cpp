@@ -48,7 +48,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(onDialogAccepted()));
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(onDialogRejected()));
-    connect(ui->pushButton_resetSettings, SIGNAL(pressed()), this, SLOT(onResetSettingsPressed()));
     connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onSettingsTabChanged(int)));
     connect(ui->pushButton_installAddon, SIGNAL(pressed()), this, SLOT(onInstallAddonPressed()));
     connect(ui->pushButton_refreshAddons, SIGNAL(pressed()), this, SLOT(onRefreshAddonsPressed()));
@@ -91,6 +90,30 @@ mpfr_rnd_t SettingsDialog::getRoundingMode() {
     return getRoundingModeFromIndex(ui->comboBox_rounding->currentIndex());
 }
 
+void SettingsDialog::setFormattingPrecision(int precision) {
+    ui->spinBox_formatting_precision->setValue(precision);
+}
+
+int SettingsDialog::getFormattingPrecision() {
+    return ui->spinBox_formatting_precision->value();
+}
+
+void SettingsDialog::setFormattingRoundingMode(mpfr_rnd_t rounding) {
+    ui->comboBox_formatting_rounding->setCurrentIndex(getIndexFromRoundingMode(rounding));
+}
+
+mpfr_rnd_t SettingsDialog::getFormattingRoundingMode() {
+    return getRoundingModeFromIndex(ui->comboBox_formatting_rounding->currentIndex());
+}
+
+void SettingsDialog::setSymbolsPrecision(int precision) {
+    ui->spinBox_symbols_precision->setValue(precision);
+}
+
+int SettingsDialog::getSymbolsPrecision() {
+    return ui->spinBox_symbols_precision->value();
+}
+
 void SettingsDialog::onModuleEnableChanged(bool enabled) {
     auto &s = dynamic_cast<AddonItemWidget &>(*sender());
 
@@ -114,18 +137,6 @@ void SettingsDialog::onDialogAccepted() {
 
 void SettingsDialog::onDialogRejected() {
     reject();
-}
-
-void SettingsDialog::onResetSettingsPressed() {
-    enabledAddons = {};
-
-    std::map<std::string, AddonMetadata> metadata = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
-    std::map<std::string, bool> addonState;
-    for (auto &pair : metadata) {
-        addonState[pair.first] = false;
-    }
-
-    applyAddonState(addonState, metadata);
 }
 
 void SettingsDialog::onSettingsTabChanged(int tab) {

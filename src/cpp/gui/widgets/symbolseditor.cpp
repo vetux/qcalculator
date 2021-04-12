@@ -91,6 +91,10 @@ void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
     scriptsEditor->setScripts(symtable.getScripts());
 }
 
+void SymbolsEditor::setPrecision(int prec) {
+    precision = prec;
+}
+
 void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
     if (name.isEmpty()) {
         QMessageBox::warning(this, "Failed to add variable", "The variable name cannot be empty.");
@@ -108,7 +112,7 @@ void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
             valueConverted = 0;
         } else {
             try {
-                valueConverted = NumberFormat::fromDecimal(value.toStdString(), MPFR_RNDN);
+                valueConverted = NumberFormat::fromDecimal(value.toStdString(), precision, MPFR_RNDN);
             }
             catch (const std::exception &e) {
                 valueConverted = 0;
@@ -151,7 +155,7 @@ void SymbolsEditor::onVariableValueChanged(const QString &name, const QString &v
     ArithmeticType originalValue = symbolTable.getVariables().at(name.toStdString());
     ArithmeticType newValue;
     try {
-        newValue = NumberFormat::fromDecimal(value.toStdString(), MPFR_RNDN);
+        newValue = NumberFormat::fromDecimal(value.toStdString(), precision, MPFR_RNDN);
     }
     catch (const std::exception &e) {
         newValue = originalValue;
@@ -178,7 +182,7 @@ void SymbolsEditor::onConstantAdded(const QString &name, const QString &value) {
             valueConverted = 0;
         } else {
             try {
-                valueConverted = NumberFormat::fromDecimal(value.toStdString(), MPFR_RNDN);
+                valueConverted = NumberFormat::fromDecimal(value.toStdString(), precision, MPFR_RNDN);
             }
             catch (const std::exception &e) {
                 valueConverted = 0;
@@ -221,7 +225,7 @@ void SymbolsEditor::onConstantValueChanged(const QString &name, const QString &v
     ArithmeticType originalValue = symbolTable.getConstants().at(name.toStdString());
     ArithmeticType newValue;
     try {
-        newValue = NumberFormat::fromDecimal(value.toStdString(), MPFR_RNDN);
+        newValue = NumberFormat::fromDecimal(value.toStdString(), precision, MPFR_RNDN);
     }
     catch (const std::exception &e) {
         newValue = originalValue;

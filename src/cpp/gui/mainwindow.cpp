@@ -71,20 +71,40 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         }
     }
 
-    int precision = settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt();
-    mpfr_rnd_t rounding = Serializer::deserializeRoundingMode(
-            settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt());
+    int formattingPrecision = settings.value(SETTING_KEY_FORMATTING_PRECISION,
+                                             SETTING_DEFAULT_FORMATTING_PRECISION).toInt();
 
-    //Do bounds checking on the deserialized precision
-    if (precision < 0 || precision > 100) {
-        precision = 0;
+    //Do bounds checking on the deserialized formatting precision
+    if (formattingPrecision < 0 || formattingPrecision > 100) {
+        formattingPrecision = 0;
+        settings.setValue(SETTING_KEY_FORMATTING_PRECISION, formattingPrecision);
+    }
+
+    // Because on 32bit platforms long(mpfr_prec_t) and int can both be 32 bit and the mpfr documentation says
+    // "no value near MPFR_PREC_MAX should be used" we limit the precision range
+    // to a max of MPFR_PREC_MAX minus one third of MPFR_PREC_MAX (Which is redundant on 64bit).
+    // The gui limits the ranges of these values, so this is to protect against invalid values in the settings file,
+    // and should not affect normal user experience.
+    int symbolsPrecision = settings.value(SETTING_KEY_SYMBOLS_PRECISION,
+                                          SETTING_DEFAULT_SYMBOLS_PRECISION).toInt();
+    if (symbolsPrecision < MPFR_PREC_MIN || (mpfr_prec_t) symbolsPrecision > (MPFR_PREC_MAX - (MPFR_PREC_MAX / 3))) {
+        symbolsPrecision = MPFR_PREC_MIN;
+        settings.setValue(SETTING_KEY_SYMBOLS_PRECISION, symbolsPrecision);
+    }
+
+    int precision = settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt();
+    if (precision < MPFR_PREC_MIN || (mpfr_prec_t) precision > (MPFR_PREC_MAX - (MPFR_PREC_MAX / 3))) {
+        precision = MPFR_PREC_MIN;
         settings.setValue(SETTING_KEY_PRECISION, precision);
     }
 
-    //Use fixed precision internally (1000 digits) and utilize the user configured precision only when converting to string.
-    mpfr::mpreal::set_default_prec(mpfr::digits2bits(1000));
+    mpfr_rnd_t rounding = Serializer::deserializeRoundingMode(
+            settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt());
+
+    mpfr::mpreal::set_default_prec(precision);
     mpfr::mpreal::set_default_rnd(rounding);
 
+    symbolsEditor->setPrecision(symbolsPrecision);
     symbolsEditor->setSymbols(symbolTable);
 
     ExprtkModule::initialize();
@@ -145,9 +165,11 @@ void MainWindow::onInputReturnPressed() {
 
         symbolsEditor->setSymbols(symbolTable);
 
-        std::string resultText = NumberFormat::toDecimal(value, settings.value(SETTING_KEY_PRECISION,
-                                                                               SETTING_DEFAULT_PRECISION).toInt(),
-                                                         mpfr::mpreal::get_default_rnd());
+        std::string resultText = NumberFormat::toDecimal(value, settings.value(SETTING_KEY_FORMATTING_PRECISION,
+                                                                               SETTING_DEFAULT_FORMATTING_PRECISION).toInt(),
+                                                         Serializer::deserializeRoundingMode(
+                                                                 settings.value(SETTING_KEY_FORMATTING_ROUNDING,
+                                                                                SETTING_DEFAULT_FORMATTING_ROUNDING).toInt()));
 
         emit signalExpressionEvaluated(inputText.c_str(), resultText.c_str());
 
@@ -171,6 +193,12 @@ void MainWindow::onActionSettings() {
     dialog.setRoundingMode(
             Serializer::deserializeRoundingMode(
                     settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt()));
+    dialog.setFormattingPrecision(
+            settings.value(SETTING_KEY_FORMATTING_PRECISION, SETTING_DEFAULT_FORMATTING_PRECISION).toInt());
+    dialog.setFormattingRoundingMode(Serializer::deserializeRoundingMode(
+            settings.value(SETTING_KEY_FORMATTING_ROUNDING, SETTING_DEFAULT_FORMATTING_ROUNDING).toInt()));
+    dialog.setSymbolsPrecision(
+            settings.value(SETTING_KEY_SYMBOLS_PRECISION, SETTING_DEFAULT_SYMBOLS_PRECISION).toInt());
     dialog.setEnabledAddons(AddonManager::getActiveAddons());
     dialog.show();
     if (dialog.exec() == QDialog::Accepted) {
@@ -180,7 +208,33 @@ void MainWindow::onActionSettings() {
         mpfr_rnd_t rounding = dialog.getRoundingMode();
         settings.setValue(SETTING_KEY_ROUNDING, Serializer::serializeRoundingMode(rounding));
 
+        int formattingPrecision = dialog.getFormattingPrecision();
+        settings.setValue(SETTING_KEY_FORMATTING_PRECISION, formattingPrecision);
+
+        mpfr_rnd_t formattingRounding = dialog.getFormattingRoundingMode();
+        settings.setValue(SETTING_KEY_FORMATTING_ROUNDING, formattingRounding);
+
+        int symbolsPrecision = dialog.getSymbolsPrecision();
+        settings.setValue(SETTING_KEY_SYMBOLS_PRECISION, symbolsPrecision);
+
+        mpfr::mpreal::set_default_prec(precision);
         mpfr::mpreal::set_default_rnd(rounding);
+
+        symbolsEditor->setPrecision(symbolsPrecision);
+
+        auto tmp = symbolTable.getVariables();
+        for (auto &v : tmp) {
+            v.second.setPrecision(symbolsPrecision, MPFR_RNDN);
+            symbolTable.remove(v.first);
+            symbolTable.setVariable(v.first, v.second);
+        }
+
+        tmp = symbolTable.getConstants();
+        for (auto& v : tmp) {
+            v.second.setPrecision(symbolsPrecision, MPFR_RNDN);
+            symbolTable.remove(v.first);
+            symbolTable.setConstant(v.first, v.second);
+        }
 
         symbolsEditor->setSymbols(symbolTable);
 

@@ -23,6 +23,8 @@ public slots:
 
     void setSymbols(const SymbolTable &symbolTable);
 
+    void setPrecision(int precision);
+
 signals:
 
     void onSymbolsChanged(const SymbolTable &symbolTable);
@@ -60,6 +62,8 @@ private:
     ScriptsEditor *scriptsEditor;
 
     QString currentFunction;
+
+    int precision = MPFR_PREC_MIN;
 };
 
 #endif //QCALC_SYMBOLSEDITOR_HPP
