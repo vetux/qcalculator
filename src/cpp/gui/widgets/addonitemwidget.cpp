@@ -6,7 +6,9 @@
 
 #include "addonmanager.hpp"
 
-AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent), layout(nullptr), checkbox(nullptr),
+AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent),
+                                                    layout(nullptr),
+                                                    checkbox(nullptr),
                                                     label(nullptr) {
     layout = new QHBoxLayout(this);
     checkbox = new QCheckBox(this);
@@ -16,10 +18,12 @@ AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent), layout(null
 
     connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChange(int)));
 
+#ifdef QT_DEBUG
     button = new QPushButton(this);
     connect(button, SIGNAL(pressed()), this, SLOT(onButtonPressed()));
     layout->addWidget(button);
     button->setText("Run Test");
+#endif
 }
 
 void AddonItemWidget::setModuleName(const QString &name) {

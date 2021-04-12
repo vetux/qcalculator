@@ -328,7 +328,7 @@ PyObject *mpreal_int(PyObject *v) {
         PyErr_BadInternalCall(); // Should never happen.
         return PyNull;
     }
-    return PyLong_FromLong(((PyMpRealObject*)v)->mpreal->toLong());
+    return PyLong_FromLong(((PyMpRealObject *) v)->mpreal->toLong());
 }
 
 PyObject *mpreal_str(PyObject *self) {
@@ -362,6 +362,8 @@ int mpreal_init(PyObject *self, PyObject *args, PyObject *kwds) {
             ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyFloat_AsDouble(arg));
         } else if (PyLong_Check(arg)) {
             ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyLong_AsLong(arg));
+        } else if (PyUnicode_Check(arg)) {
+            ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyUnicode_AsUTF8(arg));
         } else {
             PyErr_BadArgument();
             return -1;
