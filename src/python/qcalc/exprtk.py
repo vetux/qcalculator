@@ -100,3 +100,11 @@ def evaluate(expression, symtable=None):
 # in case the expression modifies variables.
 def evaluate_with_side_effects(expression, symtable):
     return qc_native_exprtk.evaluate(expression, symtable)
+
+
+def get_global_symtable():
+    return qc_native_exprtk.get_global_symtable()
+
+
+def set_global_symtable(sym):
+    return qc_native_exprtk.set_global_symtable(sym)

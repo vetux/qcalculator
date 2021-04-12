@@ -40,6 +40,8 @@ int mpreal_bool(PyMpRealObject *v);
 
 PyObject *mpreal_float(PyObject *v);
 
+PyObject *mpreal_int(PyObject *v);
+
 PyObject *mpreal_str(PyObject *self);
 
 PyObject *mpreal_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -87,7 +89,7 @@ static PyNumberMethods MpRealNumberMethods = {
         PyNull,                   /* nb_and */
         PyNull,                   /* nb_xor */
         PyNull,                  /* nb_or */
-        PyNull,                  /* nb_int */
+        mpreal_int,                  /* nb_int */
         PyNull,                  /* nb_reserved */
         mpreal_float,        /* nb_float */
         PyNull,                  /* nb_inplace_add */
@@ -319,6 +321,14 @@ PyObject *mpreal_float(PyObject *v) {
         return PyNull;
     }
     return PyFloat_FromDouble(((PyMpRealObject *) v)->mpreal->toDouble());
+}
+
+PyObject *mpreal_int(PyObject *v) {
+    if (!PyMpReal_Check(v)) {
+        PyErr_BadInternalCall(); // Should never happen.
+        return PyNull;
+    }
+    return PyLong_FromLong(((PyMpRealObject*)v)->mpreal->toLong());
 }
 
 PyObject *mpreal_str(PyObject *self) {

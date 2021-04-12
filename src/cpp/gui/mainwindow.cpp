@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     symbolsEditor->setPrecision(symbolsPrecision);
     symbolsEditor->setSymbols(symbolTable, symbolsFormattingPrecision);
 
-    ExprtkModule::initialize();
+    ExprtkModule::initialize(symbolTable);
 
     PyUtil::initializePython();
     PyUtil::addModuleDirectory(Paths::getSystemDirectory());

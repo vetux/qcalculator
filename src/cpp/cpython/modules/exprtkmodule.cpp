@@ -10,6 +10,8 @@
 
 #define MODULE_NAME "qc_native_exprtk"
 
+SymbolTable *globalSymbolTable = nullptr;
+
 PyObject *evaluate(PyObject *self, PyObject *args) {
     MODULE_FUNC_TRY
 
@@ -41,8 +43,23 @@ PyObject *evaluate(PyObject *self, PyObject *args) {
     MODULE_FUNC_CATCH
 }
 
+PyObject *get_global_symtable(PyObject *self, PyObject *args) {
+    return SymbolTableConverter::New(*globalSymbolTable);
+}
+
+PyObject *set_global_symtable(PyObject *self, PyObject *args) {
+    PyObject *pysym = PyNull;
+    if (!PyArg_ParseTuple(args, "O:", &pysym)) {
+        return PyNull;
+    }
+    *globalSymbolTable = SymbolTableConverter::Convert(pysym);
+    return PyLong_FromLong(0);
+}
+
 static PyMethodDef MethodDef[] = {
-        {"evaluate", evaluate, METH_VARARGS, "."},
+        {"evaluate",            evaluate,            METH_VARARGS, "."},
+        {"get_global_symtable", get_global_symtable, METH_NOARGS,  "."},
+        {"set_global_symtable", set_global_symtable, METH_VARARGS, "."},
         {PyNull, PyNull, 0, PyNull}
 };
 
@@ -70,6 +87,7 @@ static PyObject *PyInit() {
     return m;
 }
 
-void ExprtkModule::initialize() {
+void ExprtkModule::initialize(SymbolTable &gs) {
+    globalSymbolTable = &gs;
     PyImport_AppendInittab(MODULE_NAME, PyInit);
 }
