@@ -363,13 +363,23 @@ int mpreal_init(PyObject *self, PyObject *args, PyObject *kwds) {
         } else if (PyLong_Check(arg)) {
             ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyLong_AsLong(arg));
         } else if (PyUnicode_Check(arg)) {
-            ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyUnicode_AsUTF8(arg));
+            //Check if string can be converted by mpfr and otherwise set error.
+            std::string argStr = PyUnicode_AsUTF8(arg);
+            mpfr_t x;
+            mpfr_init2(x, 64);
+            int r = mpfr_set_str(x, argStr.c_str(), 10, MPFR_RNDN);
+            if (r != 0) {
+                PyErr_SetString(PyExc_ValueError, ("could not convert string to mpreal: '" + argStr + "'").c_str());
+                return -1;
+            } else {
+                ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(argStr);
+            }
         } else {
             PyErr_BadArgument();
             return -1;
         }
     } else {
-        ((PyMpRealObject *) self)->mpreal = 0;
+        *((PyMpRealObject *) self)->mpreal = 0;
     }
 
     return 0;
