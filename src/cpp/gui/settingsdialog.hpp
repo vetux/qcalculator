@@ -46,6 +46,10 @@ public:
 
     int getSymbolsPrecision();
 
+    void setSymbolsFormattingPrecision(int precision);
+
+    int getSymbolsFormattingPrecision();
+
 private slots:
 
     void onModuleEnableChanged(bool enabled);

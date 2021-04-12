@@ -114,6 +114,14 @@ int SettingsDialog::getSymbolsPrecision() {
     return ui->spinBox_symbols_precision->value();
 }
 
+void SettingsDialog::setSymbolsFormattingPrecision(int precision) {
+    ui->spinBox_symbols_formatting_precision->setValue(precision);
+}
+
+int SettingsDialog::getSymbolsFormattingPrecision() {
+    return ui->spinBox_symbols_formatting_precision->value();
+}
+
 void SettingsDialog::onModuleEnableChanged(bool enabled) {
     auto &s = dynamic_cast<AddonItemWidget &>(*sender());
 
