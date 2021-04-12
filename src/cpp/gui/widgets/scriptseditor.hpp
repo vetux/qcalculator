@@ -2,6 +2,7 @@
 #define QCALC_SCRIPTSEDITOR_HPP
 
 #include <QWidget>
+#include <QListWidget>
 
 #include "math/script.hpp"
 
@@ -13,6 +14,9 @@ public:
 public slots:
 
     void setScripts(const std::map<std::string, Script> &scripts);
+
+private:
+    QListWidget *list;
 };
 
 #endif //QCALC_SCRIPTSEDITOR_HPP

@@ -77,6 +77,8 @@ public slots:
 
     void onActionExportSymbolTable();
 
+    const SymbolTable& getSymbolTable();
+
 private:
     void exitRoutine();
 

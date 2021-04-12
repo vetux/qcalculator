@@ -6,11 +6,13 @@
 #include "cpython/modules/modulecommon.hpp"
 #include "cpython/types/pympreal.hpp"
 
+#include "gui/mainwindow.hpp"
+
 #include "math/expressionparser.hpp"
 
 #define MODULE_NAME "qc_native_exprtk"
 
-SymbolTable *globalSymbolTable = nullptr;
+MainWindow *mainWindow = nullptr;
 
 PyObject *evaluate(PyObject *self, PyObject *args) {
     MODULE_FUNC_TRY
@@ -44,7 +46,7 @@ PyObject *evaluate(PyObject *self, PyObject *args) {
 }
 
 PyObject *get_global_symtable(PyObject *self, PyObject *args) {
-    return SymbolTableConverter::New(*globalSymbolTable);
+    return SymbolTableConverter::New(mainWindow->getSymbolTable());
 }
 
 PyObject *set_global_symtable(PyObject *self, PyObject *args) {
@@ -52,7 +54,7 @@ PyObject *set_global_symtable(PyObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "O:", &pysym)) {
         return PyNull;
     }
-    *globalSymbolTable = SymbolTableConverter::Convert(pysym);
+    mainWindow->onSymbolTableChanged(SymbolTableConverter::Convert(pysym));
     return PyLong_FromLong(0);
 }
 
@@ -87,7 +89,7 @@ static PyObject *PyInit() {
     return m;
 }
 
-void ExprtkModule::initialize(SymbolTable &gs) {
-    globalSymbolTable = &gs;
+void ExprtkModule::initialize(MainWindow &w) {
+    mainWindow = &w;
     PyImport_AppendInittab(MODULE_NAME, PyInit);
 }

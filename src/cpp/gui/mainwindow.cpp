@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     symbolsEditor->setPrecision(symbolsPrecision);
     symbolsEditor->setSymbols(symbolTable, symbolsFormattingPrecision);
 
-    ExprtkModule::initialize(symbolTable);
+    ExprtkModule::initialize(*this);
 
     PyUtil::initializePython();
     PyUtil::addModuleDirectory(Paths::getSystemDirectory());
@@ -361,6 +361,10 @@ void MainWindow::onActionExportSymbolTable() {
         error += e.what();
         QMessageBox::warning(this, "Export failed", error.c_str());
     }
+}
+
+const SymbolTable &MainWindow::getSymbolTable() {
+    return symbolTable;
 }
 
 void MainWindow::exitRoutine() {
