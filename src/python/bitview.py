@@ -80,7 +80,7 @@ class BitViewWidget(QtWidgets.QWidget):
         bitgroup_3 = QtWidgets.QHBoxLayout()
         bitgroup_2 = QtWidgets.QHBoxLayout()
         bitgroup_1 = QtWidgets.QHBoxLayout()
-        margin = 12
+        margin = 9
         bitgroup_16.setMargin(margin)
         bitgroup_15.setMargin(margin)
         bitgroup_14.setMargin(margin)
