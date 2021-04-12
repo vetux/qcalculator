@@ -174,12 +174,11 @@ class BitViewWidget(QtWidgets.QWidget):
             self.set_bits_value(0)
             self.setEnabled(False)
             return
-        f = float(value)
-        if not f.is_integer():
+        if not value.is_integer():
             self.set_bits_value(0)
             self.setEnabled(False)
             return
-        i = int(f)
+        i = int(value)
         if i > uint_max:
             self.set_bits_value(0)
             self.setEnabled(False)

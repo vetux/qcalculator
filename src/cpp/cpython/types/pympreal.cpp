@@ -62,13 +62,16 @@ PyObject *mpreal_set_default_rounding(PyMpRealObject *self, PyObject *args);
 
 PyObject *mpreal_get_default_rounding(PyMpRealObject *self, PyObject *args);
 
+PyObject *mpreal_is_integer(PyMpRealObject *self, PyObject *args);
+
 static PyMethodDef mpreal_methods[] = {
         {"set_precision",         (PyCFunction) mpreal_setprecision,          METH_VARARGS},
-        {"get_precision",         (PyCFunction) mpreal_getprecision,          METH_VARARGS},
+        {"get_precision",         (PyCFunction) mpreal_getprecision,          METH_NOARGS},
         {"set_default_precision", (PyCFunction) mpreal_set_default_precision, METH_VARARGS | METH_STATIC},
-        {"get_default_precision", (PyCFunction) mpreal_get_default_precision, METH_VARARGS | METH_STATIC},
+        {"get_default_precision", (PyCFunction) mpreal_get_default_precision, METH_NOARGS},
         {"set_default_rounding",  (PyCFunction) mpreal_set_default_rounding,  METH_VARARGS | METH_STATIC},
-        {"get_default_rounding",  (PyCFunction) mpreal_get_default_rounding,  METH_VARARGS | METH_STATIC},
+        {"get_default_rounding",  (PyCFunction) mpreal_get_default_rounding,  METH_NOARGS},
+        {"is_integer",            (PyCFunction) mpreal_is_integer,            METH_NOARGS},
         {PyNull, PyNull}           /* sentinel */
 };
 
@@ -328,7 +331,16 @@ PyObject *mpreal_int(PyObject *v) {
         PyErr_BadInternalCall(); // Should never happen.
         return PyNull;
     }
-    return PyLong_FromLong(((PyMpRealObject *) v)->mpreal->toLong());
+
+    const mpfr::mpreal &vmp = *((PyMpRealObject *) v)->mpreal;
+
+    PyObject *unicode = PyUnicode_FromString(vmp.toString().c_str());
+
+    //Use PyLong_FromUnicodeObject to make use of variable length integer feature of python.
+    PyObject *ret = PyLong_FromUnicodeObject(unicode, 10);
+
+    Py_DECREF(unicode);
+    return ret;
 }
 
 PyObject *mpreal_str(PyObject *self) {
@@ -400,9 +412,6 @@ PyObject *mpreal_setprecision(PyMpRealObject *self, PyObject *args) {
 }
 
 PyObject *mpreal_getprecision(PyMpRealObject *self, PyObject *args) {
-    if (!PyArg_ParseTuple(args, ":")) {
-        return PyNull;
-    }
     return PyLong_FromLong(mpfr::bits2digits(self->mpreal->getPrecision()));
 }
 
@@ -416,9 +425,6 @@ PyObject *mpreal_set_default_precision(PyMpRealObject *self, PyObject *args) {
 }
 
 PyObject *mpreal_get_default_precision(PyMpRealObject *self, PyObject *args) {
-    if (!PyArg_ParseTuple(args, ":")) {
-        return PyNull;
-    }
     return PyLong_FromLong(mpfr::bits2digits(mpfr::mpreal::get_default_prec()));
 }
 
@@ -442,8 +448,12 @@ PyObject *mpreal_set_default_rounding(PyMpRealObject *self, PyObject *args) {
 }
 
 PyObject *mpreal_get_default_rounding(PyMpRealObject *self, PyObject *args) {
-    if (!PyArg_ParseTuple(args, ":")) {
-        return PyNull;
-    }
     return PyLong_FromLong(mpfr::mpreal::get_default_rnd());
+}
+
+PyObject *mpreal_is_integer(PyMpRealObject *self, PyObject *args) {
+    const mpfr::mpreal &value = *self->mpreal;
+    mpfr::mpreal integral;
+    mpfr::mpreal fractional = mpfr::modf(value, integral);
+    return PyBool_FromLong(fractional == 0);
 }
