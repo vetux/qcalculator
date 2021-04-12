@@ -286,9 +286,10 @@ void MainWindow::onActionAbout() {
     https://github.com/xenotux/qcalc
 
 Powered by:
-    https://github.com/ArashPartow/exprtk
-    https://github.com/python/cpython
-    https://github.com/qt
+    exprtk - https://github.com/ArashPartow/exprtk
+    cpython - https://github.com/python/cpython
+    qt - https://www.qt.io/
+    mpfr - https://www.mpfr.org/
 )LLL"));
 }
 
