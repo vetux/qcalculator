@@ -4,6 +4,7 @@
 #include <QHeaderView>
 #include <QScrollBar>
 
+//TODO:Feature: Syntax highlighting and completion for functions editor expression edit text.
 FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
 
@@ -97,8 +98,6 @@ void FunctionsEditor::setFunctions(const std::map<std::string, Function> &f) {
     this->functions = f;
     addLineEdit->setText("");
 
-    applyArgs({});
-
     expressionEdit->setText("");
     expressionEdit->setEnabled(false);
 
@@ -134,6 +133,8 @@ void FunctionsEditor::setCurrentFunction(const QString &name) {
     if (rowMapping.find(currentFunction) != rowMapping.end()) {
         list->setCurrentCell(rowMapping.at(currentFunction), 0);
         list->cellClicked(rowMapping.at(currentFunction), 0);
+    } else {
+        applyArgs({});
     }
 }
 
@@ -212,16 +213,25 @@ void FunctionsEditor::onFunctionExpressionChanged() {
 }
 
 void FunctionsEditor::applyArgs(const std::vector<std::string> &args) {
-    argEdit4->setVisible(false);
-    argEdit4->setText("");
-    argEdit3->setVisible(false);
-    argEdit3->setText("");
-    argEdit2->setVisible(false);
-    argEdit2->setText("");
-    argEdit1->setVisible(false);
-    argEdit1->setText("");
-    argEdit0->setVisible(false);
-    argEdit0->setText("");
+    switch (args.size()) {
+        case 0:
+            argEdit0->setVisible(false);
+            argEdit0->setText("");
+        case 1:
+            argEdit1->setVisible(false);
+            argEdit1->setText("");
+        case 2:
+            argEdit2->setVisible(false);
+            argEdit2->setText("");
+        case 3:
+            argEdit3->setVisible(false);
+            argEdit3->setText("");
+        case 4:
+            argEdit4->setVisible(false);
+            argEdit4->setText("");
+        default:
+            break;
+    }
 
     switch (args.size()) {
         case 5:

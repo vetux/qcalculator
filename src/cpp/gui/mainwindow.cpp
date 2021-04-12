@@ -26,6 +26,7 @@
 #define ADDONS_FILE "/addons.json"
 #define SETTINGS_FILE "/settings.json"
 
+//TODO:Feature: Completion and history navigation for input line edit with eg. up / down arrows.
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow()) {
     ui->setupUi(this);
 
