@@ -2,6 +2,7 @@
 
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QScrollBar>
 
 FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
@@ -200,11 +201,13 @@ void FunctionsEditor::onFunctionExpressionChanged() {
         // QTextCursor seems to have an internal reference to the text edit therefore we take the position
         // and call setPosition on the cursor object returned after setting the text.
         int cursorPos = expressionEdit->textCursor().position();
+        auto scrollPos = expressionEdit->verticalScrollBar()->sliderPosition();
         emit onFunctionBodyChanged(currentFunction.c_str(), expressionEdit->toPlainText());
         expressionEdit->setFocus();
         auto cursor = expressionEdit->textCursor();
         cursor.setPosition(cursorPos);
         expressionEdit->setTextCursor(cursor);
+        expressionEdit->verticalScrollBar()->setSliderPosition(scrollPos);
     }
 }
 
