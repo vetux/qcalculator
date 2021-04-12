@@ -7,11 +7,13 @@ NamedValueEditor::NamedValueEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
     list = new QTableWidget(this);
 
+    list->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     list->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
     list->horizontalHeader()->hide();
     list->verticalHeader()->hide();
     list->horizontalHeader()->setStretchLastSection(true);
+    list->horizontalHeader()->setDefaultSectionSize(200);
 
     addLineEditName = new QLineEdit(this);
     addLineEditValue = new QLineEdit(this);

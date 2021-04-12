@@ -8,6 +8,7 @@ FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
 
     list = new QTableWidget(this);
 
+    list->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     list->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
     addLineEdit = new QLineEdit(this);
@@ -23,8 +24,9 @@ FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     expressionEdit = new QTextEdit(this);
 
     list->horizontalHeader()->hide();
-    list->horizontalHeader()->setStretchLastSection(true);
     list->verticalHeader()->hide();
+
+    list->horizontalHeader()->setStretchLastSection(true);
 
     auto *widgetAdd = new QWidget(this);
     widgetAdd->setLayout(new QHBoxLayout());
@@ -48,6 +50,7 @@ FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     widgetLeft->layout()->addWidget(widgetAdd);
     widgetLeft->layout()->addWidget(list);
     widgetLeft->layout()->setContentsMargins(0, 0, 0, 0);
+    widgetLeft->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
     auto *widgetTop = new QWidget(this);
     widgetTop->setLayout(new QHBoxLayout());
