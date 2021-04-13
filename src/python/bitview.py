@@ -229,7 +229,7 @@ def load():
                               QtCore.SLOT("slot_input_text_changed(QString)"))
     QtWidgets.QWidget.connect(widget, QtCore.SIGNAL("signal_set_input_text(QString)"), gui.input_line_edit,
                               QtCore.SLOT("setText(QString)"))
-    gui.root.layout().addWidget(widget)
+    gui.root.layout().insertWidget(2, widget)
     widget.slot_input_text_changed(gui.input_line_edit.text())
 
 
