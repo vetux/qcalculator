@@ -1,4 +1,4 @@
 {
-  "displayName": "BitView Addon",
-  "description": "This addon adds a BitView gui to manipulate 64 bits visually."
+  "displayName": "BitView",
+  "description": "This addon adds a BitView to the gui with which you can manipulate 64 bits visually."
 }
