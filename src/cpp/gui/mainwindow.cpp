@@ -26,6 +26,8 @@
 #define ADDONS_FILE "/addons.json"
 #define SETTINGS_FILE "/settings.json"
 
+#define MAX_FORMATTING_PRECISION 100000
+
 //TODO:Feature: Completion and history navigation for input line edit with eg. up / down arrows.
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow()) {
     ui->setupUi(this);
@@ -38,10 +40,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     symbolsEditor = new SymbolsEditor(this);
     symbolsEditor->setObjectName("widget_symtable_editor");
 
+    ui->tab_symbols->layout()->addWidget(symbolsEditor);
+
     connect(symbolsEditor, SIGNAL(onSymbolsChanged(const SymbolTable &)), this,
             SLOT(onSymbolTableChanged(const SymbolTable &)));
-
-    ui->tab_symbols->layout()->addWidget(symbolsEditor);
 
     connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
     connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
@@ -76,14 +78,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                                              SETTING_DEFAULT_FORMATTING_PRECISION).toInt();
 
     //Do bounds checking on the deserialized formatting precision
-    if (formattingPrecision < 0 || formattingPrecision > 1000) {
+    if (formattingPrecision < 0 || formattingPrecision > MAX_FORMATTING_PRECISION) {
         formattingPrecision = 0;
         settings.setValue(SETTING_KEY_FORMATTING_PRECISION, formattingPrecision);
     }
 
     int symbolsFormattingPrecision = settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
                                                     SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt();
-    if (symbolsFormattingPrecision < 0 || symbolsFormattingPrecision > 1000) {
+    if (symbolsFormattingPrecision < 0 || symbolsFormattingPrecision > MAX_FORMATTING_PRECISION) {
         symbolsFormattingPrecision = 0;
         settings.setValue(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION, symbolsFormattingPrecision);
     }

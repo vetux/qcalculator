@@ -176,7 +176,7 @@
           <item>
            <widget class="QSpinBox" name="spinBox_symbols_formatting_precision">
             <property name="maximum">
-             <number>1000</number>
+             <number>100000</number>
             </property>
            </widget>
           </item>
@@ -235,7 +235,7 @@
              <number>0</number>
             </property>
             <property name="maximum">
-             <number>1000</number>
+             <number>100000</number>
             </property>
            </widget>
           </item>
