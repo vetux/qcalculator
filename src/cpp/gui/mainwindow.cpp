@@ -61,6 +61,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->tab_symbols->layout()->addWidget(symbolsEditor);
 
+    ui->statusbar->hide();
+
     connect(symbolsEditor, SIGNAL(onSymbolsChanged(const SymbolTable &)), this,
             SLOT(onSymbolTableChanged(const SymbolTable &)));
 
