@@ -32,7 +32,7 @@ NamedValueEditor::NamedValueEditor(QWidget *parent) : QWidget(parent) {
     list->horizontalHeader()->hide();
     list->verticalHeader()->hide();
     list->horizontalHeader()->setStretchLastSection(true);
-    list->horizontalHeader()->setDefaultSectionSize(200);
+    list->horizontalHeader()->setDefaultSectionSize(150);
 
     addLineEditName = new QLineEdit(this);
     addLineEditValue = new QLineEdit(this);
