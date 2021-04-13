@@ -142,14 +142,19 @@ class KeyPadButton(QtWidgets.QPushButton):
 class KeyPadWidget(QtWidgets.QWidget):
     def __init__(self, parent):
         QtWidgets.QWidget.__init__(self, parent)
-        self.setLayout(QtWidgets.QGridLayout())
+        self.setLayout(QtWidgets.QHBoxLayout())
+        container = QtWidgets.QWidget(self)
+        self.layout().addWidget(container)
+        container.setLayout(QtWidgets.QGridLayout())
+        container.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
+        container.layout().setMargin(0)
         i = KeyCode.START
         while i < KeyCode.END:
             btn = KeyPadButton(self)
             btn.key = i
             btn.setText(convert_key_to_string(i))
             pos = get_key_position(i)
-            self.layout().addWidget(btn, pos[0], pos[1])
+            container.layout().addWidget(btn, pos[0], pos[1])
             QtCore.QObject.connect(btn,
                                    QtCore.SIGNAL("signal_key_pressed(int)"),
                                    self,
