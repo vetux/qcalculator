@@ -87,6 +87,7 @@ FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     argsSpinBox->setMaximum(5);
 
     connect(addPushButton, SIGNAL(pressed()), this, SLOT(onFunctionAddPressed()));
+    connect(addLineEdit, SIGNAL(returnPressed()), this, SLOT(onFunctionAddPressed()));
 
     connect(argEdit0, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
     connect(argEdit1, SIGNAL(editingFinished()), this, SLOT(onFunctionArgEditingFinished()));
