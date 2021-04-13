@@ -29,10 +29,8 @@ NamedValueEditor::NamedValueEditor(QWidget *parent) : QWidget(parent) {
     list->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     list->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
-    list->horizontalHeader()->hide();
     list->verticalHeader()->hide();
-    list->horizontalHeader()->setStretchLastSection(true);
-    list->horizontalHeader()->setDefaultSectionSize(150);
+    list->horizontalHeader()->hide();
 
     addLineEditName = new QLineEdit(this);
     addLineEditValue = new QLineEdit(this);
@@ -65,6 +63,9 @@ void NamedValueEditor::setValues(const std::map<QString, QString> &values) {
 
     list->setColumnCount(2);
     list->setRowCount(values.size());
+
+    list->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    list->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
 
     mapping.clear();
 
