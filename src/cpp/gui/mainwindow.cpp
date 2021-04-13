@@ -95,6 +95,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         }
     }
 
+    resize(settings.value(SETTING_KEY_WINDOWSIZE_X, SETTING_DEFAULT_WINDOWSIZE_X).toInt(),
+           settings.value(SETTING_KEY_WINDOWSIZE_Y, SETTING_DEFAULT_WINDOWSIZE_Y).toInt());
+
     int formattingPrecision = settings.value(SETTING_KEY_FORMATTING_PRECISION,
                                              SETTING_DEFAULT_FORMATTING_PRECISION).toInt();
 
@@ -394,6 +397,9 @@ const SymbolTable &MainWindow::getSymbolTable() {
 
 void MainWindow::exitRoutine() {
     AddonManager::setActiveAddons({}, *this);
+
+    settings.setValue(SETTING_KEY_WINDOWSIZE_X, size().width());
+    settings.setValue(SETTING_KEY_WINDOWSIZE_Y, size().height());
 
     try {
         std::string dataDir = Paths::getAppDataDirectory();
