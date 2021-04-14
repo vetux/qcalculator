@@ -84,6 +84,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             history,
             SLOT(addContent(const QString &, const QString &)));
 
+    connect(history,
+            SIGNAL(onTextDoubleClicked(const QString &)),
+            this,
+            SLOT(onHistoryTextDoubleClicked(const QString &)));
+
     std::string settingsFilePath = Paths::getAppDataDirectory().append(SETTINGS_FILE);
     if (QFile(settingsFilePath.c_str()).exists()) {
         try {
@@ -393,6 +398,10 @@ void MainWindow::onActionExportSymbolTable() {
 
 const SymbolTable &MainWindow::getSymbolTable() {
     return symbolTable;
+}
+
+void MainWindow::onHistoryTextDoubleClicked(const QString &text) {
+    ui->lineEdit_input->setText(text);
 }
 
 void MainWindow::exitRoutine() {

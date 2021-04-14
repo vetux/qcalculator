@@ -98,6 +98,8 @@ public slots:
 
     const SymbolTable &getSymbolTable();
 
+    void onHistoryTextDoubleClicked(const QString &text);
+
 private:
     void exitRoutine();
 

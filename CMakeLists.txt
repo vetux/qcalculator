@@ -35,8 +35,8 @@ set(HDR_GUI src/cpp/gui/mainwindow.hpp
         src/cpp/gui/settingsdialog.hpp
         src/cpp/gui/addontesterdialog.hpp
         src/cpp/gui/widgets/addonitemwidget.hpp
-        src/cpp/gui/widgets/historyitemwidget.hpp
         src/cpp/gui/widgets/historywidget.hpp
+        src/cpp/gui/widgets/historylabel.hpp
         src/cpp/gui/widgets/functionseditor.hpp
         src/cpp/gui/widgets/namedvalueeditor.hpp
         src/cpp/gui/widgets/scriptseditor.hpp
