@@ -83,6 +83,8 @@ PyObject *mpreal_get_default_rounding(PyMpRealObject *self, PyObject *args);
 
 PyObject *mpreal_is_integer(PyMpRealObject *self, PyObject *args);
 
+PyObject *mpreal_to_string(PyMpRealObject *self, PyObject *args);
+
 static PyMethodDef mpreal_methods[] = {
         {"set_precision",         (PyCFunction) mpreal_setprecision,          METH_VARARGS},
         {"get_precision",         (PyCFunction) mpreal_getprecision,          METH_NOARGS},
@@ -91,6 +93,7 @@ static PyMethodDef mpreal_methods[] = {
         {"set_default_rounding",  (PyCFunction) mpreal_set_default_rounding,  METH_VARARGS | METH_STATIC},
         {"get_default_rounding",  (PyCFunction) mpreal_get_default_rounding,  METH_NOARGS},
         {"is_integer",            (PyCFunction) mpreal_is_integer,            METH_NOARGS},
+        {"to_string",             (PyCFunction) mpreal_to_string,             METH_VARARGS},
         {PyNull, PyNull}           /* sentinel */
 };
 
@@ -382,35 +385,52 @@ PyObject *mpreal_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 }
 
 int mpreal_init(PyObject *self, PyObject *args, PyObject *kwds) {
-    PyObject *arg = PyNull;
-    if (!PyArg_ParseTuple(args, "|O:", &arg))
+    PyObject *arg0 = PyNull;
+    PyObject *arg1 = PyNull;
+    if (!PyArg_ParseTuple(args, "|OO:", &arg0, &arg1))
         return -1;
 
-    if (arg != PyNull) {
-        if (PyMpReal_Check(arg)) {
-            ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyMpReal_AsMpReal(arg));
-        } else if (PyFloat_Check(arg)) {
-            ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyFloat_AsDouble(arg));
-        } else if (PyLong_Check(arg)) {
-            ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyLong_AsLong(arg));
-        } else if (PyUnicode_Check(arg)) {
+    if (arg0 != PyNull) {
+        if (PyMpReal_Check(arg0)) {
+            ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyMpReal_AsMpReal(arg0));
+        } else if (PyFloat_Check(arg0)) {
+            ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyFloat_AsDouble(arg0));
+        } else if (PyLong_Check(arg0)) {
+            ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(PyLong_AsLong(arg0));
+        } else if (PyUnicode_Check(arg0)) {
+            int base = 10;
+            if (arg1 != PyNull && PyLong_Check(arg1)) {
+                long tmp = PyLong_AsLong(arg1);
+                if (PyErr_Occurred())
+                    return -1;
+                if (tmp > std::numeric_limits<int>::max()
+                    || tmp < std::numeric_limits<int>::min()) {
+                    PyErr_SetString(PyExc_OverflowError, "cannot init mpreal: base argument overflow.");
+                    return -1;
+                }
+                base = (int) tmp;
+            }
+            if (base < 2 || base > 256) {
+                PyErr_SetString(PyExc_RuntimeError, "base argument must be in the range 2 - 256");
+                return -1;
+            }
             //Check if string can be converted by mpfr and otherwise set error.
-            std::string argStr = PyUnicode_AsUTF8(arg);
+            std::string argStr = PyUnicode_AsUTF8(arg0);
             mpfr_t x;
             mpfr_init2(x, 64);
-            int r = mpfr_set_str(x, argStr.c_str(), 10, MPFR_RNDN);
+            int r = mpfr_set_str(x, argStr.c_str(), base, MPFR_RNDN);
             if (r != 0) {
                 PyErr_SetString(PyExc_ValueError, ("could not convert string to mpreal: '" + argStr + "'").c_str());
                 return -1;
             } else {
-                ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(argStr);
+                ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal(argStr, mpfr::mpreal::get_default_prec(), base);
             }
         } else {
             PyErr_BadArgument();
             return -1;
         }
     } else {
-        *((PyMpRealObject *) self)->mpreal = 0;
+        ((PyMpRealObject *) self)->mpreal = new mpfr::mpreal();
     }
 
     return 0;
@@ -475,4 +495,20 @@ PyObject *mpreal_is_integer(PyMpRealObject *self, PyObject *args) {
     mpfr::mpreal integral;
     mpfr::mpreal fractional = mpfr::modf(value, integral);
     return PyBool_FromLong(fractional == 0);
+}
+
+PyObject *mpreal_to_string(PyMpRealObject *self, PyObject *args) {
+    PyObject *formatString = PyNull;
+    if (!PyArg_ParseTuple(args, "|O:", &formatString)) {
+        return PyNull;
+    }
+
+    if (formatString == PyNull) {
+        return PyUnicode_FromString(self->mpreal->toString().c_str());
+    } else if (PyUnicode_Check(formatString)) {
+        return PyUnicode_FromString(self->mpreal->toString(PyUnicode_AsUTF8(formatString)).c_str());
+    } else {
+        PyErr_SetString(PyExc_RuntimeError, "argument must be unicode");
+        return PyNull;
+    }
 }
