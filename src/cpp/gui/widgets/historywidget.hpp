@@ -24,7 +24,7 @@
 
 #include "gui/widgets/historyitemwidget.hpp"
 
-//TODO: Fix history overlapping scrollbar when reducing window size with different tab active.
+//TODO: Fix history overlapping scrollbar when reducing window size with different tab active, caused by QListWidget not invoking items resize when scrollbar is added / removed.
 class HistoryWidget : public QListWidget {
 Q_OBJECT
 public:
