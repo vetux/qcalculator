@@ -70,6 +70,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->lineEdit_input->setFont(largeFont);
     history->setHistoryFont(largeFont);
 
+    QPalette historyPalette = history->palette();
+    historyPalette.setColor(history->backgroundRole(),
+                            ui->lineEdit_input->palette().color(ui->lineEdit_input->backgroundRole()));
+    history->setPalette(historyPalette);
+
     connect(symbolsEditor, SIGNAL(onSymbolsChanged(const SymbolTable &)), this,
             SLOT(onSymbolTableChanged(const SymbolTable &)));
 
