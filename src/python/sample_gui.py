@@ -33,19 +33,6 @@ menu = QtWidgets.QMenu
 action = QtWidgets.QAction
 
 
-class SampleInputWidget(QtWidgets.QWidget):
-    text = ""
-
-    def input_changed(self, text):
-        self.text = text
-
-    def return_pressed(self):
-        gui.input_line_edit.setText(str(exprtk.evaluate(self.text)))
-
-
-sample_widget = SampleInputWidget
-
-
 # Our python side onclick callback
 def onclick():
     print("Question Response: " + str(QtWidgets.QMessageBox.question(gui.wnd, "Title", "Text")))
@@ -56,7 +43,6 @@ def load():
     print("Loading gui sample addon")
     global menu
     global action
-    global sample_widget
 
     # !IMPORTANT! Instantiate all new qt objects on the python side otherwise memory leaks will happen!
     menu = QtWidgets.QMenu()
@@ -69,25 +55,6 @@ def load():
     QtCore.QObject.connect(action, QtCore.SIGNAL('triggered()'), onclick)  # USE THIS
     # action.triggered.connect(onclick)  # NOT THIS, leaks memory.
 
-    sample_widget = SampleInputWidget()
-
-    # Store existing text in our sample widget
-    sample_widget.text = gui.input_line_edit.text()
-
-    # Disconnect the input field from the MainWindow
-    gui.input_line_edit.disconnect(gui.wnd)
-
-    # Register our own text changed and return pressed listener
-    QtCore.QObject.connect(gui.input_line_edit,
-                           QtCore.SIGNAL("returnPressed()"),
-                           sample_widget,
-                           QtCore.SLOT("return_pressed()"))
-
-    QtCore.QObject.connect(gui.input_line_edit,
-                           QtCore.SIGNAL("textChanged(QString)"),
-                           sample_widget,
-                           QtCore.SLOT("input_changed(QString)"))
-
 
 # Unload is invoked by the native code when the addon is requested to be unloaded by the user
 # It should perform cleanup such as removing gui elements.
@@ -97,31 +64,12 @@ def unload():
     print("Unloading gui sample addon")
     global menu
     global action
-    global sample_widget
 
     # !IMPORTANT! Always remove actions from the native QMenu by using the menu action, otherwise memory leaks!
     gui.menu.removeAction(menu.menuAction())
 
     # !IMPORTANT! Call deleteLater() for qt objects created by python, otherwise memory leaks!
     menu.deleteLater()
-
-    # Disconnect our widget
-    gui.input_line_edit.disconnect(sample_widget)
-
-    # Reconnect the input field to the MainWindow
-    QtCore.QObject.connect(gui.input_line_edit,
-                           QtCore.SIGNAL("returnPressed()"),
-                           gui.wnd,
-                           QtCore.SLOT("onInputReturnPressed()"))
-    QtCore.QObject.connect(gui.input_line_edit,
-                           QtCore.SIGNAL("textChanged(QString)"),
-                           gui.wnd,
-                           QtCore.SLOT("onInputTextChanged(QString)"))
-
-    # Return our text to the MainWindow
-    gui.wnd.onInputTextChanged(sample_widget.text)
-
-    sample_widget.deleteLater()
 
 
 # You can define logic at module level. This logic will be invoked when the module is imported.
