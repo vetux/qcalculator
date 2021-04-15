@@ -63,6 +63,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->statusbar->hide();
 
+    //Scale original point size by 1.3 and convert to integer (C++ Floating–integral conversion - fraction is truncated)
+    QFont defaultFont = ui->lineEdit_input->font();
+    QFont largeFont(defaultFont.family(), (int) (defaultFont.pointSize() * 1.3));
+
+    ui->lineEdit_input->setFont(largeFont);
+    history->setHistoryFont(largeFont);
+
     connect(symbolsEditor, SIGNAL(onSymbolsChanged(const SymbolTable &)), this,
             SLOT(onSymbolTableChanged(const SymbolTable &)));
 

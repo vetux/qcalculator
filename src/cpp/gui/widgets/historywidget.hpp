@@ -75,6 +75,10 @@ public slots:
         auto *equalsLabel = new QLabel(row);
         auto *resultLabel = new HistoryLabel(row);
 
+        expressionLabel->setFont(historyFont);
+        equalsLabel->setFont(historyFont);
+        resultLabel->setFont(historyFont);
+
         expressionLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
         resultLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
@@ -117,6 +121,10 @@ public slots:
         rows.emplace_back(row);
     }
 
+    void setHistoryFont(const QFont &font) {
+        historyFont = font;
+    }
+
 signals:
 
     void onTextDoubleClicked(const QString &text);
@@ -125,6 +133,8 @@ private:
     QScrollArea *scroll;
     QWidget *container;
     std::vector<QWidget *> rows;
+
+    QFont historyFont;
 };
 
 #endif //QCALC_HISTORYWIDGET_HPP
