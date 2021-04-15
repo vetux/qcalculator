@@ -26,14 +26,10 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QTimer>
+#include <QCoreApplication>
 
 #include "gui/widgets/historylabel.hpp"
 
-// Because eliding of QLabel widgets is not possible without drawing all the text by hand with qpainter or setting
-// the elided text on resize (Contrary to what the qt5 documentation says "https://doc.qt.io/qt-5/qtwidgets-widgets-elidedlabel-example.html"
-// which states "QLabel can elide text that doesn't fit within it, but only in one line." which is not true.)
-// the history will just have a horizontal scroll bar on overflow for now.
-//TODO: Implement custom label which auto ellides text. (This involves using correct style values, drawing the text by hand with qpainter etc.)
 class HistoryWidget : public QWidget {
 Q_OBJECT
 public:
@@ -55,11 +51,6 @@ public:
         layout()->addWidget(scroll);
 
         container->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
-
-        connect(scroll->verticalScrollBar(),
-                SIGNAL(rangeChanged(int, int)),
-                this,
-                SLOT(onVerticalRangeChanged(int, int)));
     }
 
 public slots:
@@ -84,27 +75,33 @@ public slots:
         auto *equalsLabel = new QLabel(row);
         auto *resultLabel = new HistoryLabel(row);
 
+        expressionLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+        resultLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
+        auto *layout = new QHBoxLayout();
+
         expressionLabel->setAlignment(Qt::AlignLeft);
         equalsLabel->setAlignment(Qt::AlignHCenter);
         resultLabel->setAlignment(Qt::AlignRight);
 
-        row->setLayout(new QHBoxLayout());
-
-        row->layout()->addWidget(expressionLabel);
-        row->layout()->addWidget(equalsLabel);
-        row->layout()->addWidget(resultLabel);
+        row->setLayout(layout);
 
         row->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-        expressionLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-        equalsLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
-        resultLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        layout->addWidget(expressionLabel, 4);
+        layout->addWidget(equalsLabel, 1);
+        layout->addWidget(resultLabel, 4);
+
+        container->layout()->addWidget(row);
+        container->layout()->invalidate();
+        container->layout()->activate();
+
+        // Call to processEvents is required here so that a scroll to the bottom can be done immediately.
+        QCoreApplication::processEvents();
 
         expressionLabel->setTextElided(expression);
-        expressionLabel->setText(expression);
         equalsLabel->setText("=");
         resultLabel->setTextElided(value);
-        resultLabel->setText(value);
 
         connect(expressionLabel,
                 SIGNAL(onDoubleClick(const QString &)),
@@ -115,34 +112,19 @@ public slots:
                 this,
                 SIGNAL(onTextDoubleClicked(const QString &)));
 
+        scroll->verticalScrollBar()->setValue(scroll->verticalScrollBar()->maximum());
+
         rows.emplace_back(row);
-
-        container->layout()->addWidget(row);
-
-        // The scrolling has to happen in the rangeChanged callback because its not possible to force update
-        // the scrollbars even after invalidating, updating and activating all layouts and widgets involved.
-        scrollingToBottom = true;
     }
 
 signals:
 
     void onTextDoubleClicked(const QString &text);
 
-private slots:
-
-    void onVerticalRangeChanged(int min, int max) {
-        if (scrollingToBottom) {
-            scroll->verticalScrollBar()->setValue(max);
-            scrollingToBottom = false;
-        }
-    }
-
 private:
     QScrollArea *scroll;
     QWidget *container;
     std::vector<QWidget *> rows;
-
-    bool scrollingToBottom = false;
 };
 
 #endif //QCALC_HISTORYWIDGET_HPP
