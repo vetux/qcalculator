@@ -41,7 +41,7 @@ public:
 
         container = new QWidget(this);
         container->setLayout(new QVBoxLayout());
-        container->layout()->setMargin(6);
+        container->layout()->setMargin(9);
         container->layout()->setSpacing(12);
 
         scroll->setWidget(container);
@@ -75,6 +75,8 @@ public slots:
         auto *equalsLabel = new QLabel(row);
         auto *resultLabel = new HistoryLabel(row);
 
+        row->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
         expressionLabel->setFont(historyFont);
         equalsLabel->setFont(historyFont);
         resultLabel->setFont(historyFont);
@@ -82,19 +84,19 @@ public slots:
         expressionLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
         resultLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
-        auto *layout = new QHBoxLayout();
-
         expressionLabel->setAlignment(Qt::AlignLeft);
         equalsLabel->setAlignment(Qt::AlignHCenter);
         resultLabel->setAlignment(Qt::AlignRight);
 
+        auto *layout = new QHBoxLayout();
+
+        layout->setMargin(0);
+
         row->setLayout(layout);
 
-        row->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
-        layout->addWidget(expressionLabel, 4);
+        layout->addWidget(expressionLabel, 5);
         layout->addWidget(equalsLabel, 1);
-        layout->addWidget(resultLabel, 4);
+        layout->addWidget(resultLabel, 5);
 
         container->layout()->addWidget(row);
         container->layout()->invalidate();
