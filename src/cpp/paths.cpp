@@ -27,9 +27,9 @@ std::string Paths::getAppDataDirectory() {
 }
 
 std::string Paths::getAddonDirectory() {
-    return QCoreApplication::applicationDirPath().append("/addon").toStdString();
+    return QCoreApplication::applicationDirPath().append("/modules/addon").toStdString();
 }
 
 std::string Paths::getSystemDirectory() {
-    return QCoreApplication::applicationDirPath().append("/system").toStdString();
+    return QCoreApplication::applicationDirPath().append("/modules/system").toStdString();
 }

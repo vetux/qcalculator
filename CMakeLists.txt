@@ -27,9 +27,9 @@ file(GLOB ADDON_SRC src/python/*.py)
 file(GLOB ADDON_META src/python/*.json)
 set(SYSTEM_SRC src/python/qcalc)
 
-file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy addon scripts
-file(COPY ${ADDON_META} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy addon metadata
-file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/system) # Copy system scripts
+file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/addon) # Copy addon scripts
+file(COPY ${ADDON_META} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/addon) # Copy addon metadata
+file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/system) # Copy system scripts
 
 set(HDR_GUI src/cpp/gui/mainwindow.hpp
         src/cpp/gui/settingsdialog.hpp
