@@ -140,7 +140,7 @@ class KeyPadButton(QtWidgets.QPushButton):
 
 
 class KeyPadWidget(QtWidgets.QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, font=gui.input_line_edit.font()):
         QtWidgets.QWidget.__init__(self, parent)
         self.setLayout(QtWidgets.QHBoxLayout())
         container = QtWidgets.QWidget(self)
@@ -153,6 +153,7 @@ class KeyPadWidget(QtWidgets.QWidget):
             btn = KeyPadButton(self)
             btn.key = i
             btn.setText(convert_key_to_string(i))
+            btn.setFont(font)
             pos = get_key_position(i)
             container.layout().addWidget(btn, pos[0], pos[1])
             QtCore.QObject.connect(btn,
