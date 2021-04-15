@@ -89,9 +89,9 @@ static PyMethodDef mpreal_methods[] = {
         {"set_precision",         (PyCFunction) mpreal_setprecision,          METH_VARARGS},
         {"get_precision",         (PyCFunction) mpreal_getprecision,          METH_NOARGS},
         {"set_default_precision", (PyCFunction) mpreal_set_default_precision, METH_VARARGS | METH_STATIC},
-        {"get_default_precision", (PyCFunction) mpreal_get_default_precision, METH_NOARGS},
+        {"get_default_precision", (PyCFunction) mpreal_get_default_precision, METH_NOARGS  | METH_STATIC},
         {"set_default_rounding",  (PyCFunction) mpreal_set_default_rounding,  METH_VARARGS | METH_STATIC},
-        {"get_default_rounding",  (PyCFunction) mpreal_get_default_rounding,  METH_NOARGS},
+        {"get_default_rounding",  (PyCFunction) mpreal_get_default_rounding,  METH_NOARGS  | METH_STATIC},
         {"is_integer",            (PyCFunction) mpreal_is_integer,            METH_NOARGS},
         {"to_string",             (PyCFunction) mpreal_to_string,             METH_VARARGS},
         {PyNull, PyNull}           /* sentinel */
