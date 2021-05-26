@@ -29,7 +29,7 @@
 #include "addon/addonhelper.hpp"
 #include "io/paths.hpp"
 #include "io/serializer.hpp"
-#include "io/io.hpp"
+#include "io/fileoperations.hpp"
 #include "settingconstants.hpp"
 
 #include "math/numberformat.hpp"
@@ -104,7 +104,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     std::string settingsFilePath = Paths::getAppDataDirectory().append(SETTINGS_FILE);
     if (QFile(settingsFilePath.c_str()).exists()) {
         try {
-            settings = Serializer::deserializeSettings(IO::fileReadAllText(settingsFilePath));
+            settings = Serializer::deserializeSettings(FileOperations::fileReadAllText(settingsFilePath));
         }
         catch (const std::runtime_error &e) {
             QMessageBox::warning(this, "Failed to load settings", e.what());
@@ -169,7 +169,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     std::set<std::string> enabledAddons;
     if (QFile(enabledAddonsFilePath.c_str()).exists()) {
         try {
-            enabledAddons = Serializer::deserializeSet(IO::fileReadAllText(enabledAddonsFilePath));
+            enabledAddons = Serializer::deserializeSet(FileOperations::fileReadAllText(enabledAddonsFilePath));
         }
         catch (const std::runtime_error &e) {
             QMessageBox::warning(this, "Failed to load enabled addons", e.what());
@@ -306,7 +306,7 @@ void MainWindow::onActionSettings() {
             if (!QDir(dataDir.c_str()).exists())
                 QDir().mkpath(dataDir.c_str());
 
-            IO::fileWriteAllText(dataDir.append(ADDONS_FILE), Serializer::serializeSet(addons));
+            FileOperations::fileWriteAllText(dataDir.append(ADDONS_FILE), Serializer::serializeSet(addons));
         }
         catch (const std::runtime_error &e) {
             QMessageBox::warning(this, "Failed to save enabled addons", e.what());
@@ -358,7 +358,7 @@ void MainWindow::onActionImportSymbolTable() {
     AddonManager::setActiveAddons({}, *this);
 
     try {
-        symbolTable = Serializer::deserializeTable(IO::fileReadAllText(filepath),
+        symbolTable = Serializer::deserializeTable(FileOperations::fileReadAllText(filepath),
                                                    settings.value(SETTING_KEY_SYMBOLS_PRECISION,
                                                                   SETTING_DEFAULT_SYMBOLS_PRECISION).toInt());
         symbolsEditor->setSymbols(symbolTable, settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
@@ -394,7 +394,7 @@ void MainWindow::onActionExportSymbolTable() {
     std::string filepath = list[0].toStdString();
 
     try {
-        IO::fileWriteAllText(filepath, Serializer::serializeTable(symbolTable));
+        FileOperations::fileWriteAllText(filepath, Serializer::serializeTable(symbolTable));
         QMessageBox::information(this,
                                  "Export successful",
                                  ("Successfully exported symbols to " + filepath).c_str());
@@ -429,8 +429,8 @@ void MainWindow::exitRoutine() {
         if (!QDir(dataDir.c_str()).exists())
             QDir().mkpath(dataDir.c_str());
 
-        IO::fileWriteAllText(dataDir.append(SETTINGS_FILE),
-                             Serializer::serializeSettings(settings));
+        FileOperations::fileWriteAllText(dataDir.append(SETTINGS_FILE),
+                                         Serializer::serializeSettings(settings));
     }
     catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to save settings", e.what());

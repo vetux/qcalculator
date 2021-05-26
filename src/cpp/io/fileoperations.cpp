@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "io/io.hpp"
+#include "io/fileoperations.hpp"
 
 #include <QFile>
 #include <QDir>
@@ -25,7 +25,7 @@
 
 #include <stdexcept>
 
-namespace IO {
+namespace FileOperations {
     std::vector<std::string> findFilesInDirectory(const std::string &directory,
                                                   const std::string &suffix,
                                                   bool recursive) {

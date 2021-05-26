@@ -17,13 +17,13 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_IO_HPP
-#define QCALC_IO_HPP
+#ifndef QCALC_FILEOPERATIONS_HPP
+#define QCALC_FILEOPERATIONS_HPP
 
 #include <string>
 #include <vector>
 
-namespace IO {
+namespace FileOperations {
     /**
      * Find files in the passed directory with an optional suffix.
      *
@@ -39,4 +39,4 @@ namespace IO {
     void fileWriteAllText(const std::string &filePath, const std::string &contents);
 }
 
-#endif //QCALC_IO_HPP
+#endif //QCALC_FILEOPERATIONS_HPP

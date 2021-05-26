@@ -28,7 +28,7 @@
 
 #include "cpython/pyutil.hpp"
 #include "extern/json.hpp"
-#include "io/io.hpp"
+#include "io/fileoperations.hpp"
 
 namespace AddonHelper {
     AddonMetadata deserializeMetadata(const std::string &text) {
@@ -42,7 +42,7 @@ namespace AddonHelper {
     std::map<std::string, AddonMetadata> getAvailableAddons(const std::string &addonDirectory) {
         std::map<std::string, AddonMetadata> ret;
 
-        std::vector<std::string> addonFiles = IO::findFilesInDirectory(addonDirectory, "py");
+        std::vector<std::string> addonFiles = FileOperations::findFilesInDirectory(addonDirectory, "py");
         for (auto &filePath : addonFiles) {
             QFileInfo addonFile(filePath.c_str());
 
@@ -56,7 +56,7 @@ namespace AddonHelper {
             if (metadataFile.exists()) {
                 //Has metadata file
                 try {
-                    metadata = deserializeMetadata(IO::fileReadAllText(metadataFile.absoluteFilePath().toStdString()));
+                    metadata = deserializeMetadata(FileOperations::fileReadAllText(metadataFile.absoluteFilePath().toStdString()));
                 }
                 catch (const std::exception &e) {
                     //Ignore exception and set default metadata
