@@ -101,62 +101,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             this,
             SLOT(onHistoryTextDoubleClicked(const QString &)));
 
-    std::string settingsFilePath = Paths::getAppDataDirectory().append(SETTINGS_FILE);
-    if (QFile(settingsFilePath.c_str()).exists()) {
-        try {
-            settings = Serializer::deserializeSettings(FileOperations::fileReadAllText(settingsFilePath));
-        }
-        catch (const std::runtime_error &e) {
-            QMessageBox::warning(this, "Failed to load settings", e.what());
-            settings = {};
-        }
-    }
-
-    resize(settings.value(SETTING_KEY_WINDOWSIZE_X, SETTING_DEFAULT_WINDOWSIZE_X).toInt(),
-           settings.value(SETTING_KEY_WINDOWSIZE_Y, SETTING_DEFAULT_WINDOWSIZE_Y).toInt());
-
-    int formattingPrecision = settings.value(SETTING_KEY_FORMATTING_PRECISION,
-                                             SETTING_DEFAULT_FORMATTING_PRECISION).toInt();
-
-    //Do bounds checking on the deserialized formatting precision
-    if (formattingPrecision < 0 || formattingPrecision > MAX_FORMATTING_PRECISION) {
-        formattingPrecision = 0;
-        settings.setValue(SETTING_KEY_FORMATTING_PRECISION, formattingPrecision);
-    }
-
-    int symbolsFormattingPrecision = settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
-                                                    SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt();
-    if (symbolsFormattingPrecision < 0 || symbolsFormattingPrecision > MAX_FORMATTING_PRECISION) {
-        symbolsFormattingPrecision = 0;
-        settings.setValue(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION, symbolsFormattingPrecision);
-    }
-
-    // Because on 32bit platforms long(mpfr_prec_t) and int can both be 32 bit and the mpfr documentation says
-    // "no value near MPFR_PREC_MAX should be used" we limit the precision range
-    // to a max of MPFR_PREC_MAX minus one third of MPFR_PREC_MAX (Which is redundant on 64bit).
-    // The gui limits the ranges of these values, so this is to protect against invalid values in the settings file,
-    // and should not affect normal user experience.
-    int symbolsPrecision = settings.value(SETTING_KEY_SYMBOLS_PRECISION,
-                                          SETTING_DEFAULT_SYMBOLS_PRECISION).toInt();
-    if (symbolsPrecision < MPFR_PREC_MIN || (mpfr_prec_t) symbolsPrecision > (MPFR_PREC_MAX - (MPFR_PREC_MAX / 3))) {
-        symbolsPrecision = MPFR_PREC_MIN;
-        settings.setValue(SETTING_KEY_SYMBOLS_PRECISION, symbolsPrecision);
-    }
-
-    int precision = settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt();
-    if (precision < MPFR_PREC_MIN || (mpfr_prec_t) precision > (MPFR_PREC_MAX - (MPFR_PREC_MAX / 3))) {
-        precision = MPFR_PREC_MIN;
-        settings.setValue(SETTING_KEY_PRECISION, precision);
-    }
-
-    mpfr_rnd_t rounding = Serializer::deserializeRoundingMode(
-            settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt());
-
-    mpfr::mpreal::set_default_prec(precision);
-    mpfr::mpreal::set_default_rnd(rounding);
-
-    symbolsEditor->setPrecision(symbolsPrecision);
-    symbolsEditor->setSymbols(symbolTable, symbolsFormattingPrecision);
+    loadSettings();
 
     ExprtkModule::initialize(*this);
 
@@ -193,7 +138,7 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    exitRoutine();
+    saveSettings();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
@@ -315,7 +260,7 @@ void MainWindow::onActionSettings() {
 }
 
 void MainWindow::onActionExit() {
-    exitRoutine();
+    saveSettings();
     QCoreApplication::quit();
 }
 
@@ -418,8 +363,10 @@ void MainWindow::onHistoryTextDoubleClicked(const QString &text) {
     ui->lineEdit_input->setFocus();
 }
 
-void MainWindow::exitRoutine() {
-    AddonManager::setActiveAddons({}, *this);
+void MainWindow::saveSettings() {
+    AddonManager::setActiveAddons({}, *this); //Unload addons
+
+    settings.setValue(SETTING_KEY_WINDOW_MAXIMIZED, windowState().testFlag(Qt::WindowMaximized));
 
     settings.setValue(SETTING_KEY_WINDOWSIZE_X, size().width());
     settings.setValue(SETTING_KEY_WINDOWSIZE_Y, size().height());
@@ -436,4 +383,67 @@ void MainWindow::exitRoutine() {
     catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to save settings", e.what());
     }
+}
+
+void MainWindow::loadSettings() {
+    std::string settingsFilePath = Paths::getAppDataDirectory().append(SETTINGS_FILE);
+    if (QFile(settingsFilePath.c_str()).exists()) {
+        try {
+            settings = Serializer::deserializeSettings(FileOperations::fileReadAllText(settingsFilePath));
+        }
+        catch (const std::runtime_error &e) {
+            QMessageBox::warning(this, "Failed to load settings", e.what());
+            settings = {};
+        }
+    }
+
+    resize(settings.value(SETTING_KEY_WINDOWSIZE_X, SETTING_DEFAULT_WINDOWSIZE_X).toInt(),
+           settings.value(SETTING_KEY_WINDOWSIZE_Y, SETTING_DEFAULT_WINDOWSIZE_Y).toInt());
+
+    if (settings.value(SETTING_KEY_WINDOW_MAXIMIZED, SETTING_DEFAULT_WINDOW_MAXIMIZED).toInt()) {
+        showMaximized();
+    }
+
+    int formattingPrecision = settings.value(SETTING_KEY_FORMATTING_PRECISION,
+                                             SETTING_DEFAULT_FORMATTING_PRECISION).toInt();
+
+    //Do bounds checking on the deserialized formatting precision
+    if (formattingPrecision < 0 || formattingPrecision > MAX_FORMATTING_PRECISION) {
+        formattingPrecision = 0;
+        settings.setValue(SETTING_KEY_FORMATTING_PRECISION, formattingPrecision);
+    }
+
+    int symbolsFormattingPrecision = settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
+                                                    SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt();
+    if (symbolsFormattingPrecision < 0 || symbolsFormattingPrecision > MAX_FORMATTING_PRECISION) {
+        symbolsFormattingPrecision = 0;
+        settings.setValue(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION, symbolsFormattingPrecision);
+    }
+
+    // Because on 32bit platforms long(mpfr_prec_t) and int can both be 32 bit and the mpfr documentation says
+    // "no value near MPFR_PREC_MAX should be used" we limit the precision range
+    // to a max of MPFR_PREC_MAX minus one third of MPFR_PREC_MAX (Which is redundant on 64bit).
+    // The gui limits the ranges of these values, so this is to protect against invalid values in the settings file,
+    // and should not affect normal user experience.
+    int symbolsPrecision = settings.value(SETTING_KEY_SYMBOLS_PRECISION,
+                                          SETTING_DEFAULT_SYMBOLS_PRECISION).toInt();
+    if (symbolsPrecision < MPFR_PREC_MIN || (mpfr_prec_t) symbolsPrecision > (MPFR_PREC_MAX - (MPFR_PREC_MAX / 3))) {
+        symbolsPrecision = MPFR_PREC_MIN;
+        settings.setValue(SETTING_KEY_SYMBOLS_PRECISION, symbolsPrecision);
+    }
+
+    int precision = settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt();
+    if (precision < MPFR_PREC_MIN || (mpfr_prec_t) precision > (MPFR_PREC_MAX - (MPFR_PREC_MAX / 3))) {
+        precision = MPFR_PREC_MIN;
+        settings.setValue(SETTING_KEY_PRECISION, precision);
+    }
+
+    mpfr_rnd_t rounding = Serializer::deserializeRoundingMode(
+            settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt());
+
+    mpfr::mpreal::set_default_prec(precision);
+    mpfr::mpreal::set_default_rnd(rounding);
+
+    symbolsEditor->setPrecision(symbolsPrecision);
+    symbolsEditor->setSymbols(symbolTable, symbolsFormattingPrecision);
 }

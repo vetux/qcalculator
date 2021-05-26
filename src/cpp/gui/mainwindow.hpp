@@ -101,7 +101,9 @@ public slots:
     void onHistoryTextDoubleClicked(const QString &text);
 
 private:
-    void exitRoutine();
+    void loadSettings();
+
+    void saveSettings();
 
     Ui::MainWindow *ui;
 
