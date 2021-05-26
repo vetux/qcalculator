@@ -413,7 +413,8 @@ const SymbolTable &MainWindow::getSymbolTable() {
 }
 
 void MainWindow::onHistoryTextDoubleClicked(const QString &text) {
-    ui->lineEdit_input->setText(text);
+    const QString &currentText = ui->lineEdit_input->text();
+    ui->lineEdit_input->setText(currentText + text);
     ui->lineEdit_input->setFocus();
 }
 
