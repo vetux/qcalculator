@@ -28,7 +28,7 @@
 #include <set>
 #include <string>
 
-#include "addonhelper.hpp"
+#include "addon/addonhelper.hpp"
 
 class AddonTesterDialog : public QDialog {
 Q_OBJECT

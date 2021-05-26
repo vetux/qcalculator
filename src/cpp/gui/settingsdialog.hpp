@@ -25,7 +25,7 @@
 #include <set>
 #include <string>
 
-#include "addonmetadata.hpp"
+#include "addon/addonmetadata.hpp"
 
 #include <mpfr.h>
 

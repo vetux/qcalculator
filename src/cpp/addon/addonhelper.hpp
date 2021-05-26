@@ -23,7 +23,7 @@
 #include <string>
 #include <map>
 
-#include "addonmetadata.hpp"
+#include "addon/addonmetadata.hpp"
 
 namespace AddonHelper {
     /**

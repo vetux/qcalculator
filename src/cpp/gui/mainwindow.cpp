@@ -25,11 +25,11 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
-#include "addonmanager.hpp"
-#include "addonhelper.hpp"
-#include "paths.hpp"
-#include "serializer.hpp"
-#include "io.hpp"
+#include "addon/addonmanager.hpp"
+#include "addon/addonhelper.hpp"
+#include "io/paths.hpp"
+#include "io/serializer.hpp"
+#include "io/io.hpp"
 #include "settingconstants.hpp"
 
 #include "math/numberformat.hpp"

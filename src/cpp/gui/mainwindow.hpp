@@ -27,8 +27,8 @@
 #include <bitset>
 #include <set>
 
-#include "addonmanagerlistener.hpp"
-#include "settings.hpp"
+#include "addon/addonmanagerlistener.hpp"
+#include "io/settings.hpp"
 
 #include "math/symboltable.hpp"
 #include "math/numeralsystem.hpp"

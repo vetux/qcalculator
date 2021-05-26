@@ -24,7 +24,7 @@
 #include <string>
 #include <functional>
 
-#include "addonmanagerlistener.hpp"
+#include "addon/addonmanagerlistener.hpp"
 
 namespace AddonManager {
     /**

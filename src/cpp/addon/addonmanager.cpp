@@ -17,9 +17,9 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "addonmanager.hpp"
+#include "addon/addonmanager.hpp"
 
-#include "addonhelper.hpp"
+#include "addon/addonhelper.hpp"
 
 std::set<std::string> loadedModules;
 

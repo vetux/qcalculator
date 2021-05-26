@@ -22,7 +22,7 @@
 
 #include <vector>
 
-#include "uid.hpp"
+#include "util/uid.hpp"
 
 /**
  * Generates unique identifiers which are guaranteed to be unique for each generator instance.

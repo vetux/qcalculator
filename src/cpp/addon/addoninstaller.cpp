@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "addoninstaller.hpp"
+#include "addon/addoninstaller.hpp"
 
 void AddonInstaller::installAddon(std::string &sourceFile, const std::string &addonsDirectory) {
 

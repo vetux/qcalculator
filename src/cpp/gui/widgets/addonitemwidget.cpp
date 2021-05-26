@@ -23,7 +23,7 @@
 
 #include "gui/addontesterdialog.hpp"
 
-#include "addonmanager.hpp"
+#include "addon/addonmanager.hpp"
 
 AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent),
                                                     layout(nullptr),

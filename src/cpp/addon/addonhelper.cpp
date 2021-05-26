@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "addonhelper.hpp"
+#include "addon/addonhelper.hpp"
 
 #include "cpython/pythoninclude.hpp"
 
@@ -28,7 +28,7 @@
 
 #include "cpython/pyutil.hpp"
 #include "extern/json.hpp"
-#include "io.hpp"
+#include "io/io.hpp"
 
 namespace AddonHelper {
     AddonMetadata deserializeMetadata(const std::string &text) {

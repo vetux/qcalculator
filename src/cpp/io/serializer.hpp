@@ -17,19 +17,32 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "paths.hpp"
+#ifndef QT_CALC_SERIALIZER_HPP
+#define QT_CALC_SERIALIZER_HPP
 
-#include <QStandardPaths>
-#include <QCoreApplication>
+#include <string>
+#include <set>
 
-std::string Paths::getAppDataDirectory() {
-    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString();
+#include "math/symboltable.hpp"
+
+#include "io/settings.hpp"
+
+namespace Serializer {
+    std::string serializeTable(const SymbolTable &table);
+
+    SymbolTable deserializeTable(const std::string &str, int precision);
+
+    std::string serializeSettings(const Settings &settings);
+
+    Settings deserializeSettings(const std::string &str);
+
+    std::string serializeSet(const std::set<std::string> &set);
+
+    std::set<std::string> deserializeSet(const std::string &str);
+
+    int serializeRoundingMode(mpfr_rnd_t mode);
+
+    mpfr_rnd_t deserializeRoundingMode(int mode);
 }
 
-std::string Paths::getAddonDirectory() {
-    return QCoreApplication::applicationDirPath().append("/modules/addon").toStdString();
-}
-
-std::string Paths::getSystemDirectory() {
-    return QCoreApplication::applicationDirPath().append("/modules/system").toStdString();
-}
+#endif //QT_CALC_SERIALIZER_HPP

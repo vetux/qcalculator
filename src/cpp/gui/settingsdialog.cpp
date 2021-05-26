@@ -25,8 +25,8 @@
 
 #include "gui/widgets/addonitemwidget.hpp"
 
-#include "addonhelper.hpp"
-#include "paths.hpp"
+#include "addon/addonhelper.hpp"
+#include "io/paths.hpp"
 
 int getIndexFromRoundingMode(mpfr_rnd_t mode) {
     switch (mode) {
