@@ -28,17 +28,9 @@ def find_widget(object_name):
 app = QtWidgets.QApplication.instance()
 
 wnd = find_widget("MainWindow")
-menu = find_widget("menubar")
+menubar = find_widget("menubar")
 statusbar = find_widget("statusbar")
 
-menu_file = find_widget("menuFile")
-menu_help = find_widget("menuHelp")
-
-action_settings = find_widget("actionSettings")
-action_exit = find_widget("actionExit")
-action_about = find_widget("actionAbout")
-
 root = find_widget("widget_root")
-tabs = find_widget("tabWidget_main")
 history = find_widget("widget_history")
 input_line_edit = find_widget("lineEdit_input")

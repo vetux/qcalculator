@@ -74,9 +74,6 @@ class NumeralSystemWidget(QtWidgets.QWidget):
         self.layout().addLayout(octlayout)
         self.layout().addLayout(binlayout)
 
-        spacer = QtWidgets.QSpacerItem(50, 50, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
-        self.layout().addItem(spacer)
-
         QtCore.QObject.connect(self.dectext,
                                QtCore.SIGNAL("editingFinished()"),
                                self,
@@ -137,14 +134,12 @@ class NumeralSystemWidget(QtWidgets.QWidget):
 
 widget = NumeralSystemWidget
 
-
 def load():
     global widget
     widget = NumeralSystemWidget(gui.wnd)
-    gui.tabs.addTab(widget, "Numeral Systems")
-
+    gui.root.layout().addWidget(widget)
 
 def unload():
     global widget
-    gui.tabs.removeTab(gui.tabs.indexOf(widget))
+    gui.root.layout().removeWidget(widget)
     widget.deleteLater()

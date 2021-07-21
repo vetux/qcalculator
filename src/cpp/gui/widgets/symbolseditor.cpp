@@ -100,15 +100,24 @@ SymbolsEditor::SymbolsEditor(QWidget *parent) : QWidget(parent) {
             SLOT(onCurrentFunctionChanged(const QString &)));
 }
 
-void SymbolsEditor::setSymbols(const SymbolTable &symtable, int fp) {
+void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
     symbolTable = symtable;
-    formattingPrecision = fp;
 
-    variablesEditor->setValues(convertMap(symtable.getVariables(), formattingPrecision));
-    constantsEditor->setValues(convertMap(symtable.getConstants(), formattingPrecision));
-    functionsEditor->setFunctions(symtable.getFunctions());
+    variablesEditor->setValues(convertMap(symbolTable.getVariables(), formattingPrecision));
+    constantsEditor->setValues(convertMap(symbolTable.getConstants(), formattingPrecision));
+    functionsEditor->setFunctions(symbolTable.getFunctions());
     functionsEditor->setCurrentFunction(currentFunction);
-    scriptsEditor->setScripts(symtable.getScripts());
+    scriptsEditor->setScripts(symbolTable.getScripts());
+}
+
+void SymbolsEditor::setFormattingPrecision(int p) {
+    formattingPrecision = p;
+
+    variablesEditor->setValues(convertMap(symbolTable.getVariables(), formattingPrecision));
+    constantsEditor->setValues(convertMap(symbolTable.getConstants(), formattingPrecision));
+    functionsEditor->setFunctions(symbolTable.getFunctions());
+    functionsEditor->setCurrentFunction(currentFunction);
+    scriptsEditor->setScripts(symbolTable.getScripts());
 }
 
 void SymbolsEditor::setPrecision(int prec) {

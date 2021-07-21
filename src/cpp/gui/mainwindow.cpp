@@ -37,6 +37,7 @@
 #include "math/expressionparser.hpp"
 
 #include "gui/dialog/settingsdialog.hpp"
+#include "gui/dialog/symbolsdialog.hpp"
 #include "gui/widgets/historywidget.hpp"
 #include "gui/widgets/symbolseditor.hpp"
 
@@ -66,14 +67,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     historyPalette.setColor(history->backgroundRole(), input->palette().color(input->backgroundRole()));
     history->setPalette(historyPalette);
 
-    connect(symbolsEditor, SIGNAL(onSymbolsChanged(const SymbolTable &)), this,
-            SLOT(onSymbolTableChanged(const SymbolTable &)));
-
     connect(actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
     connect(actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
     connect(actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
     connect(actionImportSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionImportSymbolTable()));
     connect(actionExportSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionExportSymbolTable()));
+    connect(actionEditSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionEditSymbolTable()));
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
@@ -149,8 +148,10 @@ void MainWindow::onInputReturnPressed() {
 
         ArithmeticType value = ExpressionParser::evaluate(inputText, symbolTable);
 
-        symbolsEditor->setSymbols(symbolTable, settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
-                                                              SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt());
+        // Apply side effects
+        if (symbolsDialog != nullptr) {
+            symbolsDialog->setSymbols(symbolTable);
+        }
 
         std::string resultText = NumberFormat::toDecimal(value, settings.value(SETTING_KEY_FORMATTING_PRECISION,
                                                                                SETTING_DEFAULT_FORMATTING_PRECISION).toInt(),
@@ -171,8 +172,9 @@ void MainWindow::onInputReturnPressed() {
 
 void MainWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
     this->symbolTable = symbolTableArg;
-    symbolsEditor->setSymbols(symbolTable, settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
-                                                          SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt());
+    if (symbolsDialog != nullptr) {
+        symbolsDialog->setSymbols(symbolTable);
+    }
 }
 
 void MainWindow::onActionSettings() {
@@ -213,7 +215,9 @@ void MainWindow::onActionSettings() {
         mpfr::mpreal::set_default_prec(precision);
         mpfr::mpreal::set_default_rnd(rounding);
 
-        symbolsEditor->setPrecision(symbolsPrecision);
+        if (symbolsDialog != nullptr) {
+            symbolsDialog->setSymbolsPrecision(symbolsPrecision);
+        }
 
         auto tmp = symbolTable.getVariables();
         for (auto &v : tmp) {
@@ -229,7 +233,9 @@ void MainWindow::onActionSettings() {
             symbolTable.setConstant(v.first, v.second);
         }
 
-        symbolsEditor->setSymbols(symbolTable, symbolsFormattingPrecision);
+        if (symbolsDialog != nullptr) {
+            symbolsDialog->setSymbolsFormattingPrecision(symbolsFormattingPrecision);
+        }
 
         std::set<std::string> addons = dialog.getEnabledAddons();
 
@@ -296,8 +302,10 @@ void MainWindow::onActionImportSymbolTable() {
         symbolTable = Serializer::deserializeTable(FileOperations::fileReadAllText(filepath),
                                                    settings.value(SETTING_KEY_SYMBOLS_PRECISION,
                                                                   SETTING_DEFAULT_SYMBOLS_PRECISION).toInt());
-        symbolsEditor->setSymbols(symbolTable, settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
-                                                              SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt());
+        if (symbolsDialog != nullptr) {
+            symbolsDialog->setSymbols(symbolTable);
+        }
+
         QMessageBox::information(this, "Import successful", ("Successfully imported symbols from " + filepath).c_str());
     }
     catch (const std::exception &e) {
@@ -340,6 +348,25 @@ void MainWindow::onActionExportSymbolTable() {
         error += " Error: ";
         error += e.what();
         QMessageBox::warning(this, "Export failed", error.c_str());
+    }
+}
+
+void MainWindow::onActionEditSymbolTable() {
+    if (symbolsDialog == nullptr) {
+        symbolsDialog = new SymbolsDialog(symbolTable,
+                                          settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
+                                                         SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt(),
+                                          settings.value(SETTING_KEY_SYMBOLS_PRECISION,
+                                                         SETTING_DEFAULT_SYMBOLS_PRECISION).toInt(),
+                                          this);
+        connect(symbolsDialog,
+                &QDialog::finished,
+                [this](int) {
+                    symbolsDialog = nullptr;
+                });
+        symbolsDialog->show();
+    } else {
+        symbolsDialog->activateWindow();
     }
 }
 
@@ -434,8 +461,11 @@ void MainWindow::loadSettings() {
     mpfr::mpreal::set_default_prec(precision);
     mpfr::mpreal::set_default_rnd(rounding);
 
-    symbolsEditor->setPrecision(symbolsPrecision);
-    symbolsEditor->setSymbols(symbolTable, symbolsFormattingPrecision);
+    if (symbolsDialog != nullptr) {
+        symbolsDialog->setSymbolsPrecision(symbolsPrecision);
+        symbolsDialog->setSymbols(symbolTable);
+        symbolsDialog->setSymbolsFormattingPrecision(symbolsFormattingPrecision);
+    }
 }
 
 void MainWindow::setupMenuBar() {
@@ -444,6 +474,10 @@ void MainWindow::setupMenuBar() {
     menuFile = new QMenu(this);
     menuFile->setObjectName("menuFile");
     menuFile->setTitle("File");
+
+    menuSymbols = new QMenu(this);
+    menuSymbols->setObjectName("menuSymbols");
+    menuSymbols->setTitle("Symbols");
 
     menuHelp = new QMenu(this);
     menuHelp->setObjectName("menuHelp");
@@ -469,15 +503,23 @@ void MainWindow::setupMenuBar() {
     actionAbout->setText("About QCalculator");
     actionAbout->setObjectName("actionAbout");
 
+    actionEditSymbols = new QAction(this);
+    actionEditSymbols->setText("Edit Symbols");
+    actionEditSymbols->setObjectName("actionEditSymbols");
+
     menuFile->addAction(actionSettings);
     menuFile->addSeparator();
-    menuFile->addAction(actionImportSymbols);
-    menuFile->addAction(actionExportSymbols);
     menuFile->addAction(actionExit);
+
+    menuSymbols->addAction(actionEditSymbols);
+    menuSymbols->addSeparator();
+    menuSymbols->addAction(actionImportSymbols);
+    menuSymbols->addAction(actionExportSymbols);
 
     menuHelp->addAction(actionAbout);
 
     menuBar()->addMenu(menuFile);
+    menuBar()->addMenu(menuSymbols);
     menuBar()->addMenu(menuHelp);
 }
 
@@ -486,23 +528,13 @@ void MainWindow::setupLayout() {
     rootWidget->setObjectName("widget_root");
     rootWidget->setLayout(new QVBoxLayout());
 
-    tabWidget = new QTabWidget(this);
-    tabWidget->setObjectName("tabWidget_main");
-
     history = new HistoryWidget(this);
     history->setObjectName("widget_history");
-
-    tabWidget->addTab(history, "History");
-
-    symbolsEditor = new SymbolsEditor(this);
-    symbolsEditor->setObjectName("widget_symtable_editor");
-
-    tabWidget->addTab(symbolsEditor, "Symbols");
 
     input = new QLineEdit(this);
     input->setObjectName("lineEdit_input");
 
-    rootWidget->layout()->addWidget(tabWidget);
+    rootWidget->layout()->addWidget(history);
     rootWidget->layout()->addWidget(input);
 
     setCentralWidget(rootWidget);

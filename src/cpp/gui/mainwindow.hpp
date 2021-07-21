@@ -36,6 +36,8 @@
 #include "gui/widgets/symbolseditor.hpp"
 #include "gui/widgets/historywidget.hpp"
 
+#include "gui/dialog/symbolsdialog.hpp"
+
 class MainWindow : public QMainWindow, public AddonManagerListener {
 Q_OBJECT
 
@@ -92,6 +94,8 @@ public slots:
 
     void onActionExportSymbolTable();
 
+    void onActionEditSymbolTable();
+
     const SymbolTable &getSymbolTable();
 
     void onHistoryTextDoubleClicked(const QString &text);
@@ -106,19 +110,23 @@ private:
     void setupLayout();
 
     QWidget *rootWidget{};
-    QTabWidget *tabWidget{};
-    QLineEdit *input{};
     HistoryWidget *history{};
-    SymbolsEditor *symbolsEditor{};
+    QLineEdit *input{};
 
     QMenu *menuFile{};
+    QMenu *menuSymbols{};
     QMenu *menuHelp{};
 
     QAction *actionSettings{};
+    QAction *actionExit{};
+
+    QAction *actionEditSymbols;
     QAction *actionImportSymbols{};
     QAction *actionExportSymbols{};
-    QAction *actionExit{};
+
     QAction *actionAbout{};
+
+    SymbolsDialog *symbolsDialog = nullptr;
 
     SymbolTable symbolTable;
 

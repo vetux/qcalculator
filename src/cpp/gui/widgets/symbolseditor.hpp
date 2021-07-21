@@ -40,7 +40,9 @@ public:
 
 public slots:
 
-    void setSymbols(const SymbolTable &symbolTable, int formattingPrecision);
+    void setSymbols(const SymbolTable &symbolTable);
+
+    void setFormattingPrecision(int precision);
 
     void setPrecision(int precision);
 

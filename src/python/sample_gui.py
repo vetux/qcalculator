@@ -48,7 +48,7 @@ def load():
     menu = QtWidgets.QMenu()
 
     menu.setTitle("Sample Menu")
-    gui.menu.addMenu(menu)
+    gui.menubar.addMenu(menu)
     action = menu.addAction("Sample Action")
 
     # !IMPORTANT! Use QtCore.QObject.connect() to connect signals and slots, as the new way leaks memory.
@@ -66,7 +66,7 @@ def unload():
     global action
 
     # !IMPORTANT! Always remove actions from the native QMenu by using the menu action, otherwise memory leaks!
-    gui.menu.removeAction(menu.menuAction())
+    gui.menubar.removeAction(menu.menuAction())
 
     # !IMPORTANT! Call deleteLater() for qt objects created by python, otherwise memory leaks!
     menu.deleteLater()

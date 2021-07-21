@@ -34,6 +34,7 @@ file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/system) 
 set(HDR_GUI src/cpp/gui/mainwindow.hpp
         src/cpp/gui/dialog/settingsdialog.hpp
         src/cpp/gui/dialog/addontesterdialog.hpp
+        src/cpp/gui/dialog/symbolsdialog.hpp
         src/cpp/gui/widgets/addonitemwidget.hpp
         src/cpp/gui/widgets/historywidget.hpp
         src/cpp/gui/widgets/historylabel.hpp
