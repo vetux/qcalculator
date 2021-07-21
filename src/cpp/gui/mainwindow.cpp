@@ -393,11 +393,6 @@ void MainWindow::onHistoryTextDoubleClicked(const QString &text) {
 void MainWindow::saveSettings() {
     AddonManager::setActiveAddons({}, *this); //Unload addons
 
-    settings.setValue(SETTING_KEY_WINDOW_MAXIMIZED, windowState().testFlag(Qt::WindowMaximized));
-
-    settings.setValue(SETTING_KEY_WINDOWSIZE_X, size().width());
-    settings.setValue(SETTING_KEY_WINDOWSIZE_Y, size().height());
-
     try {
         std::string dataDir = Paths::getAppDataDirectory();
 
@@ -422,13 +417,6 @@ void MainWindow::loadSettings() {
             QMessageBox::warning(this, "Failed to load settings", e.what());
             settings = {};
         }
-    }
-
-    resize(settings.value(SETTING_KEY_WINDOWSIZE_X, SETTING_DEFAULT_WINDOWSIZE_X).toInt(),
-           settings.value(SETTING_KEY_WINDOWSIZE_Y, SETTING_DEFAULT_WINDOWSIZE_Y).toInt());
-
-    if (settings.value(SETTING_KEY_WINDOW_MAXIMIZED, SETTING_DEFAULT_WINDOW_MAXIMIZED).toInt()) {
-        showMaximized();
     }
 
     int formattingPrecision = settings.value(SETTING_KEY_FORMATTING_PRECISION,
