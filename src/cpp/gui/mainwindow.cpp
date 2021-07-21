@@ -364,6 +364,10 @@ void MainWindow::onActionEditSymbolTable() {
                 [this](int) {
                     symbolsDialog = nullptr;
                 });
+        connect(symbolsDialog,
+                SIGNAL(symbolsChanged(const SymbolTable &)),
+                this,
+                SLOT(onSymbolTableChanged(const SymbolTable &)));
         symbolsDialog->show();
     } else {
         symbolsDialog->activateWindow();
@@ -490,14 +494,17 @@ void MainWindow::setupMenuBar() {
     actionImportSymbols = new QAction(this);
     actionImportSymbols->setText("Import Symbols...");
     actionImportSymbols->setObjectName("actionImport_Symbols");
+    actionImportSymbols->setShortcut(QKeySequence::Open);
 
     actionExportSymbols = new QAction(this);
     actionExportSymbols->setText("Export Symbols...");
     actionExportSymbols->setObjectName("actionExport_Symbols");
+    actionExportSymbols->setShortcut(QKeySequence::Save);
 
     actionExit = new QAction(this);
     actionExit->setText("Exit");
     actionExit->setObjectName("actionExit");
+    actionExit->setShortcut(QKeySequence::Quit);
 
     actionAbout = new QAction(this);
     actionAbout->setText("About QCalculator");
