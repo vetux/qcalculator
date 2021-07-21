@@ -26,11 +26,13 @@
 
 #include "addon/addonmetadata.hpp"
 
+#include "gui/widgets/addonitemwidget.hpp"
+
 class AddonTab : public QWidget {
 Q_OBJECT
 signals:
 
-    void addonEnableChanged(bool enabled);
+    void addonEnableChanged(AddonItemWidget *item);
 
     void installPressed();
 
@@ -43,6 +45,9 @@ public slots:
 
 public:
     explicit AddonTab(QWidget *parent = nullptr);
+
+private slots:
+    void onAddonEnableChanged();
 
 private:
     QPushButton *installButton;

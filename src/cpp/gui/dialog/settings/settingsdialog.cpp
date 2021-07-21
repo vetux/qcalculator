@@ -69,6 +69,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     connect(addonTab, SIGNAL(installPressed()), this, SLOT(onInstallAddonPressed()));
     connect(addonTab, SIGNAL(refreshPressed()), this, SLOT(onRefreshAddonsPressed()));
+    connect(addonTab, SIGNAL(addonEnableChanged(AddonItemWidget * )), this,
+            SLOT(onModuleEnableChanged(AddonItemWidget * )));
 
     resize({700, 500});
 }
@@ -140,10 +142,9 @@ int SettingsDialog::getSymbolsFormattingPrecision() {
     return generalTab->getSymbolsFormatPrecision();
 }
 
-void SettingsDialog::onModuleEnableChanged(bool enabled) {
-    auto &s = dynamic_cast<AddonItemWidget &>(*sender());
-
-    std::string name = s.getModuleName().toStdString();
+void SettingsDialog::onModuleEnableChanged(AddonItemWidget *item) {
+    std::string name = item->getModuleName().toStdString();
+    bool enabled = item->getModuleEnabled();
 
     auto it = enabledAddons.find(name);
     if (it != enabledAddons.end()) {

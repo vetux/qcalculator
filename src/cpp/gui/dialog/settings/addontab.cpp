@@ -39,7 +39,7 @@ void AddonTab::setAddons(const std::map<std::string, bool> &addonState,
         item->setSizeHint(itemWidget->minimumSizeHint());
         listWidget->addItem(item);
         listWidget->setItemWidget(item, itemWidget);
-        connect(itemWidget, SIGNAL(onModuleEnabledChanged(bool)), this, SIGNAL(addonEnableChanged(bool)));
+        connect(itemWidget, SIGNAL(onModuleEnabledChanged(bool)), this, SLOT(onAddonEnableChanged()));
     }
 }
 
@@ -62,4 +62,9 @@ AddonTab::AddonTab(QWidget *parent)
     setLayout(new QVBoxLayout(this));
     layout()->addWidget(header);
     layout()->addWidget(listWidget);
+}
+
+
+void AddonTab::onAddonEnableChanged() {
+    emit addonEnableChanged(dynamic_cast<AddonItemWidget*>(sender()));
 }

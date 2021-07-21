@@ -86,10 +86,6 @@ void GeneralTab::setSymbolsFormatPrecision(int digits) {
     symbolsFormatPrecisionSpinBox->setValue(digits);
 }
 
-void GeneralTab::setSymbolsFormatRounding(mpfr_rnd_t rounding) {
-    symbolsFormatRoundingComboBox->setCurrentIndex(getIndexFromRoundingMode(rounding));
-}
-
 GeneralTab::GeneralTab(QWidget *parent)
         : QWidget(parent) {
     roundingModel.setStringList({"Round to nearest",
@@ -131,19 +127,12 @@ GeneralTab::GeneralTab(QWidget *parent)
             "The precision in decimal spaces used when formatting variable and constant values to strings.");
     symbolsFormatPrecisionSpinBox = new QSpinBox(this);
 
-    symbolsFormatRoundingLabel = new QLabel(this);
-    symbolsFormatRoundingLabel->setText("Symbols Format Rounding");
-    symbolsFormatRoundingLabel->setToolTip(
-            "The rounding mode used when formatting variable and constant values to strings.");
-    symbolsFormatRoundingComboBox = new QComboBox(this);
-
     precisionSpinBox->setRange(1, 1000000000);
     formatPrecisionSpinBox->setRange(0, 1000000);
     symbolsPrecisionSpinBox->setRange(1, 1000000000);
     symbolsFormatPrecisionSpinBox->setRange(0, 1000000);
 
     formatRoundingComboBox->setModel(&roundingModel);
-    symbolsFormatRoundingComboBox->setModel(&roundingModel);
 
     auto *layout = new QVBoxLayout();
 
@@ -169,14 +158,11 @@ GeneralTab::GeneralTab(QWidget *parent)
     layout->addWidget(symbolsPrecisionSpinBox);
     layout->addWidget(symbolsFormatPrecisionLabel);
     layout->addWidget(symbolsFormatPrecisionSpinBox);
-    layout->addWidget(symbolsFormatRoundingLabel);
-    layout->addWidget(symbolsFormatRoundingComboBox);
 
     layout->addWidget(new QWidget(this), 1);
 
     setLayout(layout);
 }
-
 
 int GeneralTab::getPrecision() {
     return precisionSpinBox->value();
@@ -200,8 +186,4 @@ int GeneralTab::getSymbolsPrecision() {
 
 int GeneralTab::getSymbolsFormatPrecision() {
     return symbolsFormatPrecisionSpinBox->value();
-}
-
-mpfr_rnd_t GeneralTab::getSymbolsFormatRounding() {
-    return getRoundingModeFromIndex(symbolsFormatRoundingComboBox->currentIndex());
 }

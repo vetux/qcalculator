@@ -70,7 +70,7 @@ public:
 
 private slots:
 
-    void onModuleEnableChanged(bool enabled);
+    void onModuleEnableChanged(AddonItemWidget *item);
 
     void onDialogAccepted();
 
