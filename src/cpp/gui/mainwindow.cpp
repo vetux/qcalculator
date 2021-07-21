@@ -282,6 +282,7 @@ void MainWindow::onActionImportSymbolTable() {
     QFileDialog dialog(this);
     dialog.setWindowTitle("Import Symbols...");
     dialog.setFileMode(QFileDialog::ExistingFile);
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
 
     if (!dialog.exec()) {
         return;
@@ -321,8 +322,9 @@ void MainWindow::onActionImportSymbolTable() {
 
 void MainWindow::onActionExportSymbolTable() {
     QFileDialog dialog(this);
-    dialog.setWindowTitle("Import Symbols...");
+    dialog.setWindowTitle("Export Symbols...");
     dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
 
     if (!dialog.exec()) {
         return;
@@ -513,6 +515,7 @@ void MainWindow::setupMenuBar() {
     actionEditSymbols = new QAction(this);
     actionEditSymbols->setText("Edit Symbols");
     actionEditSymbols->setObjectName("actionEditSymbols");
+    actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
     menuFile->addAction(actionSettings);
     menuFile->addSeparator();
