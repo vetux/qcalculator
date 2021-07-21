@@ -27,6 +27,7 @@ SymbolsDialog::SymbolsDialog(const SymbolTable &symbols,
                              QWidget *parent)
         : QDialog(parent) {
     setModal(false);
+    setWindowTitle("Symbols");
     setLayout(new QVBoxLayout());
 
     editor = new SymbolsEditor(this);
