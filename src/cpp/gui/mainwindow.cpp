@@ -36,7 +36,7 @@
 #include "math/numberformat.hpp"
 #include "math/expressionparser.hpp"
 
-#include "gui/dialog/settingsdialog.hpp"
+#include "gui/dialog/settings/settingsdialog.hpp"
 #include "gui/dialog/symbolsdialog.hpp"
 #include "gui/widgets/historywidget.hpp"
 #include "gui/widgets/symbolseditor.hpp"
@@ -192,7 +192,9 @@ void MainWindow::onActionSettings() {
     dialog.setSymbolsFormattingPrecision(settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
                                                         SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt());
     dialog.setEnabledAddons(AddonManager::getActiveAddons());
+
     dialog.show();
+
     if (dialog.exec() == QDialog::Accepted) {
         int precision = dialog.getPrecision();
         settings.setValue(SETTING_KEY_PRECISION, precision);

@@ -21,7 +21,6 @@ if (WIN32)
 endif (WIN32)
 
 file(GLOB_RECURSE SRC src/cpp/*.cpp)
-file(GLOB_RECURSE FORMS src/forms/*.ui)
 
 file(GLOB ADDON_SRC src/python/*.py)
 file(GLOB ADDON_META src/python/*.json)
@@ -32,7 +31,9 @@ file(COPY ${ADDON_META} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/addon) #
 file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/system) # Copy system scripts
 
 set(HDR_GUI src/cpp/gui/mainwindow.hpp
-        src/cpp/gui/dialog/settingsdialog.hpp
+        src/cpp/gui/dialog/settings/settingsdialog.hpp
+        src/cpp/gui/dialog/settings/generaltab.hpp
+        src/cpp/gui/dialog/settings/addontab.hpp
         src/cpp/gui/dialog/addontesterdialog.hpp
         src/cpp/gui/dialog/symbolsdialog.hpp
         src/cpp/gui/widgets/addonitemwidget.hpp
@@ -44,7 +45,6 @@ set(HDR_GUI src/cpp/gui/mainwindow.hpp
         src/cpp/gui/widgets/symbolseditor.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
-qt5_wrap_ui(WRAP_UI ${FORMS}) # Seems to output into CMAKE_CURRENT_BINARY_DIR
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}) # Include for generated ui header files
 include_directories(src/cpp/)

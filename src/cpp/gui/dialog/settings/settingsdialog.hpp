@@ -25,13 +25,12 @@
 #include <set>
 #include <string>
 
-#include "addon/addonmetadata.hpp"
-
 #include <mpfr.h>
 
-namespace Ui {
-    class SettingsDialog;
-}
+#include "addon/addonmetadata.hpp"
+
+#include "gui/dialog/settings/generaltab.hpp"
+#include "gui/dialog/settings/addontab.hpp"
 
 class SettingsDialog : public QDialog {
 Q_OBJECT
@@ -84,12 +83,15 @@ private slots:
     void onInstallAddonPressed();
 
 private:
-    Ui::SettingsDialog *ui;
+    QPushButton *okButton;
+    QPushButton *cancelButton;
 
-    std::set<std::string> enabledAddons;
+    QTabWidget *tabWidget;
 
-    void applyAddonState(const std::map<std::string, bool> &addonState,
-                         const std::map<std::string, AddonMetadata> &addonMetadata);
+    GeneralTab *generalTab;
+    AddonTab *addonTab;
+
+    std::set<std::string> enabledAddons;;
 };
 
 #endif // QCALC_SETTINGSDIALOG_HPP
