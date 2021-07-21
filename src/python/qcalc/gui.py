@@ -40,7 +40,5 @@ action_about = find_widget("actionAbout")
 
 root = find_widget("widget_root")
 tabs = find_widget("tabWidget_main")
-tab_history = find_widget("tab_history")
-tab_symbols = find_widget("tab_symbols")
 history = find_widget("widget_history")
 input_line_edit = find_widget("lineEdit_input")

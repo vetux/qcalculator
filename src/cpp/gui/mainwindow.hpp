@@ -36,10 +36,6 @@
 #include "gui/widgets/symbolseditor.hpp"
 #include "gui/widgets/historywidget.hpp"
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
-
 class MainWindow : public QMainWindow, public AddonManagerListener {
 Q_OBJECT
 
@@ -105,11 +101,24 @@ private:
 
     void saveSettings();
 
-    Ui::MainWindow *ui;
+    void setupMenuBar();
 
-    HistoryWidget *history;
+    void setupLayout();
 
-    SymbolsEditor *symbolsEditor;
+    QWidget *rootWidget{};
+    QTabWidget *tabWidget{};
+    QLineEdit *input{};
+    HistoryWidget *history{};
+    SymbolsEditor *symbolsEditor{};
+
+    QMenu *menuFile{};
+    QMenu *menuHelp{};
+
+    QAction *actionSettings{};
+    QAction *actionImportSymbols{};
+    QAction *actionExportSymbols{};
+    QAction *actionExit{};
+    QAction *actionAbout{};
 
     SymbolTable symbolTable;
 

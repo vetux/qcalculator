@@ -18,12 +18,13 @@
  */
 
 #include "gui/mainwindow.hpp"
-#include "ui_mainwindow.h"
 
 #include <QFile>
 #include <QDir>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QMenuBar>
+#include <QApplication>
 
 #include "addon/addonmanager.hpp"
 #include "addon/addonhelper.hpp"
@@ -48,47 +49,37 @@
 #define MAX_FORMATTING_PRECISION 100000
 
 //TODO:Feature: Completion and history navigation for input line edit with eg. up / down arrows.
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow()) {
-    ui->setupUi(this);
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+    setObjectName("MainWindow");
 
-    history = new HistoryWidget(this);
-    history->setObjectName("widget_history");
-
-    ui->tab_history->layout()->addWidget(history);
-
-    symbolsEditor = new SymbolsEditor(this);
-    symbolsEditor->setObjectName("widget_symtable_editor");
-
-    ui->tab_symbols->layout()->addWidget(symbolsEditor);
-
-    ui->statusbar->hide();
+    setupLayout();
+    setupMenuBar();
 
     //Scale original point size by 1.3 and convert to integer (C++ Floating–integral conversion - fraction is truncated)
-    QFont defaultFont = ui->lineEdit_input->font();
+    QFont defaultFont = input->font();
     QFont largeFont(defaultFont.family(), (int) (defaultFont.pointSize() * 1.3));
 
-    ui->lineEdit_input->setFont(largeFont);
+    input->setFont(largeFont);
     history->setHistoryFont(largeFont);
 
     QPalette historyPalette = history->palette();
-    historyPalette.setColor(history->backgroundRole(),
-                            ui->lineEdit_input->palette().color(ui->lineEdit_input->backgroundRole()));
+    historyPalette.setColor(history->backgroundRole(), input->palette().color(input->backgroundRole()));
     history->setPalette(historyPalette);
 
     connect(symbolsEditor, SIGNAL(onSymbolsChanged(const SymbolTable &)), this,
             SLOT(onSymbolTableChanged(const SymbolTable &)));
 
-    connect(ui->actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
-    connect(ui->actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
-    connect(ui->actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
-    connect(ui->actionImport_Symbols, SIGNAL(triggered(bool)), this, SLOT(onActionImportSymbolTable()));
-    connect(ui->actionExport_Symbols, SIGNAL(triggered(bool)), this, SLOT(onActionExportSymbolTable()));
+    connect(actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
+    connect(actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
+    connect(actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
+    connect(actionImportSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionImportSymbolTable()));
+    connect(actionExportSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionExportSymbolTable()));
 
-    connect(ui->lineEdit_input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
+    connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
     connect(this,
             SIGNAL(signalInputTextChange(const QString &)),
-            ui->lineEdit_input,
+            input,
             SLOT(setText(const QString &)));
 
     connect(this,
@@ -133,9 +124,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     AddonManager::setActiveAddons(availableAddons, *this);
 }
 
-MainWindow::~MainWindow() {
-    delete ui;
-}
+MainWindow::~MainWindow() = default;
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     saveSettings();
@@ -156,7 +145,8 @@ void MainWindow::onAddonUnloadFail(const std::string &moduleName, const std::str
 
 void MainWindow::onInputReturnPressed() {
     try {
-        std::string inputText = ui->lineEdit_input->text().toStdString();
+        std::string inputText = input->text().toStdString();
+
         ArithmeticType value = ExpressionParser::evaluate(inputText, symbolTable);
 
         symbolsEditor->setSymbols(symbolTable, settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
@@ -358,9 +348,9 @@ const SymbolTable &MainWindow::getSymbolTable() {
 }
 
 void MainWindow::onHistoryTextDoubleClicked(const QString &text) {
-    const QString &currentText = ui->lineEdit_input->text();
-    ui->lineEdit_input->setText(currentText + text);
-    ui->lineEdit_input->setFocus();
+    const QString &currentText = input->text();
+    input->setText(currentText + text);
+    input->setFocus();
 }
 
 void MainWindow::saveSettings() {
@@ -447,3 +437,74 @@ void MainWindow::loadSettings() {
     symbolsEditor->setPrecision(symbolsPrecision);
     symbolsEditor->setSymbols(symbolTable, symbolsFormattingPrecision);
 }
+
+void MainWindow::setupMenuBar() {
+    menuBar()->setObjectName("menubar");
+
+    menuFile = new QMenu(this);
+    menuFile->setObjectName("menuFile");
+    menuFile->setTitle("File");
+
+    menuHelp = new QMenu(this);
+    menuHelp->setObjectName("menuHelp");
+    menuHelp->setTitle("Help");
+
+    actionSettings = new QAction(this);
+    actionSettings->setText("Settings");
+    actionSettings->setObjectName("actionSettings");
+
+    actionImportSymbols = new QAction(this);
+    actionImportSymbols->setText("Import Symbols...");
+    actionImportSymbols->setObjectName("actionImport_Symbols");
+
+    actionExportSymbols = new QAction(this);
+    actionExportSymbols->setText("Export Symbols...");
+    actionExportSymbols->setObjectName("actionExport_Symbols");
+
+    actionExit = new QAction(this);
+    actionExit->setText("Exit");
+    actionExit->setObjectName("actionExit");
+
+    actionAbout = new QAction(this);
+    actionAbout->setText("About QCalculator");
+    actionAbout->setObjectName("actionAbout");
+
+    menuFile->addAction(actionSettings);
+    menuFile->addSeparator();
+    menuFile->addAction(actionImportSymbols);
+    menuFile->addAction(actionExportSymbols);
+    menuFile->addAction(actionExit);
+
+    menuHelp->addAction(actionAbout);
+
+    menuBar()->addMenu(menuFile);
+    menuBar()->addMenu(menuHelp);
+}
+
+void MainWindow::setupLayout() {
+    rootWidget = new QWidget(this);
+    rootWidget->setObjectName("widget_root");
+    rootWidget->setLayout(new QVBoxLayout());
+
+    tabWidget = new QTabWidget(this);
+    tabWidget->setObjectName("tabWidget_main");
+
+    history = new HistoryWidget(this);
+    history->setObjectName("widget_history");
+
+    tabWidget->addTab(history, "History");
+
+    symbolsEditor = new SymbolsEditor(this);
+    symbolsEditor->setObjectName("widget_symtable_editor");
+
+    tabWidget->addTab(symbolsEditor, "Symbols");
+
+    input = new QLineEdit(this);
+    input->setObjectName("lineEdit_input");
+
+    rootWidget->layout()->addWidget(tabWidget);
+    rootWidget->layout()->addWidget(input);
+
+    setCentralWidget(rootWidget);
+}
+
