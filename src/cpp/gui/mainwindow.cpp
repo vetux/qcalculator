@@ -35,7 +35,7 @@
 #include "math/numberformat.hpp"
 #include "math/expressionparser.hpp"
 
-#include "gui/settingsdialog.hpp"
+#include "gui/dialog/settingsdialog.hpp"
 #include "gui/widgets/historywidget.hpp"
 #include "gui/widgets/symbolseditor.hpp"
 

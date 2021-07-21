@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "gui/settingsdialog.hpp"
+#include "settingsdialog.hpp"
 #include "ui_settingsdialog.h"
 
 #include <QSettings>

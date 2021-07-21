@@ -32,8 +32,8 @@ file(COPY ${ADDON_META} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/addon) #
 file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/system) # Copy system scripts
 
 set(HDR_GUI src/cpp/gui/mainwindow.hpp
-        src/cpp/gui/settingsdialog.hpp
-        src/cpp/gui/addontesterdialog.hpp
+        src/cpp/gui/dialog/settingsdialog.hpp
+        src/cpp/gui/dialog/addontesterdialog.hpp
         src/cpp/gui/widgets/addonitemwidget.hpp
         src/cpp/gui/widgets/historywidget.hpp
         src/cpp/gui/widgets/historylabel.hpp

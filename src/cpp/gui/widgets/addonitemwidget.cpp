@@ -21,7 +21,7 @@
 
 #include <QPushButton>
 
-#include "gui/addontesterdialog.hpp"
+#include "gui/dialog/addontesterdialog.hpp"
 
 #include "addon/addonmanager.hpp"
 
