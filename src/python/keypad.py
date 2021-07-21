@@ -143,10 +143,10 @@ class KeyPadWidget(QtWidgets.QWidget):
     def __init__(self, parent, font=gui.input_line_edit.font()):
         QtWidgets.QWidget.__init__(self, parent)
         self.setLayout(QtWidgets.QHBoxLayout())
+        self.layout().setMargin(0)
         container = QtWidgets.QWidget(self)
         self.layout().addWidget(container)
         container.setLayout(QtWidgets.QGridLayout())
-        container.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed))
         container.layout().setMargin(0)
         i = KeyCode.START
         while i < KeyCode.END:
