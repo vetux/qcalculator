@@ -56,6 +56,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setupLayout();
     setupMenuBar();
 
+    input->setFocus();
+
     //Scale original point size by 1.3 and convert to integer (C++ Floating–integral conversion - fraction is truncated)
     QFont defaultFont = input->font();
     QFont largeFont(defaultFont.family(), (int) (defaultFont.pointSize() * 1.3));
