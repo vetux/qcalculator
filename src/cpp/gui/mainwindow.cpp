@@ -486,12 +486,12 @@ void MainWindow::setupMenuBar() {
     actionSettings->setObjectName("actionSettings");
 
     actionImportSymbols = new QAction(this);
-    actionImportSymbols->setText("Import Symbols...");
+    actionImportSymbols->setText("Load Symbols...");
     actionImportSymbols->setObjectName("actionImport_Symbols");
     actionImportSymbols->setShortcut(QKeySequence::Open);
 
     actionExportSymbols = new QAction(this);
-    actionExportSymbols->setText("Export Symbols...");
+    actionExportSymbols->setText("Save Symbols...");
     actionExportSymbols->setObjectName("actionExport_Symbols");
     actionExportSymbols->setShortcut(QKeySequence::Save);
 
