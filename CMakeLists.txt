@@ -20,34 +20,34 @@ if (WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif (WIN32)
 
-file(GLOB_RECURSE SRC src/cpp/*.cpp)
+file(GLOB_RECURSE SRC src/*.cpp)
 
-file(GLOB ADDON_SRC src/python/*.py)
-file(GLOB ADDON_META src/python/*.json)
-set(SYSTEM_SRC src/python/qcalc)
+file(GLOB ADDON_SRC python/addon/*.py)
+file(GLOB ADDON_META python/addon/*.json)
+set(SYSTEM_SRC python/system/qcalc)
 
 file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/addon) # Copy addon scripts
 file(COPY ${ADDON_META} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/addon) # Copy addon metadata
 file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/system) # Copy system scripts
 
-set(HDR_GUI src/cpp/gui/mainwindow.hpp
-        src/cpp/gui/dialog/settings/settingsdialog.hpp
-        src/cpp/gui/dialog/settings/generaltab.hpp
-        src/cpp/gui/dialog/settings/addontab.hpp
-        src/cpp/gui/dialog/addontesterdialog.hpp
-        src/cpp/gui/dialog/symbolsdialog.hpp
-        src/cpp/gui/widgets/addonitemwidget.hpp
-        src/cpp/gui/widgets/historywidget.hpp
-        src/cpp/gui/widgets/historylabel.hpp
-        src/cpp/gui/widgets/functionseditor.hpp
-        src/cpp/gui/widgets/namedvalueeditor.hpp
-        src/cpp/gui/widgets/scriptseditor.hpp
-        src/cpp/gui/widgets/symbolseditor.hpp)
+set(HDR_GUI src/gui/mainwindow.hpp
+        src/gui/dialog/settings/settingsdialog.hpp
+        src/gui/dialog/settings/generaltab.hpp
+        src/gui/dialog/settings/addontab.hpp
+        src/gui/dialog/addontesterdialog.hpp
+        src/gui/dialog/symbolsdialog.hpp
+        src/gui/widgets/addonitemwidget.hpp
+        src/gui/widgets/historywidget.hpp
+        src/gui/widgets/historylabel.hpp
+        src/gui/widgets/functionseditor.hpp
+        src/gui/widgets/namedvalueeditor.hpp
+        src/gui/widgets/scriptseditor.hpp
+        src/gui/widgets/symbolseditor.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}) # Include for generated ui header files
-include_directories(src/cpp/)
+include_directories(src/)
 include_directories(${Python_INCLUDE_DIRS}) # Python
 
 if (WIN32)
