@@ -24,6 +24,7 @@
 #include <QScrollBar>
 
 //TODO:Feature: Syntax highlighting and completion for functions editor expression edit text.
+//TODO:Feature: Notify user of syntax errors in function expressions
 FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
 
@@ -129,7 +130,7 @@ void FunctionsEditor::setFunctions(const std::map<std::string, Function> &f) {
     list->setColumnCount(1);
     list->setRowCount(functions.size());
     int i = 0;
-    for (auto &p : functions) {
+    for (auto &p: functions) {
         rowMapping[p.first] = i;
         auto *item = new QTableWidgetItem(p.first.c_str());
         list->setItem(i++, 0, item);
@@ -165,16 +166,23 @@ void FunctionsEditor::onFunctionAddPressed() {
 void FunctionsEditor::onFunctionArgEditingFinished() {
     auto &edit = dynamic_cast<QLineEdit &>(*sender());
     std::vector<std::string> currentArgs = functions.at(currentFunction).argumentNames;
+// editingFinished of the argument name text edits is for some reason invoked when decrementing the argument spin box when previously having entered text into the expression text edit
+// therefore we check current args size
     if (&edit == argEdit0) {
-        currentArgs.at(0) = edit.text().toStdString();
+        if (!currentArgs.empty())
+            currentArgs.at(0) = edit.text().toStdString();
     } else if (&edit == argEdit1) {
-        currentArgs.at(1) = edit.text().toStdString();
+        if (currentArgs.size() > 1)
+            currentArgs.at(1) = edit.text().toStdString();
     } else if (&edit == argEdit2) {
-        currentArgs.at(2) = edit.text().toStdString();
+        if (currentArgs.size() > 2)
+            currentArgs.at(2) = edit.text().toStdString();
     } else if (&edit == argEdit3) {
-        currentArgs.at(3) = edit.text().toStdString();
+        if (currentArgs.size() > 3)
+            currentArgs.at(3) = edit.text().toStdString();
     } else if (&edit == argEdit4) {
-        currentArgs.at(4) = edit.text().toStdString();
+        if (currentArgs.size() > 4)
+            currentArgs.at(4) = edit.text().toStdString();
     }
     emit onFunctionArgsChanged(currentFunction.c_str(), currentArgs);
 }
@@ -207,7 +215,7 @@ void FunctionsEditor::onTableCellActivated(int row, int column) {
 
 void FunctionsEditor::onTableCellChanged(int row, int column) {
     std::string originalName;
-    for (auto &p : rowMapping) {
+    for (auto &p: rowMapping) {
         if (p.second == row) {
             originalName = p.first;
             break;
