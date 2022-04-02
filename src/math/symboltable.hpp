@@ -40,6 +40,14 @@ class SymbolTable {
 public:
     SymbolTable();
 
+    SymbolTable(const SymbolTable &other) = default;
+
+    SymbolTable(SymbolTable &&other) = default;
+
+    SymbolTable &operator=(const SymbolTable &other) = default;
+
+    SymbolTable &operator=(SymbolTable &&other) = default;
+
     const std::map<std::string, ArithmeticType> &getVariables() const;
 
     const std::map<std::string, ArithmeticType> &getConstants() const;

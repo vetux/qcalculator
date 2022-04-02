@@ -17,16 +17,11 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_EXPRTKMODULE_HPP
-#define QCALC_EXPRTKMODULE_HPP
+#ifndef QCALC_INTERACTIVEINTERPRETER_HPP
+#define QCALC_INTERACTIVEINTERPRETER_HPP
 
-#include <functional>
-
-#include "math/symboltable.hpp"
-
-namespace ExprtkModule {
-    void initialize(const std::function<void(const SymbolTable &)> &symbolTableChangeCallback,
-                    const std::function<const SymbolTable &()> &symbolTableRetrieveCallback);
+namespace InteractiveInterpreter {
+    int run();
 }
 
-#endif //QCALC_EXPRTKMODULE_HPP
+#endif //QCALC_INTERACTIVEINTERPRETER_HPP

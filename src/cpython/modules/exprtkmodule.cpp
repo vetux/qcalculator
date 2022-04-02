@@ -31,7 +31,8 @@
 
 #define MODULE_NAME "qc_native_exprtk"
 
-MainWindow *mainWindow = nullptr;
+std::function<void(const SymbolTable &)> symCallback;
+std::function<const SymbolTable &()> getSymCallback;
 
 PyObject *evaluate(PyObject *self, PyObject *args) {
     MODULE_FUNC_TRY
@@ -65,7 +66,7 @@ PyObject *evaluate(PyObject *self, PyObject *args) {
 }
 
 PyObject *get_global_symtable(PyObject *self, PyObject *args) {
-    return SymbolTableConverter::New(mainWindow->getSymbolTable());
+    return SymbolTableConverter::New(getSymCallback());
 }
 
 PyObject *set_global_symtable(PyObject *self, PyObject *args) {
@@ -73,7 +74,7 @@ PyObject *set_global_symtable(PyObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "O:", &pysym)) {
         return PyNull;
     }
-    mainWindow->onSymbolTableChanged(SymbolTableConverter::Convert(pysym));
+    symCallback(SymbolTableConverter::Convert(pysym));
     return PyLong_FromLong(0);
 }
 
@@ -108,7 +109,9 @@ static PyObject *PyInit() {
     return m;
 }
 
-void ExprtkModule::initialize(MainWindow &w) {
-    mainWindow = &w;
+void ExprtkModule::initialize(const std::function<void(const SymbolTable &)> &symbolTableChangeCallback,
+                              const std::function<const SymbolTable &()> &symbolTableRetrieveCallback) {
+    symCallback = symbolTableChangeCallback;
+    getSymCallback = symbolTableRetrieveCallback;
     PyImport_AppendInittab(MODULE_NAME, PyInit);
 }

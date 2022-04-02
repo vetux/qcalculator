@@ -21,6 +21,17 @@
 
 #include "gui/mainwindow.hpp"
 
+#include "cpython/interactiveinterpreter.hpp"
+
+std::vector<std::string> parseArgs(int argc, char *argv[]) {
+    std::vector<std::string> ret;
+    ret.reserve(argc);
+    for (int i = 0; i < argc; i++) {
+        ret.emplace_back(argv[i]);
+    }
+    return ret;
+}
+
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     a.setOrganizationName("Xenotux");
@@ -29,6 +40,15 @@ int main(int argc, char *argv[]) {
     a.setApplicationVersion("v0.5.0");
 
     MainWindow w;
+
+    auto args = parseArgs(argc, argv);
+
+    if (args.size() > 1) {
+        if (args.at(1) == "--interpreter") {
+            return InteractiveInterpreter::run();
+        }
+    }
+
     w.show();
 
     return a.exec();

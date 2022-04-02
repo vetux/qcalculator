@@ -17,16 +17,31 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_EXPRTKMODULE_HPP
-#define QCALC_EXPRTKMODULE_HPP
+#include "interactiveinterpreter.hpp"
 
-#include <functional>
+#include <cstdio>
 
-#include "math/symboltable.hpp"
+#include "cpython/pythoninclude.hpp"
+#include "cpython/modules/exprtkmodule.hpp"
+#include "cpython/pyutil.hpp"
+#include "io/paths.hpp"
 
-namespace ExprtkModule {
-    void initialize(const std::function<void(const SymbolTable &)> &symbolTableChangeCallback,
-                    const std::function<const SymbolTable &()> &symbolTableRetrieveCallback);
+int InteractiveInterpreter::run() {
+    SymbolTable table;
+
+    ExprtkModule::initialize([&table](const SymbolTable &sym) {
+                                 table = sym;
+                             },
+                             [&table]() {
+                                 return table;
+                             });
+
+    PyUtil::initializePython();
+
+    PyUtil::addModuleDirectory(Paths::getSystemDirectory());
+    PyUtil::addModuleDirectory(Paths::getAddonDirectory());
+
+    auto ret = PyRun_InteractiveLoop(stdin, "stdin");
+
+    return ret;
 }
-
-#endif //QCALC_EXPRTKMODULE_HPP

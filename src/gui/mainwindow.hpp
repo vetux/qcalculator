@@ -102,6 +102,8 @@ public slots:
 
     void onActionSymbolTableHistory();
 
+    void onActionOpenPythonTerminal();
+
     const SymbolTable &getSymbolTable();
 
     void onHistoryTextDoubleClicked(const QString &text);
@@ -131,12 +133,15 @@ private:
 
     QMenu *menuFile{};
     QMenu *menuSymbols{};
+    QMenu *menuTools{};
     QMenu *menuHelp{};
 
     QMenu *menuOpenRecent{};
 
     QAction *actionSettings{};
     QAction *actionExit{};
+
+    QAction *actionOpenPythonTerminal{};
 
     QAction *actionEditSymbols{};
     QAction *actionOpenSymbols{};
