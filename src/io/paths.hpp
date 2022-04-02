@@ -26,6 +26,8 @@ namespace Paths
 {
     std::string getAppDataDirectory();
 
+    std::string getAppConfigDirectory();
+
     std::string getAddonDirectory();
 
     std::string getSystemDirectory();

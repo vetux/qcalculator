@@ -19,6 +19,8 @@
 
 #include "mainwindow.hpp"
 
+#include <filesystem>
+
 #include <QFile>
 #include <QDir>
 #include <QMessageBox>
@@ -26,28 +28,30 @@
 #include <QMenuBar>
 #include <QApplication>
 
-#include "../addon/addonmanager.hpp"
-#include "../addon/addonhelper.hpp"
-#include "../io/paths.hpp"
-#include "../io/serializer.hpp"
-#include "../io/fileoperations.hpp"
-#include "../settingconstants.hpp"
+#include "addon/addonmanager.hpp"
+#include "addon/addonhelper.hpp"
+#include "io/paths.hpp"
+#include "io/serializer.hpp"
+#include "io/fileoperations.hpp"
+#include "settingconstants.hpp"
 
-#include "../math/numberformat.hpp"
-#include "../math/expressionparser.hpp"
+#include "math/numberformat.hpp"
+#include "math/expressionparser.hpp"
 
 #include "dialog/settings/settingsdialog.hpp"
 #include "dialog/symbolsdialog.hpp"
 #include "widgets/historywidget.hpp"
 #include "widgets/symbolseditor.hpp"
 
-#include "../cpython/modules/exprtkmodule.hpp"
-#include "../cpython/pyutil.hpp"
+#include "cpython/modules/exprtkmodule.hpp"
+#include "cpython/pyutil.hpp"
 
-#define ADDONS_FILE "/addons.json"
-#define SETTINGS_FILE "/settings.json"
+static const std::string ADDONS_FILE = "/addons.json";
+static const std::string SETTINGS_FILE = "/settings.json";
+static const std::string SYMBOL_TABLE_HISTORY_FILE = "/symboltablehistory.json";
 
-#define MAX_FORMATTING_PRECISION 100000
+static const int MAX_FORMATTING_PRECISION = 100000;
+static const int MAX_SYMBOL_TABLE_HISTORY = 100;
 
 //TODO:Feature: Completion and history navigation for input line edit with eg. up / down arrows.
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
@@ -117,12 +121,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     //Check for enabled addons which dont exist anymore.
     std::set<std::string> availableAddons;
     auto addons = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
-    for (auto &addon : enabledAddons) {
+    for (auto &addon: enabledAddons) {
         if (addons.find(addon) != addons.end())
             availableAddons.insert(addon);
     }
 
     AddonManager::setActiveAddons(availableAddons, *this);
+
+    loadSymbolTablePathHistory();
+    saveSymbolTablePathHistory();
+
+    updateSymbolHistoryMenu();
 }
 
 MainWindow::~MainWindow() = default;
@@ -224,14 +233,14 @@ void MainWindow::onActionSettings() {
         }
 
         auto tmp = symbolTable.getVariables();
-        for (auto &v : tmp) {
+        for (auto &v: tmp) {
             v.second.setPrecision(symbolsPrecision, MPFR_RNDN);
             symbolTable.remove(v.first);
             symbolTable.setVariable(v.first, v.second);
         }
 
         tmp = symbolTable.getConstants();
-        for (auto &v : tmp) {
+        for (auto &v: tmp) {
             v.second.setPrecision(symbolsPrecision, MPFR_RNDN);
             symbolTable.remove(v.first);
             symbolTable.setConstant(v.first, v.second);
@@ -298,30 +307,12 @@ void MainWindow::onActionImportSymbolTable() {
         return;
     }
 
-    std::string filepath = list[0].toStdString();
-
-    std::set<std::string> addons = AddonManager::getActiveAddons();
-    AddonManager::setActiveAddons({}, *this);
-
-    try {
-        symbolTable = Serializer::deserializeTable(FileOperations::fileReadAllText(filepath),
-                                                   settings.value(SETTING_KEY_SYMBOLS_PRECISION,
-                                                                  SETTING_DEFAULT_SYMBOLS_PRECISION).toInt());
-        if (symbolsDialog != nullptr) {
-            symbolsDialog->setSymbols(symbolTable);
-        }
-
-        QMessageBox::information(this, "Import successful", ("Successfully imported symbols from " + filepath).c_str());
+    auto path = list[0].toStdString();
+    if (importSymbolTable(path)) {
+        symbolTablePathHistory.insert(path);
+        saveSymbolTablePathHistory();
+        updateSymbolHistoryMenu();
     }
-    catch (const std::exception &e) {
-        std::string error = "Failed to import symbols from ";
-        error += filepath;
-        error += " Error: ";
-        error += e.what();
-        QMessageBox::warning(this, "Import failed", error.c_str());
-    }
-
-    AddonManager::setActiveAddons(addons, *this);
 }
 
 void MainWindow::onActionExportSymbolTable() {
@@ -344,6 +335,11 @@ void MainWindow::onActionExportSymbolTable() {
 
     try {
         FileOperations::fileWriteAllText(filepath, Serializer::serializeTable(symbolTable));
+
+        symbolTablePathHistory.insert(filepath);
+        saveSymbolTablePathHistory();
+        updateSymbolHistoryMenu();
+
         QMessageBox::information(this,
                                  "Export successful",
                                  ("Successfully exported symbols to " + filepath).c_str());
@@ -380,6 +376,10 @@ void MainWindow::onActionEditSymbolTable() {
     }
 }
 
+void MainWindow::onActionSymbolTableHistory() {
+    importSymbolTable(dynamic_cast<QAction *>(sender())->data().toString().toStdString());
+}
+
 const SymbolTable &MainWindow::getSymbolTable() {
     return symbolTable;
 }
@@ -390,30 +390,12 @@ void MainWindow::onHistoryTextDoubleClicked(const QString &text) {
     input->setFocus();
 }
 
-void MainWindow::saveSettings() {
-    AddonManager::setActiveAddons({}, *this); //Unload addons
-
-    try {
-        std::string dataDir = Paths::getAppDataDirectory();
-
-        if (!QDir(dataDir.c_str()).exists())
-            QDir().mkpath(dataDir.c_str());
-
-        FileOperations::fileWriteAllText(dataDir.append(SETTINGS_FILE),
-                                         Serializer::serializeSettings(settings));
-    }
-    catch (const std::exception &e) {
-        QMessageBox::warning(this, "Failed to save settings", e.what());
-    }
-}
-
 void MainWindow::loadSettings() {
-    std::string settingsFilePath = Paths::getAppDataDirectory().append(SETTINGS_FILE);
+    std::string settingsFilePath = Paths::getAppConfigDirectory().append(SETTINGS_FILE);
     if (QFile(settingsFilePath.c_str()).exists()) {
         try {
             settings = Serializer::deserializeSettings(FileOperations::fileReadAllText(settingsFilePath));
-        }
-        catch (const std::runtime_error &e) {
+        } catch (const std::runtime_error &e) {
             QMessageBox::warning(this, "Failed to load settings", e.what());
             settings = {};
         }
@@ -466,6 +448,75 @@ void MainWindow::loadSettings() {
     }
 }
 
+void MainWindow::saveSettings() {
+    AddonManager::setActiveAddons({}, *this); //Unload addons
+
+    try {
+        std::string dir = Paths::getAppConfigDirectory();
+
+        if (!QDir(dir.c_str()).exists())
+            QDir().mkpath(dir.c_str());
+
+        FileOperations::fileWriteAllText(dir.append(SETTINGS_FILE), Serializer::serializeSettings(settings));
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, "Failed to save settings", e.what());
+    }
+}
+
+void MainWindow::loadSymbolTablePathHistory() {
+    std::string filePath = Paths::getAppDataDirectory().append(SYMBOL_TABLE_HISTORY_FILE);
+
+    if (!std::filesystem::exists(filePath)) {
+        symbolTablePathHistory = {};
+        return;
+    }
+
+    try {
+        symbolTablePathHistory = Serializer::deserializeSet(FileOperations::fileReadAllText(filePath));
+
+        if (symbolTablePathHistory.size() > MAX_SYMBOL_TABLE_HISTORY) {
+            std::set<std::string> tmp;
+            int i = 0;
+            for (auto it = symbolTablePathHistory.rbegin();
+                 it != symbolTablePathHistory.rend() && i < MAX_SYMBOL_TABLE_HISTORY; it++, i++) {
+                tmp.insert(it->c_str());
+            }
+            symbolTablePathHistory = tmp;
+        }
+
+        std::set<std::string> delPaths;
+        for (const auto &path: symbolTablePathHistory) {
+            if (!std::filesystem::exists(path))
+                delPaths.insert(path);
+        }
+
+        for (const auto &path: delPaths)
+            symbolTablePathHistory.erase(path);
+
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, "Failed to load symbol table history", e.what());
+        symbolTablePathHistory = {};
+    }
+}
+
+void MainWindow::saveSymbolTablePathHistory() {
+    if (!settings.value(SETTING_KEY_SAVE_SYM_HISTORY, SETTING_DEFAULT_SAVE_SYM_HISTORY).toInt()) {
+        return;
+    }
+
+    try {
+        std::string dataDir = Paths::getAppDataDirectory();
+
+        if (!QDir(dataDir.c_str()).exists())
+            QDir().mkpath(dataDir.c_str());
+
+        FileOperations::fileWriteAllText(dataDir.append(SYMBOL_TABLE_HISTORY_FILE),
+                                         Serializer::serializeSet(symbolTablePathHistory));
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, "Failed to save symbol table history", e.what());
+    }
+}
+
 void MainWindow::setupMenuBar() {
     menuBar()->setObjectName("menubar");
 
@@ -481,12 +532,16 @@ void MainWindow::setupMenuBar() {
     menuHelp->setObjectName("menuHelp");
     menuHelp->setTitle("Help");
 
+    menuSymbolsHistory = new QMenu(this);
+    menuSymbolsHistory->setObjectName("menuSymbolsHistory");
+    menuSymbolsHistory->setTitle("Open Recent");
+
     actionSettings = new QAction(this);
     actionSettings->setText("Settings");
     actionSettings->setObjectName("actionSettings");
 
     actionImportSymbols = new QAction(this);
-    actionImportSymbols->setText("Load Symbols...");
+    actionImportSymbols->setText("Open Symbols...");
     actionImportSymbols->setObjectName("actionImport_Symbols");
     actionImportSymbols->setShortcut(QKeySequence::Open);
 
@@ -517,6 +572,7 @@ void MainWindow::setupMenuBar() {
     menuSymbols->addSeparator();
     menuSymbols->addAction(actionImportSymbols);
     menuSymbols->addAction(actionExportSymbols);
+    menuSymbols->addMenu(menuSymbolsHistory);
 
     menuHelp->addAction(actionAbout);
 
@@ -540,5 +596,47 @@ void MainWindow::setupLayout() {
     rootWidget->layout()->addWidget(input);
 
     setCentralWidget(rootWidget);
+}
+
+void MainWindow::updateSymbolHistoryMenu() {
+    auto menu = menuSymbolsHistory;
+    menu->clear();
+    for (auto rev = symbolTablePathHistory.rbegin(); rev != symbolTablePathHistory.rend(); rev++) {
+        auto path = rev->c_str();
+        auto action = menu->addAction(path);
+        action->setData(path);
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(onActionSymbolTableHistory()));
+    }
+}
+
+bool MainWindow::importSymbolTable(const std::string &path) {
+    try {
+        auto syms = Serializer::deserializeTable(FileOperations::fileReadAllText(path),
+                                                 settings.value(SETTING_KEY_SYMBOLS_PRECISION,
+                                                                SETTING_DEFAULT_SYMBOLS_PRECISION).toInt());
+
+        QMessageBox::information(this, "Import successful", ("Successfully imported symbols from " + path).c_str());
+
+        std::set<std::string> addons = AddonManager::getActiveAddons();
+        AddonManager::setActiveAddons({}, *this);
+
+        symbolTable = syms;
+
+        if (symbolsDialog != nullptr) {
+            symbolsDialog->setSymbols(symbolTable);
+        }
+
+        AddonManager::setActiveAddons(addons, *this);
+
+        return true;
+    } catch (const std::exception &e) {
+        std::string error = "Failed to import symbols from ";
+        error += path;
+        error += " Error: ";
+        error += e.what();
+        QMessageBox::warning(this, "Import failed", error.c_str());
+
+        return false;
+    }
 }
 

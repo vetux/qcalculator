@@ -12,10 +12,6 @@ message("Python_Development_FOUND:${Python_Development_FOUND}")
 message("Python_LIBRARIES:${Python_LIBRARIES}")
 message("Python_INCLUDE_DIRS:${Python_INCLUDE_DIRS}")
 
-if (UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif (UNIX)
-
 if (WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif (WIN32)
@@ -55,6 +51,8 @@ if (WIN32)
 else ()
     add_executable(qcalc ${SRC} ${WRAP_CPP} ${WRAP_UI})
 endif ()
+
+set_property(TARGET qcalc PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(qcalc Qt5::Core Qt5::Widgets)
 target_link_libraries(qcalc ${Python_LIBRARIES}) # Python

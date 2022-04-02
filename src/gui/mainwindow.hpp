@@ -96,6 +96,8 @@ public slots:
 
     void onActionEditSymbolTable();
 
+    void onActionSymbolTableHistory();
+
     const SymbolTable &getSymbolTable();
 
     void onHistoryTextDoubleClicked(const QString &text);
@@ -105,9 +107,17 @@ private:
 
     void saveSettings();
 
+    void loadSymbolTablePathHistory();
+
+    void saveSymbolTablePathHistory();
+
     void setupMenuBar();
 
     void setupLayout();
+
+    void updateSymbolHistoryMenu();
+
+    bool importSymbolTable(const std::string &path);
 
     QWidget *rootWidget{};
     HistoryWidget *history{};
@@ -117,10 +127,12 @@ private:
     QMenu *menuSymbols{};
     QMenu *menuHelp{};
 
+    QMenu *menuSymbolsHistory{};
+
     QAction *actionSettings{};
     QAction *actionExit{};
 
-    QAction *actionEditSymbols;
+    QAction *actionEditSymbols{};
     QAction *actionImportSymbols{};
     QAction *actionExportSymbols{};
 
@@ -131,6 +143,8 @@ private:
     SymbolTable symbolTable;
 
     Settings settings;
+
+    std::set<std::string> symbolTablePathHistory;
 };
 
 #endif // QCALC_MAINWINDOW_HPP

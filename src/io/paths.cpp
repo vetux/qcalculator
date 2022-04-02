@@ -26,6 +26,10 @@ std::string Paths::getAppDataDirectory() {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString();
 }
 
+std::string Paths::getAppConfigDirectory() {
+    return QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation).toStdString();
+}
+
 std::string Paths::getAddonDirectory() {
     return QCoreApplication::applicationDirPath().append("/modules/addon").toStdString();
 }

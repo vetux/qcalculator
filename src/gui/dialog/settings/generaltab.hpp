@@ -44,7 +44,7 @@ public slots:
     void setSymbolsPrecision(int bits);
 
     void setSymbolsFormatPrecision(int digits);
-    
+
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
 
