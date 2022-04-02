@@ -353,7 +353,7 @@ def load():
     QtCore.QObject.connect(keyPadWidget, QtCore.SIGNAL("signal_key_pressed(int)"), handler,
                            QtCore.SLOT("slot_key_press(int)"))
 
-    QtWidgets.QWidget.connect(gui.input_line_edit, QtCore.SIGNAL("textEdited(const QString &)"), numWidget,
+    QtWidgets.QWidget.connect(gui.input_line_edit, QtCore.SIGNAL("textChanged(const QString &)"), numWidget,
                               QtCore.SLOT("slot_set_value(QString)"))
     QtWidgets.QWidget.connect(gui.wnd, QtCore.SIGNAL("signalExpressionEvaluated(const QString &, const QString &)"),
                               numWidget, QtCore.SLOT("slot_expression_evaluated(QString, QString)"))

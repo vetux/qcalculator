@@ -225,7 +225,7 @@ def load():
     widget = BitViewWidget(gui.wnd)
     QtWidgets.QWidget.connect(gui.wnd, QtCore.SIGNAL("signalExpressionEvaluated(const QString &, const QString &)"),
                               widget, QtCore.SLOT("slot_expression_evaluated(QString, QString)"))
-    QtWidgets.QWidget.connect(gui.input_line_edit, QtCore.SIGNAL("textEdited(const QString &)"), widget,
+    QtWidgets.QWidget.connect(gui.input_line_edit, QtCore.SIGNAL("textChanged(const QString &)"), widget,
                               QtCore.SLOT("slot_input_text_changed(QString)"))
     QtWidgets.QWidget.connect(widget, QtCore.SIGNAL("signal_set_input_text(QString)"), gui.input_line_edit,
                               QtCore.SLOT("setText(QString)"))
