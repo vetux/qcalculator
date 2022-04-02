@@ -628,7 +628,6 @@ void MainWindow::setupMenuBar() {
 void MainWindow::setupLayout() {
     rootWidget = new QWidget(this);
     rootWidget->setObjectName("widget_root");
-    rootWidget->setLayout(new QVBoxLayout());
 
     history = new HistoryWidget(this);
     history->setObjectName("widget_history");
@@ -636,8 +635,16 @@ void MainWindow::setupLayout() {
     input = new QLineEdit(this);
     input->setObjectName("lineEdit_input");
 
-    rootWidget->layout()->addWidget(history);
-    rootWidget->layout()->addWidget(input);
+    auto l = new QVBoxLayout();
+
+    l->addWidget(history);
+    l->addWidget(input);
+
+    for (int i = 0; i < 10; i++) {
+        l->addSpacing(0);
+    }
+
+    rootWidget->setLayout(l);
 
     setCentralWidget(rootWidget);
 }

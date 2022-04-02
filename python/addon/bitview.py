@@ -228,7 +228,6 @@ class NumeralSystemWidget(QtWidgets.QWidget):
         QtWidgets.QWidget.__init__(self, parent)
         self.setLayout(QtWidgets.QVBoxLayout())
 
-        self.layout().setSpacing(12)
         self.layout().setMargin(0)
 
         declayout = QtWidgets.QHBoxLayout()
@@ -393,7 +392,7 @@ def load():
     QtWidgets.QWidget.connect(gui.wnd, QtCore.SIGNAL("signalExpressionEvaluated(const QString &, const QString &)"),
                           numWidget, QtCore.SLOT("slot_expression_evaluated(QString, QString)"))
 
-    gui.root.layout().insertWidget(2, containerWidget)
+    gui.root.layout().insertWidget(3, containerWidget)
 
     widget.slot_input_text_changed(gui.input_line_edit.text())
 

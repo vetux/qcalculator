@@ -200,7 +200,7 @@ def load():
     handler = KeyPadHandler()
     keyPadWidget = KeyPadWidget(gui.wnd)
 
-    gui.root.layout().insertWidget(-1, keyPadWidget)
+    gui.root.layout().insertWidget(gui.root.layout().count() - 1, keyPadWidget)
 
     QtCore.QObject.connect(keyPadWidget, QtCore.SIGNAL("signal_key_pressed(int)"), handler,
                            QtCore.SLOT("slot_key_press(int)"))
