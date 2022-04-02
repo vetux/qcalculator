@@ -92,9 +92,11 @@ public slots:
 
     void onActionAboutQt();
 
-    void onActionImportSymbolTable();
+    void onActionOpenSymbolTable();
 
-    void onActionExportSymbolTable();
+    void onActionSaveSymbolTable();
+
+    void onActionSaveAsSymbolTable();
 
     void onActionEditSymbolTable();
 
@@ -121,6 +123,8 @@ private:
 
     bool importSymbolTable(const std::string &path);
 
+    bool saveSymbolTable(const std::string &path);
+
     QWidget *rootWidget{};
     HistoryWidget *history{};
     QLineEdit *input{};
@@ -129,14 +133,15 @@ private:
     QMenu *menuSymbols{};
     QMenu *menuHelp{};
 
-    QMenu *menuSymbolsHistory{};
+    QMenu *menuOpenRecent{};
 
     QAction *actionSettings{};
     QAction *actionExit{};
 
     QAction *actionEditSymbols{};
-    QAction *actionImportSymbols{};
-    QAction *actionExportSymbols{};
+    QAction *actionOpenSymbols{};
+    QAction *actionSaveSymbols{};
+    QAction *actionSaveAsSymbols{};
 
     QAction *actionAbout{};
     QAction *actionAboutQt{};
@@ -148,6 +153,8 @@ private:
     Settings settings;
 
     std::set<std::string> symbolTablePathHistory;
+
+    std::string currentSymbolTablePath; // If the currently active symboltable was loaded from a file or saved to a file this path contains the path of the symbol table file.
 };
 
 #endif // QCALC_MAINWINDOW_HPP

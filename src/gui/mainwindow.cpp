@@ -77,8 +77,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
     connect(actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
     connect(actionAboutQt, SIGNAL(triggered(bool)), this, SLOT(onActionAboutQt()));
-    connect(actionImportSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionImportSymbolTable()));
-    connect(actionExportSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionExportSymbolTable()));
+    connect(actionOpenSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionOpenSymbolTable()));
+    connect(actionSaveSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveSymbolTable()));
+    connect(actionSaveAsSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveAsSymbolTable()));
     connect(actionEditSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionEditSymbolTable()));
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
@@ -296,7 +297,7 @@ void MainWindow::onActionAboutQt() {
     QMessageBox::aboutQt(this);
 }
 
-void MainWindow::onActionImportSymbolTable() {
+void MainWindow::onActionOpenSymbolTable() {
     QFileDialog dialog(this);
     dialog.setWindowTitle("Import Symbols...");
     dialog.setFileMode(QFileDialog::ExistingFile);
@@ -320,9 +321,18 @@ void MainWindow::onActionImportSymbolTable() {
     }
 }
 
-void MainWindow::onActionExportSymbolTable() {
+void MainWindow::onActionSaveSymbolTable() {
+    std::string filepath;
+    if (currentSymbolTablePath.empty()) {
+        onActionSaveAsSymbolTable();
+    } else {
+        saveSymbolTable(currentSymbolTablePath);
+    }
+}
+
+void MainWindow::onActionSaveAsSymbolTable() {
     QFileDialog dialog(this);
-    dialog.setWindowTitle("Export Symbols...");
+    dialog.setWindowTitle("Save Symbols as ...");
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
 
@@ -336,26 +346,7 @@ void MainWindow::onActionExportSymbolTable() {
         return;
     }
 
-    std::string filepath = list[0].toStdString();
-
-    try {
-        FileOperations::fileWriteAllText(filepath, Serializer::serializeTable(symbolTable));
-
-        symbolTablePathHistory.insert(filepath);
-        saveSymbolTablePathHistory();
-        updateSymbolHistoryMenu();
-
-        QMessageBox::information(this,
-                                 "Export successful",
-                                 ("Successfully exported symbols to " + filepath).c_str());
-    }
-    catch (const std::exception &e) {
-        std::string error = "Failed to export symbols to ";
-        error += filepath;
-        error += " Error: ";
-        error += e.what();
-        QMessageBox::warning(this, "Export failed", error.c_str());
-    }
+    saveSymbolTable(list[0].toStdString());
 }
 
 void MainWindow::onActionEditSymbolTable() {
@@ -537,23 +528,29 @@ void MainWindow::setupMenuBar() {
     menuHelp->setObjectName("menuHelp");
     menuHelp->setTitle("Help");
 
-    menuSymbolsHistory = new QMenu(this);
-    menuSymbolsHistory->setObjectName("menuSymbolsHistory");
-    menuSymbolsHistory->setTitle("Open Recent");
+    menuOpenRecent = new QMenu(this);
+    menuOpenRecent->setObjectName("menuOpenRecent");
+    menuOpenRecent->setTitle("Open Recent");
 
     actionSettings = new QAction(this);
     actionSettings->setText("Settings");
     actionSettings->setObjectName("actionSettings");
 
-    actionImportSymbols = new QAction(this);
-    actionImportSymbols->setText("Open Symbols...");
-    actionImportSymbols->setObjectName("actionImport_Symbols");
-    actionImportSymbols->setShortcut(QKeySequence::Open);
+    actionOpenSymbols = new QAction(this);
+    actionOpenSymbols->setText("Open...");
+    actionOpenSymbols->setObjectName("actionOpenSymbols");
+    actionOpenSymbols->setShortcut(QKeySequence::Open);
 
-    actionExportSymbols = new QAction(this);
-    actionExportSymbols->setText("Save Symbols...");
-    actionExportSymbols->setObjectName("actionExport_Symbols");
-    actionExportSymbols->setShortcut(QKeySequence::Save);
+    actionSaveSymbols = new QAction(this);
+    actionSaveSymbols->setText("Save...");
+    actionSaveSymbols->setObjectName("actionSaveSymbols");
+    actionSaveSymbols->setShortcut(QKeySequence::Save);
+    actionSaveSymbols->setEnabled(false);
+
+    actionSaveAsSymbols = new QAction(this);
+    actionSaveAsSymbols->setText("Save As...");
+    actionSaveAsSymbols->setObjectName("actionSaveAsSymbols");
+    actionSaveAsSymbols->setShortcut(QKeySequence::SaveAs);
 
     actionExit = new QAction(this);
     actionExit->setText("Exit");
@@ -569,7 +566,7 @@ void MainWindow::setupMenuBar() {
     actionAboutQt->setObjectName("actionAboutQt");
 
     actionEditSymbols = new QAction(this);
-    actionEditSymbols->setText("Edit Symbols");
+    actionEditSymbols->setText("Edit");
     actionEditSymbols->setObjectName("actionEditSymbols");
     actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
@@ -579,9 +576,10 @@ void MainWindow::setupMenuBar() {
 
     menuSymbols->addAction(actionEditSymbols);
     menuSymbols->addSeparator();
-    menuSymbols->addAction(actionImportSymbols);
-    menuSymbols->addAction(actionExportSymbols);
-    menuSymbols->addMenu(menuSymbolsHistory);
+    menuSymbols->addAction(actionOpenSymbols);
+    menuSymbols->addMenu(menuOpenRecent);
+    menuSymbols->addAction(actionSaveSymbols);
+    menuSymbols->addAction(actionSaveAsSymbols);
 
     menuHelp->addAction(actionAbout);
     menuHelp->addAction(actionAboutQt);
@@ -609,7 +607,7 @@ void MainWindow::setupLayout() {
 }
 
 void MainWindow::updateSymbolHistoryMenu() {
-    auto menu = menuSymbolsHistory;
+    auto menu = menuOpenRecent;
     menu->clear();
     for (auto rev = symbolTablePathHistory.rbegin(); rev != symbolTablePathHistory.rend(); rev++) {
         auto path = rev->c_str();
@@ -631,6 +629,9 @@ bool MainWindow::importSymbolTable(const std::string &path) {
         AddonManager::setActiveAddons({}, *this);
 
         symbolTable = syms;
+        currentSymbolTablePath = path;
+
+        actionSaveSymbols->setEnabled(true);
 
         if (symbolsDialog != nullptr) {
             symbolsDialog->setSymbols(symbolTable);
@@ -650,3 +651,29 @@ bool MainWindow::importSymbolTable(const std::string &path) {
     }
 }
 
+bool MainWindow::saveSymbolTable(const std::string &path) {
+    try {
+        FileOperations::fileWriteAllText(path, Serializer::serializeTable(symbolTable));
+
+        symbolTablePathHistory.insert(path);
+        saveSymbolTablePathHistory();
+        updateSymbolHistoryMenu();
+
+        currentSymbolTablePath = path;
+
+        actionSaveSymbols->setEnabled(true);
+
+        QMessageBox::information(this,
+                                 "Export successful",
+                                 ("Successfully saved symbols to " + path).c_str());
+        return true;
+    }
+    catch (const std::exception &e) {
+        std::string error = "Failed to save symbols to ";
+        error += path;
+        error += " Error: ";
+        error += e.what();
+        QMessageBox::warning(this, "Export failed", error.c_str());
+        return false;
+    }
+}
