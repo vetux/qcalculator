@@ -15,7 +15,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import qcalc as gui
-from mpreal import mpreal as mpreal
+import mpreal
 
 from PySide2 import QtCore, QtWidgets
 
@@ -35,7 +35,7 @@ def int_to_bool_list(num):
 # https://stackoverflow.com/q/354038
 def is_number(s):
     try:
-        mpreal(s)
+        mpreal.mpreal(s)
         return True
     except ValueError:
         return False
@@ -148,6 +148,13 @@ class BitViewWidget(QtWidgets.QWidget):
         self.layout().addLayout(hbox0)
         self.layout().addLayout(hbox1)
 
+        for i in range(8):
+            hbox0.itemAt(i).setSpacing(0)
+            hbox0.itemAt(i).setMargin(5)
+        for i in range(8):
+            hbox1.itemAt(i).setSpacing(0)
+            hbox1.itemAt(i).setMargin(5)
+
     def instantiate_bit_widgets(self, index, end, layout):
         while index > end:
             button = BitButton(self)
@@ -186,8 +193,8 @@ class BitViewWidget(QtWidgets.QWidget):
             self.set_bits_value(0)
             self.setEnabled(False)
             return
-        value = mpreal(value_string)
-        if value < mpreal(0):
+        value = mpreal.mpreal(value_string)
+        if value < mpreal.mpreal(0):
             self.set_bits_value(0)
             self.setEnabled(False)
             return
@@ -216,13 +223,162 @@ class BitViewWidget(QtWidgets.QWidget):
 
     signal_set_input_text = QtCore.Signal("QString")
 
+class NumeralSystemWidget(QtWidgets.QWidget):
+    def __init__(self, parent):
+        QtWidgets.QWidget.__init__(self, parent)
+        self.setLayout(QtWidgets.QVBoxLayout())
+
+        self.layout().setSpacing(12)
+        self.layout().setMargin(0)
+
+        declayout = QtWidgets.QHBoxLayout()
+        label = QtWidgets.QLabel(self)
+        label.setText("Decimal")
+        label.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred))
+        label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        label.setMinimumSize(70, 0)
+        self.dectext = QtWidgets.QLineEdit(self)
+        declayout.addWidget(self.dectext, 1)
+        declayout.addWidget(label, 0)
+
+        hexlayout = QtWidgets.QHBoxLayout()
+        label = QtWidgets.QLabel(self)
+        label.setText("Hex")
+        label.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred))
+        label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        label.setMinimumSize(70, 0)
+        self.hextext = QtWidgets.QLineEdit(self)
+        hexlayout.addWidget(self.hextext, 1)
+        hexlayout.addWidget(label, 0)
+
+        octlayout = QtWidgets.QHBoxLayout()
+        label = QtWidgets.QLabel(self)
+        label.setText("Octal")
+        label.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred))
+        label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        label.setMinimumSize(70, 0)
+        self.octtext = QtWidgets.QLineEdit(self)
+        octlayout.addWidget(self.octtext, 1)
+        octlayout.addWidget(label, 0)
+
+        binlayout = QtWidgets.QHBoxLayout()
+        label = QtWidgets.QLabel(self)
+        label.setText("Binary")
+        label.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred))
+        label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        label.setMinimumSize(70, 0)
+        self.bintext = QtWidgets.QLineEdit(self)
+        binlayout.addWidget(self.bintext, 1)
+        binlayout.addWidget(label, 0)
+
+        self.layout().addLayout(declayout)
+        self.layout().addLayout(hexlayout)
+        self.layout().addLayout(octlayout)
+        self.layout().addLayout(binlayout)
+
+        QtCore.QObject.connect(self.dectext,
+                               QtCore.SIGNAL("editingFinished()"),
+                               self,
+                               QtCore.SLOT("slot_decimal_editing_finished()"))
+        QtCore.QObject.connect(self.hextext,
+                               QtCore.SIGNAL("editingFinished()"),
+                               self,
+                               QtCore.SLOT("slot_hex_editing_finished()"))
+        QtCore.QObject.connect(self.octtext,
+                               QtCore.SIGNAL("editingFinished()"),
+                               self,
+                               QtCore.SLOT("slot_octal_editing_finished()"))
+        QtCore.QObject.connect(self.bintext,
+                               QtCore.SIGNAL("editingFinished()"),
+                               self,
+                               QtCore.SLOT("slot_binary_editing_finished()"))
+
+    def slot_decimal_editing_finished(self):
+        if self.dectext.isModified():
+            try:
+                self.slot_set_value(mpreal.from_decimal(self.dectext.text()))
+            except:
+                self.dectext.setText("")
+                self.hextext.setText("")
+                self.octtext.setText("")
+                self.bintext.setText("")
+
+    def slot_hex_editing_finished(self):
+        if self.hextext.isModified():
+            try:
+                self.slot_set_value(mpreal.from_hex(self.hextext.text()))
+            except:
+                self.dectext.setText("")
+                self.hextext.setText("")
+                self.octtext.setText("")
+                self.bintext.setText("")
+
+    def slot_octal_editing_finished(self):
+        if self.octtext.isModified():
+            try:
+                self.slot_set_value(mpreal.from_octal(self.octtext.text()))
+            except:
+                self.dectext.setText("")
+                self.hextext.setText("")
+                self.octtext.setText("")
+                self.bintext.setText("")
+
+    def slot_binary_editing_finished(self):
+        if self.bintext.isModified():
+            try:
+                self.slot_set_value(mpreal.from_binary(self.bintext.text()))
+            except:
+                self.dectext.setText("")
+                self.hextext.setText("")
+                self.octtext.setText("")
+                self.bintext.setText("")
+
+    def slot_set_value(self, value):
+        r = mpreal.mpreal
+        try:
+            r = mpreal.mpreal(value)
+        except:
+            try:
+                r = mpreal.from_decimal(value)
+            except:
+                self.dectext.setText("")
+                self.hextext.setText("")
+                self.octtext.setText("")
+                self.bintext.setText("")
+                return
+
+        self.dectext.setText(mpreal.to_decimal(r))
+        if r.is_integer():
+            self.hextext.setText(mpreal.to_hex(r))
+            self.octtext.setText(mpreal.to_octal(r))
+            self.bintext.setText(mpreal.to_binary(r))
+        else:
+            self.hextext.setText("")
+            self.octtext.setText("")
+            self.bintext.setText("")
+
+    def slot_expression_evaluated(self, expression, value):
+        self.slot_set_value(value)
+
+numWidget = NumeralSystemWidget
 
 widget = BitViewWidget
 
+containerWidget = QtWidgets.QWidget
 
 def load():
+    global numWidget
+    global containerWidget
     global widget
-    widget = BitViewWidget(gui.wnd)
+    containerWidget = QtWidgets.QWidget(gui.wnd)
+    widget = BitViewWidget(containerWidget)
+    numWidget = NumeralSystemWidget(containerWidget)
+
+    containerWidget.setLayout(QtWidgets.QHBoxLayout())
+    containerWidget.layout().addWidget(numWidget, 1)
+    containerWidget.layout().addWidget(widget, 1)
+    containerWidget.layout().setMargin(0)
+
     QtWidgets.QWidget.connect(gui.wnd, QtCore.SIGNAL("signalExpressionEvaluated(const QString &, const QString &)"),
                               widget, QtCore.SLOT("slot_expression_evaluated(QString, QString)"))
     QtWidgets.QWidget.connect(gui.input_line_edit, QtCore.SIGNAL("textChanged(const QString &)"), widget,
@@ -232,16 +388,28 @@ def load():
     QtWidgets.QWidget.connect(widget, QtCore.SIGNAL("signal_set_input_text(QString)"), gui.wnd,
                               QtCore.SLOT("onInputReturnPressed()"))
 
-    gui.root.layout().insertWidget(2, widget)
+    QtWidgets.QWidget.connect(gui.input_line_edit, QtCore.SIGNAL("textChanged(const QString &)"), numWidget,
+                              QtCore.SLOT("slot_set_value(QString)"))
+    QtWidgets.QWidget.connect(gui.wnd, QtCore.SIGNAL("signalExpressionEvaluated(const QString &, const QString &)"),
+                          numWidget, QtCore.SLOT("slot_expression_evaluated(QString, QString)"))
+
+    gui.root.layout().insertWidget(2, containerWidget)
 
     widget.slot_input_text_changed(gui.input_line_edit.text())
 
 
 def unload():
     global widget
-    gui.root.layout().removeWidget(widget)
+    gui.root.layout().removeWidget(containerWidget)
+
     gui.wnd.disconnect(widget)
     gui.input_line_edit.disconnect(widget)
 
     widget.disconnect(gui.input_line_edit)
     widget.deleteLater()
+
+    numWidget.disconnect(gui.input_line_edit)
+    numWidget.disconnect(gui.wnd)
+    numWidget.deleteLater()
+
+    containerWidget.deleteLater()

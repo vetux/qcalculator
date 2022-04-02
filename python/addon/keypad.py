@@ -190,192 +190,29 @@ class KeyPadHandler(QtCore.QObject):
             t += v
             gui.input_line_edit.setText(t)
 
-class NumeralSystemWidget(QtWidgets.QWidget):
-    def __init__(self, parent):
-        QtWidgets.QWidget.__init__(self, parent)
-        self.setLayout(QtWidgets.QVBoxLayout())
-
-        self.layout().setSpacing(12)
-        self.layout().setMargin(12)
-
-        declayout = QtWidgets.QHBoxLayout()
-        label = QtWidgets.QLabel(self)
-        label.setText("Decimal")
-        label.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred))
-        label.setMinimumSize(150, 0)
-        label.setAlignment(QtCore.Qt.AlignCenter)
-        self.dectext = QtWidgets.QLineEdit(self)
-        declayout.addWidget(label)
-        declayout.addWidget(self.dectext)
-
-        hexlayout = QtWidgets.QHBoxLayout()
-        label = QtWidgets.QLabel(self)
-        label.setText("Hexadecimal")
-        label.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred))
-        label.setMinimumSize(150, 0)
-        label.setAlignment(QtCore.Qt.AlignCenter)
-        self.hextext = QtWidgets.QLineEdit(self)
-        hexlayout.addWidget(label)
-        hexlayout.addWidget(self.hextext)
-
-        octlayout = QtWidgets.QHBoxLayout()
-        label = QtWidgets.QLabel(self)
-        label.setText("Octal")
-        label.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred))
-        label.setMinimumSize(150, 0)
-        label.setAlignment(QtCore.Qt.AlignCenter)
-        self.octtext = QtWidgets.QLineEdit(self)
-        octlayout.addWidget(label)
-        octlayout.addWidget(self.octtext)
-
-        binlayout = QtWidgets.QHBoxLayout()
-        label = QtWidgets.QLabel(self)
-        label.setText("Binary")
-        label.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred))
-        label.setMinimumSize(150, 0)
-        label.setAlignment(QtCore.Qt.AlignCenter)
-        self.bintext = QtWidgets.QLineEdit(self)
-        binlayout.addWidget(label)
-        binlayout.addWidget(self.bintext)
-
-        self.layout().addLayout(declayout)
-        self.layout().addLayout(hexlayout)
-        self.layout().addLayout(octlayout)
-        self.layout().addLayout(binlayout)
-
-        QtCore.QObject.connect(self.dectext,
-                               QtCore.SIGNAL("editingFinished()"),
-                               self,
-                               QtCore.SLOT("slot_decimal_editing_finished()"))
-        QtCore.QObject.connect(self.hextext,
-                               QtCore.SIGNAL("editingFinished()"),
-                               self,
-                               QtCore.SLOT("slot_hex_editing_finished()"))
-        QtCore.QObject.connect(self.octtext,
-                               QtCore.SIGNAL("editingFinished()"),
-                               self,
-                               QtCore.SLOT("slot_octal_editing_finished()"))
-        QtCore.QObject.connect(self.bintext,
-                               QtCore.SIGNAL("editingFinished()"),
-                               self,
-                               QtCore.SLOT("slot_binary_editing_finished()"))
-
-    def slot_decimal_editing_finished(self):
-        if self.dectext.isModified():
-            try:
-                self.slot_set_value(mpreal.from_decimal(self.dectext.text()))
-            except:
-                self.dectext.setText("")
-                self.hextext.setText("")
-                self.octtext.setText("")
-                self.bintext.setText("")
-
-    def slot_hex_editing_finished(self):
-        if self.hextext.isModified():
-            try:
-                self.slot_set_value(mpreal.from_hex(self.hextext.text()))
-            except:
-                self.dectext.setText("")
-                self.hextext.setText("")
-                self.octtext.setText("")
-                self.bintext.setText("")
-
-    def slot_octal_editing_finished(self):
-        if self.octtext.isModified():
-            try:
-                self.slot_set_value(mpreal.from_octal(self.octtext.text()))
-            except:
-                self.dectext.setText("")
-                self.hextext.setText("")
-                self.octtext.setText("")
-                self.bintext.setText("")
-
-    def slot_binary_editing_finished(self):
-        if self.bintext.isModified():
-            try:
-                self.slot_set_value(mpreal.from_binary(self.bintext.text()))
-            except:
-                self.dectext.setText("")
-                self.hextext.setText("")
-                self.octtext.setText("")
-                self.bintext.setText("")
-
-    def slot_set_value(self, value):
-        r = mpreal
-        try:
-            r = mpreal(value)
-        except:
-            try:
-                r = mpreal.from_decimal(value)
-            except:
-                self.dectext.setText("")
-                self.hextext.setText("")
-                self.octtext.setText("")
-                self.bintext.setText("")
-                return
-
-        self.dectext.setText(mpreal.to_decimal(r))
-        if r.is_integer():
-            self.hextext.setText(mpreal.to_hex(r))
-            self.octtext.setText(mpreal.to_octal(r))
-            self.bintext.setText(mpreal.to_binary(r))
-        else:
-            self.hextext.setText("")
-            self.octtext.setText("")
-            self.bintext.setText("")
-
-    def slot_expression_evaluated(self, expression, value):
-        self.slot_set_value(value)
-
-numWidget = NumeralSystemWidget
 handler = KeyPadHandler
 keyPadWidget = KeyPadWidget
 
-containerWidget = QtWidgets.QWidget
-
-
 def load():
-    global numWidget
     global handler
     global keyPadWidget
-    global containerWidget
 
-    containerWidget = QtWidgets.QWidget(gui.wnd)
-
-    numWidget = NumeralSystemWidget(containerWidget)
     handler = KeyPadHandler()
-    keyPadWidget = KeyPadWidget(containerWidget)
+    keyPadWidget = KeyPadWidget(gui.wnd)
 
-    containerWidget.setLayout(QtWidgets.QHBoxLayout())
-    containerWidget.layout().addWidget(numWidget, 1)
-    containerWidget.layout().addWidget(keyPadWidget, 2)
+    gui.root.layout().insertWidget(-1, keyPadWidget)
 
     QtCore.QObject.connect(keyPadWidget, QtCore.SIGNAL("signal_key_pressed(int)"), handler,
                            QtCore.SLOT("slot_key_press(int)"))
 
-    QtWidgets.QWidget.connect(gui.input_line_edit, QtCore.SIGNAL("textChanged(const QString &)"), numWidget,
-                              QtCore.SLOT("slot_set_value(QString)"))
-    QtWidgets.QWidget.connect(gui.wnd, QtCore.SIGNAL("signalExpressionEvaluated(const QString &, const QString &)"),
-                              numWidget, QtCore.SLOT("slot_expression_evaluated(QString, QString)"))
-
-    gui.root.layout().insertWidget(-1, containerWidget)
-
 
 def unload():
-    global numWidget
     global handler
     global keyPadWidget
-    global containerWidget
 
-    gui.root.layout().removeWidget(containerWidget)
-
-    containerWidget.deleteLater()
+    gui.root.layout().removeWidget(keyPadWidget)
 
     keyPadWidget.disconnect(handler)
     keyPadWidget.deleteLater()
-
-    numWidget.disconnect(gui.input_line_edit)
-    numWidget.disconnect(gui.wnd)
-    numWidget.deleteLater()
 
     handler.deleteLater()
