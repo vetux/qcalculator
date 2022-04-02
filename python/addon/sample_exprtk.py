@@ -14,8 +14,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from qcalc.exprtk import *
-
+import exprtk
+import mpreal
 
 class CustomCallbacks:
     def __init__(self):
@@ -43,14 +43,14 @@ def load():
     # this also affects the native precision ( But not the output formatting precision.) and
     # user configured rounding mode,
     # and should therefore be reset to the original value before returning control to the native side.
-    original_precision = mpreal.get_default_precision()
-    original_rounding = mpreal.get_default_rounding()
+    original_precision = mpreal.mpreal.get_default_precision()
+    original_rounding = mpreal.mpreal.get_default_rounding()
 
-    mpreal.set_default_precision(9)
-    mpreal.set_default_rounding(RoundingMode.ROUND_AWAY_FROM_ZERO)
+    mpreal.mpreal.set_default_precision(9)
+    mpreal.mpreal.set_default_rounding(mpreal.RoundingMode.ROUND_AWAY_FROM_ZERO)
 
-    x = mpreal(1)
-    y = mpreal(3)
+    x = mpreal.mpreal(1)
+    y = mpreal.mpreal(3)
 
     z = x / y
     z.set_precision(3)
@@ -61,30 +61,30 @@ def load():
 
     callbacks = CustomCallbacks()
 
-    sym = SymbolTable()
+    sym = exprtk.SymbolTable()
 
     sym.set_variable("pyVar", 0)
     sym.set_constant("pyConst", 3.141)
 
     # A native function with no arguments
-    sym.set_function("pyFunc", Function("42 + sin(32)"))
+    sym.set_function("pyFunc", exprtk.Function("42 + sin(32)"))
 
     # A native function with 1 argument called "arg1"
-    sym.set_function("pyFuncArgs", Function("133 + cos(arg1)", {"arg1"}))
+    sym.set_function("pyFuncArgs", exprtk.Function("133 + cos(arg1)", {"arg1"}))
 
     # A script function with no arguments
     sym.set_script_noargs("pyScript", callbacks.evaluate)
 
     # A script function which accepts at least 1 argument
-    sym.set_script("pyScriptArgs", ScriptFunction(callbacks.evaluate_args, True))
+    sym.set_script("pyScriptArgs", exprtk.ScriptFunction(callbacks.evaluate_args, True))
 
-    result = evaluate_with_side_effects("pyVar := pyConst / pyFunc + pyFuncArgs(42) + pyScript + pyScriptArgs(42, 13)",
+    result = exprtk.evaluate_with_side_effects("pyVar := pyConst / pyFunc + pyFuncArgs(42) + pyScript + pyScriptArgs(42, 13)",
                                         sym)
 
     print("Variable: " + str(result[1].get_variable("pyVar")))
 
-    mpreal.set_default_precision(original_precision)
-    mpreal.set_default_rounding(original_rounding)
+    mpreal.mpreal.set_default_precision(original_precision)
+    mpreal.mpreal.set_default_rounding(original_rounding)
 
 
 def unload():

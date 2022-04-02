@@ -15,7 +15,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import math
-import qcalc.exprtk
+import exprtk
 
 
 def callback(*args):
@@ -23,12 +23,12 @@ def callback(*args):
 
 
 def load():
-    sym = qcalc.exprtk.get_global_symtable()
-    sym.set_script("factorial", qcalc.exprtk.ScriptFunction(callback, True))
-    qcalc.exprtk.set_global_symtable(sym)
+    sym = exprtk.get_global_symtable()
+    sym.set_script("factorial", exprtk.ScriptFunction(callback, True))
+    exprtk.set_global_symtable(sym)
 
 
 def unload():
-    sym = qcalc.exprtk.get_global_symtable()
+    sym = exprtk.get_global_symtable()
     sym.remove("factorial")
-    qcalc.exprtk.set_global_symtable(sym)
+    exprtk.set_global_symtable(sym)

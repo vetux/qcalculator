@@ -14,11 +14,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import qcalc.gui as gui
+import qcalc as gui
 from PySide2 import QtCore, QtWidgets
 
-from qcalc.exprtk import mpreal as mpreal
-import qcalc.mprealformatting
+import mpreal
+import exprtk
 
 class KeyCode:
     START = 0
@@ -263,7 +263,7 @@ class NumeralSystemWidget(QtWidgets.QWidget):
     def slot_decimal_editing_finished(self):
         if self.dectext.isModified():
             try:
-                self.slot_set_value(qcalc.mprealformatting.from_decimal(self.dectext.text()))
+                self.slot_set_value(mpreal.from_decimal(self.dectext.text()))
             except:
                 self.dectext.setText("")
                 self.hextext.setText("")
@@ -273,7 +273,7 @@ class NumeralSystemWidget(QtWidgets.QWidget):
     def slot_hex_editing_finished(self):
         if self.hextext.isModified():
             try:
-                self.slot_set_value(qcalc.mprealformatting.from_hex(self.hextext.text()))
+                self.slot_set_value(mpreal.from_hex(self.hextext.text()))
             except:
                 self.dectext.setText("")
                 self.hextext.setText("")
@@ -283,7 +283,7 @@ class NumeralSystemWidget(QtWidgets.QWidget):
     def slot_octal_editing_finished(self):
         if self.octtext.isModified():
             try:
-                self.slot_set_value(qcalc.mprealformatting.from_octal(self.octtext.text()))
+                self.slot_set_value(mpreal.from_octal(self.octtext.text()))
             except:
                 self.dectext.setText("")
                 self.hextext.setText("")
@@ -293,7 +293,7 @@ class NumeralSystemWidget(QtWidgets.QWidget):
     def slot_binary_editing_finished(self):
         if self.bintext.isModified():
             try:
-                self.slot_set_value(qcalc.mprealformatting.from_binary(self.bintext.text()))
+                self.slot_set_value(mpreal.from_binary(self.bintext.text()))
             except:
                 self.dectext.setText("")
                 self.hextext.setText("")
@@ -306,7 +306,7 @@ class NumeralSystemWidget(QtWidgets.QWidget):
             r = mpreal(value)
         except:
             try:
-                r = qcalc.mprealformatting.from_decimal(value)
+                r = mpreal.from_decimal(value)
             except:
                 self.dectext.setText("")
                 self.hextext.setText("")
@@ -314,11 +314,11 @@ class NumeralSystemWidget(QtWidgets.QWidget):
                 self.bintext.setText("")
                 return
 
-        self.dectext.setText(qcalc.mprealformatting.to_decimal(r))
+        self.dectext.setText(mpreal.to_decimal(r))
         if r.is_integer():
-            self.hextext.setText(qcalc.mprealformatting.to_hex(r))
-            self.octtext.setText(qcalc.mprealformatting.to_octal(r))
-            self.bintext.setText(qcalc.mprealformatting.to_binary(r))
+            self.hextext.setText(mpreal.to_hex(r))
+            self.octtext.setText(mpreal.to_octal(r))
+            self.bintext.setText(mpreal.to_binary(r))
         else:
             self.hextext.setText("")
             self.octtext.setText("")
@@ -368,6 +368,8 @@ def unload():
     global containerWidget
 
     gui.root.layout().removeWidget(containerWidget)
+
+    containerWidget.deleteLater()
 
     keyPadWidget.disconnect(handler)
     keyPadWidget.deleteLater()

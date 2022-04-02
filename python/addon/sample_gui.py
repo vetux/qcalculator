@@ -14,8 +14,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import qcalc.gui as gui
-import qcalc.exprtk as exprtk
+import qcalc as gui
+import exprtk as exprtk
 
 # We use PySide2 to create qt objects owned by python and integrate them into our native gui
 # by using the QtWidgets.QApplication.instance() reference.

@@ -24,9 +24,9 @@
 #include "types/pympreal.hpp"
 
 PyObject *SymbolTableConverter::New(const SymbolTable &table) {
-    PyObject *symModule = PyImport_ImportModule("qcalc.exprtk");
+    PyObject *symModule = PyImport_ImportModule("exprtk");
     if (symModule == PyNull) {
-        throw std::runtime_error("Failed to import qcalc.exprtk module, Error: " + PyUtil::getError());
+        throw std::runtime_error("Failed to import exprtk module, Error: " + PyUtil::getError());
     }
 
     PyObject *symDict = PyModule_GetDict(symModule);

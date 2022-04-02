@@ -85,6 +85,11 @@ PyObject *mpreal_is_integer(PyMpRealObject *self, PyObject *args);
 
 PyObject *mpreal_to_string(PyMpRealObject *self, PyObject *args);
 
+PyObject *mpreal_bits2digits(PyMpRealObject *self, PyObject *args);
+
+PyObject *mpreal_digits2bits(PyMpRealObject *self, PyObject *args);
+
+
 static PyMethodDef mpreal_methods[] = {
         {"set_precision",         (PyCFunction) mpreal_setprecision,          METH_VARARGS},
         {"get_precision",         (PyCFunction) mpreal_getprecision,          METH_NOARGS},
@@ -94,6 +99,8 @@ static PyMethodDef mpreal_methods[] = {
         {"get_default_rounding",  (PyCFunction) mpreal_get_default_rounding,  METH_NOARGS  | METH_STATIC},
         {"is_integer",            (PyCFunction) mpreal_is_integer,            METH_NOARGS},
         {"to_string",             (PyCFunction) mpreal_to_string,             METH_VARARGS},
+        {"bits2digits",  (PyCFunction) mpreal_bits2digits,  METH_VARARGS | METH_STATIC},
+        {"digits2bits",  (PyCFunction) mpreal_digits2bits,  METH_VARARGS | METH_STATIC},
         {PyNull, PyNull}           /* sentinel */
 };
 
@@ -446,12 +453,12 @@ PyObject *mpreal_setprecision(PyMpRealObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "i:", &precision)) {
         return PyNull;
     }
-    self->mpreal->setPrecision(mpfr::digits2bits(precision));
+    self->mpreal->setPrecision(precision);
     return PyLong_FromLong(0);
 }
 
 PyObject *mpreal_getprecision(PyMpRealObject *self, PyObject *args) {
-    return PyLong_FromLong(mpfr::bits2digits(self->mpreal->getPrecision()));
+    return PyLong_FromLong(self->mpreal->getPrecision());
 }
 
 PyObject *mpreal_set_default_precision(PyMpRealObject *self, PyObject *args) {
@@ -459,12 +466,12 @@ PyObject *mpreal_set_default_precision(PyMpRealObject *self, PyObject *args) {
     if (!PyArg_ParseTuple(args, "i:", &precision)) {
         return PyNull;
     }
-    mpfr::mpreal::set_default_prec(mpfr::digits2bits(precision));
+    mpfr::mpreal::set_default_prec(precision);
     return PyLong_FromLong(0);
 }
 
 PyObject *mpreal_get_default_precision(PyMpRealObject *self, PyObject *args) {
-    return PyLong_FromLong(mpfr::bits2digits(mpfr::mpreal::get_default_prec()));
+    return PyLong_FromLong(mpfr::mpreal::get_default_prec());
 }
 
 PyObject *mpreal_set_default_rounding(PyMpRealObject *self, PyObject *args) {
@@ -511,4 +518,20 @@ PyObject *mpreal_to_string(PyMpRealObject *self, PyObject *args) {
         PyErr_SetString(PyExc_RuntimeError, "argument must be unicode");
         return PyNull;
     }
+}
+
+PyObject *mpreal_bits2digits(PyMpRealObject *self, PyObject *args) {
+    int bits;
+    if (!PyArg_ParseTuple(args, "i:", &bits)) {
+        return PyNull;
+    }
+    return PyLong_FromSize_t(mpfr::bits2digits(bits));
+}
+
+PyObject *mpreal_digits2bits(PyMpRealObject *self, PyObject *args) {
+    int digits;
+    if (!PyArg_ParseTuple(args, "i:", &digits)) {
+        return PyNull;
+    }
+    return PyLong_FromSize_t(mpfr::digits2bits(digits));
 }

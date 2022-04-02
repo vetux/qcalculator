@@ -20,7 +20,7 @@ file(GLOB_RECURSE SRC src/*.cpp)
 
 file(GLOB ADDON_SRC python/addon/*.py)
 file(GLOB ADDON_META python/addon/*.json)
-set(SYSTEM_SRC python/system/qcalc)
+file(GLOB_RECURSE SYSTEM_SRC python/system/*.py)
 
 file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/addon) # Copy addon scripts
 file(COPY ${ADDON_META} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/modules/addon) # Copy addon metadata

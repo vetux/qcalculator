@@ -15,19 +15,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import qc_native_exprtk
-
-mpreal = qc_native_exprtk.mpreal
-
-
-class RoundingMode:
-    def __init__(self):
-        pass
-
-    ROUND_NEAREST = 0
-    ROUND_TOWARD_ZERO = 1
-    ROUND_TOWARD_INFINITY = 2
-    ROUND_TOWARD_INFINITY_NEGATIVE = 3
-    ROUND_AWAY_FROM_ZERO = 4
+from mpreal import mpreal as mpreal
 
 
 class Function:
