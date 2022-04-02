@@ -25,8 +25,7 @@
 #include "math/symboltable.hpp"
 
 namespace ExprtkModule {
-    void initialize(const std::function<void(const SymbolTable &)> &symbolTableChangeCallback,
-                    const std::function<const SymbolTable &()> &symbolTableRetrieveCallback);
+    void initialize(SymbolTable &globalTable, std::function<void()> tableChangeCallback);
 }
 
 #endif //QCALC_EXPRTKMODULE_HPP

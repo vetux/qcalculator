@@ -29,12 +29,7 @@
 int InteractiveInterpreter::run() {
     SymbolTable table;
 
-    ExprtkModule::initialize([&table](const SymbolTable &sym) {
-                                 table = sym;
-                             },
-                             [&table]() {
-                                 return table;
-                             });
+    ExprtkModule::initialize(table, []() {});
 
     PyUtil::initializePython();
 

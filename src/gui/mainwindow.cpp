@@ -103,11 +103,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     loadSettings();
 
-    ExprtkModule::initialize([this](const SymbolTable &sym) {
-                                 onSymbolTableChanged(sym);
-                             },
+    ExprtkModule::initialize(symbolTable,
                              [this]() {
-                                 return symbolTable;
+                                 onSymbolTableChanged(symbolTable);
                              });
 
     PyUtil::initializePython();
