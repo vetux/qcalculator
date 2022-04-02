@@ -76,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
     connect(actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
     connect(actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
+    connect(actionAboutQt, SIGNAL(triggered(bool)), this, SLOT(onActionAboutQt()));
     connect(actionImportSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionImportSymbolTable()));
     connect(actionExportSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionExportSymbolTable()));
     connect(actionEditSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionEditSymbolTable()));
@@ -289,6 +290,10 @@ Powered by:
     qt - https://www.qt.io/
     mpfr - https://www.mpfr.org/
 )LLL"));
+}
+
+void MainWindow::onActionAboutQt() {
+    QMessageBox::aboutQt(this);
 }
 
 void MainWindow::onActionImportSymbolTable() {
@@ -559,6 +564,10 @@ void MainWindow::setupMenuBar() {
     actionAbout->setText("About QCalculator");
     actionAbout->setObjectName("actionAbout");
 
+    actionAboutQt = new QAction(this);
+    actionAboutQt->setText("About Qt");
+    actionAboutQt->setObjectName("actionAboutQt");
+
     actionEditSymbols = new QAction(this);
     actionEditSymbols->setText("Edit Symbols");
     actionEditSymbols->setObjectName("actionEditSymbols");
@@ -575,6 +584,7 @@ void MainWindow::setupMenuBar() {
     menuSymbols->addMenu(menuSymbolsHistory);
 
     menuHelp->addAction(actionAbout);
+    menuHelp->addAction(actionAboutQt);
 
     menuBar()->addMenu(menuFile);
     menuBar()->addMenu(menuSymbols);

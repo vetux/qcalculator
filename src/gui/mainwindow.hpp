@@ -90,6 +90,8 @@ public slots:
 
     void onActionAbout();
 
+    void onActionAboutQt();
+
     void onActionImportSymbolTable();
 
     void onActionExportSymbolTable();
@@ -137,6 +139,7 @@ private:
     QAction *actionExportSymbols{};
 
     QAction *actionAbout{};
+    QAction *actionAboutQt{};
 
     SymbolsDialog *symbolsDialog = nullptr;
 
