@@ -229,7 +229,11 @@ def load():
                               QtCore.SLOT("slot_input_text_changed(QString)"))
     QtWidgets.QWidget.connect(widget, QtCore.SIGNAL("signal_set_input_text(QString)"), gui.input_line_edit,
                               QtCore.SLOT("setText(QString)"))
+    QtWidgets.QWidget.connect(widget, QtCore.SIGNAL("signal_set_input_text(QString)"), gui.wnd,
+                              QtCore.SLOT("onInputReturnPressed()"))
+
     gui.root.layout().insertWidget(2, widget)
+
     widget.slot_input_text_changed(gui.input_line_edit.text())
 
 
@@ -238,5 +242,6 @@ def unload():
     gui.root.layout().removeWidget(widget)
     gui.wnd.disconnect(widget)
     gui.input_line_edit.disconnect(widget)
+
     widget.disconnect(gui.input_line_edit)
     widget.deleteLater()
