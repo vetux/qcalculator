@@ -27,7 +27,7 @@
 
 #include <mpfr.h>
 
-#include "../../../addon/addonmetadata.hpp"
+#include "addon/addonmanager.hpp"
 
 #include "generaltab.hpp"
 #include "addontab.hpp"
@@ -36,7 +36,7 @@ class SettingsDialog : public QDialog {
 Q_OBJECT
 
 public:
-    explicit SettingsDialog(QWidget *parent = nullptr);
+    explicit SettingsDialog(AddonManager &addonManager, QWidget *parent = nullptr);
 
     ~SettingsDialog() override;
 
@@ -82,6 +82,8 @@ private slots:
 
     void onInstallAddonPressed();
 
+    void onAddonStartTest(const QString &module);
+
 private:
     QPushButton *okButton;
     QPushButton *cancelButton;
@@ -90,6 +92,8 @@ private:
 
     GeneralTab *generalTab;
     AddonTab *addonTab;
+
+    AddonManager &addonManager;
 
     std::set<std::string> enabledAddons;;
 };

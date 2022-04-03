@@ -24,15 +24,16 @@
 #include <QPushButton>
 #include <QListWidget>
 
-#include "../../../addon/addonmetadata.hpp"
-
-#include "../../widgets/addonitemwidget.hpp"
+#include "gui/widgets/addonitemwidget.hpp"
+#include "addon/addon.hpp"
 
 class AddonTab : public QWidget {
 Q_OBJECT
 signals:
 
     void addonEnableChanged(AddonItemWidget *item);
+
+    void addonStartTest(const QString &module);
 
     void installPressed();
 
@@ -41,13 +42,16 @@ signals:
 public slots:
 
     void setAddons(const std::map<std::string, bool> &addonState,
-                   const std::map<std::string, AddonMetadata> &addonMetadata);
+                   const std::map<std::string, Addon> &addonMetadata);
 
 public:
     explicit AddonTab(QWidget *parent = nullptr);
 
 private slots:
+
     void onAddonEnableChanged();
+
+    void onAddonStartTest();
 
 private:
     QPushButton *installButton;

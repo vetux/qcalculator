@@ -25,6 +25,16 @@
 #include "math/symboltable.hpp"
 
 namespace ExprtkModule {
+    /**
+     * Initialize the exprtk python module,
+     * this appends logic to the cpython init tab
+     * and should therefore be called before initializing cpython.
+     *
+     * Dependency on mpreal module, readAddons mpreal module beforehand.
+     *
+     * @param globalTable
+     * @param tableChangeCallback
+     */
     void initialize(SymbolTable &globalTable, std::function<void()> tableChangeCallback);
 }
 

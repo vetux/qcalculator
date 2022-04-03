@@ -85,10 +85,6 @@ PyObject *mpreal_is_integer(PyMpRealObject *self, PyObject *args);
 
 PyObject *mpreal_to_string(PyMpRealObject *self, PyObject *args);
 
-PyObject *mpreal_bits2digits(PyMpRealObject *self, PyObject *args);
-
-PyObject *mpreal_digits2bits(PyMpRealObject *self, PyObject *args);
-
 
 static PyMethodDef mpreal_methods[] = {
         {"set_precision",         (PyCFunction) mpreal_setprecision,          METH_VARARGS},
@@ -99,8 +95,6 @@ static PyMethodDef mpreal_methods[] = {
         {"get_default_rounding",  (PyCFunction) mpreal_get_default_rounding,  METH_NOARGS  | METH_STATIC},
         {"is_integer",            (PyCFunction) mpreal_is_integer,            METH_NOARGS},
         {"to_string",             (PyCFunction) mpreal_to_string,             METH_VARARGS},
-        {"bits2digits",  (PyCFunction) mpreal_bits2digits,  METH_VARARGS | METH_STATIC},
-        {"digits2bits",  (PyCFunction) mpreal_digits2bits,  METH_VARARGS | METH_STATIC},
         {PyNull, PyNull}           /* sentinel */
 };
 
@@ -518,20 +512,4 @@ PyObject *mpreal_to_string(PyMpRealObject *self, PyObject *args) {
         PyErr_SetString(PyExc_RuntimeError, "argument must be unicode");
         return PyNull;
     }
-}
-
-PyObject *mpreal_bits2digits(PyMpRealObject *self, PyObject *args) {
-    int bits;
-    if (!PyArg_ParseTuple(args, "i:", &bits)) {
-        return PyNull;
-    }
-    return PyLong_FromSize_t(mpfr::bits2digits(bits));
-}
-
-PyObject *mpreal_digits2bits(PyMpRealObject *self, PyObject *args) {
-    int digits;
-    if (!PyArg_ParseTuple(args, "i:", &digits)) {
-        return PyNull;
-    }
-    return PyLong_FromSize_t(mpfr::digits2bits(digits));
 }

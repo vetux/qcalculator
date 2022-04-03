@@ -47,6 +47,8 @@ signals:
 
     void onModuleEnabledChanged(bool enabled);
 
+    void onModuleStartTest();
+
 private:
     QString moduleName;
     QHBoxLayout *layout;

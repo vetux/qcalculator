@@ -283,7 +283,6 @@ class NumeralSystemWidget(QtWidgets.QWidget):
                 val = mpreal.from_hex(self.hextext.text())
                 self.slot_set_value(val)
             except:
-                self.hextext.setText("")
                 self.octtext.setText("")
                 self.bintext.setText("")
 
@@ -293,7 +292,6 @@ class NumeralSystemWidget(QtWidgets.QWidget):
                 self.slot_set_value(mpreal.from_octal(self.octtext.text()))
             except:
                 self.hextext.setText("")
-                self.octtext.setText("")
                 self.bintext.setText("")
 
     def slot_binary_editing_finished(self):
@@ -302,7 +300,6 @@ class NumeralSystemWidget(QtWidgets.QWidget):
                 self.slot_set_value(mpreal.from_binary(self.bintext.text()))
             except:
                 self.hextext.setText("")
-                self.octtext.setText("")
                 self.bintext.setText("")
 
     def slot_set_value(self, value, signal = True):
@@ -313,9 +310,10 @@ class NumeralSystemWidget(QtWidgets.QWidget):
             try:
                 r = mpreal.from_decimal(value)
             except:
-                self.hextext.setText("")
-                self.octtext.setText("")
-                self.bintext.setText("")
+                if not signal:
+                    self.hextext.setText("")
+                    self.octtext.setText("")
+                    self.bintext.setText("")
                 return
         if signal:
             self.signal_value_changed.emit(mpreal.to_decimal(r))
@@ -324,13 +322,16 @@ class NumeralSystemWidget(QtWidgets.QWidget):
             self.hextext.setText(mpreal.to_hex(r))
             self.octtext.setText(mpreal.to_octal(r))
             self.bintext.setText(mpreal.to_binary(r))
-        else:
+        elif not signal:
             self.hextext.setText("")
             self.octtext.setText("")
             self.bintext.setText("")
 
     def slot_expression_evaluated(self, expression, value):
         self.slot_set_value(value, False)
+
+    def slot_input_text_changed(self, text):
+        self.slot_set_value(text, False)
 
     signal_value_changed = QtCore.Signal("QString")
 
@@ -361,9 +362,9 @@ def load():
                               QtCore.SLOT("setText(QString)"))
 
     QtWidgets.QWidget.connect(gui.input_line_edit, QtCore.SIGNAL("textChanged(const QString &)"), numWidget,
-                              QtCore.SLOT("slot_set_value(QString)"))
+                              QtCore.SLOT("slot_input_text_changed(QString)"))
     QtWidgets.QWidget.connect(gui.wnd, QtCore.SIGNAL("signalExpressionEvaluated(const QString &, const QString &)"),
-                          numWidget, QtCore.SLOT("slot_expression_evaluated(QString, QString)"))
+                              numWidget, QtCore.SLOT("slot_expression_evaluated(QString, QString)"))
     QtWidgets.QWidget.connect(numWidget, QtCore.SIGNAL("signal_value_changed(QString)"),
                               gui.input_line_edit, QtCore.SLOT("setText(const QString &)"))
     gui.root.layout().insertWidget(3, containerWidget)

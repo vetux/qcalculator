@@ -1,6 +1,6 @@
-import qc_native_exprtk
+import _mpreal
 
-mpreal = qc_native_exprtk.mpreal
+mpreal = _mpreal.mpreal
 
 class RoundingMode:
     def __init__(self):

@@ -17,14 +17,19 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_ADDON_HPP
-#define QCALC_ADDON_HPP
+#ifndef QCALC_MPREALMODULE_HPP
+#define QCALC_MPREALMODULE_HPP
 
-#include <string>
+namespace MprealModule {
+    /**
+     * Initialize the mpreal python module,
+     * this appends logic to the cpython init tab
+     * and should therefore be called before initializing cpython.
+     *
+     * @param globalTable
+     * @param tableChangeCallback
+     */
+    void initialize();
+}
 
-struct AddonMetadata {
-    std::string displayName;
-    std::string description;
-};
-
-#endif //QCALC_ADDON_HPP
+#endif //QCALC_MPREALMODULE_HPP

@@ -22,24 +22,25 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-#include "../../widgets/addonitemwidget.hpp"
+#include "gui/widgets/addonitemwidget.hpp"
 
 void AddonTab::setAddons(const std::map<std::string, bool> &addonState,
-                         const std::map<std::string, AddonMetadata> &addonMetadata) {
+                         const std::map<std::string, Addon> &addonMetadata) {
     listWidget->clear();
-    for (auto &addon : addonState) {
+    for (auto &addon: addonState) {
         auto *itemWidget = new AddonItemWidget(listWidget);
         itemWidget->setModuleName(addon.first.c_str());
         itemWidget->setModuleEnabled(addon.second);
-        itemWidget->setModuleDisplayName(addonMetadata.at(addon.first).displayName.c_str());
+        itemWidget->setModuleDisplayName(addonMetadata.at(addon.first).getDisplayName().c_str());
         itemWidget->setModuleDescription(
-                (addonMetadata.at(addon.first).description + " ( " + addon.first + " )").c_str());
+                (addonMetadata.at(addon.first).getDescription() + " ( " + addon.first + " )").c_str());
 
         auto *item = new QListWidgetItem();
         item->setSizeHint(itemWidget->minimumSizeHint());
         listWidget->addItem(item);
         listWidget->setItemWidget(item, itemWidget);
         connect(itemWidget, SIGNAL(onModuleEnabledChanged(bool)), this, SLOT(onAddonEnableChanged()));
+        connect(itemWidget, SIGNAL(onModuleStartTest()), this, SLOT(onAddonStartTest()));
     }
 }
 
@@ -62,9 +63,16 @@ AddonTab::AddonTab(QWidget *parent)
     setLayout(new QVBoxLayout(this));
     layout()->addWidget(header);
     layout()->addWidget(listWidget);
+
+    connect(installButton, SIGNAL(pressed()), this, SIGNAL(installPressed()));
+    connect(refreshButton, SIGNAL(pressed()), this, SIGNAL(refreshPressed()));
 }
 
 
 void AddonTab::onAddonEnableChanged() {
-    emit addonEnableChanged(dynamic_cast<AddonItemWidget*>(sender()));
+    emit addonEnableChanged(dynamic_cast<AddonItemWidget *>(sender()));
+}
+
+void AddonTab::onAddonStartTest() {
+    emit addonStartTest(dynamic_cast<AddonItemWidget &>(*sender()).getModuleName());
 }

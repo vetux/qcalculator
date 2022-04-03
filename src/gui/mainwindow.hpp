@@ -27,18 +27,18 @@
 #include <bitset>
 #include <set>
 
-#include "../addon/addonmanagerlistener.hpp"
-#include "../io/settings.hpp"
+#include "addon/addonmanager.hpp"
+#include "io/settings.hpp"
 
-#include "../math/symboltable.hpp"
-#include "../math/numeralsystem.hpp"
+#include "math/symboltable.hpp"
+#include "math/numeralsystem.hpp"
 
 #include "widgets/symbolseditor.hpp"
 #include "widgets/historywidget.hpp"
 
 #include "dialog/symbolsdialog.hpp"
 
-class MainWindow : public QMainWindow, public AddonManagerListener {
+class MainWindow : public QMainWindow {
 Q_OBJECT
 
 public:
@@ -50,9 +50,9 @@ public:
 
     void resizeEvent(QResizeEvent *event) override;
 
-    void onAddonLoadFail(const std::string &moduleName, const std::string &error) override;
+    void onAddonLoadFail(const std::string &moduleName, const std::string &error);
 
-    void onAddonUnloadFail(const std::string &moduleName, const std::string &error) override;
+    void onAddonUnloadFail(const std::string &moduleName, const std::string &error);
 
 signals:
 
@@ -160,6 +160,8 @@ private:
     std::set<std::string> symbolTablePathHistory;
 
     std::string currentSymbolTablePath; // If the currently active symboltable was loaded from a file or saved to a file this path contains the path of the symbol table file.
+
+    std::unique_ptr<AddonManager> addonManager;
 };
 
 #endif // QCALC_MAINWINDOW_HPP

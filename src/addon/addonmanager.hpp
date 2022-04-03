@@ -23,26 +23,49 @@
 #include <set>
 #include <string>
 #include <functional>
+#include <atomic>
+#include <map>
 
-#include "addonmanagerlistener.hpp"
+#include "addon.hpp"
 
-namespace AddonManager {
+class AddonManager {
+public:
+    typedef std::function<void(const std::string &, const std::string &)> Listener;
+
+    AddonManager(const std::string &addonDirectory,
+                 const std::set<std::string> &moduleDirectories,
+                 Listener onAddonLoadFail,
+                 Listener onAddonUnloadFail);
+
+    ~AddonManager();
+
+    void reloadModules();
+
+    const std::map<std::string, Addon> &getAvailableAddons() const;
+
+    std::map<std::string, Addon> &getAvailableAddons();
+
     /**
-     * This function ensures that the addon modules in the passed set are currently loaded,
-     * and unloads any modules which are not contained in the set.
-     *
-     * If an addon fails to load it will still be added to the active addons and unloaded when not contained
-     * in a subsequent call to setActiveAddons.
-     *
-     * @param addons The set of module names which should currently be loaded.
-     * @param listener The listener instance to invoke callbacks on in case of errors.
+     * @param inputModules The set of module names which should currently be loaded.
      */
-    void setActiveAddons(const std::set<std::string> &addons, AddonManagerListener &listener);
+    void setActiveAddons(const std::set<std::string> &inputModules);
 
     /**
-     * @return The set of currently loaded modules.
+     * @return The set of currently loaded module names.
      */
     std::set<std::string> getActiveAddons();
-}
+
+private:
+    void readAddons();
+
+    std::string addonDir;
+    std::set<std::string> moduleDirs;
+
+    std::map<std::string, Addon> addons;
+    std::set<std::string> loadedModules;
+
+    Listener onAddonLoadFail;
+    Listener onAddonUnloadFail;
+};
 
 #endif //QCALC_ADDONMANAGER_HPP

@@ -24,13 +24,14 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-#include "../../widgets/addonitemwidget.hpp"
+#include "gui/widgets/addonitemwidget.hpp"
 
-#include "../../../addon/addonhelper.hpp"
-#include "../../../io/paths.hpp"
+#include "gui/dialog/addontesterdialog.hpp"
 
-SettingsDialog::SettingsDialog(QWidget *parent) :
-        QDialog(parent) {
+#include "addon/addonmanager.hpp"
+
+SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
+        QDialog(parent), addonManager(addonManager) {
     setWindowTitle("Settings");
 
     setLayout(new QVBoxLayout(this));
@@ -71,6 +72,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     connect(addonTab, SIGNAL(refreshPressed()), this, SLOT(onRefreshAddonsPressed()));
     connect(addonTab, SIGNAL(addonEnableChanged(AddonItemWidget * )), this,
             SLOT(onModuleEnableChanged(AddonItemWidget * )));
+    connect(addonTab, SIGNAL(addonStartTest(const QString &)), this, SLOT(onAddonStartTest(const QString &)));
 
     resize({700, 500});
 }
@@ -80,14 +82,14 @@ SettingsDialog::~SettingsDialog() = default;
 void SettingsDialog::setEnabledAddons(const std::set<std::string> &addons) {
     enabledAddons = addons;
 
-    std::map<std::string, AddonMetadata> metadata = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
+    std::map<std::string, Addon> adds = addonManager.getAvailableAddons();
 
     std::map<std::string, bool> addonState;
-    for (auto &pair : metadata) {
+    for (auto &pair: adds) {
         addonState[pair.first] = enabledAddons.find(pair.first) != enabledAddons.end();
     }
 
-    addonTab->setAddons(addonState, metadata);
+    addonTab->setAddons(addonState, adds);
 }
 
 std::set<std::string> SettingsDialog::getEnabledAddons() {
@@ -156,6 +158,10 @@ void SettingsDialog::onModuleEnableChanged(AddonItemWidget *item) {
             enabledAddons.insert(name);
         }
     }
+
+    addonManager.setActiveAddons(enabledAddons);
+
+    setEnabledAddons(addonManager.getActiveAddons());
 }
 
 void SettingsDialog::onDialogAccepted() {
@@ -166,18 +172,31 @@ void SettingsDialog::onDialogRejected() {
     reject();
 }
 
-void SettingsDialog::onSettingsTabChanged(int tab) {
-}
+void SettingsDialog::onSettingsTabChanged(int tab) {}
 
 void SettingsDialog::onRefreshAddonsPressed() {
-    std::map<std::string, AddonMetadata> metadata = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
+    addonManager.reloadModules();
+
+    enabledAddons = addonManager.getActiveAddons();
+
+    std::map<std::string, Addon> adds = addonManager.getAvailableAddons();
+
+    std::set<std::string> rMod;
+    for (auto &mod: enabledAddons)
+        if (adds.find(mod) == adds.end())
+            rMod.insert(mod);
+    for (auto &mod: rMod)
+        enabledAddons.erase(mod);
+
     std::map<std::string, bool> addonState;
-    for (auto &pair : metadata) {
+    for (auto &pair: adds) {
         addonState[pair.first] = enabledAddons.find(pair.first) != enabledAddons.end();
     }
-
-    addonTab->setAddons(addonState, metadata);
+    addonTab->setAddons(addonState, adds);
 }
 
-void SettingsDialog::onInstallAddonPressed() {
+void SettingsDialog::onInstallAddonPressed() {}
+
+void SettingsDialog::onAddonStartTest(const QString &module) {
+    AddonTesterDialog(addonManager.getAvailableAddons().at(module.toStdString()), this).exec();
 }

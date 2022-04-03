@@ -28,43 +28,45 @@
 #include <set>
 #include <string>
 
-#include "../../addon/addonhelper.hpp"
+#include "addon/addon.hpp"
 
 class AddonTesterDialog : public QDialog {
 Q_OBJECT
 public:
-    explicit AddonTesterDialog(QWidget *parent = nullptr) : QDialog(parent) {
+    explicit AddonTesterDialog(Addon &addon, QWidget *parent = nullptr) : QDialog(parent),
+                                                                          addon(addon) {
         setWindowTitle("Addon Tester");
-        label = new QLabel("Running memory leak check...\nClose dialog to cancel.", this);
+        label = new QLabel(
+                "Unloading and loading addon continuously, check for memory leaks in a process manager\nClose dialog to cancel.",
+                this);
         resize(250, 150);
         connect(&timer, SIGNAL(timeout()), SLOT(leakCheck()));
     }
 
-    void setModule(const std::string &m, bool isLoaded) {
-        module = m;
-        moduleLoaded = isLoaded;
-    }
-
     int exec() override {
+        auto moduleLoaded = addon.isLoaded();
+
         if (moduleLoaded)
-            AddonHelper::unload(module);
+            addon.unload();
+
         timer.start();
         int ret = QDialog::exec();
+
         if (moduleLoaded)
-            AddonHelper::load(module);
+            addon.load();
+
         return ret;
     }
 
 private slots:
 
     void leakCheck() {
-        AddonHelper::load(module);
-        AddonHelper::unload(module);
+        addon.load();
+        addon.unload();
     }
 
 private:
-    std::string module;
-    bool moduleLoaded;
+    Addon &addon;
 
     QTimer timer;
     QLabel *label;

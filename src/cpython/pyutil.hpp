@@ -30,6 +30,10 @@ namespace PyUtil {
 
     void finalizePython();
 
+    void initializePythonEx();
+
+    void finalizePythonEx();
+
     std::vector<std::string> getModuleDirectories();
 
     void setModuleDirectories(std::vector<std::string> dirs);

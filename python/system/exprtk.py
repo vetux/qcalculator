@@ -14,8 +14,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import qc_native_exprtk
-from mpreal import mpreal as mpreal
+import _exprtk
+from _mpreal import mpreal as mpreal
 
 
 class Function:
@@ -103,12 +103,12 @@ def evaluate(expression, symtable=None):
 # Returns a tuple with ret[0] being the result of the expression and ret[1] being the updated symbol table
 # in case the expression modifies variables.
 def evaluate_with_side_effects(expression, symtable):
-    return qc_native_exprtk.evaluate(expression, symtable)
+    return _exprtk.evaluate(expression, symtable)
 
 
 def get_global_symtable():
-    return qc_native_exprtk.get_global_symtable()
+    return _exprtk.get_global_symtable()
 
 
 def set_global_symtable(sym):
-    return qc_native_exprtk.set_global_symtable(sym)
+    return _exprtk.set_global_symtable(sym)

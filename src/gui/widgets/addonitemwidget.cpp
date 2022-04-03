@@ -76,8 +76,5 @@ void AddonItemWidget::onCheckBoxStateChange(int state) {
 }
 
 void AddonItemWidget::onButtonPressed() {
-    AddonTesterDialog dialog;
-    std::set<std::string> mods = AddonManager::getActiveAddons();
-    dialog.setModule(moduleName.toStdString(), mods.find(moduleName.toStdString()) != mods.end());
-    dialog.exec();
+    emit onModuleStartTest();
 }

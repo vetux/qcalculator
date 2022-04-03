@@ -21,17 +21,15 @@
 
 #include <utility>
 
-#include "../pyutil.hpp"
-#include "../pythoninclude.hpp"
-#include "../symboltableconverter.hpp"
+#include "cpython/pyutil.hpp"
+#include "cpython/pythoninclude.hpp"
+#include "cpython/symboltableconverter.hpp"
+
+#include "math/expressionparser.hpp"
+
 #include "modulecommon.hpp"
-#include "../types/pympreal.hpp"
 
-#include "../../gui/mainwindow.hpp"
-
-#include "../../math/expressionparser.hpp"
-
-#define MODULE_NAME "qc_native_exprtk"
+#define MODULE_NAME "_exprtk"
 
 static SymbolTable *symbolTable = nullptr;
 static std::function<void()> symbolTableCallback;
@@ -107,11 +105,6 @@ static PyObject *PyInit() {
     m = PyModule_Create(&ModuleDef);
     if (m == PyNull)
         return PyNull;
-
-    if (!PyMpReal_Initialize(m)) {
-        Py_DECREF(m);
-        return PyNull;
-    }
 
     return m;
 }

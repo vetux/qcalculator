@@ -30,7 +30,7 @@
 #include <QProcess>
 
 #include "addon/addonmanager.hpp"
-#include "addon/addonhelper.hpp"
+
 #include "io/paths.hpp"
 #include "io/serializer.hpp"
 #include "io/fileoperations.hpp"
@@ -45,6 +45,7 @@
 #include "widgets/symbolseditor.hpp"
 
 #include "cpython/modules/exprtkmodule.hpp"
+#include "cpython/modules/mprealmodule.hpp"
 #include "cpython/pyutil.hpp"
 
 static const std::string ADDONS_FILE = "/addons.json";
@@ -103,14 +104,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     loadSettings();
 
+    loadSymbolTablePathHistory();
+    saveSymbolTablePathHistory();
+
+    updateSymbolHistoryMenu();
+
+    MprealModule::initialize();
     ExprtkModule::initialize(symbolTable,
                              [this]() {
                                  onSymbolTableChanged(symbolTable);
                              });
-
-    PyUtil::initializePython();
-    PyUtil::addModuleDirectory(Paths::getSystemDirectory());
-    PyUtil::addModuleDirectory(Paths::getAddonDirectory());
+    addonManager = std::make_unique<AddonManager>(Paths::getAddonDirectory(),
+                                                  std::set<std::string>({Paths::getAddonDirectory(),
+                                                                         Paths::getSystemDirectory()}),
+                                                  [this](const std::string &module, const std::string &error) {
+                                                      return onAddonLoadFail(module, error);
+                                                  },
+                                                  [this](const std::string &module, const std::string &error) {
+                                                      return onAddonUnloadFail(module, error);
+                                                  });
 
     std::string enabledAddonsFilePath = Paths::getAppDataDirectory().append(ADDONS_FILE);
 
@@ -127,18 +139,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     //Check for enabled addons which dont exist anymore.
     std::set<std::string> availableAddons;
-    auto addons = AddonHelper::getAvailableAddons(Paths::getAddonDirectory());
+    auto addons = addonManager->getAvailableAddons();
     for (auto &addon: enabledAddons) {
         if (addons.find(addon) != addons.end())
             availableAddons.insert(addon);
     }
 
-    AddonManager::setActiveAddons(availableAddons, *this);
-
-    loadSymbolTablePathHistory();
-    saveSymbolTablePathHistory();
-
-    updateSymbolHistoryMenu();
+    addonManager->setActiveAddons(availableAddons);
 }
 
 MainWindow::~MainWindow() = default;
@@ -152,12 +159,12 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
 
 void MainWindow::onAddonLoadFail(const std::string &moduleName, const std::string &error) {
     QMessageBox::warning(this, "Failed to load module",
-                         ("Module " + moduleName + " failed to load, Error: " + error).c_str());
+                         ("Module " + moduleName + " failed to load\n\n" + error).c_str());
 }
 
 void MainWindow::onAddonUnloadFail(const std::string &moduleName, const std::string &error) {
     QMessageBox::warning(this, "Failed to unload module",
-                         ("Module " + moduleName + " failed to unload, Error: " + error).c_str());
+                         ("Module " + moduleName + " failed to unload\n\n" + error).c_str());
 }
 
 void MainWindow::onInputReturnPressed() {
@@ -196,7 +203,7 @@ void MainWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
 }
 
 void MainWindow::onActionSettings() {
-    SettingsDialog dialog;
+    SettingsDialog dialog(*addonManager);
     dialog.setPrecision(settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt());
     dialog.setRoundingMode(
             Serializer::deserializeRoundingMode(
@@ -209,7 +216,7 @@ void MainWindow::onActionSettings() {
             settings.value(SETTING_KEY_SYMBOLS_PRECISION, SETTING_DEFAULT_SYMBOLS_PRECISION).toInt());
     dialog.setSymbolsFormattingPrecision(settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
                                                         SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt());
-    dialog.setEnabledAddons(AddonManager::getActiveAddons());
+    dialog.setEnabledAddons(addonManager->getActiveAddons());
 
     dialog.show();
 
@@ -257,11 +264,8 @@ void MainWindow::onActionSettings() {
             symbolsDialog->setSymbolsFormattingPrecision(symbolsFormattingPrecision);
         }
 
-        std::set<std::string> addons = dialog.getEnabledAddons();
-
-        AddonManager::setActiveAddons(addons, *this);
-
         try {
+            std::set<std::string> addons = dialog.getEnabledAddons();
             std::string dataDir = Paths::getAppDataDirectory();
 
             if (!QDir(dataDir.c_str()).exists())
@@ -470,7 +474,7 @@ void MainWindow::loadSettings() {
 }
 
 void MainWindow::saveSettings() {
-    AddonManager::setActiveAddons({}, *this); //Unload addons
+    addonManager->setActiveAddons({}); //Unload addons
 
     try {
         std::string dir = Paths::getAppConfigDirectory();
@@ -668,8 +672,8 @@ bool MainWindow::importSymbolTable(const std::string &path) {
 
         QMessageBox::information(this, "Import successful", ("Successfully imported symbols from " + path).c_str());
 
-        std::set<std::string> addons = AddonManager::getActiveAddons();
-        AddonManager::setActiveAddons({}, *this);
+        std::set<std::string> addons = addonManager->getActiveAddons();
+        addonManager->setActiveAddons({});
 
         symbolTable = syms;
         currentSymbolTablePath = path;
@@ -680,7 +684,7 @@ bool MainWindow::importSymbolTable(const std::string &path) {
             symbolsDialog->setSymbols(symbolTable);
         }
 
-        AddonManager::setActiveAddons(addons, *this);
+        addonManager->setActiveAddons(addons);
 
         return true;
     } catch (const std::exception &e) {

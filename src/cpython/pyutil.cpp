@@ -31,6 +31,14 @@ void PyUtil::finalizePython() {
     Py_Finalize();
 }
 
+void PyUtil::initializePythonEx() {
+    Py_InitializeEx(1);
+}
+
+void PyUtil::finalizePythonEx() {
+    Py_FinalizeEx();
+}
+
 std::vector<std::string> PyUtil::getModuleDirectories() {
     PyObject *sys_path = PySys_GetObject("path");
     Py_ssize_t size = PyList_Size(sys_path);
