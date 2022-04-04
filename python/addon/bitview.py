@@ -370,6 +370,7 @@ def load():
     gui.root.layout().insertWidget(3, containerWidget)
 
     widget.slot_input_text_changed(gui.input_line_edit.text())
+    numWidget.slot_input_text_changed(gui.input_line_edit.text())
 
 
 def unload():
