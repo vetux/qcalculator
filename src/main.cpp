@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     auto args = parseArgs(argc, argv);
 
     if (args.size() > 1) {
-        if (args.at(1) == "--interpreter") {
+        if (args.at(1) == "--interpreter" || args.at(1) == "-i") {
             return InteractiveInterpreter::run();
         }
     }
