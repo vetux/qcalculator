@@ -38,5 +38,7 @@ int InteractiveInterpreter::run() {
 
     auto ret = PyRun_InteractiveLoop(stdin, "stdin");
 
+    PyUtil::finalizePython();
+
     return ret;
 }
