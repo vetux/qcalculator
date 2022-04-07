@@ -49,7 +49,6 @@ private slots:
     }
 
 private:
-
     TerminalWidget *term;
 };
 

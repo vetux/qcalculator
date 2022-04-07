@@ -24,6 +24,9 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QHBoxLayout>
+#include <QScrollArea>
+#include <QSizePolicy>
+#include <QScrollBar>
 
 class TerminalWidget : public QWidget {
 Q_OBJECT
@@ -33,6 +36,26 @@ public:
         container = new QWidget();
         promptLabel = new QLabel();
         inputEdit = new QLineEdit();
+        scroll = new QScrollArea();
+
+        historyLabel->setTextInteractionFlags(Qt::TextInteractionFlag::LinksAccessibleByKeyboard
+                                              | Qt::TextInteractionFlag::LinksAccessibleByMouse
+                                              | Qt::TextInteractionFlag::TextSelectableByKeyboard
+                                              | Qt::TextInteractionFlag::TextSelectableByMouse);
+
+        scroll->setFrameShadow(QFrame::Plain);
+        scroll->setFrameShape(QFrame::NoFrame);
+
+        auto *w = new QWidget(scroll);
+        auto *l = new QVBoxLayout(w);
+        l->setSpacing(0);
+        l->setMargin(0);
+        l->addWidget(historyLabel);
+        w->setLayout(l);
+
+        scroll->setWidget(w);
+
+        scroll->setWidgetResizable(true);
 
         container->setLayout(new QHBoxLayout());
         container->layout()->addWidget(promptLabel);
@@ -43,16 +66,20 @@ public:
 
         historyLabel->setAlignment(Qt::AlignmentFlag::AlignVCenter | Qt::AlignmentFlag::AlignBottom);
         historyLabel->setContentsMargins(0, 0, 0, 0);
+        historyLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
         inputEdit->setStyleSheet("QLineEdit { background-color: rgba(0, 0, 0, 0); }");
         inputEdit->setFrame(false);
 
         connect(inputEdit, SIGNAL(returnPressed()), this, SIGNAL(onReturnPressed()));
 
-        auto l = new QVBoxLayout();
-        l->setSpacing(0);
+        connect(scroll->verticalScrollBar(), &QScrollBar::rangeChanged, [this](int min, int max) {
+            scroll->verticalScrollBar()->setValue(max);
+        });
+
+        l = new QVBoxLayout();
         l->setMargin(0);
-        l->addWidget(historyLabel, 1);
+        l->addWidget(scroll, 1);
         l->addWidget(container);
         setLayout(l);
     }
@@ -98,6 +125,7 @@ private:
     QLabel *historyLabel;
     QWidget *container;
     QLabel *promptLabel;
+    QScrollArea *scroll;
     QLineEdit *inputEdit;
 };
 
