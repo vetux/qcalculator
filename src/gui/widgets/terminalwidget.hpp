@@ -44,7 +44,8 @@ public:
         historyLabel->setAlignment(Qt::AlignmentFlag::AlignVCenter | Qt::AlignmentFlag::AlignBottom);
         historyLabel->setContentsMargins(0, 0, 0, 0);
 
-        inputEdit->setStyleSheet("QLineEdit { background: none; }");
+        inputEdit->setStyleSheet("QLineEdit { background-color: rgba(0, 0, 0, 0); }");
+        inputEdit->setFrame(false);
 
         connect(inputEdit, SIGNAL(returnPressed()), this, SIGNAL(onReturnPressed()));
 
