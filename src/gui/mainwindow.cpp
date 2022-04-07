@@ -555,6 +555,7 @@ void MainWindow::setupMenuBar() {
     actionOpenTerminal = new QAction(this);
     actionOpenTerminal->setText("Open Console");
     actionOpenTerminal->setObjectName("actionOpenTerminal");
+    actionOpenTerminal->setShortcut(QKeySequence(Qt::CTRL + Qt::Key::Key_T));
 
     actionSettings = new QAction(this);
     actionSettings->setText("Settings");
