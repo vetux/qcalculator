@@ -67,7 +67,7 @@ std::string PyUtil::getError() {
     PyObject *pType, *pValue, *pTraceback;
     PyErr_Fetch(&pType, &pValue, &pTraceback);
 
-    std::string error = "{ Type: ";
+    std::string error;
     if (pType != PyNull) {
         PyObject *pTypeStr = PyObject_Str(pType);
         const char *pErrorType = PyUnicode_AsUTF8(pTypeStr);
@@ -80,7 +80,7 @@ std::string PyUtil::getError() {
         error += "NoType";
     }
 
-    error += ", Value: ";
+    error += "\n  ";
     if (pValue != PyNull) {
         PyObject *pValueStr = PyObject_Str(pValue);
         const char *pErrorValue = PyUnicode_AsUTF8(pValueStr);
@@ -93,7 +93,7 @@ std::string PyUtil::getError() {
         error += "NoValue";
     }
 
-    error += ", Traceback: ";
+    error += "\n  ";
     if (pTraceback != PyNull) {
         PyObject *pTracebackStr = PyObject_Str(pTraceback);
         const char *pErrorTraceback = PyUnicode_AsUTF8(pTracebackStr);
@@ -105,8 +105,6 @@ std::string PyUtil::getError() {
     } else {
         error += "NoTraceback";
     }
-
-    error += " }";
 
     return error;
 }
