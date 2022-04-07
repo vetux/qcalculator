@@ -49,7 +49,9 @@ int InteractiveInterpreter::run() {
     return ret;
 }
 
-std::string InteractiveInterpreter::runString(const std::string &expression, const std::string &context) {
+std::string InteractiveInterpreter::runString(const std::string &expression,
+                                              ParseStyle style,
+                                              const std::string &context) {
     PyObject *n = PyUnicode_FromString(context.c_str());
     PyObject *m = PyImport_GetModule(n);
 
@@ -58,6 +60,21 @@ std::string InteractiveInterpreter::runString(const std::string &expression, con
         throw std::runtime_error(PyUtil::getError());
     }
 
+    auto pyStyle = Py_single_input;
+    switch (style) {
+        case SINGLE_INPUT:
+            pyStyle = Py_single_input;
+            break;
+        case FILE_INPUT:
+            pyStyle = Py_file_input;
+            break;
+        case EVAL_INPUT:
+            pyStyle = Py_eval_input;
+            break;
+        case FUNC_TYPE_INPUT:
+            pyStyle = Py_func_type_input;
+            break;
+    }
     std::string output;
 
     StdRedirModule::startRedirect([&output](const std::string &str) {
@@ -69,7 +86,7 @@ std::string InteractiveInterpreter::runString(const std::string &expression, con
 
     PyObject *g = PyModule_GetDict(m); //Borrowed
 
-    PyObject *r = PyRun_String(expression.c_str(), Py_single_input, g, g);
+    PyObject *r = PyRun_String(expression.c_str(), pyStyle, g, g);
 
     StdRedirModule::stopRedirect();
 

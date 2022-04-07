@@ -21,6 +21,8 @@
 #define QCALC_TERMINALDIALOG_HPP
 
 #include <QDialog>
+#include <QAction>
+#include <QMenu>
 
 #include "gui/widgets/terminalwidget.hpp"
 
@@ -41,7 +43,7 @@ private slots:
     void onTerminalReturnPressed() {
         std::string expr = term->getInputText().toStdString();
         try {
-            auto res = InteractiveInterpreter::runString(expr);
+            auto res = InteractiveInterpreter::runString(expr, term->getMultiLineInput() ? InteractiveInterpreter::FILE_INPUT : InteractiveInterpreter::SINGLE_INPUT);
             term->appendHistory(expr.c_str(), res.c_str());
         } catch (const std::exception &e) {
             term->appendHistory(expr.c_str(), e.what());

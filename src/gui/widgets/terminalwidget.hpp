@@ -27,16 +27,27 @@
 #include <QScrollArea>
 #include <QSizePolicy>
 #include <QScrollBar>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QCheckBox>
 
 class TerminalWidget : public QWidget {
 Q_OBJECT
 public:
     explicit TerminalWidget(QWidget *parent = nullptr) : QWidget(parent) {
         historyLabel = new QLabel();
-        container = new QWidget();
+        singleLineContainer = new QWidget();
         promptLabel = new QLabel();
         inputEdit = new QLineEdit();
         scroll = new QScrollArea();
+
+        multiLineContainer = new QWidget();
+        multiButton = new QPushButton();
+        multiEdit = new QTextEdit();
+        multiCheckBox = new QCheckBox();
+
+        multiButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        multiButton->setText("Run");
 
         historyLabel->setTextInteractionFlags(Qt::TextInteractionFlag::LinksAccessibleByKeyboard
                                               | Qt::TextInteractionFlag::LinksAccessibleByMouse
@@ -52,10 +63,17 @@ public:
 
         scroll->setWidgetResizable(true);
 
-        container->setLayout(new QHBoxLayout());
-        container->layout()->addWidget(promptLabel);
-        container->layout()->addWidget(inputEdit);
-        container->layout()->setMargin(0);
+        auto layoutMulti = new QHBoxLayout();
+        layoutMulti->setMargin(0);
+        layoutMulti->addWidget(multiButton);
+        layoutMulti->addWidget(multiEdit, 1);
+
+        multiLineContainer->setLayout(layoutMulti);
+
+        singleLineContainer->setLayout(new QHBoxLayout());
+        singleLineContainer->layout()->addWidget(promptLabel);
+        singleLineContainer->layout()->addWidget(inputEdit);
+        singleLineContainer->layout()->setMargin(0);
 
         promptLabel->setText(">>>");
 
@@ -72,11 +90,23 @@ public:
             scroll->verticalScrollBar()->setValue(max);
         });
 
+        connect(multiCheckBox, &QCheckBox::toggled, [this](bool toggle) {
+            setMultiLineInput(toggle);
+        });
+
+        connect(multiButton, SIGNAL(pressed()), this, SIGNAL(onReturnPressed()));
+
+        multiCheckBox->setText("Enable Multiline Edit");
+
         auto l = new QVBoxLayout();
         l->setMargin(0);
         l->addWidget(scroll, 1);
-        l->addWidget(container);
+        l->addWidget(singleLineContainer);
+        l->addWidget(multiLineContainer);
+        l->addWidget(multiCheckBox);
         setLayout(l);
+
+        multiLineContainer->setVisible(false);
     }
 
 signals:
@@ -89,11 +119,18 @@ public slots:
         historyLabel->setText(historyLabel->text() + "\n>>> " + command + "\n" + result);
         if (historyLabel->text().endsWith("\n"))
             historyLabel->setText(historyLabel->text().chopped(1));
-        inputEdit->setText("");
+
+        if (multiCheckBox->isChecked())
+            multiEdit->setText("");
+        else
+            inputEdit->setText("");
     }
 
     QString getInputText() {
-        return inputEdit->text();
+        if (multiCheckBox->isChecked())
+            return multiEdit->toPlainText();
+        else
+            return inputEdit->text();
     }
 
     void setInputText(const QString &text) {
@@ -116,12 +153,37 @@ public slots:
         historyLabel->setText(text);
     }
 
+    void setMultiLineInput(bool multi) {
+        multiCheckBox->setChecked(multi);
+        if (multi) {
+            singleLineContainer->setVisible(false);
+            multiLineContainer->setVisible(true);
+        } else {
+            singleLineContainer->setVisible(true);
+            multiLineContainer->setVisible(false);
+        }
+    }
+
+    bool getMultiLineInput() {
+        return multiCheckBox->isChecked();
+    }
+
 private:
+    bool multiLine = false;
+
     QLabel *historyLabel;
-    QWidget *container;
+
+    QWidget *singleLineContainer;
     QLabel *promptLabel;
-    QScrollArea *scroll;
     QLineEdit *inputEdit;
+
+    QWidget *multiLineContainer;
+    QPushButton *multiButton;
+    QTextEdit *multiEdit;
+
+    QCheckBox *multiCheckBox;
+
+    QScrollArea *scroll;
 };
 
 #endif //QCALC_TERMINALWIDGET_HPP

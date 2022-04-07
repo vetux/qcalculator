@@ -27,6 +27,13 @@ namespace InteractiveInterpreter {
 
     int run();
 
+    enum ParseStyle {
+        SINGLE_INPUT,
+        FILE_INPUT,
+        EVAL_INPUT,
+        FUNC_TYPE_INPUT
+    };
+
     /**
      * Run the python code in the expression argument in the context module and return the string value
      * of the result.
@@ -34,7 +41,7 @@ namespace InteractiveInterpreter {
      * @param expression
      * @return
      */
-    std::string runString(const std::string &expression, const std::string &context = "__main__");
+    std::string runString(const std::string &expression, ParseStyle style = SINGLE_INPUT, const std::string &context = "__main__");
 }
 
 #endif //QCALC_INTERACTIVEINTERPRETER_HPP
