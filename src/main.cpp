@@ -43,6 +43,8 @@ int main(int argc, char *argv[]) {
 
     auto args = parseArgs(argc, argv);
 
+    // Run the application as an interactive python interpreter
+    // Does not work on win32 if the application is not using the console subsystem
     if (args.size() > 1) {
         if (args.at(1) == "--interpreter" || args.at(1) == "-i") {
             return InteractiveInterpreter::run();
