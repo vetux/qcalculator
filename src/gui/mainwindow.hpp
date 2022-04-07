@@ -37,6 +37,7 @@
 #include "widgets/historywidget.hpp"
 
 #include "dialog/symbolsdialog.hpp"
+#include "dialog/terminaldialog.hpp"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -102,7 +103,7 @@ public slots:
 
     void onActionSymbolTableHistory();
 
-    void onActionOpenPythonTerminal();
+    void onActionOpenTerminal();
 
     const SymbolTable &getSymbolTable();
 
@@ -141,7 +142,7 @@ private:
     QAction *actionSettings{};
     QAction *actionExit{};
 
-    QAction *actionOpenPythonTerminal{};
+    QAction *actionOpenTerminal{};
 
     QAction *actionEditSymbols{};
     QAction *actionOpenSymbols{};

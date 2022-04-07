@@ -26,6 +26,12 @@
 #include "cpython/pyutil.hpp"
 #include "io/paths.hpp"
 
+#include "cpython/modules/stdredirmodule.hpp"
+
+void InteractiveInterpreter::initialize() {
+    StdRedirModule::initialize();
+}
+
 int InteractiveInterpreter::run() {
     SymbolTable table;
 
@@ -41,4 +47,43 @@ int InteractiveInterpreter::run() {
     PyUtil::finalizePython();
 
     return ret;
+}
+
+std::string InteractiveInterpreter::runString(const std::string &expression, const std::string &context) {
+    PyObject *n = PyUnicode_FromString(context.c_str());
+    PyObject *m = PyImport_GetModule(n);
+
+    if (m == PyNull) {
+        Py_DECREF(n);
+        throw std::runtime_error(PyUtil::getError());
+    }
+
+    std::string output;
+
+    StdRedirModule::startRedirect([&output](const std::string &str) {
+                                      output += str;
+                                  },
+                                  [&output](const std::string &str) {
+                                      output += str;
+                                  });
+
+    PyObject *g = PyModule_GetDict(m); //Borrowed
+
+    PyObject *r = PyRun_String(expression.c_str(), Py_single_input, g, g);
+
+    StdRedirModule::stopRedirect();
+
+    if (r == PyNull) {
+        Py_DECREF(m);
+        Py_DECREF(n);
+
+        throw std::runtime_error(PyUtil::getError());
+    }
+
+    Py_DECREF(r);
+
+    Py_DECREF(m);
+    Py_DECREF(n);
+
+    return output;
 }

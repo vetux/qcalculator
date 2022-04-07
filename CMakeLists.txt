@@ -32,13 +32,15 @@ set(HDR_GUI src/gui/mainwindow.hpp
         src/gui/dialog/settings/addontab.hpp
         src/gui/dialog/addontesterdialog.hpp
         src/gui/dialog/symbolsdialog.hpp
+        src/gui/dialog/terminaldialog.hpp
         src/gui/widgets/addonitemwidget.hpp
         src/gui/widgets/historywidget.hpp
         src/gui/widgets/historylabel.hpp
         src/gui/widgets/functionseditor.hpp
         src/gui/widgets/namedvalueeditor.hpp
         src/gui/widgets/scriptseditor.hpp
-        src/gui/widgets/symbolseditor.hpp)
+        src/gui/widgets/symbolseditor.hpp
+        src/gui/widgets/terminalwidget.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
 

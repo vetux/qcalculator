@@ -17,24 +17,31 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_INTERACTIVEINTERPRETER_HPP
-#define QCALC_INTERACTIVEINTERPRETER_HPP
+#ifndef QCALC_STDREDIRMODULE_HPP
+#define QCALC_STDREDIRMODULE_HPP
 
+#include <functional>
 #include <string>
 
-namespace InteractiveInterpreter {
+/**
+ * When this module is initialized it redirects the std out and std error of the python interpreter to
+ * the specified function objects.
+ */
+namespace StdRedirModule {
+    /**
+     * Initialize the stdredir python module,
+     * this appends logic to the cpython init tab
+     * and should therefore be called before initializing cpython.
+     *
+     * @param stdOut The stream to redirect the python stdout to
+     * @param stdErr The stream to redirect the python stderr to
+     */
     void initialize();
 
-    int run();
+    void startRedirect(std::function<void(const std::string &)> stdOut,
+                       std::function<void(const std::string &)> stdErr);
 
-    /**
-     * Run the python code in the expression argument in the context module and return the string value
-     * of the result.
-     *
-     * @param expression
-     * @return
-     */
-    std::string runString(const std::string &expression, const std::string &context = "__main__");
+    void stopRedirect();
 }
 
-#endif //QCALC_INTERACTIVEINTERPRETER_HPP
+#endif //QCALC_STDREDIRMODULE_HPP

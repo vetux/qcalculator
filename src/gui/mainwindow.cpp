@@ -83,7 +83,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionSaveSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveSymbolTable()));
     connect(actionSaveAsSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveAsSymbolTable()));
     connect(actionEditSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionEditSymbolTable()));
-    connect(actionOpenPythonTerminal, SIGNAL(triggered(bool)), this, SLOT(onActionOpenPythonTerminal()));
+    connect(actionOpenTerminal, SIGNAL(triggered(bool)), this, SLOT(onActionOpenTerminal()));
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
@@ -109,6 +109,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     updateSymbolHistoryMenu();
 
+    InteractiveInterpreter::initialize();
     MprealModule::initialize();
     ExprtkModule::initialize(symbolTable,
                              [this]() {
@@ -385,24 +386,10 @@ void MainWindow::onActionSymbolTableHistory() {
     importSymbolTable(dynamic_cast<QAction *>(sender())->data().toString().toStdString());
 }
 
-void MainWindow::onActionOpenPythonTerminal() {
-    auto path = std::filesystem::path(QApplication::applicationFilePath().toStdString());
-    auto process = new QProcess(this);
-    std::string program;
-    auto command = path.string() + " --interpreter";
-#if unix
-// Because popular linux terminal emulators do not offer a cross emulator way to execute a command qterminal is assumed to be present
-    process->setProgram("qterminal");
-    process->setArguments({"-e", command.c_str()});
-#elif _WIN32
-    process->setProgram("cmd");
-    process->setArguments({"/c", command.c_str()})
-#endif
-    process->start();
-    if (!process->waitForStarted()) {
-        QMessageBox::warning(this, "Failed to start python console",
-                             "Could not start process:\n" + process->errorString());
-    }
+void MainWindow::onActionOpenTerminal() {
+    auto *d = new TerminalDialog(this);
+    d->setWindowTitle("Console");
+    d->show();
 }
 
 const SymbolTable &MainWindow::getSymbolTable() {
@@ -565,9 +552,9 @@ void MainWindow::setupMenuBar() {
     menuTools->setObjectName("menuTools");
     menuTools->setTitle("Tools");
 
-    actionOpenPythonTerminal = new QAction(this);
-    actionOpenPythonTerminal->setText("Open Python Console");
-    actionOpenPythonTerminal->setObjectName("actionOpenPythonTerminal");
+    actionOpenTerminal = new QAction(this);
+    actionOpenTerminal->setText("Open Console");
+    actionOpenTerminal->setObjectName("actionOpenTerminal");
 
     actionSettings = new QAction(this);
     actionSettings->setText("Settings");
@@ -607,7 +594,7 @@ void MainWindow::setupMenuBar() {
     actionEditSymbols->setObjectName("actionEditSymbols");
     actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
-    menuTools->addAction(actionOpenPythonTerminal);
+    menuTools->addAction(actionOpenTerminal);
 
     menuFile->addAction(actionSettings);
     menuFile->addSeparator();
