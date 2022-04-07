@@ -46,14 +46,9 @@ public:
         scroll->setFrameShadow(QFrame::Plain);
         scroll->setFrameShape(QFrame::NoFrame);
 
-        auto *w = new QWidget(scroll);
-        auto *l = new QVBoxLayout(w);
-        l->setSpacing(0);
-        l->setMargin(0);
-        l->addWidget(historyLabel);
-        w->setLayout(l);
-
-        scroll->setWidget(w);
+        scroll->setWidget(historyLabel);
+        scroll->setAlignment(Qt::AlignmentFlag::AlignBottom);
+        scroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
         scroll->setWidgetResizable(true);
 
@@ -64,8 +59,8 @@ public:
 
         promptLabel->setText(">>>");
 
-        historyLabel->setAlignment(Qt::AlignmentFlag::AlignVCenter | Qt::AlignmentFlag::AlignBottom);
         historyLabel->setContentsMargins(0, 0, 0, 0);
+        historyLabel->setAlignment(Qt::AlignmentFlag::AlignBottom);
         historyLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
         inputEdit->setStyleSheet("QLineEdit { background-color: rgba(0, 0, 0, 0); }");
@@ -77,7 +72,7 @@ public:
             scroll->verticalScrollBar()->setValue(max);
         });
 
-        l = new QVBoxLayout();
+        auto l = new QVBoxLayout();
         l->setMargin(0);
         l->addWidget(scroll, 1);
         l->addWidget(container);
