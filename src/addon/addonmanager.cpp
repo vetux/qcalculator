@@ -68,7 +68,7 @@ static std::map<std::string, AddonMetadata> readAvailableAddons(const std::strin
         if (exists(metadataFile)) {
             //Has metadata file
             try {
-                metadata = deserializeMetadata(FileOperations::fileReadAllText(absolute(metadataFile)));
+                metadata = deserializeMetadata(FileOperations::fileReadAllText(absolute(metadataFile).string()));
             } catch (const std::exception &e) {
                 //Ignore exception and set default metadata
                 metadata.displayName = moduleName;
