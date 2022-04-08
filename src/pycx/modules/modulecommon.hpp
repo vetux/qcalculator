@@ -17,30 +17,14 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_PYUTIL_HPP
-#define QCALC_PYUTIL_HPP
+#ifndef QCALC_MODULECOMMON_HPP
+#define QCALC_MODULECOMMON_HPP
 
-#include <string>
-#include <vector>
+// Try / Catch macros used at the beginning and end of each function block invoked by the python interpreter.
+// This is needed because cpython is a c library which does not handle c++ exceptions,
+// instead we have to catch all exceptions and give the error messages back to python,
+// which in turn causes python to set the error indicator which we then can retrieve again on the invocation site.
+#define MODULE_FUNC_TRY try {
+#define MODULE_FUNC_CATCH } catch (const std::exception &e) { PyErr_SetString(PyExc_RuntimeError, e.what()); return NULL; }
 
-#define PyNull NULL
-
-namespace PyUtil {
-    void initializePython();
-
-    void finalizePython();
-
-    void initializePythonEx();
-
-    void finalizePythonEx();
-
-    std::vector<std::string> getModuleDirectories();
-
-    void setModuleDirectories(std::vector<std::string> dirs);
-
-    void addModuleDirectory(const std::string &directory);
-
-    std::string getError();
-}
-
-#endif //QCALC_PYUTIL_HPP
+#endif //QCALC_MODULECOMMON_HPP

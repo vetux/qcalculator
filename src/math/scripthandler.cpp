@@ -19,13 +19,12 @@
 
 #include "scripthandler.hpp"
 
-#include "../cpython/pythoninclude.hpp"
-#include "../cpython/pyutil.hpp"
-
-#include "../cpython/types/pympreal.hpp"
+#include "pycx/include.hpp"
+#include "pycx/types/pympreal.hpp"
+#include "pycx/interpreter.hpp"
 
 ArithmeticType ScriptHandler::run(PyObject *c, const std::vector<ArithmeticType> &a) {
-    if (c == PyNull) {
+    if (c == NULL) {
         throw std::runtime_error("Null callback in script handler");
     }
 
@@ -36,11 +35,11 @@ ArithmeticType ScriptHandler::run(PyObject *c, const std::vector<ArithmeticType>
         PyTuple_SetItem(args, i, f);
     }
 
-    PyObject *pyRet = PyObject_Call(c, args, PyNull);
+    PyObject *pyRet = PyObject_Call(c, args, NULL);
     Py_DECREF(args);
 
-    if (pyRet == PyNull) {
-        throw std::runtime_error(PyUtil::getError());
+    if (pyRet == NULL) {
+        throw std::runtime_error(Interpreter::getError());
     }
 
     mpfr::mpreal ret;
@@ -53,8 +52,8 @@ ArithmeticType ScriptHandler::run(PyObject *c, const std::vector<ArithmeticType>
         ret = PyLong_AsDouble(pyRet);
     }
 
-    if (PyErr_Occurred() != PyNull) {
-        throw std::runtime_error(PyUtil::getError());
+    if (PyErr_Occurred() != NULL) {
+        throw std::runtime_error(Interpreter::getError());
     }
 
     Py_DECREF(pyRet);

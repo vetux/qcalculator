@@ -19,10 +19,9 @@
 
 #include "mprealmodule.hpp"
 
-#include "cpython/pythoninclude.hpp"
-#include "cpython/pyutil.hpp"
+#include "pycx/include.hpp"
 
-#include "cpython/types/pympreal.hpp"
+#include "pycx/types/pympreal.hpp"
 
 #include "extern/mpreal.h"
 
@@ -35,28 +34,28 @@ PyObject *mpreal_digits2bits(PyObject *self, PyObject *args);
 static PyMethodDef MethodDef[] = {
         {"bits2digits", mpreal_bits2digits, METH_VARARGS, "."},
         {"digits2bits", mpreal_digits2bits, METH_VARARGS, "."},
-        {PyNull, PyNull, 0, PyNull}
+        {NULL, NULL, 0, NULL}
 };
 
 static PyModuleDef ModuleDef = {
         PyModuleDef_HEAD_INIT,
         MODULE_NAME,
-        PyNull,
+        NULL,
         -1,
         MethodDef,
-        PyNull, PyNull, PyNull, PyNull
+        NULL, NULL, NULL, NULL
 };
 
 static PyObject *PyInit() {
     PyObject *m;
 
     m = PyModule_Create(&ModuleDef);
-    if (m == PyNull)
-        return PyNull;
+    if (m == NULL)
+        return NULL;
 
     if (!PyMpReal_Initialize(m)) {
         Py_DECREF(m);
-        return PyNull;
+        return NULL;
     }
 
     return m;
@@ -65,7 +64,7 @@ static PyObject *PyInit() {
 PyObject *mpreal_bits2digits(PyObject *self, PyObject *args) {
     int bits;
     if (!PyArg_ParseTuple(args, "i:", &bits)) {
-        return PyNull;
+        return NULL;
     }
     return PyLong_FromSize_t(mpfr::bits2digits(bits));
 }
@@ -73,7 +72,7 @@ PyObject *mpreal_bits2digits(PyObject *self, PyObject *args) {
 PyObject *mpreal_digits2bits(PyObject *self, PyObject *args) {
     int digits;
     if (!PyArg_ParseTuple(args, "i:", &digits)) {
-        return PyNull;
+        return NULL;
     }
     return PyLong_FromSize_t(mpfr::digits2bits(digits));
 }

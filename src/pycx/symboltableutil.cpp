@@ -17,32 +17,32 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "symboltableconverter.hpp"
+#include "symboltableutil.hpp"
 
-#include "pythoninclude.hpp"
-#include "pyutil.hpp"
+#include "include.hpp"
+#include "interpreter.hpp"
 #include "types/pympreal.hpp"
 
-PyObject *SymbolTableConverter::New(const SymbolTable &table) {
+PyObject *SymbolTableUtil::New(const SymbolTable &table) {
     PyObject *symModule = PyImport_ImportModule("exprtk");
-    if (symModule == PyNull) {
-        throw std::runtime_error("Failed to import exprtk module, Error: " + PyUtil::getError());
+    if (symModule == NULL) {
+        throw std::runtime_error("Failed to import exprtk module, Error: " + Interpreter::getError());
     }
 
     PyObject *symDict = PyModule_GetDict(symModule);
 
     PyObject *symClass = PyDict_GetItemString(symDict, "SymbolTable");
-    if (symClass == PyNull) {
+    if (symClass == NULL) {
         throw std::runtime_error("Failed to get SymbolTable class object");
     }
 
     PyObject *funcClass = PyDict_GetItemString(symDict, "Function");
-    if (funcClass == PyNull) {
+    if (funcClass == NULL) {
         throw std::runtime_error("Failed to get Function class object");
     }
 
     PyObject *scriptClass = PyDict_GetItemString(symDict, "ScriptFunction");
-    if (scriptClass == PyNull) {
+    if (scriptClass == NULL) {
         throw std::runtime_error("Failed to get ScriptFunction class object");
     }
 
@@ -94,7 +94,7 @@ PyObject *SymbolTableConverter::New(const SymbolTable &table) {
 
         // PyObject_SetAttrString increments reference on passed object, we dont decrement because the returned
         // symbol table holds a new reference to the callback and therefore
-        // has to be cleaned up by calling SymbolTableConverter::Cleanup
+        // has to be cleaned up by calling SymbolTableUtil::Cleanup
         PyObject_SetAttrString(scriptInstance, "callback", var.second.callback);
 
         PyObject *o = PyBool_FromLong(var.second.enableArguments);
@@ -112,7 +112,7 @@ PyObject *SymbolTableConverter::New(const SymbolTable &table) {
     return symInstance;
 }
 
-SymbolTable SymbolTableConverter::Convert(PyObject *o) {
+SymbolTable SymbolTableUtil::Convert(PyObject *o) {
     SymbolTable ret;
 
     if (!PyObject_HasAttrString(o, "variables")) {
@@ -137,10 +137,10 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
         }
 
         const char *k = PyUnicode_AsUTF8(key);
-        if (k == PyNull) {
+        if (k == NULL) {
             //Should never happen, just in case we will steal the error indicator and throw.
             Py_DECREF(attr);
-            throw std::runtime_error(PyUtil::getError());
+            throw std::runtime_error(Interpreter::getError());
         }
 
         mpfr::mpreal v;
@@ -188,10 +188,10 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
         }
 
         const char *k = PyUnicode_AsUTF8(key);
-        if (k == PyNull) {
+        if (k == NULL) {
             //Should never happen, just in case we will steal the error indicator and throw.
             Py_DECREF(attr);
-            throw std::runtime_error(PyUtil::getError());
+            throw std::runtime_error(Interpreter::getError());
         }
 
         mpfr::mpreal v;
@@ -239,10 +239,10 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
         }
 
         const char *k = PyUnicode_AsUTF8(key);
-        if (k == PyNull) {
+        if (k == NULL) {
             //Should never happen, just in case we will steal the error indicator and throw.
             Py_DECREF(attr);
-            throw std::runtime_error(PyUtil::getError());
+            throw std::runtime_error(Interpreter::getError());
         }
 
         Function f;
@@ -262,11 +262,11 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
         }
 
         const char *expr = PyUnicode_AsUTF8(funcAttr);
-        if (expr == PyNull) {
+        if (expr == NULL) {
             //Should never happen, just in case we will steal the error indicator and throw.
             Py_DECREF(funcAttr);
             Py_DECREF(attr);
-            throw std::runtime_error(PyUtil::getError());
+            throw std::runtime_error(Interpreter::getError());
         }
 
         Py_DECREF(funcAttr);
@@ -284,11 +284,11 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
                     throw std::runtime_error("Function argument_name values must be unicode strings");
                 }
                 const char *argumentName = PyUnicode_AsUTF8(pyArgName);
-                if (argumentName == PyNull) {
+                if (argumentName == NULL) {
                     //Should never happen, just in case we will steal the error indicator and throw.
                     Py_DECREF(funcAttr);
                     Py_DECREF(attr);
-                    throw std::runtime_error(PyUtil::getError());
+                    throw std::runtime_error(Interpreter::getError());
                 }
                 f.argumentNames.emplace_back(argumentName);
             }
@@ -302,11 +302,11 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
                     throw std::runtime_error("Function argument_name values must be unicode strings");
                 }
                 const char *argumentName = PyUnicode_AsUTF8(pyArgName);
-                if (argumentName == PyNull) {
+                if (argumentName == NULL) {
                     //Should never happen, just in case we will steal the error indicator and throw.
                     Py_DECREF(funcAttr);
                     Py_DECREF(attr);
-                    throw std::runtime_error(PyUtil::getError());
+                    throw std::runtime_error(Interpreter::getError());
                 }
                 f.argumentNames.emplace_back(argumentName);
             }
@@ -320,11 +320,11 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
                     throw std::runtime_error("Function argument_name values must be unicode strings");
                 }
                 const char *argumentName = PyUnicode_AsUTF8(pyArgName);
-                if (argumentName == PyNull) {
+                if (argumentName == NULL) {
                     //Should never happen, just in case we will steal the error indicator and throw.
                     Py_DECREF(funcAttr);
                     Py_DECREF(attr);
-                    throw std::runtime_error(PyUtil::getError());
+                    throw std::runtime_error(Interpreter::getError());
                 }
                 f.argumentNames.emplace_back(argumentName);
             }
@@ -369,10 +369,10 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
         }
 
         const char *k = PyUnicode_AsUTF8(key);
-        if (k == PyNull) {
+        if (k == NULL) {
             //Should never happen, just in case we will steal the error indicator and throw.
             Py_DECREF(attr);
-            throw std::runtime_error(PyUtil::getError());
+            throw std::runtime_error(Interpreter::getError());
         }
 
         Script s;
@@ -424,7 +424,7 @@ SymbolTable SymbolTableConverter::Convert(PyObject *o) {
     return ret;
 }
 
-SymbolTable SymbolTableConverter::Cleanup(const SymbolTable &table) {
+SymbolTable SymbolTableUtil::Cleanup(const SymbolTable &table) {
     SymbolTable ret = table;
 
     std::vector<std::string> scriptKeys;
@@ -432,7 +432,7 @@ SymbolTable SymbolTableConverter::Cleanup(const SymbolTable &table) {
     for (auto &script : ret.getScripts()) {
         scriptKeys.emplace_back(script.first);
 
-        if (script.second.callback == PyNull) {
+        if (script.second.callback == NULL) {
             // Should never happen
             throw std::runtime_error("Null callback in cleanup");
         }

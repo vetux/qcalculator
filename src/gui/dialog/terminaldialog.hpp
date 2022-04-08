@@ -26,7 +26,7 @@
 
 #include "gui/widgets/terminalwidget.hpp"
 
-#include "cpython/interactiveinterpreter.hpp"
+#include "pycx/interpreter.hpp"
 
 class TerminalDialog : public QDialog {
 Q_OBJECT
@@ -43,7 +43,7 @@ private slots:
     void onTerminalReturnPressed() {
         std::string expr = term->getInputText().toStdString();
         try {
-            auto res = InteractiveInterpreter::runString(expr, term->getMultiLineInput() ? InteractiveInterpreter::FILE_INPUT : InteractiveInterpreter::SINGLE_INPUT);
+            auto res = Interpreter::runString(expr, term->getMultiLineInput() ? Interpreter::FILE_INPUT : Interpreter::SINGLE_INPUT);
             term->appendHistory(expr.c_str(), res.c_str());
         } catch (const std::exception &e) {
             term->appendHistory(expr.c_str(), e.what());

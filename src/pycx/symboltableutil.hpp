@@ -17,8 +17,8 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_SYMBOLTABLECONVERTER_HPP
-#define QCALC_SYMBOLTABLECONVERTER_HPP
+#ifndef QCALC_SYMBOLTABLEUTIL_HPP
+#define QCALC_SYMBOLTABLEUTIL_HPP
 
 struct _object;
 typedef _object PyObject;
@@ -31,7 +31,7 @@ typedef _object PyObject;
  * we will convert between some python object which has the required attributes and
  * our c++ symbol table.
  */
-namespace SymbolTableConverter {
+namespace SymbolTableUtil {
     /**
      * Throws on error and does NOT touch python errors in any way.
      *
@@ -48,7 +48,7 @@ namespace SymbolTableConverter {
      * Does extensive type checking on the relevant attributes of the object.
      *
      * The passed object may be any class instance as long as the attributes specified
-     * in sym.py are present. Which means 4 dictionaries with the names defined in sym.py.
+     * in sym.pycx are present. Which means 4 dictionaries with the names defined in sym.pycx.
      *
      * All keys have to be unicode strings.
      *
@@ -73,4 +73,4 @@ namespace SymbolTableConverter {
     SymbolTable Cleanup(const SymbolTable &table);
 }
 
-#endif //QCALC_SYMBOLTABLECONVERTER_HPP
+#endif //QCALC_SYMBOLTABLEUTIL_HPP

@@ -19,10 +19,9 @@
 
 #include <stdexcept>
 
-#include "cpython/modules/stdredirmodule.hpp"
+#include "pycx/modules/stdredirmodule.hpp"
 
-#include "cpython/pythoninclude.hpp"
-#include "cpython/pyutil.hpp"
+#include "pycx/include.hpp"
 
 static bool redirecting = false;
 static std::function<void(const std::string &)> stdOut;
@@ -37,24 +36,24 @@ PyObject *stdredir_stderr(PyObject *self, PyObject *args);
 static PyMethodDef MethodDef[] = {
         {"stdout", stdredir_stdout, METH_VARARGS, "."},
         {"stderr", stdredir_stderr, METH_VARARGS, "."},
-        {PyNull, PyNull, 0, PyNull}
+        {NULL, NULL, 0, NULL}
 };
 
 static PyModuleDef ModuleDef = {
         PyModuleDef_HEAD_INIT,
         MODULE_NAME,
-        PyNull,
+        NULL,
         -1,
         MethodDef,
-        PyNull, PyNull, PyNull, PyNull
+        NULL, NULL, NULL, NULL
 };
 
 static PyObject *PyInit() {
     PyObject *m;
 
     m = PyModule_Create(&ModuleDef);
-    if (m == PyNull)
-        return PyNull;
+    if (m == NULL)
+        return NULL;
 
     return m;
 }
@@ -77,8 +76,12 @@ PyObject *stdredir_stderr(PyObject *self, PyObject *args) {
     return Py_BuildValue("");
 }
 
+static bool initialized = false;
+
 void StdRedirModule::initialize() {
-    PyImport_AppendInittab(MODULE_NAME, PyInit);
+    if (!initialized)
+        PyImport_AppendInittab(MODULE_NAME, PyInit);
+    initialized = true;
 }
 
 //https://mail.python.org/pipermail/python-list/2002-August/140241.html
@@ -129,8 +132,8 @@ void StdRedirModule::stopRedirect() {
     stdOut = {};
     stdErr = {};
 
-  /*  int r1 = PyRun_SimpleString((code + "undo_redirect()").c_str());
-    if (r1 < 0) {
-        throw std::runtime_error("Err");
-    }*/
+    /*  int r1 = PyRun_SimpleString((code + "undo_redirect()").c_str());
+      if (r1 < 0) {
+          throw std::runtime_error("Err");
+      }*/
 }

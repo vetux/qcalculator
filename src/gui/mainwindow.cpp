@@ -44,9 +44,11 @@
 #include "widgets/historywidget.hpp"
 #include "widgets/symbolseditor.hpp"
 
-#include "cpython/modules/exprtkmodule.hpp"
-#include "cpython/modules/mprealmodule.hpp"
-#include "cpython/pyutil.hpp"
+#include "pycx/modules/exprtkmodule.hpp"
+#include "pycx/modules/mprealmodule.hpp"
+#include "pycx/modules/stdredirmodule.hpp"
+
+#include "pycx/interpreter.hpp"
 
 static const std::string ADDONS_FILE = "/addons.json";
 static const std::string SETTINGS_FILE = "/settings.json";
@@ -109,15 +111,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     updateSymbolHistoryMenu();
 
-    InteractiveInterpreter::initialize();
+    StdRedirModule::initialize();
     MprealModule::initialize();
     ExprtkModule::initialize(symbolTable,
                              [this]() {
                                  onSymbolTableChanged(symbolTable);
                              });
+
+    Interpreter::initialize();
+
+    Interpreter::addModuleDir(Paths::getAddonDirectory());
+    Interpreter::addModuleDir(Paths::getSystemDirectory());
+
     addonManager = std::make_unique<AddonManager>(Paths::getAddonDirectory(),
-                                                  std::set<std::string>({Paths::getAddonDirectory(),
-                                                                         Paths::getSystemDirectory()}),
                                                   [this](const std::string &module, const std::string &error) {
                                                       return onAddonLoadFail(module, error);
                                                   },

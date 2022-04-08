@@ -21,7 +21,7 @@
 
 #include "gui/mainwindow.hpp"
 
-#include "cpython/interactiveinterpreter.hpp"
+#include "pycx/interpreter.hpp"
 
 std::vector<std::string> parseArgs(int argc, char *argv[]) {
     std::vector<std::string> ret;
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     // Does not work on win32 if the application is not using the console subsystem
     if (args.size() > 1) {
         if (args.at(1) == "--interpreter" || args.at(1) == "-i") {
-            return InteractiveInterpreter::run();
+            return Interpreter::runInteractiveLoop();
         }
     }
 

@@ -20,10 +20,8 @@
 #include "addon.hpp"
 
 #include <utility>
-#include <stdexcept>
 
-#include "cpython/pythoninclude.hpp"
-#include "cpython/pyutil.hpp"
+#include "pycx/interpreter.hpp"
 
 Addon::Addon(std::string moduleName, std::string displayName, std::string description)
         : loaded(false),
@@ -33,37 +31,7 @@ Addon::Addon(std::string moduleName, std::string displayName, std::string descri
 
 void Addon::callFunctionNoArgs(const std::string &name) {
     moduleLoaded = true;
-
-    PyObject *mod = PyImport_ImportModule(moduleName.c_str());
-    if (mod == PyNull) {
-        throw std::runtime_error(PyUtil::getError());
-    }
-
-    PyObject *dict = PyModule_GetDict(mod);
-    if (dict == PyNull) {
-        throw std::runtime_error(PyUtil::getError());
-    }
-
-    PyObject *key = PyUnicode_FromString(name.c_str());
-
-    PyObject *function = PyDict_GetItem(dict, key);
-
-    if (function != PyNull) {
-        PyObject *result = PyObject_CallNoArgs(function);
-        if (result == PyNull) {
-            Py_DECREF(key);
-            Py_DECREF(mod);
-            throw std::runtime_error(PyUtil::getError());
-        }
-        Py_DECREF(result);
-    } else {
-        Py_DECREF(key);
-        Py_DECREF(mod);
-        throw std::runtime_error("Function not found in addon module: " + name);
-    }
-
-    Py_DECREF(key);
-    Py_DECREF(mod);
+    Interpreter::callFunctionNoArgs(moduleName, name);
 }
 
 void Addon::reload() {
@@ -71,16 +39,7 @@ void Addon::reload() {
     if (l)
         unload();
 
-    PyObject *mod = PyImport_ImportModule(moduleName.c_str());
-    if (mod == PyNull) {
-        throw std::runtime_error(PyUtil::getError());
-    }
-    PyObject *nMod = PyImport_ReloadModule(mod);
-    if (nMod == PyNull) {
-        throw std::runtime_error(PyUtil::getError());
-    }
-    Py_DECREF(mod);
-    Py_DECREF(nMod);
+    Interpreter::reloadModule(moduleName);
 
     if (l)
         load();

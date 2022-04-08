@@ -21,9 +21,8 @@
 
 #include <utility>
 
-#include "cpython/pyutil.hpp"
-#include "cpython/pythoninclude.hpp"
-#include "cpython/symboltableconverter.hpp"
+#include "pycx/include.hpp"
+#include "pycx/symboltableutil.hpp"
 
 #include "math/expressionparser.hpp"
 
@@ -41,24 +40,24 @@ PyObject *evaluate(PyObject *self, PyObject *args) {
         PyObject *pySymTable;
 
         if (!PyArg_ParseTuple(args, "OO:", &pyExpression, &pySymTable)) {
-            return PyNull;
+            return NULL;
         }
 
         const char *expression = PyUnicode_AsUTF8(pyExpression);
-        if (expression == PyNull) {
-            return PyNull;
+        if (expression == NULL) {
+            return NULL;
         }
 
-        SymbolTable symTable = SymbolTableConverter::Convert(pySymTable);
+        SymbolTable symTable = SymbolTableUtil::Convert(pySymTable);
 
         ArithmeticType value = ExpressionParser::evaluate(expression, symTable);
 
         PyObject *ret = PyTuple_New(2);
 
         PyTuple_SetItem(ret, 0, PyFloat_FromDouble(value.toDouble()));
-        PyTuple_SetItem(ret, 1, SymbolTableConverter::New(symTable));
+        PyTuple_SetItem(ret, 1, SymbolTableUtil::New(symTable));
 
-        SymbolTableConverter::Cleanup(symTable);
+        SymbolTableUtil::Cleanup(symTable);
 
         return ret;
 
@@ -69,16 +68,16 @@ PyObject *get_global_symtable(PyObject *self, PyObject *args) {
     if (symbolTable == nullptr)
         return nullptr;
     else
-        return SymbolTableConverter::New(*symbolTable);
+        return SymbolTableUtil::New(*symbolTable);
 }
 
 PyObject *set_global_symtable(PyObject *self, PyObject *args) {
-    PyObject *pysym = PyNull;
+    PyObject *pysym = NULL;
     if (!PyArg_ParseTuple(args, "O:", &pysym)) {
-        return PyNull;
+        return NULL;
     }
     SymbolTable &t = *symbolTable;
-    t = SymbolTableConverter::Convert(pysym);
+    t = SymbolTableUtil::Convert(pysym);
     symbolTableCallback();
     return PyLong_FromLong(0);
 }
@@ -87,24 +86,24 @@ static PyMethodDef MethodDef[] = {
         {"evaluate",            evaluate,            METH_VARARGS, "."},
         {"get_global_symtable", get_global_symtable, METH_NOARGS,  "."},
         {"set_global_symtable", set_global_symtable, METH_VARARGS, "."},
-        {PyNull, PyNull, 0, PyNull}
+        {NULL, NULL, 0, NULL}
 };
 
 static PyModuleDef ModuleDef = {
         PyModuleDef_HEAD_INIT,
         MODULE_NAME,
-        PyNull,
+        NULL,
         -1,
         MethodDef,
-        PyNull, PyNull, PyNull, PyNull
+        NULL, NULL, NULL, NULL
 };
 
 static PyObject *PyInit() {
     PyObject *m;
 
     m = PyModule_Create(&ModuleDef);
-    if (m == PyNull)
-        return PyNull;
+    if (m == NULL)
+        return NULL;
 
     return m;
 }

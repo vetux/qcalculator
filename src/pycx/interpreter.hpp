@@ -17,16 +17,13 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_INTERACTIVEINTERPRETER_HPP
-#define QCALC_INTERACTIVEINTERPRETER_HPP
+#ifndef QCALC_INTERPRETER_HPP
+#define QCALC_INTERPRETER_HPP
 
+#include <vector>
 #include <string>
 
-namespace InteractiveInterpreter {
-    void initialize();
-
-    int run();
-
+namespace Interpreter {
     enum ParseStyle {
         SINGLE_INPUT,
         FILE_INPUT,
@@ -34,14 +31,27 @@ namespace InteractiveInterpreter {
         FUNC_TYPE_INPUT
     };
 
-    /**
-     * Run the python code in the expression argument in the context module and return the string value
-     * of the result.
-     *
-     * @param expression
-     * @return
-     */
-    std::string runString(const std::string &expression, ParseStyle style = SINGLE_INPUT, const std::string &context = "__main__");
+    void initialize();
+
+    void finalize();
+
+    void setModuleDirs(const std::vector<std::string> &moduleDirectories);
+
+    std::vector<std::string> getModuleDirs();
+
+    void addModuleDir(const std::string &dir);
+
+    int runInteractiveLoop();
+
+    std::string runString(const std::string &expression,
+                          ParseStyle style = SINGLE_INPUT,
+                          const std::string &context = "__main__");
+
+    void callFunctionNoArgs(const std::string &module, const std::string &function);
+
+    void reloadModule(const std::string &module);
+
+    std::string getError();
 }
 
-#endif //QCALC_INTERACTIVEINTERPRETER_HPP
+#endif //QCALC_INTERPRETER_HPP

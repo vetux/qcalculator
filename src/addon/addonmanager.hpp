@@ -33,7 +33,6 @@ public:
     typedef std::function<void(const std::string &, const std::string &)> Listener;
 
     AddonManager(const std::string &addonDirectory,
-                 const std::set<std::string> &moduleDirectories,
                  Listener onAddonLoadFail,
                  Listener onAddonUnloadFail);
 
@@ -59,7 +58,6 @@ private:
     void readAddons();
 
     std::string addonDir;
-    std::set<std::string> moduleDirs;
 
     std::map<std::string, Addon> addons;
     std::set<std::string> loadedModules;

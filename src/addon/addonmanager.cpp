@@ -24,7 +24,7 @@
 
 #include "io/fileoperations.hpp"
 
-#include "cpython/pyutil.hpp"
+#include "pycx/interpreter.hpp"
 
 #include "extern/json.hpp"
 
@@ -89,22 +89,16 @@ static std::map<std::string, AddonMetadata> readAvailableAddons(const std::strin
 static std::atomic<bool> constructFlag; // Only one instance of AddonManager may exist because of cpython api static context.
 
 AddonManager::AddonManager(const std::string &addonDirectory,
-                           const std::set<std::string> &moduleDirectories,
                            Listener onAddonLoadFail,
                            Listener onAddonUnloadFail)
         : addonDir(addonDirectory),
-          moduleDirs(moduleDirectories),
           onAddonLoadFail(std::move(onAddonLoadFail)),
           onAddonUnloadFail(std::move(onAddonUnloadFail)) {
-    PyUtil::initializePython();
-    for (auto &p: moduleDirs)
-        PyUtil::addModuleDirectory(p);
     readAddons();
 }
 
 AddonManager::~AddonManager() {
     setActiveAddons({});
-    PyUtil::finalizePython();
 }
 
 void AddonManager::reloadModules() {
