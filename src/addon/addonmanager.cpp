@@ -21,12 +21,15 @@
 
 #include <utility>
 #include <filesystem>
+#include <fstream>
 
 #include "io/fileoperations.hpp"
 
 #include "pycx/interpreter.hpp"
 
 #include "extern/json.hpp"
+
+#include "arcpp/archive.hpp"
 
 struct AddonMetadata {
     std::string displayName;
@@ -203,4 +206,28 @@ void AddonManager::readAddons() {
     }
     for (auto &a: del)
         addons.erase(a);
+}
+
+void AddonManager::installAddon(std::istream &sourceFile,
+                                std::function<bool(const std::string &)> fileOverwriteFunction) {
+    Archive arch(sourceFile);
+    auto addonmetadata = arch.entries().at("metadata.json");
+
+    nlohmann::json j = nlohmann::json::parse(addonmetadata);
+
+    for (auto &filePath: j["files"]) {
+        auto &entry = arch.entries().at(filePath);
+        std::string path = filePath;
+        if (!path.empty() && path.front() != '/') {
+            path = "/" + path;
+        }
+        std::string outputPath = addonDir + std::string(path);
+        if (std::filesystem::exists(outputPath)) {
+            if (!fileOverwriteFunction(outputPath)) {
+                return;
+            }
+        }
+        std::ofstream ofs(outputPath);
+        ofs.write(entry.data(), entry.size());
+    }
 }

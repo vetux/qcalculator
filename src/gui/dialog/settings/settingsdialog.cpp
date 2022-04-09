@@ -23,12 +23,17 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QFileDialog>
+
+#include <fstream>
 
 #include "gui/widgets/addonitemwidget.hpp"
 
 #include "gui/dialog/addontesterdialog.hpp"
 
 #include "addon/addonmanager.hpp"
+
+#include "arcpp/archive.hpp"
 
 SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
         QDialog(parent), addonManager(addonManager) {
@@ -195,7 +200,32 @@ void SettingsDialog::onRefreshAddonsPressed() {
     addonTab->setAddons(addonState, adds);
 }
 
-void SettingsDialog::onInstallAddonPressed() {}
+void SettingsDialog::onInstallAddonPressed() {
+    auto *d = new QFileDialog();
+    d->setWindowTitle("Select addon package");
+    d->setFileMode(QFileDialog::ExistingFile);
+    if (d->exec()) {
+        auto file = d->selectedFiles().first().toStdString();
+        delete d;
+        try {
+            std::ifstream ifs(file);
+            addonManager.installAddon(ifs, [this](const std::string &path) {
+                return QMessageBox::question(this, "Overwrite existing file", ("File already exists at " + path +
+                                                                               "\nDo you want to overwrite the existing file?").c_str());
+            });
+            QMessageBox::information(this,
+                                     "Installation Successful",
+                                     ("Successfully installed addon from source file " + file).c_str());
+        } catch (const std::exception &e) {
+            QMessageBox::critical(this,
+                                  "Installation Failed",
+                                  ("Failed to install addon from source file " + file + "\n" + e.what()).c_str());
+        }
+        onRefreshAddonsPressed();
+    } else {
+        delete d;
+    }
+}
 
 void SettingsDialog::onAddonStartTest(const QString &module) {
     AddonTesterDialog(addonManager.getAvailableAddons().at(module.toStdString()), this).exec();

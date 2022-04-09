@@ -54,6 +54,8 @@ public:
      */
     std::set<std::string> getActiveAddons();
 
+    void installAddon(std::istream &sourceFile, std::function<bool(const std::string &)> fileOverwriteFunction);
+
 private:
     void readAddons();
 
