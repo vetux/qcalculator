@@ -51,17 +51,18 @@ void AddonTab::setLibraries(const std::set<std::string> &libs) {
         auto *itemWidget = new LibraryItemWidget(libListWidget);
         itemWidget->setLibrary(lib.c_str());
 
+        auto *item = new QListWidgetItem();
+        item->setSizeHint(itemWidget->minimumSizeHint());
+
+        libListWidget->addItem(item);
+        libListWidget->setItemWidget(item, itemWidget);
+
         connect(itemWidget,
                 SIGNAL(onUninstallLibrary(const QString &)),
                 this,
                 SIGNAL(libraryUninstall(const QString &)));
-
-        auto *item = new QListWidgetItem();
-        item->setSizeHint(itemWidget->minimumSizeHint());
-        libListWidget->addItem(item);
-
-        libListWidget->setItemWidget(item, itemWidget);
     }
+    libListWidget->update(); // When not calling update here the widget contents are drawn for one frame with smaller size
 }
 
 AddonTab::AddonTab(QWidget *parent)

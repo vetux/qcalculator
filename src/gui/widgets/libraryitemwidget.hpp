@@ -31,8 +31,6 @@ public:
     explicit LibraryItemWidget(QWidget *parent = nullptr)
             : QWidget(parent) {
         layout = new QHBoxLayout(this);
-        setLayout(layout);
-
         label = new QLabel(this);
         buttonDelete = new QPushButton(this);
 
@@ -41,9 +39,11 @@ public:
         buttonDelete->setText("Uninstall");
 
         layout->addWidget(label, 1);
-        layout->addWidget(buttonDelete);
+        layout->addWidget(buttonDelete, 0);
 
         connect(buttonDelete, SIGNAL(pressed()), this, SLOT(onButtonDeletePressed()));
+
+        setLayout(layout);
     }
 
     void setLibrary(const QString &name) {
