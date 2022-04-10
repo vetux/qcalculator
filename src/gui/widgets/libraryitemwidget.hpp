@@ -36,9 +36,11 @@ public:
         label = new QLabel(this);
         buttonDelete = new QPushButton(this);
 
+        label->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+
         buttonDelete->setText("Uninstall");
 
-        layout->addWidget(label);
+        layout->addWidget(label, 1);
         layout->addWidget(buttonDelete);
 
         connect(buttonDelete, SIGNAL(pressed()), this, SLOT(onButtonDeletePressed()));

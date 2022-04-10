@@ -207,7 +207,7 @@ void SettingsDialog::onRefreshAddonsPressed() {
 
 void SettingsDialog::onInstallAddonPressed() {
     auto *d = new QFileDialog();
-    d->setWindowTitle("Select addon package");
+    d->setWindowTitle("Select addon package file");
     d->setFileMode(QFileDialog::ExistingFile);
     if (d->exec()) {
         auto file = d->selectedFiles().first().toStdString();
@@ -220,11 +220,11 @@ void SettingsDialog::onInstallAddonPressed() {
             });
             QMessageBox::information(this,
                                      "Installation Successful",
-                                     ("Successfully installed addon from source file " + file).c_str());
+                                     ("Successfully installed addon package from " + file).c_str());
         } catch (const std::exception &e) {
             QMessageBox::critical(this,
                                   "Installation Failed",
-                                  ("Failed to install addon from source file " + file + "\n" + e.what()).c_str());
+                                  ("Failed to install addon package from " + file + "\n" + e.what()).c_str());
         }
         onRefreshAddonsPressed();
     } else {

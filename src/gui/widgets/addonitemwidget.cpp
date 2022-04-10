@@ -30,15 +30,17 @@ AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent),
     layout = new QHBoxLayout(this);
     checkbox = new QCheckBox(this);
     label = new QLabel(this);
-    layout->addWidget(checkbox);
-    layout->addWidget(label);
+    layout->addWidget(checkbox, 0);
+    layout->addWidget(label, 1);
+
+    label->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 
     connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChange(int)));
 
     buttonDelete = new QPushButton(this);
     buttonDelete->setText("Uninstall");
     connect(buttonDelete, SIGNAL(pressed()), this, SLOT(onButtonDeletePressed()));
-    layout->addWidget(buttonDelete);
+    layout->addWidget(buttonDelete, 0);
 }
 
 void AddonItemWidget::setModuleName(const QString &name) {
