@@ -95,6 +95,8 @@ void SettingsDialog::setEnabledAddons(const std::set<std::string> &addons) {
     }
 
     addonTab->setAddons(addonState, adds);
+
+    addonTab->setLibraries(addonManager.getLibraryPackages());
 }
 
 std::set<std::string> SettingsDialog::getEnabledAddons() {
@@ -198,6 +200,8 @@ void SettingsDialog::onRefreshAddonsPressed() {
         addonState[pair.first] = enabledAddons.find(pair.first) != enabledAddons.end();
     }
     addonTab->setAddons(addonState, adds);
+
+    addonTab->setLibraries(addonManager.getLibraryPackages());
 }
 
 void SettingsDialog::onInstallAddonPressed() {

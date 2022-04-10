@@ -39,8 +39,25 @@ void AddonTab::setAddons(const std::map<std::string, bool> &addonState,
         item->setSizeHint(itemWidget->minimumSizeHint());
         listWidget->addItem(item);
         listWidget->setItemWidget(item, itemWidget);
+
         connect(itemWidget, SIGNAL(onModuleEnabledChanged(bool)), this, SLOT(onAddonEnableChanged()));
         connect(itemWidget, SIGNAL(onModuleStartTest()), this, SLOT(onAddonStartTest()));
+    }
+}
+
+void AddonTab::setLibraries(const std::set<std::string> &libs) {
+    libListWidget->clear();
+    for (auto &lib: libs) {
+        auto *itemWidget = new QLabel(libListWidget);
+        itemWidget->setText(lib.c_str());
+        itemWidget->setAlignment(Qt::AlignVCenter);
+        itemWidget->setMargin(5);
+
+        auto *item = new QListWidgetItem();
+        item->setSizeHint(itemWidget->minimumSizeHint());
+        libListWidget->addItem(item);
+
+        libListWidget->setItemWidget(item, itemWidget);
     }
 }
 
@@ -51,8 +68,10 @@ AddonTab::AddonTab(QWidget *parent)
 
     listWidget = new QListWidget(this);
 
-    installButton->setText("Install Addon");
-    refreshButton->setText("Refresh Addons");
+    libListWidget = new QListWidget(this);
+
+    installButton->setText("Install");
+    refreshButton->setText("Refresh");
 
     auto *header = new QWidget(this);
     header->setLayout(new QHBoxLayout(header));
@@ -61,8 +80,11 @@ AddonTab::AddonTab(QWidget *parent)
     header->layout()->addWidget(installButton);
 
     setLayout(new QVBoxLayout(this));
-    layout()->addWidget(header);
+    layout()->addWidget(new QLabel("Addons"));
     layout()->addWidget(listWidget);
+    layout()->addWidget(new QLabel("Libraries"));
+    layout()->addWidget(libListWidget);
+    layout()->addWidget(header);
 
     connect(installButton, SIGNAL(pressed()), this, SIGNAL(installPressed()));
     connect(refreshButton, SIGNAL(pressed()), this, SIGNAL(refreshPressed()));

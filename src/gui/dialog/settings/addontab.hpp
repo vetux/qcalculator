@@ -24,6 +24,8 @@
 #include <QPushButton>
 #include <QListWidget>
 
+#include <set>
+
 #include "gui/widgets/addonitemwidget.hpp"
 #include "addon/addon.hpp"
 
@@ -44,6 +46,8 @@ public slots:
     void setAddons(const std::map<std::string, bool> &addonState,
                    const std::map<std::string, Addon> &addonMetadata);
 
+    void setLibraries(const std::set<std::string> &libs);
+
 public:
     explicit AddonTab(QWidget *parent = nullptr);
 
@@ -57,6 +61,7 @@ private:
     QPushButton *installButton;
     QPushButton *refreshButton;
     QListWidget *listWidget;
+    QListWidget *libListWidget;
 };
 
 #endif //QCALC_ADDONTAB_HPP

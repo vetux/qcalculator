@@ -192,6 +192,19 @@ std::set<std::string> AddonManager::getActiveAddons() {
     return loadedModules;
 }
 
+std::set<std::string> AddonManager::getLibraryPackages() {
+    std::set<std::string> ret;
+    for (auto &entry: std::filesystem::directory_iterator(libDir)) {
+        if (entry.is_directory()) {
+            auto p = entry.path().filename().string();
+            if (p == "__pycache__")
+                continue;
+            ret.insert(p);
+        }
+    }
+    return ret;
+}
+
 void AddonManager::readAddons() {
     auto ad = readAvailableAddons(addonDir);
     for (const auto &addon: ad) {
@@ -210,34 +223,8 @@ void AddonManager::readAddons() {
         addons.erase(a);
 }
 
-static std::string getPath(const std::string &path,
-                           const std::string &dir,
-                           bool allowSubDirs = false,
-                           bool requireSubdirs = false) {
-    int slashes = 0;
-    for (auto i = path.find('/'); i != std::string::npos; i = path.find('/', i + 1)) {
-        slashes++;
-    }
-
-    if (requireSubdirs) {
-        if ((path.front() != '/' && slashes < 1) || (path.front() == '/' && slashes < 2))
-            throw std::runtime_error("Subdirectories are required in path " + path);
-    } else if (!allowSubDirs) {
-        if ((path.front() != '/' && slashes > 0) || (path.front() == '/' && slashes > 1)) {
-            throw std::runtime_error("Subdirectory in path " + path + " not allowed");
-        }
-    }
-
-    if (!path.empty() && path.front() != '/') {
-        return dir + "/" + path;
-    } else {
-        return dir + path;
-    }
-}
-
-static void install(const std::string &path,
-                    const std::vector<char> &data,
-                    const std::function<bool(const std::string &)> &fileOverwriteFunction) {
+static void createPath(const std::string &path,
+                       const std::function<bool(const std::string &)> &fileOverwriteFunction) {
     if (std::filesystem::exists(path)) {
         if (!fileOverwriteFunction(path)) {
             return;
@@ -248,7 +235,30 @@ static void install(const std::string &path,
                                       path.length() - p.filename().string().length());
         std::filesystem::create_directories(dir);
     }
+}
 
+static bool checkPathHasSubDir(const std::string &path) {
+    auto slashes = 0;
+    for (auto i = path.find('/'); i != std::string::npos; i = path.find('/', i + 1)) {
+        slashes++;
+    }
+    if ((path.front() != '/' && slashes > 0) || (path.front() == '/' && slashes > 1))
+        return true;
+    else
+        return false;
+}
+
+static std::string getPath(const std::string &path,
+                           const std::string &dir) {
+    if (!path.empty() && path.front() != '/') {
+        return dir + "/" + path;
+    } else {
+        return dir + path;
+    }
+}
+
+static void install(const std::string &path,
+                    const std::vector<char> &data) {
     std::ofstream ofs(path);
     ofs.write(data.data(), data.size());
 }
@@ -259,17 +269,41 @@ void AddonManager::installAddon(std::istream &sourceFile,
     auto metadata = arch.entries().at("metadata.json");
     nlohmann::json j = nlohmann::json::parse(metadata);
 
-    /**
-     * Addons should be a single file without subdirectory
-     */
-    auto &addonFilePath = j["addon"];
-    install(getPath(addonFilePath, addonDir), arch.entries().at(addonFilePath), fileOverwriteFunction);
+    if (j.find("addons") != j.end()) {
+        for (auto &addonFilePath: j["addons"]) {
+            std::filesystem::path addonFile(addonFilePath);
 
-    /**
-     * Addon libraries are required to use subdirectories / packages and are accessible in python via directory.module
-     */
-    for (auto &libFilePath: j["libs"]) {
-        auto path = getPath(libFilePath, libDir, true, true);
-        install(path, arch.entries().at(libFilePath), fileOverwriteFunction);
+            if (addonFile.extension() != ".py") {
+                throw std::runtime_error("Invalid extension for addon file " + addonFile.string());
+            }
+
+            auto path = getPath(addonFile.filename(), addonDir);
+
+            createPath(path, fileOverwriteFunction);
+            install(path, arch.entries().at(addonFilePath));
+        }
     }
+
+    if (j.find("libs") != j.end()) {
+        for (auto &libFilePath: j["libs"]) {
+            if (!checkPathHasSubDir(libFilePath)) {
+                throw std::runtime_error("Library files must be in a subdirectory, path: " + std::string(libFilePath));
+            }
+
+            auto path = getPath(libFilePath, libDir);
+
+            createPath(path, fileOverwriteFunction);
+            install(path, arch.entries().at(libFilePath));
+        }
+    }
+}
+
+void AddonManager::uninstallAddon(const std::string &moduleName) {
+    auto path = addonDir + "/" + moduleName + ".py";
+    std::filesystem::remove(path.c_str());
+}
+
+void AddonManager::uninstallLibrary(const std::string &libraryPackage) {
+    auto path = libDir + "/" + libraryPackage;
+    std::filesystem::remove_all(path.c_str());
 }

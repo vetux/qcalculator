@@ -55,7 +55,16 @@ public:
      */
     std::set<std::string> getActiveAddons();
 
+    /**
+     * @return The set of available library packages.
+     */
+    std::set<std::string> getLibraryPackages();
+
     void installAddon(std::istream &sourceFile, const std::function<bool(const std::string &)>& fileOverwriteFunction);
+
+    void uninstallAddon(const std::string &moduleName);
+
+    void uninstallLibrary(const std::string &libraryPackage);
 
 private:
     void readAddons();
