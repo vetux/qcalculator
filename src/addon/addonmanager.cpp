@@ -301,6 +301,8 @@ void AddonManager::installAddon(std::istream &sourceFile,
 void AddonManager::uninstallAddon(const std::string &moduleName) {
     auto path = addonDir + "/" + moduleName + ".py";
     std::filesystem::remove(path.c_str());
+    addons.erase(moduleName);
+    loadedModules.erase(moduleName);
 }
 
 void AddonManager::uninstallLibrary(const std::string &libraryPackage) {
