@@ -33,6 +33,7 @@ public:
     typedef std::function<void(const std::string &, const std::string &)> Listener;
 
     AddonManager(const std::string &addonDirectory,
+                 const std::string &libDirectory,
                  Listener onAddonLoadFail,
                  Listener onAddonUnloadFail);
 
@@ -54,12 +55,13 @@ public:
      */
     std::set<std::string> getActiveAddons();
 
-    void installAddon(std::istream &sourceFile, std::function<bool(const std::string &)> fileOverwriteFunction);
+    void installAddon(std::istream &sourceFile, const std::function<bool(const std::string &)>& fileOverwriteFunction);
 
 private:
     void readAddons();
 
     std::string addonDir;
+    std::string libDir;
 
     std::map<std::string, Addon> addons;
     std::set<std::string> loadedModules;

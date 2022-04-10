@@ -30,7 +30,7 @@ namespace Paths
 
     std::string getAddonDirectory();
 
-    std::string getSystemDirectory();
+    std::string getLibDirectory();
 }
 
 #endif //QCALC_PATHS_HPP

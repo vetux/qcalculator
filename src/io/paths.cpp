@@ -31,9 +31,9 @@ std::string Paths::getAppConfigDirectory() {
 }
 
 std::string Paths::getAddonDirectory() {
-    return QCoreApplication::applicationDirPath().append("/modules/addon").toStdString();
+    return QCoreApplication::applicationDirPath().append("/python/addon").toStdString();
 }
 
-std::string Paths::getSystemDirectory() {
-    return QCoreApplication::applicationDirPath().append("/modules/system").toStdString();
+std::string Paths::getLibDirectory() {
+    return QCoreApplication::applicationDirPath().append("/python/lib").toStdString();
 }

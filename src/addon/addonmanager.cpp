@@ -92,9 +92,11 @@ static std::map<std::string, AddonMetadata> readAvailableAddons(const std::strin
 static std::atomic<bool> constructFlag; // Only one instance of AddonManager may exist because of cpython api static context.
 
 AddonManager::AddonManager(const std::string &addonDirectory,
+                           const std::string &libDirectory,
                            Listener onAddonLoadFail,
                            Listener onAddonUnloadFail)
         : addonDir(addonDirectory),
+          libDir(libDirectory),
           onAddonLoadFail(std::move(onAddonLoadFail)),
           onAddonUnloadFail(std::move(onAddonUnloadFail)) {
     readAddons();
@@ -208,26 +210,66 @@ void AddonManager::readAddons() {
         addons.erase(a);
 }
 
+static std::string getPath(const std::string &path,
+                           const std::string &dir,
+                           bool allowSubDirs = false,
+                           bool requireSubdirs = false) {
+    int slashes = 0;
+    for (auto i = path.find('/'); i != std::string::npos; i = path.find('/', i + 1)) {
+        slashes++;
+    }
+
+    if (requireSubdirs) {
+        if ((path.front() != '/' && slashes < 1) || (path.front() == '/' && slashes < 2))
+            throw std::runtime_error("Subdirectories are required in path " + path);
+    } else if (!allowSubDirs) {
+        if ((path.front() != '/' && slashes > 0) || (path.front() == '/' && slashes > 1)) {
+            throw std::runtime_error("Subdirectory in path " + path + " not allowed");
+        }
+    }
+
+    if (!path.empty() && path.front() != '/') {
+        return dir + "/" + path;
+    } else {
+        return dir + path;
+    }
+}
+
+static void install(const std::string &path,
+                    const std::vector<char> &data,
+                    const std::function<bool(const std::string &)> &fileOverwriteFunction) {
+    if (std::filesystem::exists(path)) {
+        if (!fileOverwriteFunction(path)) {
+            return;
+        }
+    } else {
+        std::filesystem::path p(path);
+        std::string dir = path.substr(0,
+                                      path.length() - p.filename().string().length());
+        std::filesystem::create_directories(dir);
+    }
+
+    std::ofstream ofs(path);
+    ofs.write(data.data(), data.size());
+}
+
 void AddonManager::installAddon(std::istream &sourceFile,
-                                std::function<bool(const std::string &)> fileOverwriteFunction) {
+                                const std::function<bool(const std::string &)> &fileOverwriteFunction) {
     Archive arch(sourceFile);
-    auto addonmetadata = arch.entries().at("metadata.json");
+    auto metadata = arch.entries().at("metadata.json");
+    nlohmann::json j = nlohmann::json::parse(metadata);
 
-    nlohmann::json j = nlohmann::json::parse(addonmetadata);
+    /**
+     * Addons should be a single file without subdirectory
+     */
+    auto &addonFilePath = j["addon"];
+    install(getPath(addonFilePath, addonDir), arch.entries().at(addonFilePath), fileOverwriteFunction);
 
-    for (auto &filePath: j["files"]) {
-        auto &entry = arch.entries().at(filePath);
-        std::string path = filePath;
-        if (!path.empty() && path.front() != '/') {
-            path = "/" + path;
-        }
-        std::string outputPath = addonDir + std::string(path);
-        if (std::filesystem::exists(outputPath)) {
-            if (!fileOverwriteFunction(outputPath)) {
-                return;
-            }
-        }
-        std::ofstream ofs(outputPath);
-        ofs.write(entry.data(), entry.size());
+    /**
+     * Addon libraries are required to use subdirectories / packages and are accessible in python via directory.module
+     */
+    for (auto &libFilePath: j["libs"]) {
+        auto path = getPath(libFilePath, libDir, true, true);
+        install(path, arch.entries().at(libFilePath), fileOverwriteFunction);
     }
 }

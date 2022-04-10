@@ -121,9 +121,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     Interpreter::initialize();
 
     Interpreter::addModuleDir(Paths::getAddonDirectory());
-    Interpreter::addModuleDir(Paths::getSystemDirectory());
+    Interpreter::addModuleDir(Paths::getLibDirectory());
 
     addonManager = std::make_unique<AddonManager>(Paths::getAddonDirectory(),
+                                                  Paths::getLibDirectory(),
                                                   [this](const std::string &module, const std::string &error) {
                                                       return onAddonLoadFail(module, error);
                                                   },
