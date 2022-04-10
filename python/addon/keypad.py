@@ -1,3 +1,10 @@
+"""
+{
+  "displayName": "Keypad",
+  "description": "This addon adds a simple keypad to the gui."
+}
+"""
+
 # QCalc - Extensible programming calculator
 # Copyright (C) 2021  Julian Zampiccoli
 #

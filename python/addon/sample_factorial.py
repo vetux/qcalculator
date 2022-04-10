@@ -1,3 +1,10 @@
+"""
+{
+  "displayName": "Sample Addon - Factorial",
+  "description": "A sample addon which adds the factorial function as a script function."
+}
+"""
+
 # QCalc - Extensible programming calculator
 # Copyright (C) 2021  Julian Zampiccoli
 #

@@ -1,3 +1,10 @@
+"""
+{
+  "displayName": "Sample Addon - GUI",
+  "description": "A sample addon demonstrating the use of the gui api."
+}
+"""
+
 # QCalc - Extensible programming calculator
 # Copyright (C) 2021  Julian Zampiccoli
 #

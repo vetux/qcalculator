@@ -1,3 +1,10 @@
+"""
+{
+  "displayName": "Number View",
+  "description": "This addon adds gui for displaying values in various numeral systems."
+}
+"""
+
 # QCalc - Extensible programming calculator
 # Copyright (C) 2021  Julian Zampiccoli
 #

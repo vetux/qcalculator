@@ -49,29 +49,29 @@ static std::map<std::string, AddonMetadata> readAvailableAddons(const std::strin
 
     std::vector<std::string> addonFiles = FileOperations::findFilesInDirectory(addonDirectory, "py");
     for (auto &filePath: addonFiles) {
-        std::filesystem::path addonFile(filePath.c_str());
+        auto fileContents = FileOperations::fileReadAllText(filePath);
+        std::string n = R"(""")";
 
-        auto extension = addonFile.extension().string();
-        auto moduleName = addonFile.filename().string();
+        std::string json;
+        auto start = fileContents.find_first_of(n);
+        if (start != std::string::npos) {
+            auto end = fileContents.find(n, start + n.length());
+            if (end != std::string::npos) {
+                json = fileContents.substr(start + n.length(), end - n.length());
+            }
+        }
 
-        for (auto c: extension)
-            if (!moduleName.empty())
-                moduleName.pop_back();
+        auto file = std::filesystem::path(filePath);
+        auto fileName = file.filename().string();
+        auto fileExt = file.extension().string();
 
-        std::string dirStr(filePath);
-        for (auto c: moduleName + extension)
-            dirStr.pop_back();
-
-        auto metadataFile = std::filesystem::path(absolute(std::filesystem::path(dirStr)).string()
-                                                  + "/"
-                                                  + moduleName
-                                                  + ".json");
+        auto moduleName = fileName.substr(0, fileName.length() - fileExt.length());
 
         AddonMetadata metadata;
-        if (exists(metadataFile)) {
+        if (!json.empty()) {
             //Has metadata file
             try {
-                metadata = deserializeMetadata(FileOperations::fileReadAllText(absolute(metadataFile).string()));
+                metadata = deserializeMetadata(json);
             } catch (const std::exception &e) {
                 //Ignore exception and set default metadata
                 metadata.displayName = moduleName;
