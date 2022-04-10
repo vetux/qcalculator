@@ -21,8 +21,6 @@
 
 #include <QPushButton>
 
-#include "../dialog/addontesterdialog.hpp"
-
 #include "../../addon/addonmanager.hpp"
 
 AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent),
@@ -37,12 +35,10 @@ AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent),
 
     connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChange(int)));
 
-#ifdef QT_DEBUG
-    button = new QPushButton(this);
-    connect(button, SIGNAL(pressed()), this, SLOT(onButtonPressed()));
-    layout->addWidget(button);
-    button->setText("Run Test");
-#endif
+    buttonDelete = new QPushButton(this);
+    buttonDelete->setText("Uninstall");
+    connect(buttonDelete, SIGNAL(pressed()), this, SLOT(onButtonDeletePressed()));
+    layout->addWidget(buttonDelete);
 }
 
 void AddonItemWidget::setModuleName(const QString &name) {
@@ -75,6 +71,6 @@ void AddonItemWidget::onCheckBoxStateChange(int state) {
     emit onModuleEnabledChanged(state == Qt::Checked);
 }
 
-void AddonItemWidget::onButtonPressed() {
-    emit onModuleStartTest();
+void AddonItemWidget::onButtonDeletePressed() {
+    emit onUninstallModule(moduleName);
 }

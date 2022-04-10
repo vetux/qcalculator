@@ -27,6 +27,7 @@
 #include <set>
 
 #include "gui/widgets/addonitemwidget.hpp"
+#include "gui/widgets/libraryitemwidget.hpp"
 #include "addon/addon.hpp"
 
 class AddonTab : public QWidget {
@@ -35,7 +36,9 @@ signals:
 
     void addonEnableChanged(AddonItemWidget *item);
 
-    void addonStartTest(const QString &module);
+    void addonUninstall(const QString &module);
+
+    void libraryUninstall(const QString &);
 
     void installPressed();
 
@@ -55,7 +58,7 @@ private slots:
 
     void onAddonEnableChanged();
 
-    void onAddonStartTest();
+    void onModuleUninstall(const QString &name);
 
 private:
     QPushButton *installButton;

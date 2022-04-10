@@ -29,11 +29,11 @@
 
 #include "gui/widgets/addonitemwidget.hpp"
 
-#include "gui/dialog/addontesterdialog.hpp"
-
 #include "addon/addonmanager.hpp"
 
 #include "arcpp/archive.hpp"
+
+#include "io/paths.hpp"
 
 SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
         QDialog(parent), addonManager(addonManager) {
@@ -77,7 +77,8 @@ SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
     connect(addonTab, SIGNAL(refreshPressed()), this, SLOT(onRefreshAddonsPressed()));
     connect(addonTab, SIGNAL(addonEnableChanged(AddonItemWidget * )), this,
             SLOT(onModuleEnableChanged(AddonItemWidget * )));
-    connect(addonTab, SIGNAL(addonStartTest(const QString &)), this, SLOT(onAddonStartTest(const QString &)));
+    connect(addonTab, SIGNAL(addonUninstall(const QString &)), this, SLOT(onAddonUninstall(const QString &)));
+    connect(addonTab, SIGNAL(libraryUninstall(const QString &)), this, SLOT(onLibraryUninstall(const QString &)));
 
     resize({700, 500});
 }
@@ -231,6 +232,25 @@ void SettingsDialog::onInstallAddonPressed() {
     }
 }
 
-void SettingsDialog::onAddonStartTest(const QString &module) {
-    AddonTesterDialog(addonManager.getAvailableAddons().at(module.toStdString()), this).exec();
+void SettingsDialog::onAddonUninstall(const QString &name) {
+    if (QMessageBox::question(this, "Uninstall Addon",
+                              ("Do you want to delete the file:\n"
+                               + Paths::getAddonDirectory()
+                               + "/"
+                               + name.toStdString()
+                               + ".py").c_str()) == QMessageBox::Yes) {
+        addonManager.uninstallAddon(name.toStdString());
+        onRefreshAddonsPressed();
+    }
+}
+
+void SettingsDialog::onLibraryUninstall(const QString &name) {
+    if (QMessageBox::question(this, "Uninstall Library",
+                              ("Do you want to delete the directory:\n"
+                               + Paths::getLibDirectory()
+                               + "/"
+                               + name.toStdString()).c_str()) == QMessageBox::Yes) {
+        addonManager.uninstallLibrary(name.toStdString());
+        onRefreshAddonsPressed();
+    }
 }

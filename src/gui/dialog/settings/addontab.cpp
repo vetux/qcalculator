@@ -41,17 +41,20 @@ void AddonTab::setAddons(const std::map<std::string, bool> &addonState,
         listWidget->setItemWidget(item, itemWidget);
 
         connect(itemWidget, SIGNAL(onModuleEnabledChanged(bool)), this, SLOT(onAddonEnableChanged()));
-        connect(itemWidget, SIGNAL(onModuleStartTest()), this, SLOT(onAddonStartTest()));
+        connect(itemWidget, SIGNAL(onUninstallModule(const QString &)), this, SLOT(onModuleUninstall(const QString &)));
     }
 }
 
 void AddonTab::setLibraries(const std::set<std::string> &libs) {
     libListWidget->clear();
     for (auto &lib: libs) {
-        auto *itemWidget = new QLabel(libListWidget);
-        itemWidget->setText(lib.c_str());
-        itemWidget->setAlignment(Qt::AlignVCenter);
-        itemWidget->setMargin(5);
+        auto *itemWidget = new LibraryItemWidget(libListWidget);
+        itemWidget->setLibrary(lib.c_str());
+
+        connect(itemWidget,
+                SIGNAL(onUninstallLibrary(const QString &)),
+                this,
+                SIGNAL(libraryUninstall(const QString &)));
 
         auto *item = new QListWidgetItem();
         item->setSizeHint(itemWidget->minimumSizeHint());
@@ -95,6 +98,6 @@ void AddonTab::onAddonEnableChanged() {
     emit addonEnableChanged(dynamic_cast<AddonItemWidget *>(sender()));
 }
 
-void AddonTab::onAddonStartTest() {
-    emit addonStartTest(dynamic_cast<AddonItemWidget &>(*sender()).getModuleName());
+void AddonTab::onModuleUninstall(const QString &module) {
+    emit addonUninstall(module);
 }

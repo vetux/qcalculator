@@ -17,50 +17,58 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_ADDONITEMWIDGET_HPP
-#define QCALC_ADDONITEMWIDGET_HPP
+#ifndef QCALC_LIBRARYITEMWIDGET_HPP
+#define QCALC_LIBRARYITEMWIDGET_HPP
 
 #include <QWidget>
 #include <QHBoxLayout>
-#include <QCheckBox>
 #include <QLabel>
 #include <QPushButton>
 
-class AddonItemWidget : public QWidget {
+class LibraryItemWidget : public QWidget {
 Q_OBJECT
 public:
-    explicit AddonItemWidget(QWidget *parent = nullptr);
+    explicit LibraryItemWidget(QWidget *parent = nullptr)
+            : QWidget(parent) {
+        layout = new QHBoxLayout(this);
+        setLayout(layout);
 
-    void setModuleName(const QString &name);
+        label = new QLabel(this);
+        buttonDelete = new QPushButton(this);
 
-    QString getModuleName();
+        buttonDelete->setText("Uninstall");
 
-    void setModuleEnabled(bool enabled);
+        layout->addWidget(label);
+        layout->addWidget(buttonDelete);
 
-    bool getModuleEnabled();
+        connect(buttonDelete, SIGNAL(pressed()), this, SLOT(onButtonDeletePressed()));
+    }
 
-    void setModuleDisplayName(const QString &name);
+    void setLibrary(const QString &name) {
+        libraryName = name;
+        label->setText(name);
+    }
 
-    void setModuleDescription(const QString &description);
+    QString getLibrary() {
+        return label->text();
+    }
 
 signals:
 
-    void onModuleEnabledChanged(bool enabled);
-
-    void onUninstallModule(const QString &moduleName);
+    void onUninstallLibrary(const QString &name);
 
 private:
-    QString moduleName;
+    QString libraryName;
     QHBoxLayout *layout;
-    QCheckBox *checkbox;
     QLabel *label;
     QPushButton *buttonDelete;
 
 private slots:
 
-    void onCheckBoxStateChange(int state);
-
-    void onButtonDeletePressed();
+    void onButtonDeletePressed() {
+        emit onUninstallLibrary(libraryName);
+    }
 };
 
-#endif //QCALC_ADDONITEMWIDGET_HPP
+
+#endif //QCALC_LIBRARYITEMWIDGET_HPP

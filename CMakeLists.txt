@@ -30,10 +30,10 @@ set(HDR_GUI src/gui/mainwindow.hpp
         src/gui/dialog/settings/settingsdialog.hpp
         src/gui/dialog/settings/generaltab.hpp
         src/gui/dialog/settings/addontab.hpp
-        src/gui/dialog/addontesterdialog.hpp
         src/gui/dialog/symbolsdialog.hpp
         src/gui/dialog/terminaldialog.hpp
         src/gui/widgets/addonitemwidget.hpp
+        src/gui/widgets/libraryitemwidget.hpp
         src/gui/widgets/historywidget.hpp
         src/gui/widgets/historylabel.hpp
         src/gui/widgets/functionseditor.hpp

@@ -82,7 +82,9 @@ private slots:
 
     void onInstallAddonPressed();
 
-    void onAddonStartTest(const QString &module);
+    void onAddonUninstall(const QString &name);
+
+    void onLibraryUninstall(const QString &name);
 
 private:
     QPushButton *okButton;
