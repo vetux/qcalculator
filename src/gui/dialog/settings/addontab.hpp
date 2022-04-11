@@ -47,8 +47,7 @@ signals:
 
 public slots:
 
-    void setAddons(const std::map<std::string, bool> &addonState,
-                   const std::map<std::string, Addon> &addonMetadata);
+    void setAddons(const std::map<std::string, Addon> &addonMetadata);
 
     void setLibraries(const std::set<std::string> &libs);
 

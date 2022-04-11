@@ -88,15 +88,7 @@ SettingsDialog::~SettingsDialog() = default;
 void SettingsDialog::setEnabledAddons(const std::set<std::string> &addons) {
     enabledAddons = addons;
 
-    std::map<std::string, Addon> adds = addonManager.getAvailableAddons();
-
-    std::map<std::string, bool> addonState;
-    for (auto &pair: adds) {
-        addonState[pair.first] = enabledAddons.find(pair.first) != enabledAddons.end();
-    }
-
-    addonTab->setAddons(addonState, adds);
-
+    addonTab->setAddons(addonManager.getAvailableAddons());
     addonTab->setLibraries(addonManager.getLibraryPackages());
 }
 
@@ -196,12 +188,7 @@ void SettingsDialog::onRefreshAddonsPressed() {
     for (auto &mod: rMod)
         enabledAddons.erase(mod);
 
-    std::map<std::string, bool> addonState;
-    for (auto &pair: adds) {
-        addonState[pair.first] = enabledAddons.find(pair.first) != enabledAddons.end();
-    }
-    addonTab->setAddons(addonState, adds);
-
+    addonTab->setAddons(adds);
     addonTab->setLibraries(addonManager.getLibraryPackages());
 }
 

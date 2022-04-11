@@ -36,25 +36,24 @@ std::pair<char, char> getCasePair(char c) {
     }
 }
 
-void AddonTab::setAddons(const std::map<std::string, bool> &addonState,
-                         const std::map<std::string, Addon> &addonMetadata) {
+void AddonTab::setAddons(const std::map<std::string, Addon> &addons) {
     auto searchText = addonSearchEdit->text().toStdString();
-
     listWidget->clear();
-    for (auto &addon: addonState) {
-        auto &ad = addonMetadata.at(addon.first);
+    for (auto &addon: addons) {
+        auto displayName = addon.second.getDisplayName();
+
         if (!searchText.empty()) {
-            bool cont = false;
-            auto max = addon.first.size() > ad.getDisplayName().size()
-                       ? addon.first.size()
-                       : ad.getDisplayName().size();
-            if (searchText.size() > addon.first.size() && searchText.size() > ad.getDisplayName().size())
+            auto moduleName = addon.second.getModuleName();
+
+            if (searchText.size() > moduleName.size() && searchText.size() > displayName.size())
                 continue;
+
+            bool cont = false;
+            auto max = moduleName.size() > displayName.size() ? moduleName.size() : displayName.size();
             for (auto i = 0; i < searchText.size() && i < max; i++) {
                 auto c = getCasePair(searchText.at(i));
-                if ((i >= addon.first.size() || (addon.first.at(i) != c.first && addon.first.at(i) != c.second))
-                    && (i >= ad.getDisplayName().size() ||
-                        (ad.getDisplayName().at(i) != c.first && ad.getDisplayName().at(i) != c.second))) {
+                if ((i >= moduleName.size() || (moduleName.at(i) != c.first && moduleName.at(i) != c.second))
+                    && (i >= displayName.size() || (displayName.at(i) != c.first && displayName.at(i) != c.second))) {
                     cont = true;
                     break;
                 }
@@ -65,10 +64,9 @@ void AddonTab::setAddons(const std::map<std::string, bool> &addonState,
 
         auto *itemWidget = new AddonItemWidget(listWidget);
         itemWidget->setModuleName(addon.first.c_str());
-        itemWidget->setModuleEnabled(addon.second);
-        itemWidget->setModuleDisplayName(ad.getDisplayName().c_str());
-        itemWidget->setModuleDescription(
-                (ad.getDescription() + " ( " + addon.first + " )").c_str());
+        itemWidget->setModuleEnabled(addon.second.isLoaded());
+        itemWidget->setModuleDisplayName(displayName.c_str());
+        itemWidget->setModuleDescription((addon.second.getDescription() + " ( " + addon.first + " )").c_str());
 
         auto *item = new QListWidgetItem();
         item->setSizeHint(itemWidget->minimumSizeHint());
