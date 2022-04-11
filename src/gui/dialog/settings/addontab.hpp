@@ -23,6 +23,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QListWidget>
+#include <QLineEdit>
 
 #include <set>
 
@@ -60,11 +61,17 @@ private slots:
 
     void onModuleUninstall(const QString &name);
 
+    void onAddonSearchTextChanged(const QString &text);
+
+    void onLibrarySearchTextChanged(const QString &text);
+
 private:
     QPushButton *installButton;
     QPushButton *refreshButton;
     QListWidget *listWidget;
     QListWidget *libListWidget;
+    QLineEdit *addonSearchEdit;
+    QLineEdit *libSearchEdit;
 };
 
 #endif //QCALC_ADDONTAB_HPP
