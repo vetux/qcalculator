@@ -41,6 +41,8 @@
 
 #include "dialog/settings/settingsdialog.hpp"
 #include "dialog/symbolsdialog.hpp"
+#include "dialog/aboutdialog.hpp"
+
 #include "widgets/historywidget.hpp"
 #include "widgets/symbolseditor.hpp"
 
@@ -293,21 +295,9 @@ void MainWindow::onActionExit() {
 }
 
 void MainWindow::onActionAbout() {
-    QMessageBox::about(this, "About " + QApplication::applicationDisplayName(),
-                       QApplication::applicationDisplayName()
-                       + " "
-                       + QApplication::applicationVersion()
-                       + "\n\nCopyright (c) 2021 Julian Zampiccoli"
-                       + "\n\n"
-                       + QString(R"LLL(Source:
-    https://github.com/xenotux/qcalc
-
-Powered by:
-    exprtk - https://github.com/ArashPartow/exprtk
-    cpython - https://github.com/python/cpython
-    qt - https://www.qt.io/
-    mpfr - https://www.mpfr.org/
-)LLL"));
+    auto *dialog = new AboutDialog(this);
+    dialog->show();
+    dialog->exec();
 }
 
 void MainWindow::onActionAboutQt() {
