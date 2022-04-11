@@ -29,7 +29,9 @@
 
 #include "gui/widgets/addonitemwidget.hpp"
 #include "gui/widgets/libraryitemwidget.hpp"
+
 #include "addon/addon.hpp"
+#include "addon/library.hpp"
 
 class AddonTab : public QWidget {
 Q_OBJECT
@@ -49,7 +51,7 @@ public slots:
 
     void setAddons(const std::map<std::string, Addon> &addonMetadata);
 
-    void setLibraries(const std::set<std::string> &libs);
+    void setLibraries(const std::map<std::string, Library> &libs);
 
 public:
     explicit AddonTab(QWidget *parent = nullptr);

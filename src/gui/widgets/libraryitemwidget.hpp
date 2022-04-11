@@ -48,7 +48,18 @@ public:
 
     void setLibrary(const QString &name) {
         libraryName = name;
-        label->setText(name);
+        auto t = libraryName.toStdString();
+        if (version >= 0)
+            t += " : v" + std::to_string(version);
+        label->setText(t.c_str());
+    }
+
+    void setVersion(int ver) {
+        version = ver;
+        auto t = libraryName.toStdString();
+        if (version >= 0)
+            t += " : v" + std::to_string(version);
+        label->setText(t.c_str());
     }
 
     QString getLibrary() {
@@ -64,6 +75,8 @@ private:
     QHBoxLayout *layout;
     QLabel *label;
     QPushButton *buttonDelete;
+
+    int version = -1;
 
 private slots:
 

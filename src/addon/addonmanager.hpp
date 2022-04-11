@@ -27,6 +27,7 @@
 #include <map>
 
 #include "addon.hpp"
+#include "addon/library.hpp"
 
 class AddonManager {
 public:
@@ -56,11 +57,12 @@ public:
     std::set<std::string> getActiveAddons();
 
     /**
-     * @return The set of available library packages.
+     * @return The set of available libraries.
      */
-    std::set<std::string> getLibraryPackages();
+    std::map<std::string, Library> getLibraries();
 
-    void installAddon(std::istream &sourceFile, const std::function<bool(const std::string &)>& fileOverwriteFunction);
+    void installAddon(std::istream &sourceFile,
+                      std::function<bool(const std::string &, const std::string &)> questionDialog);
 
     void uninstallAddon(const std::string &moduleName);
 
@@ -77,6 +79,8 @@ private:
 
     Listener onAddonLoadFail;
     Listener onAddonUnloadFail;
+
+    std::map<std::string, Library> libraries;
 };
 
 #endif //QCALC_ADDONMANAGER_HPP

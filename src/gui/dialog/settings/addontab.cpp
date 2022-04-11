@@ -79,19 +79,21 @@ void AddonTab::setAddons(const std::map<std::string, Addon> &addons) {
     listWidget->update(); // When not calling update here the widget contents are drawn for one frame with smaller size
 }
 
-void AddonTab::setLibraries(const std::set<std::string> &libs) {
+void AddonTab::setLibraries(const std::map<std::string, Library> &libs) {
     auto searchText = libSearchEdit->text().toStdString();
 
     libListWidget->clear();
-    for (auto &lib: libs) {
+    for (auto &pair: libs) {
+        auto &lib = pair.second;
+        auto package = lib.package;
         if (!searchText.empty()) {
             bool cont = false;
-            if (searchText.size() > lib.size()) {
+            if (searchText.size() > package.size()) {
                 continue;
             }
             for (int i = 0; i < searchText.size(); i++) {
                 auto c = getCasePair(searchText.at(i));
-                if (lib.at(i) != c.first && lib.at(i) != c.second) {
+                if (package.at(i) != c.first && package.at(i) != c.second) {
                     cont = true;
                     break;
                 }
@@ -101,7 +103,8 @@ void AddonTab::setLibraries(const std::set<std::string> &libs) {
         }
 
         auto *itemWidget = new LibraryItemWidget(libListWidget);
-        itemWidget->setLibrary(lib.c_str());
+        itemWidget->setLibrary(package.c_str());
+        itemWidget->setVersion(lib.version);
 
         auto *item = new QListWidgetItem();
         item->setSizeHint(itemWidget->minimumSizeHint());

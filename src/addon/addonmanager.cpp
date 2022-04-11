@@ -99,7 +99,7 @@ AddonManager::AddonManager(const std::string &addonDirectory,
           libDir(libDirectory),
           onAddonLoadFail(std::move(onAddonLoadFail)),
           onAddonUnloadFail(std::move(onAddonUnloadFail)) {
-    readAddons();
+    reloadModules();
 }
 
 AddonManager::~AddonManager() {
@@ -144,6 +144,27 @@ void AddonManager::reloadModules() {
     }
 
     setActiveAddons(mods);
+
+    libraries.clear();
+    for (auto &entry: std::filesystem::directory_iterator(libDir)) {
+        if (entry.is_directory()) {
+            auto package = entry.path().filename().string();
+            if (package != "__pycache__") {
+                Library lib;
+                lib.package = package;
+
+                std::string metadataFile = entry.path().string() + "metadata.json";
+                if (std::filesystem::exists(metadataFile)) {
+                    nlohmann::json j = nlohmann::json::parse(FileOperations::fileReadAllText(metadataFile));
+                    if (j.find("version") != j.end())
+                        lib.version = j["version"];
+                }
+
+                libraries[package] = lib;
+            }
+        }
+    }
+
 }
 
 const std::map<std::string, Addon> &AddonManager::getAvailableAddons() const {
@@ -192,17 +213,9 @@ std::set<std::string> AddonManager::getActiveAddons() {
     return loadedModules;
 }
 
-std::set<std::string> AddonManager::getLibraryPackages() {
-    std::set<std::string> ret;
-    for (auto &entry: std::filesystem::directory_iterator(libDir)) {
-        if (entry.is_directory()) {
-            auto p = entry.path().filename().string();
-            if (p == "__pycache__")
-                continue;
-            ret.insert(p);
-        }
-    }
-    return ret;
+
+std::map<std::string, Library> AddonManager::getLibraries() {
+    return libraries;
 }
 
 void AddonManager::readAddons() {
@@ -223,18 +236,11 @@ void AddonManager::readAddons() {
         addons.erase(a);
 }
 
-static void createPath(const std::string &path,
-                       const std::function<bool(const std::string &)> &fileOverwriteFunction) {
-    if (std::filesystem::exists(path)) {
-        if (!fileOverwriteFunction(path)) {
-            return;
-        }
-    } else {
-        std::filesystem::path p(path);
-        std::string dir = path.substr(0,
-                                      path.length() - p.filename().string().length());
-        std::filesystem::create_directories(dir);
-    }
+static void createPath(const std::string &path) {
+    std::filesystem::path p(path);
+    std::string dir = path.substr(0,
+                                  path.length() - p.filename().string().length());
+    std::filesystem::create_directories(dir);
 }
 
 static bool checkPathHasSubDir(const std::string &path) {
@@ -257,14 +263,14 @@ static std::string getPath(const std::string &path,
     }
 }
 
-static void install(const std::string &path,
-                    const std::vector<char> &data) {
+static void writeToFile(const std::string &path,
+                        const std::vector<char> &data) {
     std::ofstream ofs(path);
     ofs.write(data.data(), data.size());
 }
 
 void AddonManager::installAddon(std::istream &sourceFile,
-                                const std::function<bool(const std::string &)> &fileOverwriteFunction) {
+                                std::function<bool(const std::string &, const std::string &)> questionDialog) {
     Archive arch(sourceFile);
     auto metadata = arch.entries().at("metadata.json");
     nlohmann::json j = nlohmann::json::parse(metadata);
@@ -279,21 +285,48 @@ void AddonManager::installAddon(std::istream &sourceFile,
 
             auto path = getPath(addonFile.filename(), addonDir);
 
-            createPath(path, fileOverwriteFunction);
-            install(path, arch.entries().at(addonFilePath));
+            if (std::filesystem::exists(path)){
+                if (!questionDialog("Overwrite existing addon module", "Do you want to overwrite the file at " + path)) {
+                    continue;
+                }
+            }
+
+            createPath(path);
+            writeToFile(path, arch.entries().at(addonFilePath));
         }
     }
 
     if (j.find("libs") != j.end()) {
-        for (auto &libFilePath: j["libs"]) {
-            if (!checkPathHasSubDir(libFilePath)) {
-                throw std::runtime_error("Library files must be in a subdirectory, path: " + std::string(libFilePath));
+        for (std::string libDirectory: j["libs"]) {
+            if (libDirectory.empty() && libDirectory.front() != '/')
+                libDirectory.insert(0, "/");
+
+            std::set<std::string> libFiles;
+            for (auto &entry: arch.entries()) {
+                if (entry.first.size() > libDirectory.size() && entry.first.find(libDirectory) == 0) {
+                    libFiles.insert(entry.first);
+                }
             }
 
-            auto path = getPath(libFilePath, libDir);
+            if (!libFiles.empty()) {
+                auto libPath = getPath(libDirectory, libDir);
 
-            createPath(path, fileOverwriteFunction);
-            install(path, arch.entries().at(libFilePath));
+                if (std::filesystem::exists(libPath)) {
+                    if (questionDialog("Overwrite existing library package",
+                                       "Do you want to replace the contents of the existing directory " + libPath +
+                                       "?")) {
+                        std::filesystem::remove_all(libPath.c_str());
+                    } else {
+                        continue;
+                    }
+                }
+
+                for (auto &libFilePath: libFiles) {
+                    auto path = getPath(libFilePath, libDir);
+                    createPath(path);
+                    writeToFile(path, arch.entries().at(libFilePath));
+                }
+            }
         }
     }
 }

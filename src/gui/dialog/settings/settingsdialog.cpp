@@ -89,7 +89,7 @@ void SettingsDialog::setEnabledAddons(const std::set<std::string> &addons) {
     enabledAddons = addons;
 
     addonTab->setAddons(addonManager.getAvailableAddons());
-    addonTab->setLibraries(addonManager.getLibraryPackages());
+    addonTab->setLibraries(addonManager.getLibraries());
 }
 
 std::set<std::string> SettingsDialog::getEnabledAddons() {
@@ -189,7 +189,7 @@ void SettingsDialog::onRefreshAddonsPressed() {
         enabledAddons.erase(mod);
 
     addonTab->setAddons(adds);
-    addonTab->setLibraries(addonManager.getLibraryPackages());
+    addonTab->setLibraries(addonManager.getLibraries());
 }
 
 void SettingsDialog::onInstallAddonPressed() {
@@ -201,9 +201,8 @@ void SettingsDialog::onInstallAddonPressed() {
         delete d;
         try {
             std::ifstream ifs(file);
-            addonManager.installAddon(ifs, [this](const std::string &path) {
-                return QMessageBox::question(this, "Overwrite existing file", ("File already exists at " + path +
-                                                                               "\nDo you want to overwrite the existing file?").c_str());
+            addonManager.installAddon(ifs, [this](const std::string &title, const std::string &text) {
+                return QMessageBox::question(this, title.c_str(), text.c_str()) == QMessageBox::Yes;
             });
             QMessageBox::information(this,
                                      "Installation Successful",
@@ -211,7 +210,7 @@ void SettingsDialog::onInstallAddonPressed() {
         } catch (const std::exception &e) {
             QMessageBox::critical(this,
                                   "Installation Failed",
-                                  ("Failed to install addon package from " + file + "\n" + e.what()).c_str());
+                                  ("Failed to writeToFile addon package from " + file + "\n" + e.what()).c_str());
         }
         onRefreshAddonsPressed();
     } else {
