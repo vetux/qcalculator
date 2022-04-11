@@ -36,7 +36,7 @@ public:
 
         text = new QLabel();
 
-        auto t = R"LLL(<center><p><a href="https://www.github.com/xenotux/qcalc">Source Code</a></p></center>
+        auto t = R"LLL(<p><a href="https://www.github.com/xenotux/qcalc">Source Code</a></p>
 <p>
 Powered by:
 <a href="https://www.github.com/ArashPartow/exprtk">ExprTk</a>
@@ -45,12 +45,13 @@ Powered by:
 <a href="https://www.mpfr.org">MPFR</a>
 </p>
 )LLL";
-        text->setText("<h1>"
+        text->setText("<center><h1>"
         +QApplication::applicationDisplayName()
                       + " "
                       + QApplication::applicationVersion()
                       + "</h1><p>Copyright (c) 2021 Julian Zampiccoli</p>"
-                      + t);
+                      + t
+                      + "</center>");
 
         text->setTextFormat(Qt::RichText);
         text->setTextInteractionFlags(Qt::TextBrowserInteraction);
