@@ -29,7 +29,7 @@
 
 #include "extern/json.hpp"
 
-#include "arcpp/archive.hpp"
+#include "io/archive.hpp"
 
 struct AddonMetadata {
     std::string displayName;

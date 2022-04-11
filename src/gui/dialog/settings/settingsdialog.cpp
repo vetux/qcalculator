@@ -31,7 +31,7 @@
 
 #include "addon/addonmanager.hpp"
 
-#include "arcpp/archive.hpp"
+#include "io/archive.hpp"
 
 #include "io/paths.hpp"
 

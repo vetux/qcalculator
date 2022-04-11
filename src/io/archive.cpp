@@ -20,7 +20,7 @@
 #include <istream>
 #include <utility>
 
-#include "arcpp/archive.hpp"
+#include "io/archive.hpp"
 
 #include "archive.h"
 #include "archive_entry.h"
