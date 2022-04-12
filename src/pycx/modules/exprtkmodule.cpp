@@ -78,7 +78,10 @@ PyObject *set_global_symtable(PyObject *self, PyObject *args) {
     }
     SymbolTable &t = *symbolTable;
     t = SymbolTableUtil::Convert(pysym);
-    symbolTableCallback();
+
+    if (symbolTableCallback)
+        symbolTableCallback();
+
     return PyLong_FromLong(0);
 }
 
@@ -108,8 +111,11 @@ static PyObject *PyInit() {
     return m;
 }
 
-void ExprtkModule::initialize(SymbolTable &globalTable, std::function<void()> tableChangeCallback) {
+void ExprtkModule::initialize() {
+    PyImport_AppendInittab(MODULE_NAME, PyInit);
+}
+
+void ExprtkModule::setGlobalTable(SymbolTable &globalTable, std::function<void()> tableChangeCallback) {
     symbolTable = &globalTable;
     symbolTableCallback = std::move(tableChangeCallback);
-    PyImport_AppendInittab(MODULE_NAME, PyInit);
 }

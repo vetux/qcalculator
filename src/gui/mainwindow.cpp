@@ -113,17 +113,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     updateSymbolHistoryMenu();
 
-    StdRedirModule::initialize();
-    MprealModule::initialize();
-    ExprtkModule::initialize(symbolTable,
+    ExprtkModule::setGlobalTable(symbolTable,
                              [this]() {
                                  onSymbolTableChanged(symbolTable);
                              });
-
-    Interpreter::initialize();
-
-    Interpreter::addModuleDir(Paths::getAddonDirectory());
-    Interpreter::addModuleDir(Paths::getLibDirectory());
 
     addonManager = std::make_unique<AddonManager>(Paths::getAddonDirectory(),
                                                   Paths::getLibDirectory(),

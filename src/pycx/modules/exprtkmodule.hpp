@@ -30,12 +30,11 @@ namespace ExprtkModule {
      * this appends logic to the cpython init tab
      * and should therefore be called before initializing cpython.
      *
-     * Dependency on mpreal module, readAddons mpreal module beforehand.
-     *
-     * @param globalTable
-     * @param tableChangeCallback
+     * Dependency on mpreal module, initialize mpreal module beforehand.
      */
-    void initialize(SymbolTable &globalTable, std::function<void()> tableChangeCallback);
+    void initialize();
+
+    void setGlobalTable(SymbolTable &globalTable, std::function<void()> tableChangeCallback);
 }
 
 #endif //QCALC_EXPRTKMODULE_HPP

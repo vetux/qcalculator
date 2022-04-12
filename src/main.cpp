@@ -22,6 +22,11 @@
 #include "gui/mainwindow.hpp"
 
 #include "pycx/interpreter.hpp"
+#include "pycx/modules/stdredirmodule.hpp"
+#include "pycx/modules/mprealmodule.hpp"
+#include "pycx/modules/exprtkmodule.hpp"
+
+#include "io/paths.hpp"
 
 std::vector<std::string> parseArgs(int argc, char *argv[]) {
     std::vector<std::string> ret;
@@ -34,24 +39,29 @@ std::vector<std::string> parseArgs(int argc, char *argv[]) {
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
-    a.setOrganizationName("Xenotux");
-    a.setApplicationName("qcalc");
-    a.setApplicationDisplayName("QCalculator");
-    a.setApplicationVersion("v0.5.0");
 
-    MainWindow w;
+    QApplication::setOrganizationName("Xenotux");
+    QApplication::setApplicationName("qcalc");
+    QApplication::setApplicationDisplayName("QCalculator");
+    QApplication::setApplicationVersion("v0.5.0");
+
+    StdRedirModule::initialize();
+    MprealModule::initialize();
+    ExprtkModule::initialize();
+    Interpreter::initialize();
+    Interpreter::addModuleDir(Paths::getAddonDirectory());
+    Interpreter::addModuleDir(Paths::getLibDirectory());
 
     auto args = parseArgs(argc, argv);
-
-    // Run the application as an interactive python interpreter
-    // Does not work on win32 if the application is not using the console subsystem
     if (args.size() > 1) {
         if (args.at(1) == "--interpreter" || args.at(1) == "-i") {
+            // Run the application as an interactive python interpreter
+            // Does not work on win32 if the application is not using the console subsystem
             return Interpreter::runInteractiveLoop();
         }
     }
 
+    MainWindow w;
     w.show();
-
-    return a.exec();
+    return QApplication::exec();
 }
