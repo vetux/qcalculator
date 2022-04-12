@@ -89,8 +89,6 @@ static std::map<std::string, AddonMetadata> readAvailableAddons(const std::strin
     return ret;
 }
 
-static std::atomic<bool> constructFlag; // Only one instance of AddonManager may exist because of cpython api static context.
-
 AddonManager::AddonManager(const std::string &addonDirectory,
                            const std::string &libDirectory,
                            Listener onAddonLoadFail,
