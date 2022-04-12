@@ -271,12 +271,22 @@ static void writeToFile(const std::string &path,
 
 void AddonManager::installAddon(std::istream &sourceFile,
                                 std::function<bool(const std::string &, const std::string &)> questionDialog) {
-    Archive arch(sourceFile);
-    auto metadata = arch.entries().at("metadata.json");
-    nlohmann::json j = nlohmann::json::parse(metadata);
+    const char *const metadataFilePath = "metadata.json";
 
+    Archive arch(sourceFile);
+
+    if (arch.entries().find(metadataFilePath) == arch.entries().end()) {
+        throw std::runtime_error("metadata.json not found in package");
+    }
+
+    auto metadata = arch.entries().at(metadataFilePath);
+
+    auto j = nlohmann::json::parse(metadata);
     if (j.find("addons") != j.end()) {
         for (auto &addonFilePath: j["addons"]) {
+            if (!addonFilePath.is_string()) {
+                throw std::runtime_error("addons array members must be strings");
+            }
             std::filesystem::path addonFile(addonFilePath);
 
             if (addonFile.extension() != ".py") {
@@ -285,8 +295,9 @@ void AddonManager::installAddon(std::istream &sourceFile,
 
             auto path = getPath(addonFile.filename(), addonDir);
 
-            if (std::filesystem::exists(path)){
-                if (!questionDialog("Overwrite existing addon module", "Do you want to overwrite the file at " + path)) {
+            if (std::filesystem::exists(path)) {
+                if (!questionDialog("Overwrite existing addon module",
+                                    "Do you want to overwrite the file at " + path)) {
                     continue;
                 }
             }
@@ -297,8 +308,14 @@ void AddonManager::installAddon(std::istream &sourceFile,
     }
 
     if (j.find("libs") != j.end()) {
-        for (std::string libDirectory: j["libs"]) {
-            if (libDirectory.empty() && libDirectory.front() != '/')
+        for (auto &jLib: j["libs"]) {
+            if (!jLib.is_string()) {
+                throw std::runtime_error("libs array members must be strings");
+            }
+
+            std::string libDirectory = jLib;
+
+            if (!libDirectory.empty() && libDirectory.front() != '/')
                 libDirectory.insert(0, "/");
 
             std::set<std::string> libFiles;
@@ -326,6 +343,8 @@ void AddonManager::installAddon(std::istream &sourceFile,
                     createPath(path);
                     writeToFile(path, arch.entries().at(libFilePath));
                 }
+            } else {
+                throw std::runtime_error("No files found for defined package " + libDirectory);
             }
         }
     }
