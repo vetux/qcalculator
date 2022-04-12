@@ -210,7 +210,7 @@ void SettingsDialog::onInstallAddonPressed() {
         } catch (const std::exception &e) {
             QMessageBox::critical(this,
                                   "Installation Failed",
-                                  ("Failed to writeToFile addon package from " + file + "\n" + e.what()).c_str());
+                                  ("Failed to install addon package from " + file + "\n" + e.what()).c_str());
         }
         onRefreshAddonsPressed();
     } else {
