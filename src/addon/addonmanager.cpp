@@ -315,9 +315,6 @@ void AddonManager::installAddon(std::istream &sourceFile,
 
             std::string libDirectory = jLib;
 
-            if (!libDirectory.empty() && libDirectory.front() != '/')
-                libDirectory.insert(0, "/");
-
             std::set<std::string> libFiles;
             for (auto &entry: arch.entries()) {
                 if (entry.first.size() > libDirectory.size() && entry.first.find(libDirectory) == 0) {
