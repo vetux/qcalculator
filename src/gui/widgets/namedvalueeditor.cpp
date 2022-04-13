@@ -21,6 +21,7 @@
 
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QApplication>
 
 NamedValueEditor::NamedValueEditor(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
@@ -37,6 +38,7 @@ NamedValueEditor::NamedValueEditor(QWidget *parent) : QWidget(parent) {
     addPushButton = new QPushButton(this);
 
     addPushButton->setText("Add");
+    addPushButton->setFocusPolicy(Qt::NoFocus);
 
     auto *widgetAdd = new QWidget(this);
     widgetAdd->setLayout(new QHBoxLayout(widgetAdd));
@@ -71,7 +73,7 @@ void NamedValueEditor::setValues(const std::map<QString, QString> &values) {
     mapping.clear();
 
     int i = 0;
-    for (auto &p : values) {
+    for (auto &p: values) {
         auto *itemName = new QTableWidgetItem(p.first);
         auto *itemValue = new QTableWidgetItem(p.second);
 
@@ -89,6 +91,11 @@ void NamedValueEditor::setValues(const std::map<QString, QString> &values) {
 
 void NamedValueEditor::onAddPressed() {
     emit onNamedValueAdded(addLineEditName->text(), addLineEditValue->text());
+
+    // Unstuck button if onNamedValueAdded starts a QMessageBox
+    addPushButton->setFocus();
+    QApplication::processEvents();
+    setFocus();
 }
 
 void NamedValueEditor::onTableCellChanged(int row, int column) {

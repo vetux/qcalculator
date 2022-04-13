@@ -22,6 +22,7 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QScrollBar>
+#include <QApplication>
 
 //TODO:Feature: Syntax highlighting and completion for functions editor expression edit text.
 //TODO:Feature: Notify user of syntax errors in function expressions
@@ -84,6 +85,7 @@ FunctionsEditor::FunctionsEditor(QWidget *parent) : QWidget(parent) {
     layout()->addWidget(widgetArgs);
 
     addPushButton->setText("Add");
+    //addPushButton->setFocusPolicy(Qt::NoFocus); //If this is set it breaks the button focus of the named value editor.
 
     argsSpinBox->setMaximum(5);
 
@@ -161,6 +163,11 @@ void FunctionsEditor::setCurrentFunction(const QString &name) {
 
 void FunctionsEditor::onFunctionAddPressed() {
     emit onFunctionAdded(addLineEdit->text());
+
+    // Unstuck button if onFunctionAddPressed starts a QMessageBox
+    addPushButton->setFocus();
+    QApplication::processEvents();
+    setFocus();
 }
 
 void FunctionsEditor::onFunctionArgEditingFinished() {
