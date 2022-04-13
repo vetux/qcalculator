@@ -46,6 +46,8 @@ namespace NumberFormat {
     ArithmeticType fromOctal(const std::string &s, int precision, mpfr_rnd_t rounding);
 
     ArithmeticType fromBinary(const std::string &s, int precision, mpfr_rnd_t rounding);
+
+    size_t getDecimals(const std::string &s);
 }
 
 #endif // NUMBERFORMAT_HPP

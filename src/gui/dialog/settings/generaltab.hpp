@@ -41,10 +41,6 @@ public slots:
 
     void setFormatRounding(mpfr_rnd_t rounding);
 
-    void setSymbolsPrecision(int bits);
-
-    void setSymbolsFormatPrecision(int digits);
-
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
 
@@ -55,10 +51,6 @@ public:
     int getFormatPrecision();
 
     mpfr_rnd_t getFormatRounding();
-
-    int getSymbolsPrecision();
-
-    int getSymbolsFormatPrecision();
 
 private:
     QStringListModel roundingModel;
@@ -74,12 +66,6 @@ private:
 
     QLabel *formatRoundingLabel;
     QComboBox *formatRoundingComboBox;
-
-    QLabel *symbolsPrecisionLabel;
-    QSpinBox *symbolsPrecisionSpinBox;
-
-    QLabel *symbolsFormatPrecisionLabel;
-    QSpinBox *symbolsFormatPrecisionSpinBox;
 };
 
 #endif //QCALC_GENERALTAB_HPP

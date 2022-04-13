@@ -120,3 +120,12 @@ ArithmeticType NumberFormat::fromBinary(const std::string &s, int precision, mpf
         throw std::runtime_error("Maximum 64 bits can be converted from string");
     return mpfr::mpreal(std::bitset<64>(s).to_ullong(), precision, rounding);
 }
+
+size_t NumberFormat::getDecimals(const std::string &s) {
+    auto i = s.find('.');
+    if (i != std::string::npos) {
+        return s.size() - (i + 1);
+    } else {
+        return 0;
+    }
+}

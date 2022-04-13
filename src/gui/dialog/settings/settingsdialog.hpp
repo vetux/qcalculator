@@ -29,7 +29,7 @@
 
 #include "addon/addonmanager.hpp"
 
-#include "generaltab.hpp"
+#include "gui/dialog/settings/generaltab.hpp"
 #include "addontab.hpp"
 
 class SettingsDialog : public QDialog {
@@ -56,17 +56,9 @@ public:
 
     int getFormattingPrecision();
 
-    void setFormattingRoundingMode(mpfr_rnd_t rounding);
+    void setFormattingRoundMode(mpfr_rnd_t mode);
 
-    mpfr_rnd_t getFormattingRoundingMode();
-
-    void setSymbolsPrecision(int precision);
-
-    int getSymbolsPrecision();
-
-    void setSymbolsFormattingPrecision(int precision);
-
-    int getSymbolsFormattingPrecision();
+    mpfr_rnd_t getFormattingRoundMode();
 
 private slots:
 

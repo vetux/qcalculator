@@ -34,12 +34,8 @@ public slots:
 
     void setSymbols(const SymbolTable &symbols);
 
-    void setSymbolsFormattingPrecision(int precision);
-
-    void setSymbolsPrecision(int precision);
-
 public:
-    SymbolsDialog(const SymbolTable &symbols, int formattingPrecision, int precision, QWidget *parent);
+    SymbolsDialog(const SymbolTable &symbols, QWidget *parent);
 
 private:
     SymbolsEditor* editor;

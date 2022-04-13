@@ -21,6 +21,8 @@
 
 #include "../extern/json.hpp"
 
+#include "math/numberformat.hpp"
+
 std::string Serializer::serializeTable(const SymbolTable &table) {
     nlohmann::json j;
     j["version"] = 0;
@@ -57,29 +59,31 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     return nlohmann::to_string(j);
 }
 
-SymbolTable Serializer::deserializeTable(const std::string &str, int precision) {
+SymbolTable Serializer::deserializeTable(const std::string &str) {
     nlohmann::json j = nlohmann::json::parse(str);
     SymbolTable ret;
 
     std::vector<nlohmann::json> tmp = j["variables"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
+        auto prec = mpfr::digits2bits(NumberFormat::getDecimals(v));
         std::string name = v["name"];
         ArithmeticType value;
         if (v["value"].is_string())
-            value = mpfr::mpreal(v["value"].get<std::string>(), precision, 10, MPFR_RNDN);
+            value = mpfr::mpreal(v["value"].get<std::string>(), prec, 10, MPFR_RNDN);
         else
-            value = mpfr::mpreal(v["value"].get<double>(), precision, MPFR_RNDN); //Backwards compat
+            value = mpfr::mpreal(v["value"].get<double>(), prec, MPFR_RNDN); //Backwards compat
         ret.setVariable(name, value);
     }
 
     tmp = j["constants"].get<std::vector<nlohmann::json>>();
     for (auto &v : tmp) {
+        auto prec = mpfr::digits2bits(NumberFormat::getDecimals(v));
         std::string name = v["name"];
         ArithmeticType value;
         if (v["value"].is_string())
-            value = mpfr::mpreal(v["value"].get<std::string>(), precision, 10, MPFR_RNDN);
+            value = mpfr::mpreal(v["value"].get<std::string>(), prec, 10, MPFR_RNDN);
         else
-            value = mpfr::mpreal(v["value"].get<double>(), precision, MPFR_RNDN); //Backwards compat
+            value = mpfr::mpreal(v["value"].get<double>(), prec, MPFR_RNDN); //Backwards compat
         ret.setConstant(name, value);
     }
 

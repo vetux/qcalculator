@@ -22,8 +22,6 @@
 #include <QVBoxLayout>
 
 SymbolsDialog::SymbolsDialog(const SymbolTable &symbols,
-                             int formattingPrecision,
-                             int precision,
                              QWidget *parent)
         : QDialog(parent) {
     setModal(false);
@@ -33,8 +31,6 @@ SymbolsDialog::SymbolsDialog(const SymbolTable &symbols,
     editor = new SymbolsEditor(this);
 
     editor->setSymbols(symbols);
-    editor->setFormattingPrecision(formattingPrecision);
-    editor->setPrecision(precision);
 
     layout()->addWidget(editor);
 
@@ -48,10 +44,3 @@ void SymbolsDialog::setSymbols(const SymbolTable &symbols) {
     editor->setSymbols(symbols);
 }
 
-void SymbolsDialog::setSymbolsFormattingPrecision(int precision) {
-    editor->setFormattingPrecision(precision);
-}
-
-void SymbolsDialog::setSymbolsPrecision(int precision) {
-    editor->setPrecision(precision);
-}

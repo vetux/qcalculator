@@ -78,14 +78,6 @@ void GeneralTab::setFormatRounding(mpfr_rnd_t rounding) {
     formatRoundingComboBox->setCurrentIndex(getIndexFromRoundingMode(rounding));
 }
 
-void GeneralTab::setSymbolsPrecision(int bits) {
-    symbolsPrecisionSpinBox->setValue(bits);
-}
-
-void GeneralTab::setSymbolsFormatPrecision(int digits) {
-    symbolsFormatPrecisionSpinBox->setValue(digits);
-}
-
 GeneralTab::GeneralTab(QWidget *parent)
         : QWidget(parent) {
     roundingModel.setStringList({"Round to nearest",
@@ -115,22 +107,8 @@ GeneralTab::GeneralTab(QWidget *parent)
     formatRoundingLabel->setToolTip("The rounding mode used when formatting result values to strings.");
     formatRoundingComboBox = new QComboBox(this);
 
-    symbolsPrecisionLabel = new QLabel(this);
-    symbolsPrecisionLabel->setText("Symbols Precision");
-    symbolsPrecisionLabel->setToolTip(
-            "The mantissa size in bits of the data type used for symbols (Variables and Constants) defined in the symbol table.");
-    symbolsPrecisionSpinBox = new QSpinBox(this);
-
-    symbolsFormatPrecisionLabel = new QLabel(this);
-    symbolsFormatPrecisionLabel->setText("Symbols Format Precision");
-    symbolsFormatPrecisionLabel->setToolTip(
-            "The precision in decimal spaces used when formatting variable and constant values to strings.");
-    symbolsFormatPrecisionSpinBox = new QSpinBox(this);
-
     precisionSpinBox->setRange(1, 1000000000);
     formatPrecisionSpinBox->setRange(0, 1000000);
-    symbolsPrecisionSpinBox->setRange(1, 1000000000);
-    symbolsFormatPrecisionSpinBox->setRange(0, 1000000);
 
     formatRoundingComboBox->setModel(&roundingModel);
 
@@ -142,22 +120,11 @@ GeneralTab::GeneralTab(QWidget *parent)
     layout->addWidget(roundingComboBox);
 
     layout->addSpacing(10);
-    layout->addWidget(getLine(this));
-    layout->addSpacing(10);
 
     layout->addWidget(formatPrecisionLabel);
     layout->addWidget(formatPrecisionSpinBox);
     layout->addWidget(formatRoundingLabel);
     layout->addWidget(formatRoundingComboBox);
-
-    layout->addSpacing(10);
-    layout->addWidget(getLine(this));
-    layout->addSpacing(10);
-
-    layout->addWidget(symbolsPrecisionLabel);
-    layout->addWidget(symbolsPrecisionSpinBox);
-    layout->addWidget(symbolsFormatPrecisionLabel);
-    layout->addWidget(symbolsFormatPrecisionSpinBox);
 
     layout->addWidget(new QWidget(this), 1);
 
@@ -178,12 +145,4 @@ int GeneralTab::getFormatPrecision() {
 
 mpfr_rnd_t GeneralTab::getFormatRounding() {
     return getRoundingModeFromIndex(formatRoundingComboBox->currentIndex());
-}
-
-int GeneralTab::getSymbolsPrecision() {
-    return symbolsPrecisionSpinBox->value();
-}
-
-int GeneralTab::getSymbolsFormatPrecision() {
-    return symbolsFormatPrecisionSpinBox->value();
 }

@@ -20,25 +20,19 @@
 #ifndef QCALC_SETTINGCONSTANTS_HPP
 #define QCALC_SETTINGCONSTANTS_HPP
 
-#define SETTING_KEY_PRECISION "_qcalc_precision_internal"
-#define SETTING_DEFAULT_PRECISION 4000
+const char *const SETTING_KEY_PRECISION = "_qcalc_precision_internal";
+const int SETTING_DEFAULT_PRECISION = 4000;
 
-#define SETTING_KEY_FORMATTING_PRECISION "_qcalc_precision_formatting"
-#define SETTING_DEFAULT_FORMATTING_PRECISION 9
+const char *const SETTING_KEY_ROUNDING = "_qcalc_rounding_internal";
+const int SETTING_DEFAULT_ROUNDING = 0;
 
-#define SETTING_KEY_ROUNDING "_qcalc_rounding_internal"
-#define SETTING_DEFAULT_ROUNDING 0
+const char *const SETTING_KEY_PRECISION_F = "_qcalc_precision_format";
+const int SETTING_DEFAULT_PRECISION_F = 100;
 
-#define SETTING_KEY_FORMATTING_ROUNDING "_qcalc_rounding_formatting"
-#define SETTING_DEFAULT_FORMATTING_ROUNDING 0
+const char *const SETTING_KEY_ROUNDING_F = "_qcalc_rounding_format";
+const int SETTING_DEFAULT_ROUNDING_F = 0;
 
-#define SETTING_KEY_SYMBOLS_PRECISION "_qcalc_precision_symbols"
-#define SETTING_DEFAULT_SYMBOLS_PRECISION 4000
-
-#define SETTING_KEY_SYMBOLS_FORMATTING_PRECISION "_qcalc_precision_formatting_symbols"
-#define SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION 9
-
-#define SETTING_KEY_SAVE_SYM_HISTORY "_qcalc_save_sym_hist"
-#define SETTING_DEFAULT_SAVE_SYM_HISTORY true
+const char *const SETTING_KEY_SAVE_SYM_HISTORY = "_qcalc_save_sym_hist";
+const int SETTING_DEFAULT_SAVE_SYM_HISTORY = true;
 
 #endif //QCALC_SETTINGCONSTANTS_HPP

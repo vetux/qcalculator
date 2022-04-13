@@ -80,6 +80,7 @@ SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
     connect(addonTab, SIGNAL(addonUninstall(const QString &)), this, SLOT(onAddonUninstall(const QString &)));
     connect(addonTab, SIGNAL(libraryUninstall(const QString &)), this, SLOT(onLibraryUninstall(const QString &)));
 
+
     resize({700, 500});
 }
 
@@ -120,28 +121,12 @@ int SettingsDialog::getFormattingPrecision() {
     return generalTab->getFormatPrecision();
 }
 
-void SettingsDialog::setFormattingRoundingMode(mpfr_rnd_t rounding) {
-    generalTab->setFormatRounding(rounding);
+void SettingsDialog::setFormattingRoundMode(mpfr_rnd_t mode) {
+    generalTab->setFormatRounding(mode);
 }
 
-mpfr_rnd_t SettingsDialog::getFormattingRoundingMode() {
+mpfr_rnd_t SettingsDialog::getFormattingRoundMode() {
     return generalTab->getFormatRounding();
-}
-
-void SettingsDialog::setSymbolsPrecision(int precision) {
-    generalTab->setSymbolsPrecision(precision);
-}
-
-int SettingsDialog::getSymbolsPrecision() {
-    return generalTab->getSymbolsPrecision();
-}
-
-void SettingsDialog::setSymbolsFormattingPrecision(int precision) {
-    generalTab->setSymbolsFormatPrecision(precision);
-}
-
-int SettingsDialog::getSymbolsFormattingPrecision() {
-    return generalTab->getSymbolsFormatPrecision();
 }
 
 void SettingsDialog::onModuleEnableChanged(AddonItemWidget *item) {

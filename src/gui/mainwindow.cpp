@@ -91,16 +91,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
-    connect(this,
-            SIGNAL(signalInputTextChange(const QString &)),
-            input,
-            SLOT(setText(const QString &)));
-
-    connect(this,
-            SIGNAL(signalExpressionEvaluated(const QString &, const QString &)),
-            history,
-            SLOT(addContent(const QString &, const QString &)));
-
     connect(history,
             SIGNAL(onTextDoubleClicked(const QString &)),
             this,
@@ -114,9 +104,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     updateSymbolHistoryMenu();
 
     ExprtkModule::setGlobalTable(symbolTable,
-                             [this]() {
-                                 onSymbolTableChanged(symbolTable);
-                             });
+                                 [this]() {
+                                     onSymbolTableChanged(symbolTable);
+                                 });
 
     addonManager = std::make_unique<AddonManager>(Paths::getAddonDirectory(),
                                                   Paths::getLibDirectory(),
@@ -170,31 +160,16 @@ void MainWindow::onAddonUnloadFail(const std::string &moduleName, const std::str
                          ("Module " + moduleName + " failed to unload\n\n" + error).c_str());
 }
 
+void MainWindow::onEvaluateExpression(const QString &expression) {
+    evaluateExpression(expression);
+}
+
 void MainWindow::onInputReturnPressed() {
-    try {
-        std::string inputText = input->text().toStdString();
-
-        ArithmeticType value = ExpressionParser::evaluate(inputText, symbolTable);
-
-        // Apply side effects
-        if (symbolsDialog != nullptr) {
-            symbolsDialog->setSymbols(symbolTable);
-        }
-
-        std::string resultText = NumberFormat::toDecimal(value, settings.value(SETTING_KEY_FORMATTING_PRECISION,
-                                                                               SETTING_DEFAULT_FORMATTING_PRECISION).toInt(),
-                                                         Serializer::deserializeRoundingMode(
-                                                                 settings.value(SETTING_KEY_FORMATTING_ROUNDING,
-                                                                                SETTING_DEFAULT_FORMATTING_ROUNDING).toInt()));
-
-        emit signalExpressionEvaluated(inputText.c_str(), resultText.c_str());
-
-        inputText = resultText;
-
-        emit signalInputTextChange(inputText.c_str());
-    }
-    catch (const std::runtime_error &e) {
-        QMessageBox::warning(this, "Failed to evaluate expression", e.what());
+    auto expr = input->text();
+    auto res = evaluateExpression(expr);
+    if (!res.isEmpty()) {
+        input->setText(res);
+        history->addContent(expr, res);
     }
 }
 
@@ -207,66 +182,26 @@ void MainWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
 
 void MainWindow::onActionSettings() {
     SettingsDialog dialog(*addonManager);
-    dialog.setPrecision(settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt());
-    dialog.setRoundingMode(
-            Serializer::deserializeRoundingMode(
-                    settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt()));
-    dialog.setFormattingPrecision(
-            settings.value(SETTING_KEY_FORMATTING_PRECISION, SETTING_DEFAULT_FORMATTING_PRECISION).toInt());
-    dialog.setFormattingRoundingMode(Serializer::deserializeRoundingMode(
-            settings.value(SETTING_KEY_FORMATTING_ROUNDING, SETTING_DEFAULT_FORMATTING_ROUNDING).toInt()));
-    dialog.setSymbolsPrecision(
-            settings.value(SETTING_KEY_SYMBOLS_PRECISION, SETTING_DEFAULT_SYMBOLS_PRECISION).toInt());
-    dialog.setSymbolsFormattingPrecision(settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
-                                                        SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt());
+
     dialog.setEnabledAddons(addonManager->getActiveAddons());
+
+    dialog.setPrecision(settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt());
+    dialog.setRoundingMode(Serializer::deserializeRoundingMode(
+            settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt()));
+
+    dialog.setFormattingPrecision(settings.value(SETTING_KEY_PRECISION_F, SETTING_DEFAULT_PRECISION_F).toInt());
+    dialog.setFormattingRoundMode(Serializer::deserializeRoundingMode(
+            settings.value(SETTING_KEY_ROUNDING_F, SETTING_DEFAULT_ROUNDING_F).toInt()));
 
     dialog.show();
 
     if (dialog.exec() == QDialog::Accepted) {
-        int precision = dialog.getPrecision();
-        settings.setValue(SETTING_KEY_PRECISION, precision);
-
-        mpfr_rnd_t rounding = dialog.getRoundingMode();
-        settings.setValue(SETTING_KEY_ROUNDING, Serializer::serializeRoundingMode(rounding));
-
-        int formattingPrecision = dialog.getFormattingPrecision();
-        settings.setValue(SETTING_KEY_FORMATTING_PRECISION, formattingPrecision);
-
-        mpfr_rnd_t formattingRounding = dialog.getFormattingRoundingMode();
-        settings.setValue(SETTING_KEY_FORMATTING_ROUNDING, formattingRounding);
-
-        int symbolsPrecision = dialog.getSymbolsPrecision();
-        settings.setValue(SETTING_KEY_SYMBOLS_PRECISION, symbolsPrecision);
-
-        int symbolsFormattingPrecision = dialog.getSymbolsFormattingPrecision();
-        settings.setValue(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION, symbolsFormattingPrecision);
-
-        mpfr::mpreal::set_default_prec(precision);
-        mpfr::mpreal::set_default_rnd(rounding);
-
-        if (symbolsDialog != nullptr) {
-            symbolsDialog->setSymbolsPrecision(symbolsPrecision);
-        }
-
-        auto tmp = symbolTable.getVariables();
-        for (auto &v: tmp) {
-            v.second.setPrecision(symbolsPrecision, MPFR_RNDN);
-            symbolTable.remove(v.first);
-            symbolTable.setVariable(v.first, v.second);
-        }
-
-        tmp = symbolTable.getConstants();
-        for (auto &v: tmp) {
-            v.second.setPrecision(symbolsPrecision, MPFR_RNDN);
-            symbolTable.remove(v.first);
-            symbolTable.setConstant(v.first, v.second);
-        }
-
-        if (symbolsDialog != nullptr) {
-            symbolsDialog->setSymbolsFormattingPrecision(symbolsFormattingPrecision);
-        }
-
+        settings.setValue(SETTING_KEY_PRECISION, dialog.getPrecision());
+        settings.setValue(SETTING_KEY_ROUNDING, dialog.getRoundingMode());
+        settings.setValue(SETTING_KEY_PRECISION_F, dialog.getFormattingPrecision());
+        settings.setValue(SETTING_KEY_ROUNDING_F, dialog.getFormattingRoundMode());
+        mpfr::mpreal::set_default_prec(dialog.getPrecision());
+        mpfr::mpreal::set_default_rnd(dialog.getRoundingMode());
         try {
             std::set<std::string> addons = dialog.getEnabledAddons();
             std::string dataDir = Paths::getAppDataDirectory();
@@ -352,10 +287,6 @@ void MainWindow::onActionSaveAsSymbolTable() {
 void MainWindow::onActionEditSymbolTable() {
     if (symbolsDialog == nullptr) {
         symbolsDialog = new SymbolsDialog(symbolTable,
-                                          settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
-                                                         SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt(),
-                                          settings.value(SETTING_KEY_SYMBOLS_PRECISION,
-                                                         SETTING_DEFAULT_SYMBOLS_PRECISION).toInt(),
                                           this);
         connect(symbolsDialog,
                 &QDialog::finished,
@@ -392,6 +323,23 @@ void MainWindow::onHistoryTextDoubleClicked(const QString &text) {
     input->setFocus();
 }
 
+QString MainWindow::evaluateExpression(const QString &expression) {
+    try {
+        auto formatPrec = settings.value(SETTING_KEY_PRECISION_F, SETTING_DEFAULT_PRECISION_F).toInt();
+        auto formatRnd = Serializer::deserializeRoundingMode(
+                settings.value(SETTING_KEY_ROUNDING_F, SETTING_DEFAULT_ROUNDING_F).toInt());
+
+        auto v = ExpressionParser::evaluate(expression.toStdString(), symbolTable);
+
+        QString ret = NumberFormat::toDecimal(v, formatPrec, formatRnd).c_str();
+        emit signalExpressionEvaluated(expression, ret);
+        return ret;
+    } catch (const std::runtime_error &e) {
+        QMessageBox::warning(this, "Failed to evaluate expression", e.what());
+    }
+    return "";
+}
+
 void MainWindow::loadSettings() {
     std::string settingsFilePath = Paths::getAppConfigDirectory().append(SETTINGS_FILE);
     if (QFile(settingsFilePath.c_str()).exists()) {
@@ -403,50 +351,12 @@ void MainWindow::loadSettings() {
         }
     }
 
-    int formattingPrecision = settings.value(SETTING_KEY_FORMATTING_PRECISION,
-                                             SETTING_DEFAULT_FORMATTING_PRECISION).toInt();
-
-    //Do bounds checking on the deserialized formatting precision
-    if (formattingPrecision < 0 || formattingPrecision > MAX_FORMATTING_PRECISION) {
-        formattingPrecision = 0;
-        settings.setValue(SETTING_KEY_FORMATTING_PRECISION, formattingPrecision);
-    }
-
-    int symbolsFormattingPrecision = settings.value(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION,
-                                                    SETTING_DEFAULT_SYMBOLS_FORMATTING_PRECISION).toInt();
-    if (symbolsFormattingPrecision < 0 || symbolsFormattingPrecision > MAX_FORMATTING_PRECISION) {
-        symbolsFormattingPrecision = 0;
-        settings.setValue(SETTING_KEY_SYMBOLS_FORMATTING_PRECISION, symbolsFormattingPrecision);
-    }
-
-    // Because on 32bit platforms long(mpfr_prec_t) and int can both be 32 bit and the mpfr documentation says
-    // "no value near MPFR_PREC_MAX should be used" we limit the precision range
-    // to a max of MPFR_PREC_MAX minus one third of MPFR_PREC_MAX (Which is redundant on 64bit).
-    // The gui limits the ranges of these values, so this is to protect against invalid values in the settings file,
-    // and should not affect normal user experience.
-    int symbolsPrecision = settings.value(SETTING_KEY_SYMBOLS_PRECISION,
-                                          SETTING_DEFAULT_SYMBOLS_PRECISION).toInt();
-    if (symbolsPrecision < MPFR_PREC_MIN || (mpfr_prec_t) symbolsPrecision > (MPFR_PREC_MAX - (MPFR_PREC_MAX / 3))) {
-        symbolsPrecision = MPFR_PREC_MIN;
-        settings.setValue(SETTING_KEY_SYMBOLS_PRECISION, symbolsPrecision);
-    }
-
-    int precision = settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt();
-    if (precision < MPFR_PREC_MIN || (mpfr_prec_t) precision > (MPFR_PREC_MAX - (MPFR_PREC_MAX / 3))) {
-        precision = MPFR_PREC_MIN;
-        settings.setValue(SETTING_KEY_PRECISION, precision);
-    }
-
-    mpfr_rnd_t rounding = Serializer::deserializeRoundingMode(
-            settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt());
-
-    mpfr::mpreal::set_default_prec(precision);
-    mpfr::mpreal::set_default_rnd(rounding);
+    mpfr::mpreal::set_default_prec(settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt());
+    mpfr::mpreal::set_default_rnd(Serializer::deserializeRoundingMode(
+            settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt()));
 
     if (symbolsDialog != nullptr) {
-        symbolsDialog->setSymbolsPrecision(symbolsPrecision);
         symbolsDialog->setSymbols(symbolTable);
-        symbolsDialog->setSymbolsFormattingPrecision(symbolsFormattingPrecision);
     }
 }
 
@@ -644,9 +554,7 @@ void MainWindow::updateSymbolHistoryMenu() {
 
 bool MainWindow::importSymbolTable(const std::string &path) {
     try {
-        auto syms = Serializer::deserializeTable(FileOperations::fileReadAllText(path),
-                                                 settings.value(SETTING_KEY_SYMBOLS_PRECISION,
-                                                                SETTING_DEFAULT_SYMBOLS_PRECISION).toInt());
+        auto syms = Serializer::deserializeTable(FileOperations::fileReadAllText(path));
 
         QMessageBox::information(this, "Import successful", ("Successfully imported symbols from " + path).c_str());
 
@@ -702,3 +610,4 @@ bool MainWindow::saveSymbolTable(const std::string &path) {
         return false;
     }
 }
+
