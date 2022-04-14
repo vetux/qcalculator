@@ -130,7 +130,9 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
     if (parser.compile(expr, expression)) {
         ArithmeticType ret = expression.value();
         for (auto &v : variables) {
-            symbolTable.setVariable(v.first, v.second);
+            if (symbolTable.getVariables().at(v.first) == v.second)
+                continue;
+            symbolTable.setVariable(v.first, v.second, -1);
         }
         return ret;
     } else {

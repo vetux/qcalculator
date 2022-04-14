@@ -37,7 +37,7 @@ const std::map<std::string, Script> &SymbolTable::getScripts() const {
     return scripts;
 }
 
-void SymbolTable::setVariable(const std::string &name, ArithmeticType value) {
+void SymbolTable::setVariable(const std::string &name, ArithmeticType value, int decimals) {
     if (name.empty())
         throw std::runtime_error("Symbol name cannot be empty.");
 
@@ -45,9 +45,10 @@ void SymbolTable::setVariable(const std::string &name, ArithmeticType value) {
     functions.erase(name);
     scripts.erase(name);
     variables[name] = value;
+    vDecimals[name] = decimals;
 }
 
-void SymbolTable::setConstant(const std::string &name, ArithmeticType value) {
+void SymbolTable::setConstant(const std::string &name, ArithmeticType value, int decimals) {
     if (name.empty())
         throw std::runtime_error("Symbol name cannot be empty.");
 
@@ -55,6 +56,7 @@ void SymbolTable::setConstant(const std::string &name, ArithmeticType value) {
     functions.erase(name);
     scripts.erase(name);
     constants[name] = value;
+    cDecimals[name] = decimals;
 }
 
 void SymbolTable::setFunction(const std::string &name, const Function &value) {
@@ -101,4 +103,14 @@ void SymbolTable::remove(const std::string &name) {
     constants.erase(name);
     functions.erase(name);
     scripts.erase(name);
+    vDecimals.erase(name);
+    cDecimals.erase(name);
+}
+
+const std::map<std::string, int> &SymbolTable::getVariableDecimals() const {
+    return vDecimals;
+}
+
+const std::map<std::string, int> &SymbolTable::getConstantDecimals() const {
+    return cDecimals;
 }

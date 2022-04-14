@@ -28,25 +28,27 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     j["version"] = 0;
 
     std::vector<nlohmann::json> tmp;
-    for (auto &p : table.getVariables()) {
+    for (auto &p: table.getVariables()) {
         nlohmann::json t;
         t["name"] = p.first;
         t["value"] = p.second.toString();
+        t["decimals"] = table.getVariableDecimals().at(p.first);
         tmp.emplace_back(t);
     }
     j["variables"] = tmp;
     tmp.clear();
 
-    for (auto &p : table.getConstants()) {
+    for (auto &p: table.getConstants()) {
         nlohmann::json t;
         t["name"] = p.first;
         t["value"] = p.second.toString();
+        t["decimals"] = table.getConstantDecimals().at(p.first);
         tmp.emplace_back(t);
     }
     j["constants"] = tmp;
     tmp.clear();
 
-    for (auto &p : table.getFunctions()) {
+    for (auto &p: table.getFunctions()) {
         nlohmann::json t;
         t["name"] = p.first;
         t["expression"] = p.second.expression;
@@ -63,32 +65,36 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
     nlohmann::json j = nlohmann::json::parse(str);
     SymbolTable ret;
 
-    std::vector<nlohmann::json> tmp = j["variables"].get<std::vector<nlohmann::json>>();
-    for (auto &v : tmp) {
-        auto prec = mpfr::digits2bits(NumberFormat::getDecimals(v));
+    auto tmp = j["variables"].get<std::vector<nlohmann::json>>();
+    for (auto &v: tmp) {
         std::string name = v["name"];
-        ArithmeticType value;
-        if (v["value"].is_string())
-            value = mpfr::mpreal(v["value"].get<std::string>(), prec, 10, MPFR_RNDN);
-        else
-            value = mpfr::mpreal(v["value"].get<double>(), prec, MPFR_RNDN); //Backwards compat
-        ret.setVariable(name, value);
+        int decimals = -1;
+        mpfr_prec_t prec = mpfr::digits2bits(v["value"].get<std::string>().size());
+        ArithmeticType value = mpfr::mpreal(v["value"].get<std::string>(), prec, 10, MPFR_RNDN);
+
+        if (v.find("decimals") != v.end()) {
+            decimals = v["decimals"];
+        }
+
+        ret.setVariable(name, value, decimals);
     }
 
     tmp = j["constants"].get<std::vector<nlohmann::json>>();
-    for (auto &v : tmp) {
-        auto prec = mpfr::digits2bits(NumberFormat::getDecimals(v));
+    for (auto &v: tmp) {
         std::string name = v["name"];
-        ArithmeticType value;
-        if (v["value"].is_string())
-            value = mpfr::mpreal(v["value"].get<std::string>(), prec, 10, MPFR_RNDN);
-        else
-            value = mpfr::mpreal(v["value"].get<double>(), prec, MPFR_RNDN); //Backwards compat
-        ret.setConstant(name, value);
+        int decimals = -1;
+        mpfr_prec_t prec = mpfr::digits2bits(v["value"].get<std::string>().size());;
+        ArithmeticType value = mpfr::mpreal(v["value"].get<std::string>(), prec, 10, MPFR_RNDN);
+
+        if (v.find("decimals") != v.end()) {
+            decimals = v["decimals"];
+        }
+
+        ret.setConstant(name, value, decimals);
     }
 
     tmp = j["functions"].get<std::vector<nlohmann::json>>();
-    for (auto &v : tmp) {
+    for (auto &v: tmp) {
         std::string name;
         name = v["name"];
         Function f;
@@ -103,7 +109,7 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
 std::string Serializer::serializeSettings(const Settings &settings) {
     auto &data = settings.entries();
     nlohmann::json j;
-    for (auto &p : data) {
+    for (auto &p: data) {
         switch (p.second.type()) {
             case Settings::NONE: //Ignore NONE type values.
                 break;
@@ -124,7 +130,7 @@ std::string Serializer::serializeSettings(const Settings &settings) {
 Settings Serializer::deserializeSettings(const std::string &str) {
     Settings ret;
     nlohmann::json j = nlohmann::json::parse(str);
-    for (auto &entry : j.items()) {
+    for (auto &entry: j.items()) {
         const std::string &key = entry.key();
         const auto &value = entry.value();
         if (value.is_number_integer()) {

@@ -331,6 +331,8 @@ QString MainWindow::evaluateExpression(const QString &expression) {
 
         auto v = ExpressionParser::evaluate(expression.toStdString(), symbolTable);
 
+        onSymbolTableChanged(symbolTable);
+
         QString ret = NumberFormat::toDecimal(v, formatPrec, formatRnd).c_str();
         emit signalExpressionEvaluated(expression, ret);
         return ret;

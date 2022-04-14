@@ -156,7 +156,7 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
         }
 
         try {
-            ret.setVariable(k, v);
+            ret.setVariable(k, v, -1);
         }
         catch (const std::exception &e) {
             Py_DECREF(attr);
@@ -207,7 +207,7 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
         }
 
         try {
-            ret.setConstant(k, v);
+            ret.setConstant(k, v, -1);
         }
         catch (const std::exception &e) {
             Py_DECREF(attr);

@@ -56,9 +56,9 @@ public:
 
     const std::map<std::string, Script> &getScripts() const;
 
-    void setVariable(const std::string &name, ArithmeticType value);
+    void setVariable(const std::string &name, ArithmeticType value, int decimals);
 
-    void setConstant(const std::string &name, ArithmeticType value);
+    void setConstant(const std::string &name, ArithmeticType value, int decimals);
 
     void setFunction(const std::string &name, const Function &value);
 
@@ -74,11 +74,19 @@ public:
 
     void remove(const std::string &name);
 
+    const std::map<std::string, int> &getVariableDecimals() const;
+
+    const std::map<std::string, int> &getConstantDecimals() const;
+
 private:
     std::map<std::string, ArithmeticType> variables;
     std::map<std::string, ArithmeticType> constants;
     std::map<std::string, Function> functions;
     std::map<std::string, Script> scripts;
+
+    //The number of decimal spaces that the user has entered when defining each variable or constant.
+    std::map<std::string, int> vDecimals;
+    std::map<std::string, int> cDecimals;
 };
 
 #endif //QCALC_SYMBOLTABLE_HPP
