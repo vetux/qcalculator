@@ -28,7 +28,7 @@
 Archive::Archive() = default;
 
 Archive::Archive(std::istream &stream) {
-    std::vector<char> buf = std::vector<char>(std::istreambuf_iterator<char>(stream.rdbuf()),
+    std::vector<char> buf = std::vector<char>(std::istreambuf_iterator<char>(stream),
                                               std::istreambuf_iterator<char>());
 
     auto a = archive_read_new();
@@ -42,7 +42,7 @@ Archive::Archive(std::istream &stream) {
     struct archive_entry *entry;
     while (archive_read_next_header(a, &entry) == ARCHIVE_OK) {
         std::string path = archive_entry_pathname(entry);
-        if (path.empty() || path.back() == '/') {
+        if (path.empty() || path.back() == '/' || path.back() == '\\') {
             archive_read_data_skip(a);
             continue; //Skip directory entries
         }
@@ -68,13 +68,13 @@ void Archive::save(std::ostream &s, Archive::Format format) {
     for (auto &entry: mEntries)
         size += entry.first.size() + entry.second.size() + 1024;
 
-    char buffer[size];
+    std::vector<char> buffer(size);
     size_t used;
 
     struct archive *a = archive_write_new();
 
     archive_write_set_format(a, format);
-    archive_write_open_memory(a, buffer, size, &used);
+    archive_write_open_memory(a, buffer.data(), size, &used);
 
     for (auto &entry: mEntries) {
         auto *e = archive_entry_new();
@@ -93,5 +93,5 @@ void Archive::save(std::ostream &s, Archive::Format format) {
     archive_write_close(a);
     archive_write_free(a);
 
-    s.write(buffer, used);
+    s.write(buffer.data(), used);
 }

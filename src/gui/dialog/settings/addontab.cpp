@@ -125,6 +125,11 @@ AddonTab::AddonTab(QWidget *parent)
     installButton = new QPushButton(this);
     refreshButton = new QPushButton(this);
 
+    // Addon installation currently broken on win32 libarchive does not return correct entries.
+#ifdef WIN32
+    installButton->setEnabled(false);
+#endif
+
     listWidget = new QListWidget(this);
 
     libListWidget = new QListWidget(this);

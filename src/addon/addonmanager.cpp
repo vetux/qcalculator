@@ -241,21 +241,11 @@ static void createPath(const std::string &path) {
     std::filesystem::create_directories(dir);
 }
 
-static bool checkPathHasSubDir(const std::string &path) {
-    auto slashes = 0;
-    for (auto i = path.find('/'); i != std::string::npos; i = path.find('/', i + 1)) {
-        slashes++;
-    }
-    if ((path.front() != '/' && slashes > 0) || (path.front() == '/' && slashes > 1))
-        return true;
-    else
-        return false;
-}
-
 static std::string getPath(const std::string &path,
                            const std::string &dir) {
-    if (!path.empty() && path.front() != '/') {
-        return dir + "/" + path;
+    char separator = '/';
+    if (!path.empty() && path.front() != separator) {
+        return dir + separator + path;
     } else {
         return dir + path;
     }
@@ -285,13 +275,14 @@ void AddonManager::installAddon(std::istream &sourceFile,
             if (!addonFilePath.is_string()) {
                 throw std::runtime_error("addons array members must be strings");
             }
-            std::filesystem::path addonFile(addonFilePath);
+
+            std::filesystem::path addonFile(addonFilePath.get<std::string>());
 
             if (addonFile.extension() != ".py") {
                 throw std::runtime_error("Invalid extension for addon file " + addonFile.string());
             }
 
-            auto path = getPath(addonFile.filename(), addonDir);
+            auto path = getPath(addonFile.filename().string(), addonDir);
 
             if (std::filesystem::exists(path)) {
                 if (!questionDialog("Overwrite existing addon module",
@@ -311,7 +302,7 @@ void AddonManager::installAddon(std::istream &sourceFile,
                 throw std::runtime_error("libs array members must be strings");
             }
 
-            std::string libDirectory = jLib;
+            std::string libDirectory = jLib.get<std::string>();
 
             std::set<std::string> libFiles;
             for (auto &entry: arch.entries()) {
@@ -339,7 +330,11 @@ void AddonManager::installAddon(std::istream &sourceFile,
                     writeToFile(path, arch.entries().at(libFilePath));
                 }
             } else {
-                throw std::runtime_error("No files found for defined package " + libDirectory);
+                std::string files;
+                for (auto &entry: arch.entries()) {
+                    files += entry.first + ", ";
+                }
+                throw std::runtime_error("No files found for defined package " + libDirectory + " Files: " + files);
             }
         }
     }
