@@ -58,5 +58,5 @@ set_property(TARGET qcalc PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(qcalc Qt5::Core Qt5::Widgets)
 target_link_libraries(qcalc ${Python_LIBRARIES}) # Python
-target_link_libraries(qcalc mpfr gmp) # MPFR
+target_link_libraries(qcalc mpdec mpdec++) # MPDECIMAL
 target_link_libraries(qcalc archive) # libarchive

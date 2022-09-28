@@ -21,7 +21,6 @@
 
 #include "include.hpp"
 #include "interpreter.hpp"
-#include "types/pympreal.hpp"
 
 PyObject *SymbolTableUtil::New(const SymbolTable &table) {
     PyObject *symModule = PyImport_ImportModule("exprtk");
@@ -49,27 +48,27 @@ PyObject *SymbolTableUtil::New(const SymbolTable &table) {
     PyObject *symInstance = PyObject_CallNoArgs(symClass);
 
     PyObject *vars = PyObject_GetAttrString(symInstance, "variables");
-    for (auto &var : table.getVariables()) {
-        PyObject *o = PyMpReal_FromMpReal(var.second);
+    for (auto &var: table.getVariables()) {
+        PyObject *o = PyFloat_FromDouble(std::stod(var.second.format("f")));
         PyDict_SetItemString(vars, var.first.c_str(), o);
         Py_DECREF(o);
     }
     Py_DECREF(vars);
 
     vars = PyObject_GetAttrString(symInstance, "constants");
-    for (auto &var : table.getConstants()) {
-        PyObject *o = PyMpReal_FromMpReal(var.second);
+    for (auto &var: table.getConstants()) {
+        PyObject *o = PyFloat_FromDouble(std::stod(var.second.format("f")));
         PyDict_SetItemString(vars, var.first.c_str(), o);
         Py_DECREF(o);
     }
     Py_DECREF(vars);
 
     vars = PyObject_GetAttrString(symInstance, "functions");
-    for (auto &var : table.getFunctions()) {
+    for (auto &var: table.getFunctions()) {
         PyObject *funcInstance = PyObject_CallNoArgs(funcClass);
 
         PyObject *argList = PyList_New(0);
-        for (auto &argName : var.second.argumentNames) {
+        for (auto &argName: var.second.argumentNames) {
             PyObject *o = PyUnicode_FromString(argName.c_str());
             PyList_Append(argList, o);
             Py_DECREF(o);
@@ -89,7 +88,7 @@ PyObject *SymbolTableUtil::New(const SymbolTable &table) {
     Py_DECREF(vars);
 
     vars = PyObject_GetAttrString(symInstance, "scripts");
-    for (auto &var : table.getScripts()) {
+    for (auto &var: table.getScripts()) {
         PyObject *scriptInstance = PyObject_CallNoArgs(scriptClass);
 
         // PyObject_SetAttrString increments reference on passed object, we dont decrement because the returned
@@ -143,22 +142,19 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
             throw std::runtime_error(Interpreter::getError());
         }
 
-        mpfr::mpreal v;
-        if (PyMpReal_Check(value)) {
-            v = PyMpReal_AsMpReal(value);
-        } else if (PyFloat_Check(value)) {
-            v = PyFloat_AsDouble(value);
+        decimal::Decimal v;
+        if (PyFloat_Check(value)) {
+            v = decimal::Decimal(std::to_string(PyFloat_AsDouble(value)));
         } else if (PyLong_Check(value)) {
-            v = PyLong_AsDouble(value);
+            v = decimal::Decimal(std::to_string(PyLong_AsDouble(value)));
         } else {
             Py_DECREF(attr);
             throw std::runtime_error("Variable value must be float or long");
         }
 
         try {
-            ret.setVariable(k, v, -1);
-        }
-        catch (const std::exception &e) {
+            ret.setVariable(k, v);
+        } catch (const std::exception &e) {
             Py_DECREF(attr);
             throw e;
         }
@@ -194,20 +190,18 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
             throw std::runtime_error(Interpreter::getError());
         }
 
-        mpfr::mpreal v;
-        if (PyMpReal_Check(value)) {
-            v = PyMpReal_AsMpReal(value);
-        } else if (PyFloat_Check(value)) {
-            v = PyFloat_AsDouble(value);
+        decimal::Decimal v;
+        if (PyFloat_Check(value)) {
+            v = decimal::Decimal(std::to_string(PyFloat_AsDouble(value)));
         } else if (PyLong_Check(value)) {
-            v = PyLong_AsDouble(value);
+            v = decimal::Decimal(std::to_string(PyLong_AsDouble(value)));
         } else {
             Py_DECREF(attr);
-            throw std::runtime_error("Constant value must be float or long");
+            throw std::runtime_error("Variable value must be float or long");
         }
 
         try {
-            ret.setConstant(k, v, -1);
+            ret.setConstant(k, v);
         }
         catch (const std::exception &e) {
             Py_DECREF(attr);
@@ -429,7 +423,7 @@ SymbolTable SymbolTableUtil::Cleanup(const SymbolTable &table) {
 
     std::vector<std::string> scriptKeys;
 
-    for (auto &script : ret.getScripts()) {
+    for (auto &script: ret.getScripts()) {
         scriptKeys.emplace_back(script.first);
 
         if (script.second.callback == NULL) {
@@ -440,7 +434,7 @@ SymbolTable SymbolTableUtil::Cleanup(const SymbolTable &table) {
         Py_DECREF(script.second.callback);
     }
 
-    for (auto &key : scriptKeys) {
+    for (auto &key: scriptKeys) {
         ret.remove(key);
     }
 

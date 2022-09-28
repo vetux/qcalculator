@@ -17,19 +17,14 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_MPREALMODULE_HPP
-#define QCALC_MPREALMODULE_HPP
+#ifndef QCALC_SETTINGCONSTANTS_HPP
+#define QCALC_SETTINGCONSTANTS_HPP
 
-namespace MprealModule {
-    /**
-     * Initialize the mpreal python module,
-     * this appends logic to the cpython init tab
-     * and should therefore be called before initializing cpython.
-     *
-     * @param globalTable
-     * @param tableChangeCallback
-     */
-    void initialize();
-}
+#include "settings/settings.hpp"
 
-#endif //QCALC_MPREALMODULE_HPP
+const Setting SETTING_PRECISION = {"_qcalc_precision_internal", 100};
+const Setting SETTING_ROUNDING = {"_qcalc_rounding_internal", MPD_ROUND_HALF_EVEN};
+const Setting SETTING_SAVE_SYM_HISTORY = {"_qcalc_save_sym_hist", true};
+const Setting SETTING_WARN_INEXACT = {"_qcalc_warn_inexact", true};
+
+#endif //QCALC_SETTINGCONSTANTS_HPP

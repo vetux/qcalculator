@@ -20,7 +20,7 @@
 #ifndef QCALC_TERMINALDIALOG_HPP
 #define QCALC_TERMINALDIALOG_HPP
 
-#include <QDialog>
+#include <QMainWindow>
 #include <QAction>
 #include <QMenu>
 
@@ -28,14 +28,17 @@
 
 #include "pycx/interpreter.hpp"
 
-class TerminalDialog : public QDialog {
+class TerminalDialog : public QMainWindow {
 Q_OBJECT
 public:
-    explicit TerminalDialog(QWidget *parent = nullptr) : QDialog(parent) {
+    explicit TerminalDialog(QWidget *parent = nullptr) : QMainWindow(parent) {
         term = new TerminalWidget();
         connect(term, SIGNAL(onReturnPressed()), this, SLOT(onTerminalReturnPressed()));
-        setLayout(new QVBoxLayout());
-        layout()->addWidget(term);
+        auto *widget = new QWidget;
+        widget->setLayout(new QVBoxLayout());
+        widget->layout()->addWidget(term);
+        widget->layout()->setMargin(0);
+        setCentralWidget(widget);
     }
 
 private slots:

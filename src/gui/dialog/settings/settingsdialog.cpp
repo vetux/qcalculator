@@ -105,28 +105,20 @@ int SettingsDialog::getPrecision() {
     return generalTab->getPrecision();
 }
 
-void SettingsDialog::setRoundingMode(mpfr_rnd_t rounding) {
+void SettingsDialog::setRoundingMode(decimal::round rounding) {
     generalTab->setRounding(rounding);
 }
 
-mpfr_rnd_t SettingsDialog::getRoundingMode() {
+decimal::round SettingsDialog::getRoundingMode() {
     return generalTab->getRounding();
 }
 
-void SettingsDialog::setFormattingPrecision(int precision) {
-    generalTab->setFormatPrecision(precision);
+void SettingsDialog::setShowInexactWarning(bool showWarning) {
+    generalTab->setShowInexactWarning(showWarning);
 }
 
-int SettingsDialog::getFormattingPrecision() {
-    return generalTab->getFormatPrecision();
-}
-
-void SettingsDialog::setFormattingRoundMode(mpfr_rnd_t mode) {
-    generalTab->setFormatRounding(mode);
-}
-
-mpfr_rnd_t SettingsDialog::getFormattingRoundMode() {
-    return generalTab->getFormatRounding();
+bool SettingsDialog::getShowInexactWarning() {
+    return generalTab->getShowInexactWarning();
 }
 
 void SettingsDialog::onModuleEnableChanged(AddonItemWidget *item) {

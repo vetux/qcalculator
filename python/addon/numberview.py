@@ -22,7 +22,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import qcalc as gui
-import mpreal
+import decimal
 
 from PySide2 import QtCore, QtWidgets
 
@@ -39,13 +39,8 @@ def int_to_bool_list(num):
     return [bool(num & (1 << n)) for n in range(64)]
 
 
-# https://stackoverflow.com/q/354038
 def is_number(s):
-    try:
-        mpreal.mpreal(s)
-        return True
-    except ValueError:
-        return False
+    return not decimal.Decimal(s).is_nan()
 
 
 class BitButton(QtWidgets.QPushButton):
@@ -200,12 +195,12 @@ class BitViewWidget(QtWidgets.QWidget):
             self.set_bits_value(0)
             self.setEnabled(False)
             return
-        value = mpreal.mpreal(value_string)
-        if value < mpreal.mpreal(0):
+        value = decimal.Decimal(value_string)
+        if value < decimal.Decimal(0):
             self.set_bits_value(0)
             self.setEnabled(False)
             return
-        if not value.is_integer():
+        if value != value.to_integral_value():
             self.set_bits_value(0)
             self.setEnabled(False)
             return
@@ -267,10 +262,40 @@ class NumeralSystemWidget(QtWidgets.QWidget):
         binlayout.addWidget(self.bintext, 1)
         binlayout.addWidget(label, 0)
 
+        scilayout = QtWidgets.QHBoxLayout()
+        label = QtWidgets.QLabel(self)
+        label.setText("Scientific")
+        label.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred))
+        label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        label.setMinimumSize(70, 0)
+        self.scitext = QtWidgets.QLineEdit(self)
+        scilayout.addWidget(self.scitext, 1)
+        scilayout.addWidget(label, 0)
+
+        unilayout = QtWidgets.QHBoxLayout()
+        label = QtWidgets.QLabel(self)
+        label.setText("Unicode")
+        label.setSizePolicy(QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Preferred))
+        label.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        label.setMinimumSize(70, 0)
+        self.unitext = QtWidgets.QLineEdit(self)
+        unilayout.addWidget(self.unitext, 1)
+        unilayout.addWidget(label, 0)
+
+        self.layout().addLayout(scilayout)
         self.layout().addLayout(hexlayout)
         self.layout().addLayout(octlayout)
         self.layout().addLayout(binlayout)
+        self.layout().addLayout(unilayout)
 
+        QtCore.QObject.connect(self.scitext,
+                               QtCore.SIGNAL("textChanged(const QString &)"),
+                               self,
+                               QtCore.SLOT("slot_scientific_editing_finished()"))
+        QtCore.QObject.connect(self.unitext,
+                               QtCore.SIGNAL("textChanged(const QString &)"),
+                               self,
+                               QtCore.SLOT("slot_unicode_editing_finished()"))
         QtCore.QObject.connect(self.hextext,
                                QtCore.SIGNAL("textChanged(const QString &)"),
                                self,
@@ -284,52 +309,83 @@ class NumeralSystemWidget(QtWidgets.QWidget):
                                self,
                                QtCore.SLOT("slot_binary_editing_finished()"))
 
+    def slot_scientific_editing_finished(self):
+        if self.scitext.isModified():
+            try:
+                self.slot_set_value(decimal.Decimal(str(decimal.Decimal(self.scitext.text()))))
+            except:
+                self.unitext.setText("")
+                self.hextext.setText("")
+                self.octtext.setText("")
+                self.bintext.setText("")
+
+    def slot_unicode_editing_finished(self):
+        if self.unitext.isModified():
+            try:
+                self.slot_set_value(QtCore.QChar(self.unitext.text()[0]).digitValue())
+            except:
+                self.scitext.setText("")
+                self.hextext.setText("")
+                self.octtext.setText("")
+                self.bintext.setText("")
+
     def slot_hex_editing_finished(self):
         if self.hextext.isModified():
             try:
-                val = mpreal.from_hex(self.hextext.text())
-                self.slot_set_value(val)
+                self.slot_set_value(decimal.Decimal(int(self.hextext.text(), 16)))
             except:
+                self.scitext.setText("")
+                self.unitext.setText("")
                 self.octtext.setText("")
                 self.bintext.setText("")
 
     def slot_octal_editing_finished(self):
         if self.octtext.isModified():
             try:
-                self.slot_set_value(mpreal.from_octal(self.octtext.text()))
+                self.slot_set_value(decimal.Decimal(int(self.octtext.text(), 8)))
             except:
+                self.scitext.setText("")
+                self.unitext.setText("")
                 self.hextext.setText("")
                 self.bintext.setText("")
 
     def slot_binary_editing_finished(self):
         if self.bintext.isModified():
             try:
-                self.slot_set_value(mpreal.from_binary(self.bintext.text()))
+                self.slot_set_value(decimal.Decimal(int(self.bintext.text(), 2)))
             except:
+                self.scitext.setText("")
+                self.unitext.setText("")
                 self.hextext.setText("")
-                self.bintext.setText("")
+                self.octtext.setText("")
 
     def slot_set_value(self, value, signal = True):
-        r = mpreal.mpreal
+        r = decimal.Decimal(0)
         try:
-            r = mpreal.mpreal(value)
+            r = decimal.Decimal(value)
         except:
-            try:
-                r = mpreal.from_decimal(value)
-            except:
-                if not signal:
-                    self.hextext.setText("")
-                    self.octtext.setText("")
-                    self.bintext.setText("")
-                return
-        if signal:
-            self.signal_value_changed.emit(mpreal.to_decimal(r))
+            if not signal:
+                self.scitext.setText("")
+                self.unitext.setText("")
+                self.hextext.setText("")
+                self.octtext.setText("")
+                self.bintext.setText("")
+            return
 
-        if r.is_integer():
-            self.hextext.setText(mpreal.to_hex(r))
-            self.octtext.setText(mpreal.to_octal(r))
-            self.bintext.setText(mpreal.to_binary(r))
+        if signal:
+            self.signal_value_changed.emit(str(r))
+
+        self.scitext.setText('%E' % r)
+
+        ri = r.to_integral_value()
+
+        if r == ri:
+            self.unitext.setText(chr(int(str(ri))))
+            self.hextext.setText(hex(int(str(ri))))
+            self.octtext.setText(oct(int(str(ri))))
+            self.bintext.setText(bin(int(str(ri))))
         elif not signal:
+            self.unitext.setText("")
             self.hextext.setText("")
             self.octtext.setText("")
             self.bintext.setText("")

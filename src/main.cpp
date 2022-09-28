@@ -23,7 +23,6 @@
 
 #include "pycx/interpreter.hpp"
 #include "pycx/modules/stdredirmodule.hpp"
-#include "pycx/modules/mprealmodule.hpp"
 #include "pycx/modules/exprtkmodule.hpp"
 
 #include "io/paths.hpp"
@@ -46,7 +45,6 @@ int main(int argc, char *argv[]) {
     QApplication::setApplicationVersion("v0.5.0");
 
     StdRedirModule::initialize();
-    MprealModule::initialize();
     ExprtkModule::initialize();
     Interpreter::initialize();
     Interpreter::addModuleDir(Paths::getAddonDirectory());

@@ -25,7 +25,7 @@
 #include <set>
 #include <string>
 
-#include <mpfr.h>
+#include "math/arithmetictype.hpp"
 
 #include "addon/addonmanager.hpp"
 
@@ -48,17 +48,13 @@ public:
 
     int getPrecision();
 
-    void setRoundingMode(mpfr_rnd_t rounding);
+    void setRoundingMode(decimal::round rounding);
 
-    mpfr_rnd_t getRoundingMode();
+    decimal::round getRoundingMode();
 
-    void setFormattingPrecision(int precision);
+    void setShowInexactWarning(bool showWarning);
 
-    int getFormattingPrecision();
-
-    void setFormattingRoundMode(mpfr_rnd_t mode);
-
-    mpfr_rnd_t getFormattingRoundMode();
+    bool getShowInexactWarning();
 
 private slots:
 

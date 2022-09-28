@@ -25,7 +25,7 @@
 
 #include "../math/symboltable.hpp"
 
-#include "settings.hpp"
+#include "settings/settings.hpp"
 
 namespace Serializer {
     std::string serializeTable(const SymbolTable &table);
@@ -40,9 +40,9 @@ namespace Serializer {
 
     std::set<std::string> deserializeSet(const std::string &str);
 
-    int serializeRoundingMode(mpfr_rnd_t mode);
+    int serializeRoundingMode(decimal::round mode);
 
-    mpfr_rnd_t deserializeRoundingMode(int mode);
+    decimal::round deserializeRoundingMode(int mode);
 }
 
 #endif //QT_CALC_SERIALIZER_HPP

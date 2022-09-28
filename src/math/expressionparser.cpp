@@ -19,8 +19,8 @@
 
 #include "expressionparser.hpp"
 
-#include "../extern/exprtk_mpfr_adaptor.hpp"
-#include "../extern/exprtk.hpp"
+#include "extern/exprtk_mpdecimal_adaptor.hpp"
+#include "extern/exprtk.hpp"
 
 #include "scriptfunction.hpp"
 #include "scriptvarargfunction.hpp"
@@ -119,6 +119,8 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
         symbols.add_constant(constant.first, constant.second);
     }
 
+    symbols.add_constants();
+
     std::map<std::string, ArithmeticType> variables = symbolTable.getVariables();
     for (auto &variable : variables) {
         symbols.add_variable(variable.first, variable.second);
@@ -132,7 +134,7 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
         for (auto &v : variables) {
             if (symbolTable.getVariables().at(v.first) == v.second)
                 continue;
-            symbolTable.setVariable(v.first, v.second, -1);
+            symbolTable.setVariable(v.first, v.second);
         }
         return ret;
     } else {

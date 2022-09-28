@@ -23,6 +23,8 @@
 #include <string>
 #include <map>
 
+struct Setting;
+
 class Settings {
 public:
     enum Type {
@@ -61,9 +63,15 @@ public:
 
     explicit Settings(std::map<std::string, Entry> entries) : data(std::move(entries)) {}
 
-    void setValue(const std::string &key, const Entry &value) {
+    void update(const std::string &key, const Entry &value) {
         data[key] = value;
     }
+
+    void clear(const std::string &key) {
+        data.erase(key);
+    }
+
+    void clear(const Setting &s);
 
     Entry value(const std::string &key, const Entry &defaultValue = 0) const {
         if (data.find(key) == data.end())
@@ -72,12 +80,19 @@ public:
             return data.at(key);
     }
 
+    Entry value(const Setting &setting) const;
+
     const std::map<std::string, Entry> &entries() const {
         return data;
     }
 
 private:
     std::map<std::string, Entry> data;
+};
+
+struct Setting {
+    std::string key;
+    Settings::Entry entry;
 };
 
 #endif //QCALC_SETTINGS_HPP

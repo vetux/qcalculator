@@ -19,9 +19,7 @@
 
 #include "serializer.hpp"
 
-#include "../extern/json.hpp"
-
-#include "math/numberformat.hpp"
+#include "extern/json.hpp"
 
 std::string Serializer::serializeTable(const SymbolTable &table) {
     nlohmann::json j;
@@ -31,8 +29,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     for (auto &p: table.getVariables()) {
         nlohmann::json t;
         t["name"] = p.first;
-        t["value"] = p.second.toString();
-        t["decimals"] = table.getVariableDecimals().at(p.first);
+        t["value"] = p.second.repr();
         tmp.emplace_back(t);
     }
     j["variables"] = tmp;
@@ -41,8 +38,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     for (auto &p: table.getConstants()) {
         nlohmann::json t;
         t["name"] = p.first;
-        t["value"] = p.second.toString();
-        t["decimals"] = table.getConstantDecimals().at(p.first);
+        t["value"] = p.second.repr();
         tmp.emplace_back(t);
     }
     j["constants"] = tmp;
@@ -68,29 +64,16 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
     auto tmp = j["variables"].get<std::vector<nlohmann::json>>();
     for (auto &v: tmp) {
         std::string name = v["name"];
-        int decimals = -1;
-        mpfr_prec_t prec = mpfr::digits2bits(v["value"].get<std::string>().size());
-        ArithmeticType value = mpfr::mpreal(v["value"].get<std::string>(), prec, 10, MPFR_RNDN);
-
-        if (v.find("decimals") != v.end()) {
-            decimals = v["decimals"];
-        }
-
-        ret.setVariable(name, value, decimals);
+        ArithmeticType value = ArithmeticType (v["value"].get<std::string>());
+        ret.setVariable(name, value);
     }
 
     tmp = j["constants"].get<std::vector<nlohmann::json>>();
     for (auto &v: tmp) {
         std::string name = v["name"];
-        int decimals = -1;
-        mpfr_prec_t prec = mpfr::digits2bits(v["value"].get<std::string>().size());;
-        ArithmeticType value = mpfr::mpreal(v["value"].get<std::string>(), prec, 10, MPFR_RNDN);
+        ArithmeticType value = decimal::Decimal(v["value"].get<std::string>());
 
-        if (v.find("decimals") != v.end()) {
-            decimals = v["decimals"];
-        }
-
-        ret.setConstant(name, value, decimals);
+        ret.setConstant(name, value);
     }
 
     tmp = j["functions"].get<std::vector<nlohmann::json>>();
@@ -134,11 +117,11 @@ Settings Serializer::deserializeSettings(const std::string &str) {
         const std::string &key = entry.key();
         const auto &value = entry.value();
         if (value.is_number_integer()) {
-            ret.setValue(key, entry.value().get<int>());
+            ret.update(key, entry.value().get<int>());
         } else if (value.is_number_float()) {
-            ret.setValue(key, entry.value().get<float>());
+            ret.update(key, entry.value().get<float>());
         } else if (value.is_string()) {
-            ret.setValue(key, entry.value().get<std::string>());
+            ret.update(key, entry.value().get<std::string>());
         }
     }
     return ret;
@@ -155,24 +138,10 @@ std::set<std::string> Serializer::deserializeSet(const std::string &str) {
     return j["data"];
 }
 
-int Serializer::serializeRoundingMode(mpfr_rnd_t mode) {
+int Serializer::serializeRoundingMode(decimal::round mode) {
     return (int) mode;
 }
 
-mpfr_rnd_t Serializer::deserializeRoundingMode(int mode) {
-    switch (mode) {
-        default:
-        case (int) MPFR_RNDN:
-            return MPFR_RNDN;
-        case (int) MPFR_RNDZ:
-            return MPFR_RNDZ;
-        case (int) MPFR_RNDU:
-            return MPFR_RNDU;
-        case (int) MPFR_RNDD:
-            return MPFR_RNDD;
-        case (int) MPFR_RNDA:
-            return MPFR_RNDA;
-        case (int) MPFR_RNDF:
-            return MPFR_RNDF;
-    }
+decimal::round Serializer::deserializeRoundingMode(int mode) {
+    return (decimal::round)mode;
 }

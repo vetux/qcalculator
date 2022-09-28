@@ -22,7 +22,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import exprtk
-import mpreal
+import decimal
 
 class CustomCallbacks:
     def __init__(self):
@@ -45,24 +45,6 @@ callbacks = CustomCallbacks
 
 def load():
     print("Loading exprtk sample addon")
-
-    # When setting the default precision or rounding through a script
-    # this also affects the native precision ( But not the output formatting precision.) and
-    # user configured rounding mode,
-    # and should therefore be reset to the original value before returning control to the native side.
-    original_precision = mpreal.mpreal.get_default_precision()
-    original_rounding = mpreal.mpreal.get_default_rounding()
-
-    mpreal.mpreal.set_default_precision(9)
-    mpreal.mpreal.set_default_rounding(mpreal.RoundingMode.ROUND_AWAY_FROM_ZERO)
-
-    x = mpreal.mpreal(1)
-    y = mpreal.mpreal(3)
-
-    z = x / y
-    z.set_precision(3)
-
-    print("MpReal Value: " + str(z))
 
     global callbacks
 
@@ -89,9 +71,6 @@ def load():
                                         sym)
 
     print("Variable: " + str(result[1].get_variable("pyVar")))
-
-    mpreal.mpreal.set_default_precision(original_precision)
-    mpreal.mpreal.set_default_rounding(original_rounding)
 
 
 def unload():

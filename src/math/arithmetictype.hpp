@@ -20,8 +20,8 @@
 #ifndef QCALC_ARITHMETICTYPE_HPP
 #define QCALC_ARITHMETICTYPE_HPP
 
-#include "../extern/mpreal.h"
+#include "decimal.hh"
 
-typedef mpfr::mpreal ArithmeticType;
+typedef decimal::Decimal ArithmeticType;
 
 #endif //QCALC_ARITHMETICTYPE_HPP

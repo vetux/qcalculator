@@ -20,11 +20,11 @@
 #ifndef QCALC_SYMBOLSDIALOG_HPP
 #define QCALC_SYMBOLSDIALOG_HPP
 
-#include <QDialog>
+#include <QMainWindow>
 
-#include "../widgets/symbolseditor.hpp"
+#include "gui/widgets/symbolseditor.hpp"
 
-class SymbolsDialog : public QDialog {
+class SymbolsDialog : public QMainWindow {
 Q_OBJECT
 signals:
 

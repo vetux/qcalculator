@@ -24,9 +24,6 @@
 import qcalc as gui
 from PySide2 import QtCore, QtWidgets
 
-import mpreal
-import exprtk
-
 class KeyCode:
     START = 0
 

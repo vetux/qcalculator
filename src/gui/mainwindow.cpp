@@ -34,9 +34,8 @@
 #include "io/paths.hpp"
 #include "io/serializer.hpp"
 #include "io/fileoperations.hpp"
-#include "settingconstants.hpp"
+#include "settings/settingconstants.hpp"
 
-#include "math/numberformat.hpp"
 #include "math/expressionparser.hpp"
 
 #include "dialog/settings/settingsdialog.hpp"
@@ -47,10 +46,11 @@
 #include "widgets/symbolseditor.hpp"
 
 #include "pycx/modules/exprtkmodule.hpp"
-#include "pycx/modules/mprealmodule.hpp"
 #include "pycx/modules/stdredirmodule.hpp"
 
 #include "pycx/interpreter.hpp"
+
+#include "extern/exprtk_mpdecimal_adaptor.hpp"
 
 static const std::string ADDONS_FILE = "/addons.json";
 static const std::string SETTINGS_FILE = "/settings.json";
@@ -96,6 +96,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             this,
             SLOT(onHistoryTextDoubleClicked(const QString &)));
 
+    decimal::context.emax(MPD_MAX_EMAX);
+    decimal::context.emin(MPD_MIN_EMIN);
+
     loadSettings();
 
     loadSymbolTablePathHistory();
@@ -117,18 +120,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
                                                       return onAddonUnloadFail(module, error);
                                                   });
 
-    std::string enabledAddonsFilePath = Paths::getAppDataDirectory().append(ADDONS_FILE);
+    enabledAddonsFilePath = Paths::getAppDataDirectory().append(ADDONS_FILE).c_str();
 
-    std::set<std::string> enabledAddons;
-    if (QFile(enabledAddonsFilePath.c_str()).exists()) {
-        try {
-            enabledAddons = Serializer::deserializeSet(FileOperations::fileReadAllText(enabledAddonsFilePath));
-        }
-        catch (const std::runtime_error &e) {
-            QMessageBox::warning(this, "Failed to load enabled addons", e.what());
-            enabledAddons.clear();
-        }
-    }
+    std::set<std::string> enabledAddons = loadEnabledAddons();
 
     //Check for enabled addons which dont exist anymore.
     std::set<std::string> availableAddons;
@@ -144,7 +138,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 MainWindow::~MainWindow() = default;
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    saveSettings();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
@@ -185,40 +178,29 @@ void MainWindow::onActionSettings() {
 
     dialog.setEnabledAddons(addonManager->getActiveAddons());
 
-    dialog.setPrecision(settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt());
+    dialog.setPrecision(settings.value(SETTING_PRECISION).toInt());
     dialog.setRoundingMode(Serializer::deserializeRoundingMode(
-            settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt()));
-
-    dialog.setFormattingPrecision(settings.value(SETTING_KEY_PRECISION_F, SETTING_DEFAULT_PRECISION_F).toInt());
-    dialog.setFormattingRoundMode(Serializer::deserializeRoundingMode(
-            settings.value(SETTING_KEY_ROUNDING_F, SETTING_DEFAULT_ROUNDING_F).toInt()));
+            settings.value(SETTING_ROUNDING).toInt()));
+    dialog.setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
 
     dialog.show();
 
     if (dialog.exec() == QDialog::Accepted) {
-        settings.setValue(SETTING_KEY_PRECISION, dialog.getPrecision());
-        settings.setValue(SETTING_KEY_ROUNDING, dialog.getRoundingMode());
-        settings.setValue(SETTING_KEY_PRECISION_F, dialog.getFormattingPrecision());
-        settings.setValue(SETTING_KEY_ROUNDING_F, dialog.getFormattingRoundMode());
-        mpfr::mpreal::set_default_prec(dialog.getPrecision());
-        mpfr::mpreal::set_default_rnd(dialog.getRoundingMode());
-        try {
-            std::set<std::string> addons = dialog.getEnabledAddons();
-            std::string dataDir = Paths::getAppDataDirectory();
+        settings.update(SETTING_PRECISION.key, dialog.getPrecision());
+        settings.update(SETTING_ROUNDING.key, dialog.getRoundingMode());
+        settings.update(SETTING_WARN_INEXACT.key, dialog.getShowInexactWarning());
 
-            if (!QDir(dataDir.c_str()).exists())
-                QDir().mkpath(dataDir.c_str());
+        decimal::context.prec(settings.value(SETTING_PRECISION).toInt());
+        decimal::context.round(settings.value(SETTING_ROUNDING).toInt());
 
-            FileOperations::fileWriteAllText(dataDir.append(ADDONS_FILE), Serializer::serializeSet(addons));
-        }
-        catch (const std::runtime_error &e) {
-            QMessageBox::warning(this, "Failed to save enabled addons", e.what());
-        }
+        saveEnabledAddons(dialog.getEnabledAddons());
+        saveSettings();
     }
 }
 
 void MainWindow::onActionExit() {
     saveSettings();
+    addonManager->setActiveAddons({}); //Unload addons
     QCoreApplication::quit();
 }
 
@@ -289,8 +271,8 @@ void MainWindow::onActionEditSymbolTable() {
         symbolsDialog = new SymbolsDialog(symbolTable,
                                           this);
         connect(symbolsDialog,
-                &QDialog::finished,
-                [this](int) {
+                &QMainWindow::destroyed,
+                [this]() {
                     symbolsDialog = nullptr;
                 });
         connect(symbolsDialog,
@@ -325,15 +307,15 @@ void MainWindow::onHistoryTextDoubleClicked(const QString &text) {
 
 QString MainWindow::evaluateExpression(const QString &expression) {
     try {
-        auto formatPrec = settings.value(SETTING_KEY_PRECISION_F, SETTING_DEFAULT_PRECISION_F).toInt();
-        auto formatRnd = Serializer::deserializeRoundingMode(
-                settings.value(SETTING_KEY_ROUNDING_F, SETTING_DEFAULT_ROUNDING_F).toInt());
-
+        decimal::context.clear_status();
         auto v = ExpressionParser::evaluate(expression.toStdString(), symbolTable);
-
+        if (settings.value(SETTING_WARN_INEXACT).toInt() && decimal::context.status() & MPD_Inexact) {
+            QMessageBox::warning(this, "Inexact result",
+                                 "Result is inexact, increase the precision to compute an exact result.");
+        }
         onSymbolTableChanged(symbolTable);
 
-        QString ret = NumberFormat::toDecimal(v, formatPrec, formatRnd).c_str();
+        QString ret = v.format("f").c_str();
         emit signalExpressionEvaluated(expression, ret);
         return ret;
     } catch (const std::runtime_error &e) {
@@ -353,9 +335,29 @@ void MainWindow::loadSettings() {
         }
     }
 
-    mpfr::mpreal::set_default_prec(settings.value(SETTING_KEY_PRECISION, SETTING_DEFAULT_PRECISION).toInt());
-    mpfr::mpreal::set_default_rnd(Serializer::deserializeRoundingMode(
-            settings.value(SETTING_KEY_ROUNDING, SETTING_DEFAULT_ROUNDING).toInt()));
+    if (settings.value(SETTING_PRECISION).toInt() < 0) {
+        settings.clear(SETTING_PRECISION);
+    }
+
+    switch (settings.value(SETTING_ROUNDING).toInt()) {
+        case MPD_ROUND_UP:
+        case MPD_ROUND_DOWN:
+        case MPD_ROUND_CEILING:
+        case MPD_ROUND_FLOOR:
+        case MPD_ROUND_HALF_UP:
+        case MPD_ROUND_HALF_DOWN:
+        case MPD_ROUND_HALF_EVEN:
+        case MPD_ROUND_05UP:
+        case MPD_ROUND_TRUNC:
+        case MPD_ROUND_GUARD:
+            break;
+        default:
+            settings.clear(SETTING_ROUNDING);
+            break;
+    }
+
+    decimal::context.prec(settings.value(SETTING_PRECISION).toInt());
+    decimal::context.round(settings.value(SETTING_ROUNDING).toInt());
 
     if (symbolsDialog != nullptr) {
         symbolsDialog->setSymbols(symbolTable);
@@ -363,8 +365,6 @@ void MainWindow::loadSettings() {
 }
 
 void MainWindow::saveSettings() {
-    addonManager->setActiveAddons({}); //Unload addons
-
     try {
         std::string dir = Paths::getAppConfigDirectory();
 
@@ -374,6 +374,34 @@ void MainWindow::saveSettings() {
         FileOperations::fileWriteAllText(dir.append(SETTINGS_FILE), Serializer::serializeSettings(settings));
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to save settings", e.what());
+    }
+}
+
+std::set<std::string> MainWindow::loadEnabledAddons() {
+    if (QFile(enabledAddonsFilePath).exists()) {
+        try {
+            return Serializer::deserializeSet(FileOperations::fileReadAllText(enabledAddonsFilePath.toStdString()));
+        }
+        catch (const std::runtime_error &e) {
+            QMessageBox::warning(this, "Failed to load enabled addons", e.what());
+            return {};
+        }
+    } else {
+        return {};
+    }
+}
+
+void MainWindow::saveEnabledAddons(const std::set<std::string> &addons) {
+    try {
+        std::string dataDir = Paths::getAppDataDirectory();
+
+        if (!QDir(dataDir.c_str()).exists())
+            QDir().mkpath(dataDir.c_str());
+
+        FileOperations::fileWriteAllText(dataDir.append(ADDONS_FILE), Serializer::serializeSet(addons));
+    }
+    catch (const std::runtime_error &e) {
+        QMessageBox::warning(this, "Failed to save enabled addons", e.what());
     }
 }
 
@@ -414,7 +442,7 @@ void MainWindow::loadSymbolTablePathHistory() {
 }
 
 void MainWindow::saveSymbolTablePathHistory() {
-    if (!settings.value(SETTING_KEY_SAVE_SYM_HISTORY, SETTING_DEFAULT_SAVE_SYM_HISTORY).toInt()) {
+    if (!settings.value(SETTING_SAVE_SYM_HISTORY).toInt()) {
         return;
     }
 
@@ -455,7 +483,7 @@ void MainWindow::setupMenuBar() {
     menuTools->setTitle("Tools");
 
     actionOpenTerminal = new QAction(this);
-    actionOpenTerminal->setText("Open Console");
+    actionOpenTerminal->setText("Open Python Console");
     actionOpenTerminal->setObjectName("actionOpenTerminal");
     actionOpenTerminal->setShortcut(QKeySequence(Qt::CTRL + Qt::Key::Key_T));
 

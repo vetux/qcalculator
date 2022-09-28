@@ -15,8 +15,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import _exprtk
-from _mpreal import mpreal as mpreal
-
 
 class Function:
     def __init__(self, expression=None, argument_names=None):

@@ -23,17 +23,10 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 
-#include "../../math/numberformat.hpp"
-
-std::map<QString, QString> convertMap(const std::map<std::string, ArithmeticType> &map, const std::map<std::string, int> &prec) {
+std::map<QString, QString> convertMap(const std::map<std::string, ArithmeticType> &map) {
     std::map<QString, QString> ret;
     for (auto &p: map) {
-        int precision;
-        if (prec.at(p.first) >= 0)
-            precision = prec.at(p.first);
-        else
-            precision = mpfr::bits2digits(p.second.getPrecision());
-        ret[QString(p.first.c_str())] = NumberFormat::toDecimal(p.second, precision, MPFR_RNDN).c_str();
+        ret[QString(p.first.c_str())] = p.second.format("f").c_str();
     }
     return ret;
 }
@@ -108,8 +101,8 @@ SymbolsEditor::SymbolsEditor(QWidget *parent) : QWidget(parent) {
 void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
     symbolTable = symtable;
 
-    variablesEditor->setValues(convertMap(symbolTable.getVariables(), symbolTable.getVariableDecimals()));
-    constantsEditor->setValues(convertMap(symbolTable.getConstants(), symbolTable.getConstantDecimals()));
+    variablesEditor->setValues(convertMap(symbolTable.getVariables()));
+    constantsEditor->setValues(convertMap(symbolTable.getConstants()));
     functionsEditor->setFunctions(symbolTable.getFunctions());
     functionsEditor->setCurrentFunction(currentFunction);
     scriptsEditor->setScripts(symbolTable.getScripts());
@@ -127,22 +120,18 @@ void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
     } else if (symbolTable.hasScript(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add variable", "A script with the name already exists.");
     } else {
-        ArithmeticType valueConverted;
-        int decimals = NumberFormat::getDecimals(value.toStdString());
+        ArithmeticType valueConverted;;
         if (value.isEmpty()) {
             valueConverted = 0;
         } else {
             try {
-                valueConverted = NumberFormat::fromDecimal(value.toStdString(),
-                                                           mpfr::digits2bits(value.size()),
-                                                           MPFR_RNDN);
+                valueConverted = ArithmeticType(value.toStdString());
             } catch (const std::exception &e) {
-                decimals = 0;
                 valueConverted = 0;
                 QMessageBox::warning(this, "Failed to convert value", "Failed to parse value as decimal.");
             }
         }
-        symbolTable.setVariable(name.toStdString(), valueConverted, decimals);
+        symbolTable.setVariable(name.toStdString(), valueConverted);
         emit onSymbolsChanged(symbolTable);
     }
 }
@@ -156,19 +145,19 @@ void SymbolsEditor::onVariableNameChanged(const QString &originalName, const QSt
         emit onSymbolsChanged(symbolTable);
     } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to changed variable name", "A variable with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables(), symbolTable.getVariableDecimals()));
+        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasConstant(name.toStdString())) {
         QMessageBox::warning(this, "Failed to changed variable name", "A constant with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables(), symbolTable.getVariableDecimals()));
+        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasFunction(name.toStdString())) {
         QMessageBox::warning(this, "Failed to changed variable name", "A function with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables(), symbolTable.getVariableDecimals()));
+        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasScript(name.toStdString())) {
         QMessageBox::warning(this, "Failed to changed variable name", "A script with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables(), symbolTable.getVariableDecimals()));
+        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else {
         ArithmeticType value = symbolTable.getVariables().at(originalName.toStdString());
-        symbolTable.setVariable(name.toStdString(), value, symbolTable.getVariableDecimals().at(originalName.toStdString()));
+        symbolTable.setVariable(name.toStdString(), value);
         symbolTable.remove(originalName.toStdString());
         emit onSymbolsChanged(symbolTable);
     }
@@ -177,15 +166,13 @@ void SymbolsEditor::onVariableNameChanged(const QString &originalName, const QSt
 void SymbolsEditor::onVariableValueChanged(const QString &name, const QString &value) {
     ArithmeticType originalValue = symbolTable.getVariables().at(name.toStdString());
     ArithmeticType newValue;
-    int decimals = NumberFormat::getDecimals(value.toStdString());
     try {
-        newValue = NumberFormat::fromDecimal(value.toStdString(), mpfr::digits2bits(value.size()), MPFR_RNDN);
+        newValue = ArithmeticType(value.toStdString());
     } catch (const std::exception &e) {
-        decimals = symbolTable.getVariableDecimals().at(name.toStdString());
         newValue = originalValue;
         QMessageBox::warning(this, "Failed to convert value", "Failed to parse value as decimal.");
     }
-    symbolTable.setVariable(name.toStdString(), newValue, decimals);
+    symbolTable.setVariable(name.toStdString(), newValue);
     emit onSymbolsChanged(symbolTable);
 }
 
@@ -202,19 +189,17 @@ void SymbolsEditor::onConstantAdded(const QString &name, const QString &value) {
         QMessageBox::warning(this, "Failed to add constant", "A script with the name already exists.");
     } else {
         ArithmeticType valueConverted;
-        int decimals = NumberFormat::getDecimals(value.toStdString());
         if (value.isEmpty()) {
             valueConverted = 0;
         } else {
             try {
-                valueConverted = NumberFormat::fromDecimal(value.toStdString(), mpfr::digits2bits(value.size()), MPFR_RNDN);
+                valueConverted = ArithmeticType(value.toStdString());
             } catch (const std::exception &e) {
-                decimals = 0;
                 valueConverted = 0;
                 QMessageBox::warning(this, "Failed to convert value", "Failed to parse value as decimal.");
             }
         }
-        symbolTable.setConstant(name.toStdString(), valueConverted, decimals);
+        symbolTable.setConstant(name.toStdString(), valueConverted);
         emit onSymbolsChanged(symbolTable);
     }
 }
@@ -228,19 +213,19 @@ void SymbolsEditor::onConstantNameChanged(const QString &originalName, const QSt
         emit onSymbolsChanged(symbolTable);
     } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change constant name", "A variable with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables(), symbolTable.getVariableDecimals()));
+        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasConstant(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change constant name", "A constant with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables(), symbolTable.getVariableDecimals()));
+        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasFunction(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change constant name", "A function with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables(), symbolTable.getVariableDecimals()));
+        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else if (symbolTable.hasScript(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change constant name", "A script with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables(), symbolTable.getVariableDecimals()));
+        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else {
         ArithmeticType value = symbolTable.getConstants().at(originalName.toStdString());
-        symbolTable.setConstant(name.toStdString(), value, symbolTable.getConstantDecimals().at(name.toStdString()));
+        symbolTable.setConstant(name.toStdString(), value);
         symbolTable.remove(originalName.toStdString());
         emit onSymbolsChanged(symbolTable);
     }
@@ -249,15 +234,13 @@ void SymbolsEditor::onConstantNameChanged(const QString &originalName, const QSt
 void SymbolsEditor::onConstantValueChanged(const QString &name, const QString &value) {
     ArithmeticType originalValue = symbolTable.getConstants().at(name.toStdString());
     ArithmeticType newValue;
-    int decimals = NumberFormat::getDecimals(value.toStdString());
     try {
-        newValue = NumberFormat::fromDecimal(value.toStdString(), mpfr::digits2bits(value.size()), MPFR_RNDN);
+        newValue = ArithmeticType(value.toStdString());
     } catch (const std::exception &e) {
-        decimals = symbolTable.getConstantDecimals().at(name.toStdString());
         newValue = originalValue;
         QMessageBox::warning(this, "Failed to convert value", "Failed to parse value as decimal.");
     }
-    symbolTable.setConstant(name.toStdString(), newValue, decimals);
+    symbolTable.setConstant(name.toStdString(), newValue);
     emit onSymbolsChanged(symbolTable);
 }
 

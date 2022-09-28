@@ -26,8 +26,9 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QStringListModel>
+#include <QCheckBox>
 
-#include <mpfr.h>
+#include "math/arithmetictype.hpp"
 
 class GeneralTab : public QWidget {
 Q_OBJECT
@@ -35,22 +36,18 @@ public slots:
 
     void setPrecision(int bits);
 
-    void setRounding(mpfr_rnd_t rounding);
-
-    void setFormatPrecision(int digits);
-
-    void setFormatRounding(mpfr_rnd_t rounding);
+    void setRounding(decimal::round rounding);
 
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
 
     int getPrecision();
 
-    mpfr_rnd_t getRounding();
+    decimal::round getRounding();
 
-    int getFormatPrecision();
+    void setShowInexactWarning(bool showWarning);
 
-    mpfr_rnd_t getFormatRounding();
+    bool getShowInexactWarning();
 
 private:
     QStringListModel roundingModel;
@@ -61,11 +58,8 @@ private:
     QLabel *roundingLabel;
     QComboBox *roundingComboBox;
 
-    QLabel *formatPrecisionLabel;
-    QSpinBox *formatPrecisionSpinBox;
-
-    QLabel *formatRoundingLabel;
-    QComboBox *formatRoundingComboBox;
+    QLabel *showInexactWarningLabel;
+    QCheckBox *showInexactWarningCheckBox;
 };
 
 #endif //QCALC_GENERALTAB_HPP

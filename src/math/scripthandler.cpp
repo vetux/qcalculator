@@ -20,7 +20,6 @@
 #include "scripthandler.hpp"
 
 #include "pycx/include.hpp"
-#include "pycx/types/pympreal.hpp"
 #include "pycx/interpreter.hpp"
 
 ArithmeticType ScriptHandler::run(PyObject *c, const std::vector<ArithmeticType> &a) {
@@ -31,7 +30,7 @@ ArithmeticType ScriptHandler::run(PyObject *c, const std::vector<ArithmeticType>
     PyObject *args = PyTuple_New(a.size());
     for (size_t i = 0; i < a.size(); i++) {
         auto &v = a.at(i);
-        PyObject *f = PyMpReal_FromMpReal(v);
+        PyObject *f = PyFloat_FromDouble(std::stod(v.format("f")));
         PyTuple_SetItem(args, i, f);
     }
 
@@ -42,14 +41,12 @@ ArithmeticType ScriptHandler::run(PyObject *c, const std::vector<ArithmeticType>
         throw std::runtime_error(Interpreter::getError());
     }
 
-    mpfr::mpreal ret;
+    decimal::Decimal ret;
 
-    if (PyMpReal_Check(pyRet)) {
-        ret = PyMpReal_AsMpReal(pyRet);
-    } else if (PyFloat_Check(pyRet)) {
-        ret = PyFloat_AsDouble(pyRet);
+    if (PyFloat_Check(pyRet)) {
+        ret = decimal::Decimal(std::to_string(PyFloat_AsDouble(pyRet)));
     } else if (PyLong_Check(pyRet)) {
-        ret = PyLong_AsDouble(pyRet);
+        ret = decimal::Decimal(std::to_string(PyLong_AsDouble(pyRet)));
     }
 
     if (PyErr_Occurred() != NULL) {

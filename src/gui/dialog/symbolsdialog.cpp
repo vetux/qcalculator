@@ -23,16 +23,21 @@
 
 SymbolsDialog::SymbolsDialog(const SymbolTable &symbols,
                              QWidget *parent)
-        : QDialog(parent) {
-    setModal(false);
-    setWindowTitle("Symbols");
-    setLayout(new QVBoxLayout());
+        : QMainWindow(parent) {
+    setWindowTitle("Symbols Editor");
 
-    editor = new SymbolsEditor(this);
+    auto *widget = new QWidget;
+    widget->setLayout(new QVBoxLayout());
+
+    editor = new SymbolsEditor(widget);
 
     editor->setSymbols(symbols);
 
-    layout()->addWidget(editor);
+    widget->layout()->addWidget(editor);
+
+    widget->layout()->setMargin(0);
+
+    setCentralWidget(widget);
 
     connect(editor,
             SIGNAL(onSymbolsChanged(const SymbolTable &)),

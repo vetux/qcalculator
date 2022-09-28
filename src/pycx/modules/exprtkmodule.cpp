@@ -54,7 +54,7 @@ PyObject *evaluate(PyObject *self, PyObject *args) {
 
         PyObject *ret = PyTuple_New(2);
 
-        PyTuple_SetItem(ret, 0, PyFloat_FromDouble(value.toDouble()));
+        PyTuple_SetItem(ret, 0, PyFloat_FromDouble(std::stod(value.format("f"))));
         PyTuple_SetItem(ret, 1, SymbolTableUtil::New(symTable));
 
         SymbolTableUtil::Cleanup(symTable);

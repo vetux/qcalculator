@@ -17,22 +17,15 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_SETTINGCONSTANTS_HPP
-#define QCALC_SETTINGCONSTANTS_HPP
+#include "settings/settings.hpp"
 
-const char *const SETTING_KEY_PRECISION = "_qcalc_precision_internal";
-const int SETTING_DEFAULT_PRECISION = 4000;
+void Settings::clear(const Setting &s) {
+    data.erase(s.key);
+}
 
-const char *const SETTING_KEY_ROUNDING = "_qcalc_rounding_internal";
-const int SETTING_DEFAULT_ROUNDING = 0;
-
-const char *const SETTING_KEY_PRECISION_F = "_qcalc_precision_format";
-const int SETTING_DEFAULT_PRECISION_F = 100;
-
-const char *const SETTING_KEY_ROUNDING_F = "_qcalc_rounding_format";
-const int SETTING_DEFAULT_ROUNDING_F = 0;
-
-const char *const SETTING_KEY_SAVE_SYM_HISTORY = "_qcalc_save_sym_hist";
-const int SETTING_DEFAULT_SAVE_SYM_HISTORY = true;
-
-#endif //QCALC_SETTINGCONSTANTS_HPP
+Settings::Entry Settings::value(const Setting &setting) const {
+    if (data.find(setting.key) == data.end())
+        return setting.entry;
+    else
+        return data.at(setting.key);
+}

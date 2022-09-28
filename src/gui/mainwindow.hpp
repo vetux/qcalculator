@@ -28,9 +28,10 @@
 
 #include <bitset>
 #include <set>
+#include <bits/stl_set.h>
 
 #include "addon/addonmanager.hpp"
-#include "io/settings.hpp"
+#include "settings/settings.hpp"
 
 #include "math/symboltable.hpp"
 #include "math/numeralsystem.hpp"
@@ -99,6 +100,10 @@ private:
 
     void saveSettings();
 
+    std::set<std::string> loadEnabledAddons();
+
+    void saveEnabledAddons(const std::set<std::string> &addons);
+
     void loadSymbolTablePathHistory();
 
     void saveSymbolTablePathHistory();
@@ -147,6 +152,8 @@ private:
     std::string currentSymbolTablePath; // If the currently active symboltable was loaded from a file or saved to a file this path contains the path of the symbol table file.
 
     std::unique_ptr<AddonManager> addonManager;
+
+    QString enabledAddonsFilePath;
 };
 
 #endif // QCALC_MAINWINDOW_HPP
