@@ -384,8 +384,10 @@ class NumeralSystemWidget(QtWidgets.QWidget):
 
         if r == ri:
             value = int(str(ri))
-            if value < 0x10FFFF:
+            if value < 0x10FFFF and value > 0:
                 self.unitext.setText(chr(value))
+            else:
+                self.unitext.setText("")
             self.hextext.setText(hex(value))
             self.octtext.setText(oct(value))
             self.bintext.setText(bin(value))
