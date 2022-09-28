@@ -1,7 +1,7 @@
 """
 {
   "displayName": "Nilakantha Series",
-  "description": "Provides nilakantha series pi calculation script functions"
+  "description": "Provides nilakantha series pi calculation script function"
 }
 """
 
@@ -23,24 +23,25 @@
 
 import math
 import exprtk
+import decimal
 
 # Run the nilakantha series for the specified number of iterations and return the value.
 def nilakantha(iterations):
-    ret = 3
+    ret = decimal.Decimal(3)
     for i in range(iterations):
-        v = 4 / ((2 + 2 * i) * (3 + 2 * i) * (4 + 2 * i))
-        if i % 2 == 0:
+        v = decimal.Decimal(4) / ((decimal.Decimal(2) + decimal.Decimal(2) * decimal.Decimal(i)) * (decimal.Decimal(3) + decimal.Decimal(2) * decimal.Decimal(i)) * (decimal.Decimal(4) + decimal.Decimal(2) * decimal.Decimal(i)))
+        if decimal.Decimal(i) % decimal.Decimal(2) == decimal.Decimal(0):
             ret += v
         else:
             ret -= v
-    return ret
+    return str(ret)
 
 def callback(*args):
     return nilakantha(int(args[0]))
 
 def load():
     sym = exprtk.get_global_symtable()
-    sym.set_script("nilakantha", exprtk.ScriptFunction(callback, True))
+    sym.set_script("nilakantha", exprtk.ScriptFunction(callback, ["iterations"]))
     exprtk.set_global_symtable(sym)
 
 

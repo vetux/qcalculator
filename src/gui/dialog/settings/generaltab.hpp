@@ -38,12 +38,19 @@ public slots:
 
     void setRounding(decimal::round rounding);
 
+    void setExponentMax(int max);
+
+    void setExponentMin(int min);
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
 
     int getPrecision();
 
     decimal::round getRounding();
+
+    int getExponentMax();
+
+    int getExponentMin();
 
     void setShowInexactWarning(bool showWarning);
 
@@ -54,6 +61,12 @@ private:
 
     QLabel *precisionLabel;
     QSpinBox *precisionSpinBox;
+
+    QLabel *exponentMinLabel;
+    QSpinBox *exponentMinSpinBox;
+
+    QLabel *exponentMaxLabel;
+    QSpinBox *exponentMaxSpinBox;
 
     QLabel *roundingLabel;
     QComboBox *roundingComboBox;

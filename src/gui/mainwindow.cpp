@@ -96,9 +96,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             this,
             SLOT(onHistoryTextDoubleClicked(const QString &)));
 
-    decimal::context.emax(MPD_MAX_EMAX);
-    decimal::context.emin(MPD_MIN_EMIN);
-
     loadSettings();
 
     loadSymbolTablePathHistory();
@@ -179,6 +176,8 @@ void MainWindow::onActionSettings() {
     dialog.setEnabledAddons(addonManager->getActiveAddons());
 
     dialog.setPrecision(settings.value(SETTING_PRECISION).toInt());
+    dialog.setExponentMin(settings.value(SETTING_EXPONENT_MIN).toInt());
+    dialog.setExponentMax(settings.value(SETTING_EXPONENT_MAX).toInt());
     dialog.setRoundingMode(Serializer::deserializeRoundingMode(
             settings.value(SETTING_ROUNDING).toInt()));
     dialog.setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
@@ -187,11 +186,15 @@ void MainWindow::onActionSettings() {
 
     if (dialog.exec() == QDialog::Accepted) {
         settings.update(SETTING_PRECISION.key, dialog.getPrecision());
+        settings.update(SETTING_EXPONENT_MAX.key, dialog.getExponentMax());
+        settings.update(SETTING_EXPONENT_MIN.key, dialog.getExponentMin());
         settings.update(SETTING_ROUNDING.key, dialog.getRoundingMode());
         settings.update(SETTING_WARN_INEXACT.key, dialog.getShowInexactWarning());
 
         decimal::context.prec(settings.value(SETTING_PRECISION).toInt());
         decimal::context.round(settings.value(SETTING_ROUNDING).toInt());
+        decimal::context.emax(settings.value(SETTING_EXPONENT_MAX).toInt());
+        decimal::context.emin(settings.value(SETTING_EXPONENT_MIN).toInt());
 
         saveEnabledAddons(dialog.getEnabledAddons());
         saveSettings();
@@ -290,7 +293,7 @@ void MainWindow::onActionSymbolTableHistory() {
 }
 
 void MainWindow::onActionOpenTerminal() {
-    auto *d = new TerminalDialog(this);
+    auto *d = new TerminalWindow(this);
     d->setWindowTitle("Console");
     d->show();
 }
@@ -358,6 +361,8 @@ void MainWindow::loadSettings() {
 
     decimal::context.prec(settings.value(SETTING_PRECISION).toInt());
     decimal::context.round(settings.value(SETTING_ROUNDING).toInt());
+    decimal::context.emax(settings.value(SETTING_EXPONENT_MAX).toInt());
+    decimal::context.emin(settings.value(SETTING_EXPONENT_MIN).toInt());
 
     if (symbolsDialog != nullptr) {
         symbolsDialog->setSymbols(symbolTable);

@@ -48,6 +48,14 @@ public:
 
     int getPrecision();
 
+    void setExponentMax(int max);
+
+    int getExponentMax();
+
+    void setExponentMin(int min);
+
+    int getExponentMin();
+
     void setRoundingMode(decimal::round rounding);
 
     decimal::round getRoundingMode();

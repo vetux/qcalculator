@@ -21,21 +21,22 @@
 #define QCALC_SCRIPT_HPP
 
 #include <string>
+#include <utility>
 
 struct _object;
 typedef _object PyObject;
 
 struct Script {
     PyObject *callback = nullptr;
-    bool enableArguments = false; //If true the script is wrapped by a vararg function otherwise a function with 0 arguments is used.
+    std::vector<std::string> arguments = {}; //If not empty the script is wrapped by a vararg function otherwise a function with 0 arguments is used.
 
     Script() = default;
 
-    Script(PyObject *callback, bool enableArguments)
-            : callback(callback), enableArguments(enableArguments) {}
+    Script(PyObject *callback, std::vector<std::string> arguments)
+            : callback(callback), arguments(std::move(arguments)) {}
 
     bool operator==(const Script &other) const {
-        return callback == other.callback && enableArguments == other.enableArguments;
+        return callback == other.callback && arguments == other.arguments;
     }
 };
 

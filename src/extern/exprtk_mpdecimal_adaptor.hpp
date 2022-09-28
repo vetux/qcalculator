@@ -322,7 +322,7 @@ namespace exprtk {
 
                 template<typename T>
                 inline T equal_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    return decimal::Decimal(std::to_string(v0 == v1));
                 }
 
                 template<typename T>

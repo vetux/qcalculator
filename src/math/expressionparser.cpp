@@ -32,11 +32,11 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
 
     int varArgScriptCount = 0;
     int scriptCount = 0;
-    for (auto &v : symbolTable.getScripts()) {
-        if (v.second.enableArguments)
-            varArgScriptCount++;
-        else
+    for (auto &v: symbolTable.getScripts()) {
+        if (v.second.arguments.empty())
             scriptCount++;
+        else
+            varArgScriptCount++;
     }
 
     //Use vectors with fixed size to store the function objects as the symbol table itself only stores references.
@@ -48,24 +48,24 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
     std::vector<ScriptFunction<ArithmeticType>> scriptFunctions;
     scriptFunctions.resize(scriptCount);
 
-    for (auto &v : symbolTable.getScripts()) {
-        if (v.second.enableArguments) {
-            int index = varArgScriptIndex++;
-            assert(index < varArgScriptCount);
-            varArgScriptFunctions.at(index) = ScriptVarArgFunction<ArithmeticType>(v.second.callback);
-            symbols.add_function(v.first, varArgScriptFunctions.at(index));
-        } else {
+    for (auto &v: symbolTable.getScripts()) {
+        if (v.second.arguments.empty()) {
             int index = scriptIndex++;
             assert(index < scriptCount);
             scriptFunctions.at(index) = ScriptFunction<ArithmeticType>(v.second.callback);
             symbols.add_function(v.first, scriptFunctions.at(index));
+        } else {
+            int index = varArgScriptIndex++;
+            assert(index < varArgScriptCount);
+            varArgScriptFunctions.at(index) = ScriptVarArgFunction<ArithmeticType>(v.second.callback);
+            symbols.add_function(v.first, varArgScriptFunctions.at(index));
         }
     }
 
     assert(varArgScriptIndex == varArgScriptCount);
     assert(scriptIndex == scriptCount);
 
-    for (auto &v : symbolTable.getFunctions()) {
+    for (auto &v: symbolTable.getFunctions()) {
         switch (v.second.argumentNames.size()) {
             case 0:
                 compositor.add(
@@ -115,14 +115,14 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
         }
     }
 
-    for (auto &constant : symbolTable.getConstants()) {
+    for (auto &constant: symbolTable.getConstants()) {
         symbols.add_constant(constant.first, constant.second);
     }
 
     symbols.add_constants();
 
     std::map<std::string, ArithmeticType> variables = symbolTable.getVariables();
-    for (auto &variable : variables) {
+    for (auto &variable: variables) {
         symbols.add_variable(variable.first, variable.second);
     }
 
@@ -131,7 +131,7 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
 
     if (parser.compile(expr, expression)) {
         ArithmeticType ret = expression.value();
-        for (auto &v : variables) {
+        for (auto &v: variables) {
             if (symbolTable.getVariables().at(v.first) == v.second)
                 continue;
             symbolTable.setVariable(v.first, v.second);

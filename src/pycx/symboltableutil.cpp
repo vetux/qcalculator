@@ -96,12 +96,17 @@ PyObject *SymbolTableUtil::New(const SymbolTable &table) {
         // has to be cleaned up by calling SymbolTableUtil::Cleanup
         PyObject_SetAttrString(scriptInstance, "callback", var.second.callback);
 
-        PyObject *o = PyBool_FromLong(var.second.enableArguments);
-        PyObject_SetAttrString(scriptInstance, "enable_arguments", o);
+        PyObject *args = PyList_New(var.second.arguments.size());
+        for (auto i = 0; i < var.second.arguments.size(); i++) {
+            auto *arg = PyUnicode_FromString(var.second.arguments.at(i).c_str());
+            PyList_Append(args, arg);
+            Py_DECREF(arg);
+        }
+        PyObject_SetAttrString(scriptInstance, "arguments", args);
 
         PyDict_SetItemString(vars, var.first.c_str(), scriptInstance);
 
-        Py_DECREF(o);
+        Py_DECREF(args);
         Py_DECREF(scriptInstance);
     }
     Py_DECREF(vars);
@@ -380,33 +385,41 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
             throw std::runtime_error("Script value must have callback attribute");
         }
 
-        if (!PyObject_HasAttrString(value, "enable_arguments")) {
+        if (!PyObject_HasAttrString(value, "arguments")) {
             Py_DECREF(attr);
-            throw std::runtime_error("Script value must have enable_arguments attribute");
+            throw std::runtime_error("Script value must have arguments attribute");
         }
 
-        PyObject *enableArgs = PyObject_GetAttrString(value, "enable_arguments");
-        if (!PyBool_Check(enableArgs)) {
-            Py_DECREF(enableArgs);
+        PyObject *args = PyObject_GetAttrString(value, "arguments");
+        if (!PyList_Check(args)) {
+            Py_DECREF(args);
             Py_DECREF(attr);
-            throw std::runtime_error("Function enable_arguments must be bool");
+            throw std::runtime_error("Function arguments must be list");
         }
 
-        int eargs = PyObject_IsTrue(enableArgs);
-        if (eargs == -1) {
-            //Error indicator set? Documentation does not specify so we assume its not.
-            eargs = false;
+        std::vector<std::string> arguments;
+        auto argsSize = PyList_Size(args);
+        for (auto argsI = 0; argsI < argsSize; argsI++) {
+            auto *arg = PyList_GetItem(args, argsI);
+            if (!PyUnicode_Check(arg)){
+                Py_DECREF(arg);
+                Py_DECREF(args);
+                Py_DECREF(attr);
+                throw std::runtime_error("Function argument must be string");
+            }
+            auto argString = PyUnicode_AsUTF8(arg);
+            if (argString == nullptr)
+                throw std::runtime_error("Argument string is nullptr");
+            arguments.emplace_back(std::string(argString));
+            Py_DECREF(arg);
         }
 
-        s.enableArguments = eargs;
-
-        Py_DECREF(enableArgs);
+        s.arguments = arguments;
 
         try {
             ret.setScript(k, s);
         }
         catch (const std::exception &e) {
-            Py_DECREF(enableArgs);
             Py_DECREF(attr);
             throw e;
         }

@@ -56,10 +56,17 @@ int main(int argc, char *argv[]) {
             // Run the application as an interactive python interpreter
             // Does not work on win32 if the application is not using the console subsystem
             return Interpreter::runInteractiveLoop();
+        } else if (args.at(1) == "--terminal" || args.at(1) == "-t") {
+            TerminalWindow w;
+            w.show();
+            return QApplication::exec();
+        } else {
+            std::cout << "Invalid argument";
+            return 1;
         }
+    } else {
+        MainWindow w;
+        w.show();
+        return QApplication::exec();
     }
-
-    MainWindow w;
-    w.show();
-    return QApplication::exec();
 }

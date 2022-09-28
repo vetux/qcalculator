@@ -105,6 +105,22 @@ int SettingsDialog::getPrecision() {
     return generalTab->getPrecision();
 }
 
+void SettingsDialog::setExponentMax(int max) {
+    generalTab->setExponentMax(max);
+}
+
+int SettingsDialog::getExponentMax() {
+    return generalTab->getExponentMax();
+}
+
+void SettingsDialog::setExponentMin(int min) {
+    generalTab->setExponentMin(min);
+}
+
+int SettingsDialog::getExponentMin() {
+    return generalTab->getExponentMin();
+}
+
 void SettingsDialog::setRoundingMode(decimal::round rounding) {
     generalTab->setRounding(rounding);
 }

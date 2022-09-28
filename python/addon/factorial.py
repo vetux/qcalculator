@@ -1,7 +1,7 @@
 """
 {
-  "displayName": "Sample Addon - Factorial",
-  "description": "A sample addon which adds the factorial function as a script function."
+  "displayName": "Factorial",
+  "description": "This addon adds the factorial function as a script function."
 }
 """
 
@@ -31,7 +31,7 @@ def callback(*args):
 
 def load():
     sym = exprtk.get_global_symtable()
-    sym.set_script("factorial", exprtk.ScriptFunction(callback, True))
+    sym.set_script("factorial", exprtk.ScriptFunction(callback, ["n"]))
     exprtk.set_global_symtable(sym)
 
 

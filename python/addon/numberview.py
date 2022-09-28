@@ -40,7 +40,10 @@ def int_to_bool_list(num):
 
 
 def is_number(s):
-    return not decimal.Decimal(s).is_nan()
+    try:
+        return not decimal.Decimal(s).is_nan()
+    except decimal.InvalidOperation:
+        return False
 
 
 class BitButton(QtWidgets.QPushButton):

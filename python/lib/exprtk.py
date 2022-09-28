@@ -17,17 +17,17 @@
 import _exprtk
 
 class Function:
-    def __init__(self, expression=None, argument_names=None):
-        if argument_names is None:
-            argument_names = []
+    def __init__(self, expression=None, arguments=None):
+        if arguments is None:
+            arguments = []
         self.expression = expression
-        self.argument_names = argument_names
+        self.arguments = arguments
 
 
 class ScriptFunction:
-    def __init__(self, callback=None, enable_arguments=False):
+    def __init__(self, callback=None, arguments=[]):
         self.callback = callback
-        self.enable_arguments = enable_arguments
+        self.arguments = arguments
 
 
 class SymbolTable:

@@ -43,7 +43,10 @@ ArithmeticType ScriptHandler::run(PyObject *c, const std::vector<ArithmeticType>
 
     decimal::Decimal ret;
 
-    if (PyFloat_Check(pyRet)) {
+    if (PyUnicode_Check(pyRet)) {
+        auto *str = PyUnicode_AsUTF8(pyRet);
+        ret = decimal::Decimal(str);
+    } else if (PyFloat_Check(pyRet)) {
         ret = decimal::Decimal(std::to_string(PyFloat_AsDouble(pyRet)));
     } else if (PyLong_Check(pyRet)) {
         ret = decimal::Decimal(std::to_string(PyLong_AsDouble(pyRet)));

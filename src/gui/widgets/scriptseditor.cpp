@@ -47,16 +47,24 @@ ScriptsEditor::ScriptsEditor(QWidget *parent) : QWidget(parent) {
 
 void ScriptsEditor::setScripts(const std::map<std::string, Script> &scripts) {
     list->clear();
-    for (auto &p : scripts) {
+    for (auto &p: scripts) {
         auto *widget = new ScriptItemWidget(list);
         auto *item = new QListWidgetItem();
 
-        QString text = p.first.c_str();
+        std::string text = p.first.c_str();
 
-        if (p.second.enableArguments)
-            text.append(" - Arguments enabled");
+        if (p.second.arguments.empty()) {
+            text.append(" - No arguments");
+        } else {
+            text.append("(");
+            for (auto &arg: p.second.arguments) {
+                text.append(arg + ", ");
+            }
+            text.erase(text.end() - 2, text.end());
+            text.append(")");
+        }
 
-        widget->setText(text);
+        widget->setText(text.c_str());
 
         item->setSizeHint(widget->sizeHint());
 

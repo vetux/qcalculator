@@ -100,16 +100,16 @@ void GeneralTab::setRounding(decimal::round rounding) {
 GeneralTab::GeneralTab(QWidget *parent)
         : QWidget(parent) {
     roundingModel.setStringList({
-        "Round away from 0",
-        "Round toward 0 (truncate)",
-        "Round toward +infinity",
-        "Round toward -infinity",
-        "Round 0.5 up",
-        "Round 0.5 down",
-        "Round 0.5 to even",
-        "Round zero or five away from 0",
-        "Truncate, but set infinity"
-    });
+                                        "Round away from 0",
+                                        "Round toward 0 (truncate)",
+                                        "Round toward +infinity",
+                                        "Round toward -infinity",
+                                        "Round 0.5 up",
+                                        "Round 0.5 down",
+                                        "Round 0.5 to even",
+                                        "Round zero or five away from 0",
+                                        "Truncate, but set infinity"
+                                });
 
     precisionLabel = new QLabel(this);
     precisionSpinBox = new QSpinBox(this);
@@ -118,6 +118,22 @@ GeneralTab::GeneralTab(QWidget *parent)
             "The number of digits of precision. Beware that large values will result in more memory usage and slower computation time.");
     precisionSpinBox->setToolTip(
             "The number of digits of precision. Beware that large values will result in more memory usage and slower computation time.");
+
+    exponentMaxLabel = new QLabel(this);
+    exponentMaxSpinBox = new QSpinBox(this);
+    exponentMaxLabel->setText("Exponent Maximum");
+    exponentMaxLabel->setToolTip(
+            "The maximum value of *the* exponent. Beware that large values will result in more memory usage and slower computation time.");
+    exponentMaxSpinBox->setToolTip(
+            "The maximum value of *the* exponent. Beware that large values will result in more memory usage and slower computation time.");
+
+    exponentMinLabel = new QLabel(this);
+    exponentMinSpinBox = new QSpinBox(this);
+    exponentMinLabel->setText("Exponent Minimum");
+    exponentMinLabel->setToolTip(
+            "The minimum value of *the* exponent. Beware that large values will result in more memory usage and slower computation time.");
+    exponentMinSpinBox->setToolTip(
+            "The minimum value of *the* exponent. Beware that large values will result in more memory usage and slower computation time.");
 
     roundingLabel = new QLabel(this);
     roundingComboBox = new QComboBox(this);
@@ -128,7 +144,10 @@ GeneralTab::GeneralTab(QWidget *parent)
 
     precisionSpinBox->setRange(1, std::numeric_limits<int>().max());
 
-    auto* inexactWarnContainer = new QWidget(this);
+    exponentMinSpinBox->setRange(std::numeric_limits<int>().min(), -1);
+    exponentMaxSpinBox->setRange(1, std::numeric_limits<int>().max());
+
+    auto *inexactWarnContainer = new QWidget(this);
 
     showInexactWarningLabel = new QLabel(this);
     showInexactWarningCheckBox = new QCheckBox(this);
@@ -147,6 +166,10 @@ GeneralTab::GeneralTab(QWidget *parent)
 
     layout->addWidget(precisionLabel);
     layout->addWidget(precisionSpinBox);
+    layout->addWidget(exponentMaxLabel);
+    layout->addWidget(exponentMaxSpinBox);
+    layout->addWidget(exponentMinLabel);
+    layout->addWidget(exponentMinSpinBox);
     layout->addWidget(roundingLabel);
     layout->addWidget(roundingComboBox);
     layout->addWidget(inexactWarnContainer);
@@ -170,4 +193,20 @@ void GeneralTab::setShowInexactWarning(bool showWarning) {
 
 bool GeneralTab::getShowInexactWarning() {
     return showInexactWarningCheckBox->checkState() == Qt::Checked;
+}
+
+void GeneralTab::setExponentMax(int max) {
+    exponentMaxSpinBox->setValue(max);
+}
+
+void GeneralTab::setExponentMin(int min) {
+    exponentMinSpinBox->setValue(min);
+}
+
+int GeneralTab::getExponentMax() {
+    return exponentMaxSpinBox->value();
+}
+
+int GeneralTab::getExponentMin() {
+    return exponentMinSpinBox->value();
 }

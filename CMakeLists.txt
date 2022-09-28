@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0.0)
 
-project(QCalc)
+project(QCalculator)
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)

@@ -23,6 +23,8 @@
 #include "settings/settings.hpp"
 
 const Setting SETTING_PRECISION = {"_qcalc_precision_internal", 100};
+const Setting SETTING_EXPONENT_MAX = {"_qcalc_exponent_max", 999999};
+const Setting SETTING_EXPONENT_MIN = {"_qcalc_exponent_min", -999999};
 const Setting SETTING_ROUNDING = {"_qcalc_rounding_internal", MPD_ROUND_HALF_EVEN};
 const Setting SETTING_SAVE_SYM_HISTORY = {"_qcalc_save_sym_hist", true};
 const Setting SETTING_WARN_INEXACT = {"_qcalc_warn_inexact", true};

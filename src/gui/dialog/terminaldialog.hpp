@@ -28,10 +28,10 @@
 
 #include "pycx/interpreter.hpp"
 
-class TerminalDialog : public QMainWindow {
+class TerminalWindow : public QMainWindow {
 Q_OBJECT
 public:
-    explicit TerminalDialog(QWidget *parent = nullptr) : QMainWindow(parent) {
+    explicit TerminalWindow(QWidget *parent = nullptr) : QMainWindow(parent) {
         term = new TerminalWidget();
         connect(term, SIGNAL(onReturnPressed()), this, SLOT(onTerminalReturnPressed()));
         auto *widget = new QWidget;
