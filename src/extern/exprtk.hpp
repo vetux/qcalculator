@@ -809,7 +809,7 @@ namespace exprtk
             {
                static inline T value()
                {
-                  const T epsilon = T(0.0000000001);
+                  const T epsilon = T("0.0000000001");
                   return epsilon;
                }
             };
@@ -24304,7 +24304,7 @@ namespace exprtk
 
          free_node(node_allocator_,size_expr);
 
-         const T max_vector_size = T(2000000000.0);
+         const T max_vector_size = T("2000000000.0");
 
          if (
               (vector_size <= T(0)) ||
@@ -24570,7 +24570,7 @@ namespace exprtk
          expression_node_ptr result = error_node();
 
          if (null_initialisation)
-            result = expression_generator_(T(0.0));
+            result = expression_generator_(T("0.0"));
          else if (vec_to_vec_initialiser)
          {
             expression_node_ptr vec_node = node_allocator_.allocate<vector_node_t>(vec_holder);
