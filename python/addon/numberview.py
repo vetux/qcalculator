@@ -383,11 +383,13 @@ class NumeralSystemWidget(QtWidgets.QWidget):
         ri = r.to_integral_value()
 
         if r == ri:
-            self.unitext.setText(chr(int(str(ri))))
-            self.hextext.setText(hex(int(str(ri))))
-            self.octtext.setText(oct(int(str(ri))))
-            self.bintext.setText(bin(int(str(ri))))
-        elif not signal:
+            value = int(str(ri))
+            if value < 0x10FFFF:
+                self.unitext.setText(chr(value))
+            self.hextext.setText(hex(value))
+            self.octtext.setText(oct(value))
+            self.bintext.setText(bin(value))
+        else:
             self.unitext.setText("")
             self.hextext.setText("")
             self.octtext.setText("")
