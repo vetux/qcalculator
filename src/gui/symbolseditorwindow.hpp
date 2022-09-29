@@ -24,7 +24,7 @@
 
 #include "gui/widgets/symbolseditor.hpp"
 
-class SymbolsDialog : public QMainWindow {
+class SymbolsEditorWindow : public QMainWindow {
 Q_OBJECT
 signals:
 
@@ -35,7 +35,7 @@ public slots:
     void setSymbols(const SymbolTable &symbols);
 
 public:
-    SymbolsDialog(const SymbolTable &symbols, QWidget *parent);
+    SymbolsEditorWindow(const SymbolTable &symbols, QWidget *parent);
 
 private:
     SymbolsEditor* editor;

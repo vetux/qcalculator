@@ -39,16 +39,16 @@
 #include "widgets/symbolseditor.hpp"
 #include "widgets/historywidget.hpp"
 
-#include "dialog/symbolsdialog.hpp"
-#include "dialog/terminaldialog.hpp"
+#include "symbolseditorwindow.hpp"
+#include "terminalwindow.hpp"
 
-class MainWindow : public QMainWindow {
+class CalculatorWindow : public QMainWindow {
 Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    explicit CalculatorWindow(QWidget *parent = nullptr);
 
-    ~MainWindow() override;
+    ~CalculatorWindow() override;
 
     void closeEvent(QCloseEvent *event) override;
 
@@ -142,7 +142,7 @@ private:
     QAction *actionAbout{};
     QAction *actionAboutQt{};
 
-    SymbolsDialog *symbolsDialog = nullptr;
+    SymbolsEditorWindow *symbolsDialog = nullptr;
 
     SymbolTable symbolTable;
 

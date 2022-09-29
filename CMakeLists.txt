@@ -26,12 +26,12 @@ file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/python/addon) # C
 file(COPY ${ADDON_META} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/python/addon) # Copy addon metadata
 file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/python/lib) # Copy system scripts
 
-set(HDR_GUI src/gui/mainwindow.hpp
+set(HDR_GUI src/gui/calculatorwindow.hpp
+        src/gui/symbolseditorwindow.hpp
+        src/gui/terminalwindow.hpp
         src/gui/dialog/settings/settingsdialog.hpp
         src/gui/dialog/settings/generaltab.hpp
         src/gui/dialog/settings/addontab.hpp
-        src/gui/dialog/symbolsdialog.hpp
-        src/gui/dialog/terminaldialog.hpp
         src/gui/widgets/addonitemwidget.hpp
         src/gui/widgets/libraryitemwidget.hpp
         src/gui/widgets/historywidget.hpp

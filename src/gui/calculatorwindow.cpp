@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "mainwindow.hpp"
+#include "calculatorwindow.hpp"
 
 #include <filesystem>
 
@@ -39,7 +39,7 @@
 #include "math/expressionparser.hpp"
 
 #include "dialog/settings/settingsdialog.hpp"
-#include "dialog/symbolsdialog.hpp"
+#include "symbolseditorwindow.hpp"
 #include "dialog/aboutdialog.hpp"
 
 #include "widgets/historywidget.hpp"
@@ -60,7 +60,7 @@ static const int MAX_FORMATTING_PRECISION = 100000;
 static const int MAX_SYMBOL_TABLE_HISTORY = 100;
 
 //TODO:Feature: Completion and history navigation for input line edit with eg. up / down arrows.
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     setObjectName("MainWindow");
 
     setupLayout();
@@ -132,29 +132,29 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     addonManager->setActiveAddons(availableAddons);
 }
 
-MainWindow::~MainWindow() = default;
+CalculatorWindow::~CalculatorWindow() = default;
 
-void MainWindow::closeEvent(QCloseEvent *event) {
+void CalculatorWindow::closeEvent(QCloseEvent *event) {
 }
 
-void MainWindow::resizeEvent(QResizeEvent *event) {
+void CalculatorWindow::resizeEvent(QResizeEvent *event) {
 }
 
-void MainWindow::onAddonLoadFail(const std::string &moduleName, const std::string &error) {
+void CalculatorWindow::onAddonLoadFail(const std::string &moduleName, const std::string &error) {
     QMessageBox::warning(this, "Failed to load module",
                          ("Module " + moduleName + " failed to load\n\n" + error).c_str());
 }
 
-void MainWindow::onAddonUnloadFail(const std::string &moduleName, const std::string &error) {
+void CalculatorWindow::onAddonUnloadFail(const std::string &moduleName, const std::string &error) {
     QMessageBox::warning(this, "Failed to unload module",
                          ("Module " + moduleName + " failed to unload\n\n" + error).c_str());
 }
 
-void MainWindow::onEvaluateExpression(const QString &expression) {
+void CalculatorWindow::onEvaluateExpression(const QString &expression) {
     evaluateExpression(expression);
 }
 
-void MainWindow::onInputReturnPressed() {
+void CalculatorWindow::onInputReturnPressed() {
     auto expr = input->text();
     auto res = evaluateExpression(expr);
     if (!res.isEmpty()) {
@@ -163,14 +163,14 @@ void MainWindow::onInputReturnPressed() {
     }
 }
 
-void MainWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
+void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
     this->symbolTable = symbolTableArg;
     if (symbolsDialog != nullptr) {
         symbolsDialog->setSymbols(symbolTable);
     }
 }
 
-void MainWindow::onActionSettings() {
+void CalculatorWindow::onActionSettings() {
     SettingsDialog dialog(*addonManager);
 
     dialog.setEnabledAddons(addonManager->getActiveAddons());
@@ -201,23 +201,23 @@ void MainWindow::onActionSettings() {
     }
 }
 
-void MainWindow::onActionExit() {
+void CalculatorWindow::onActionExit() {
     saveSettings();
     addonManager->setActiveAddons({}); //Unload addons
     QCoreApplication::quit();
 }
 
-void MainWindow::onActionAbout() {
+void CalculatorWindow::onActionAbout() {
     auto *dialog = new AboutDialog(this);
     dialog->show();
     dialog->exec();
 }
 
-void MainWindow::onActionAboutQt() {
+void CalculatorWindow::onActionAboutQt() {
     QMessageBox::aboutQt(this);
 }
 
-void MainWindow::onActionOpenSymbolTable() {
+void CalculatorWindow::onActionOpenSymbolTable() {
     QFileDialog dialog(this);
     dialog.setWindowTitle("Import Symbols...");
     dialog.setFileMode(QFileDialog::ExistingFile);
@@ -241,7 +241,7 @@ void MainWindow::onActionOpenSymbolTable() {
     }
 }
 
-void MainWindow::onActionSaveSymbolTable() {
+void CalculatorWindow::onActionSaveSymbolTable() {
     std::string filepath;
     if (currentSymbolTablePath.empty()) {
         onActionSaveAsSymbolTable();
@@ -250,7 +250,7 @@ void MainWindow::onActionSaveSymbolTable() {
     }
 }
 
-void MainWindow::onActionSaveAsSymbolTable() {
+void CalculatorWindow::onActionSaveAsSymbolTable() {
     QFileDialog dialog(this);
     dialog.setWindowTitle("Save Symbols as ...");
     dialog.setFileMode(QFileDialog::AnyFile);
@@ -269,10 +269,11 @@ void MainWindow::onActionSaveAsSymbolTable() {
     saveSymbolTable(list[0].toStdString());
 }
 
-void MainWindow::onActionEditSymbolTable() {
+void CalculatorWindow::onActionEditSymbolTable() {
     if (symbolsDialog == nullptr) {
-        symbolsDialog = new SymbolsDialog(symbolTable,
-                                          this);
+        symbolsDialog = new SymbolsEditorWindow(symbolTable,
+                                                this);
+        symbolsDialog->setAttribute(Qt::WA_DeleteOnClose);
         connect(symbolsDialog,
                 &QMainWindow::destroyed,
                 [this]() {
@@ -288,33 +289,39 @@ void MainWindow::onActionEditSymbolTable() {
     }
 }
 
-void MainWindow::onActionSymbolTableHistory() {
+void CalculatorWindow::onActionSymbolTableHistory() {
     importSymbolTable(dynamic_cast<QAction *>(sender())->data().toString().toStdString());
 }
 
-void MainWindow::onActionOpenTerminal() {
+void CalculatorWindow::onActionOpenTerminal() {
     auto *d = new TerminalWindow(this);
+    d->setAttribute(Qt::WA_DeleteOnClose);
     d->setWindowTitle("Console");
     d->show();
 }
 
-const SymbolTable &MainWindow::getSymbolTable() {
+const SymbolTable &CalculatorWindow::getSymbolTable() {
     return symbolTable;
 }
 
-void MainWindow::onHistoryTextDoubleClicked(const QString &text) {
+void CalculatorWindow::onHistoryTextDoubleClicked(const QString &text) {
     const QString &currentText = input->text();
     input->setText(currentText + text);
     input->setFocus();
 }
 
-QString MainWindow::evaluateExpression(const QString &expression) {
+QString CalculatorWindow::evaluateExpression(const QString &expression) {
     try {
         decimal::context.clear_status();
         auto v = ExpressionParser::evaluate(expression.toStdString(), symbolTable);
         if (settings.value(SETTING_WARN_INEXACT).toInt() && decimal::context.status() & MPD_Inexact) {
-            QMessageBox::warning(this, "Inexact result",
-                                 "Result is inexact, increase the precision to compute an exact result.");
+            std::string msg;
+            if (v.isinfinite()) {
+                msg = "Result is inexact";
+            } else {
+                msg = "Result is inexact, increase the precision to compute an exact result.";
+            }
+            QMessageBox::warning(this, "Inexact result", msg.c_str());
         }
         onSymbolTableChanged(symbolTable);
 
@@ -327,7 +334,7 @@ QString MainWindow::evaluateExpression(const QString &expression) {
     return "";
 }
 
-void MainWindow::loadSettings() {
+void CalculatorWindow::loadSettings() {
     std::string settingsFilePath = Paths::getAppConfigDirectory().append(SETTINGS_FILE);
     if (QFile(settingsFilePath.c_str()).exists()) {
         try {
@@ -369,7 +376,7 @@ void MainWindow::loadSettings() {
     }
 }
 
-void MainWindow::saveSettings() {
+void CalculatorWindow::saveSettings() {
     try {
         std::string dir = Paths::getAppConfigDirectory();
 
@@ -382,7 +389,7 @@ void MainWindow::saveSettings() {
     }
 }
 
-std::set<std::string> MainWindow::loadEnabledAddons() {
+std::set<std::string> CalculatorWindow::loadEnabledAddons() {
     if (QFile(enabledAddonsFilePath).exists()) {
         try {
             return Serializer::deserializeSet(FileOperations::fileReadAllText(enabledAddonsFilePath.toStdString()));
@@ -396,7 +403,7 @@ std::set<std::string> MainWindow::loadEnabledAddons() {
     }
 }
 
-void MainWindow::saveEnabledAddons(const std::set<std::string> &addons) {
+void CalculatorWindow::saveEnabledAddons(const std::set<std::string> &addons) {
     try {
         std::string dataDir = Paths::getAppDataDirectory();
 
@@ -410,7 +417,7 @@ void MainWindow::saveEnabledAddons(const std::set<std::string> &addons) {
     }
 }
 
-void MainWindow::loadSymbolTablePathHistory() {
+void CalculatorWindow::loadSymbolTablePathHistory() {
     std::string filePath = Paths::getAppDataDirectory().append(SYMBOL_TABLE_HISTORY_FILE);
 
     if (!std::filesystem::exists(filePath)) {
@@ -446,7 +453,7 @@ void MainWindow::loadSymbolTablePathHistory() {
     }
 }
 
-void MainWindow::saveSymbolTablePathHistory() {
+void CalculatorWindow::saveSymbolTablePathHistory() {
     if (!settings.value(SETTING_SAVE_SYM_HISTORY).toInt()) {
         return;
     }
@@ -464,7 +471,7 @@ void MainWindow::saveSymbolTablePathHistory() {
     }
 }
 
-void MainWindow::setupMenuBar() {
+void CalculatorWindow::setupMenuBar() {
     menuBar()->setObjectName("menubar");
 
     menuFile = new QMenu(this);
@@ -552,7 +559,7 @@ void MainWindow::setupMenuBar() {
     menuBar()->addMenu(menuHelp);
 }
 
-void MainWindow::setupLayout() {
+void CalculatorWindow::setupLayout() {
     rootWidget = new QWidget(this);
     rootWidget->setObjectName("widget_root");
 
@@ -576,7 +583,7 @@ void MainWindow::setupLayout() {
     setCentralWidget(rootWidget);
 }
 
-void MainWindow::updateSymbolHistoryMenu() {
+void CalculatorWindow::updateSymbolHistoryMenu() {
     auto menu = menuOpenRecent;
     menu->clear();
     for (auto rev = symbolTablePathHistory.rbegin(); rev != symbolTablePathHistory.rend(); rev++) {
@@ -587,7 +594,7 @@ void MainWindow::updateSymbolHistoryMenu() {
     }
 }
 
-bool MainWindow::importSymbolTable(const std::string &path) {
+bool CalculatorWindow::importSymbolTable(const std::string &path) {
     try {
         auto syms = Serializer::deserializeTable(FileOperations::fileReadAllText(path));
 
@@ -619,7 +626,7 @@ bool MainWindow::importSymbolTable(const std::string &path) {
     }
 }
 
-bool MainWindow::saveSymbolTable(const std::string &path) {
+bool CalculatorWindow::saveSymbolTable(const std::string &path) {
     try {
         FileOperations::fileWriteAllText(path, Serializer::serializeTable(symbolTable));
 

@@ -77,7 +77,7 @@ PyObject *SymbolTableUtil::New(const SymbolTable &table) {
         PyObject *o = PyUnicode_FromString(var.second.expression.c_str());
 
         PyObject_SetAttrString(funcInstance, "expression", o);
-        PyObject_SetAttrString(funcInstance, "argument_names", argList);
+        PyObject_SetAttrString(funcInstance, "arguments", argList);
 
         PyDict_SetItemString(vars, var.first.c_str(), funcInstance);
 
@@ -96,12 +96,13 @@ PyObject *SymbolTableUtil::New(const SymbolTable &table) {
         // has to be cleaned up by calling SymbolTableUtil::Cleanup
         PyObject_SetAttrString(scriptInstance, "callback", var.second.callback);
 
-        PyObject *args = PyList_New(var.second.arguments.size());
+        PyObject *args = PyList_New(0);
         for (auto i = 0; i < var.second.arguments.size(); i++) {
             auto *arg = PyUnicode_FromString(var.second.arguments.at(i).c_str());
             PyList_Append(args, arg);
             Py_DECREF(arg);
         }
+
         PyObject_SetAttrString(scriptInstance, "arguments", args);
 
         PyDict_SetItemString(vars, var.first.c_str(), scriptInstance);
@@ -116,9 +117,7 @@ PyObject *SymbolTableUtil::New(const SymbolTable &table) {
     return symInstance;
 }
 
-SymbolTable SymbolTableUtil::Convert(PyObject *o) {
-    SymbolTable ret;
-
+void setVariables(PyObject *o, SymbolTable &ret) {
     if (!PyObject_HasAttrString(o, "variables")) {
         throw std::runtime_error("variables attribute must be present");
     }
@@ -166,19 +165,21 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
     }
     Py_DECREF(keys);
     Py_DECREF(attr);
+}
 
+void setConstants(PyObject *o, SymbolTable &ret) {
     if (!PyObject_HasAttrString(o, "constants")) {
         throw std::runtime_error("constants attribute must be present");
     }
 
-    attr = PyObject_GetAttrString(o, "constants");
+    auto attr = PyObject_GetAttrString(o, "constants");
     if (!PyDict_Check(attr)) {
         Py_DECREF(attr);
         throw std::runtime_error("constants attribute must be a dictionary");
     }
 
-    keys = PyDict_Keys(attr);
-    size = PyList_Size(keys);
+    auto keys = PyDict_Keys(attr);
+    auto size = PyList_Size(keys);
     for (size_t i = 0; i < size; i++) {
         PyObject *key = PyList_GetItem(keys, i);
         PyObject *value = PyDict_GetItem(attr, key);
@@ -215,20 +216,22 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
     }
     Py_DECREF(keys);
     Py_DECREF(attr);
+}
 
+void setFunctions(PyObject *o, SymbolTable &ret) {
     if (!PyObject_HasAttrString(o, "functions")) {
         throw std::runtime_error("functions attribute must be present");
     }
 
-    attr = PyObject_GetAttrString(o, "functions");
+    auto attr = PyObject_GetAttrString(o, "functions");
     if (!PyDict_Check(attr)) {
         Py_DECREF(attr);
         throw std::runtime_error("functions attribute must be a dictionary");
     }
 
-    keys = PyDict_Keys(attr);
-    size = PyList_Size(keys);
-    for (size_t i = 0; i < size; i++) {
+    auto keys = PyDict_Keys(attr);
+    auto size = PyList_Size(keys);
+    for (auto i = 0; i < size; i++) {
         PyObject *key = PyList_GetItem(keys, i);
         PyObject *value = PyDict_GetItem(attr, key);
 
@@ -248,9 +251,9 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
         if (!PyObject_HasAttrString(value, "expression")) {
             Py_DECREF(attr);
             throw std::runtime_error("Function value must have expression attribute");
-        } else if (!PyObject_HasAttrString(value, "argument_names")) {
+        } else if (!PyObject_HasAttrString(value, "arguments")) {
             Py_DECREF(attr);
-            throw std::runtime_error("Function value must have argument_names attribute");
+            throw std::runtime_error("Function value must have arguments attribute");
         }
 
         PyObject *funcAttr = PyObject_GetAttrString(value, "expression");
@@ -272,97 +275,69 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
 
         f.expression = expr;
 
-        funcAttr = PyObject_GetAttrString(value, "argument_names");
-        if (PyList_Check(funcAttr)) {
-            size_t argSize = PyList_Size(funcAttr);
-            for (size_t argi = 0; argi < argSize; argi++) {
-                PyObject *pyArgName = PyList_GetItem(funcAttr, argi);
-                if (!PyUnicode_Check(pyArgName)) {
-                    Py_DECREF(funcAttr);
-                    Py_DECREF(attr);
-                    throw std::runtime_error("Function argument_name values must be unicode strings");
-                }
-                const char *argumentName = PyUnicode_AsUTF8(pyArgName);
-                if (argumentName == NULL) {
-                    //Should never happen, just in case we will steal the error indicator and throw.
-                    Py_DECREF(funcAttr);
-                    Py_DECREF(attr);
-                    throw std::runtime_error(Interpreter::getError());
-                }
-                f.argumentNames.emplace_back(argumentName);
-            }
-        } else if (PySet_Check(funcAttr)) {
-            size_t argSize = PySet_Size(funcAttr);
-            for (size_t argi = 0; argi < argSize; argi++) {
-                PyObject *pyArgName = PySet_Pop(funcAttr);
-                if (!PyUnicode_Check(pyArgName)) {
-                    Py_DECREF(funcAttr);
-                    Py_DECREF(attr);
-                    throw std::runtime_error("Function argument_name values must be unicode strings");
-                }
-                const char *argumentName = PyUnicode_AsUTF8(pyArgName);
-                if (argumentName == NULL) {
-                    //Should never happen, just in case we will steal the error indicator and throw.
-                    Py_DECREF(funcAttr);
-                    Py_DECREF(attr);
-                    throw std::runtime_error(Interpreter::getError());
-                }
-                f.argumentNames.emplace_back(argumentName);
-            }
-        } else if (PyTuple_Check(funcAttr)) {
-            size_t argSize = PyTuple_Size(funcAttr);
-            for (size_t argi = 0; argi < argSize; argi++) {
-                PyObject *pyArgName = PyTuple_GetItem(funcAttr, argi);
-                if (!PyUnicode_Check(pyArgName)) {
-                    Py_DECREF(funcAttr);
-                    Py_DECREF(attr);
-                    throw std::runtime_error("Function argument_name values must be unicode strings");
-                }
-                const char *argumentName = PyUnicode_AsUTF8(pyArgName);
-                if (argumentName == NULL) {
-                    //Should never happen, just in case we will steal the error indicator and throw.
-                    Py_DECREF(funcAttr);
-                    Py_DECREF(attr);
-                    throw std::runtime_error(Interpreter::getError());
-                }
-                f.argumentNames.emplace_back(argumentName);
-            }
-        } else {
-            Py_DECREF(funcAttr);
-            Py_DECREF(attr);
-            throw std::runtime_error("Function argument_names must be list, set or tuple");
-        }
+        if (PyObject_HasAttrString(value, "arguments")) {
+            funcAttr = PyObject_GetAttrString(value, "arguments");
+            if (PyList_Check(funcAttr)) {
+                size_t argSize = PyList_Size(funcAttr);
+                for (size_t argi = 0; argi < argSize; argi++) {
+                    PyObject *pyArgName = PyList_GetItem(funcAttr, argi);
+                    if (!PyUnicode_Check(pyArgName)) {
+                        Py_DECREF(funcAttr);
+                        Py_DECREF(attr);
+                        throw std::runtime_error("Function arguments values must be unicode strings");
+                    }
+                    const char *argumentName = PyUnicode_AsUTF8(pyArgName);
+                    if (argumentName == NULL) {
+                        //Should never happen, just in case we will steal the error indicator and throw.
+                        Py_DECREF(funcAttr);
+                        Py_DECREF(attr);
+                        throw std::runtime_error(Interpreter::getError());
+                    }
 
-        Py_DECREF(funcAttr);
+                    f.argumentNames.emplace_back(std::string(argumentName));
 
-        try {
-            ret.setFunction(k, f);
-        }
-        catch (const std::exception &e) {
-            Py_DECREF(attr);
-            throw e;
+                    Py_DECREF(funcAttr);
+
+                    try {
+                        ret.setFunction(k, f);
+                    } catch (const std::exception &e) {
+                        Py_DECREF(keys);
+                        Py_DECREF(attr);
+                        throw e;
+                    }
+                }
+            } else {
+                Py_DECREF(funcAttr);
+                Py_DECREF(keys);
+                Py_DECREF(attr);
+                throw std::runtime_error("Function arguments must be list");
+            }
         }
     }
+
     Py_DECREF(keys);
     Py_DECREF(attr);
+}
 
+void setScripts(PyObject *o, SymbolTable &ret) {
     if (!PyObject_HasAttrString(o, "scripts")) {
         throw std::runtime_error("scripts attribute must be present");
     }
 
-    attr = PyObject_GetAttrString(o, "scripts");
+    auto attr = PyObject_GetAttrString(o, "scripts");
     if (!PyDict_Check(attr)) {
         Py_DECREF(attr);
         throw std::runtime_error("scripts attribute must be a dictionary");
     }
 
-    keys = PyDict_Keys(attr);
-    size = PyList_Size(keys);
-    for (size_t i = 0; i < size; i++) {
+    auto keys = PyDict_Keys(attr);
+    auto size = PyList_Size(keys);
+    for (auto i = 0; i < size; i++) {
         PyObject *key = PyList_GetItem(keys, i);
         PyObject *value = PyDict_GetItem(attr, key);
 
         if (!PyUnicode_Check(key)) {
+            Py_DECREF(keys);
             Py_DECREF(attr);
             throw std::runtime_error("Script key must be unicode string");
         }
@@ -370,6 +345,7 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
         const char *k = PyUnicode_AsUTF8(key);
         if (k == NULL) {
             //Should never happen, just in case we will steal the error indicator and throw.
+            Py_DECREF(keys);
             Py_DECREF(attr);
             throw std::runtime_error(Interpreter::getError());
         }
@@ -381,11 +357,13 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
             // Cleanup().
             s.callback = PyObject_GetAttrString(value, "callback");
         } else {
+            Py_DECREF(keys);
             Py_DECREF(attr);
             throw std::runtime_error("Script value must have callback attribute");
         }
 
         if (!PyObject_HasAttrString(value, "arguments")) {
+            Py_DECREF(keys);
             Py_DECREF(attr);
             throw std::runtime_error("Script value must have arguments attribute");
         }
@@ -393,40 +371,58 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
         PyObject *args = PyObject_GetAttrString(value, "arguments");
         if (!PyList_Check(args)) {
             Py_DECREF(args);
+            Py_DECREF(keys);
             Py_DECREF(attr);
-            throw std::runtime_error("Function arguments must be list");
+            throw std::runtime_error("Script arguments must be list");
         }
 
         std::vector<std::string> arguments;
         auto argsSize = PyList_Size(args);
         for (auto argsI = 0; argsI < argsSize; argsI++) {
             auto *arg = PyList_GetItem(args, argsI);
-            if (!PyUnicode_Check(arg)){
-                Py_DECREF(arg);
+            if (arg == nullptr
+                || !PyUnicode_Check(arg)) {
                 Py_DECREF(args);
+                Py_DECREF(keys);
                 Py_DECREF(attr);
-                throw std::runtime_error("Function argument must be string");
+                throw std::runtime_error("Script argument at index " + std::to_string(argsI) + " must be string");
             }
             auto argString = PyUnicode_AsUTF8(arg);
-            if (argString == nullptr)
+            if (argString == nullptr) {
+                Py_DECREF(args);
+                Py_DECREF(keys);
+                Py_DECREF(attr);
                 throw std::runtime_error("Argument string is nullptr");
+            }
             arguments.emplace_back(std::string(argString));
-            Py_DECREF(arg);
         }
 
         s.arguments = arguments;
 
         try {
             ret.setScript(k, s);
-        }
-        catch (const std::exception &e) {
+        } catch (const std::exception &e) {
+            Py_DECREF(args);
+            Py_DECREF(keys);
             Py_DECREF(attr);
             throw e;
         }
-    }
-    Py_DECREF(keys);
 
+        Py_DECREF(args);
+    }
+
+    Py_DECREF(keys);
     Py_DECREF(attr);
+}
+
+
+SymbolTable SymbolTableUtil::Convert(PyObject *o) {
+    SymbolTable ret;
+
+    setVariables(o, ret);
+    setConstants(o, ret);
+    setFunctions(o, ret);
+    setScripts(o, ret);
 
     return ret;
 }
@@ -440,7 +436,6 @@ SymbolTable SymbolTableUtil::Cleanup(const SymbolTable &table) {
         scriptKeys.emplace_back(script.first);
 
         if (script.second.callback == NULL) {
-            // Should never happen
             throw std::runtime_error("Null callback in cleanup");
         }
 

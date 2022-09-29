@@ -19,7 +19,7 @@
 
 #include <QApplication>
 
-#include "gui/mainwindow.hpp"
+#include "gui/calculatorwindow.hpp"
 
 #include "pycx/interpreter.hpp"
 #include "pycx/modules/stdredirmodule.hpp"
@@ -61,11 +61,11 @@ int main(int argc, char *argv[]) {
             w.show();
             return QApplication::exec();
         } else {
-            std::cout << "Invalid argument";
+            std::cout << "Invalid argument " + std::string(args.at(1));
             return 1;
         }
     } else {
-        MainWindow w;
+        CalculatorWindow w;
         w.show();
         return QApplication::exec();
     }

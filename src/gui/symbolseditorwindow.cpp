@@ -17,12 +17,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "symbolsdialog.hpp"
+#include "symbolseditorwindow.hpp"
 
 #include <QVBoxLayout>
 
-SymbolsDialog::SymbolsDialog(const SymbolTable &symbols,
-                             QWidget *parent)
+SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
+                                         QWidget *parent)
         : QMainWindow(parent) {
     setWindowTitle("Symbols Editor");
 
@@ -45,7 +45,7 @@ SymbolsDialog::SymbolsDialog(const SymbolTable &symbols,
             SIGNAL(symbolsChanged(const SymbolTable &)));
 }
 
-void SymbolsDialog::setSymbols(const SymbolTable &symbols) {
+void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols) {
     editor->setSymbols(symbols);
 }
 
