@@ -23,7 +23,7 @@ void Settings::clear(const Setting &s) {
     data.erase(s.key);
 }
 
-Settings::Entry Settings::value(const Setting &setting) const {
+const Settings::Entry &Settings::value(const Setting &setting) const {
     if (data.find(setting.key) == data.end())
         return setting.entry;
     else

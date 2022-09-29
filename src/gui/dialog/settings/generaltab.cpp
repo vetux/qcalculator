@@ -21,6 +21,7 @@
 
 #include <QVBoxLayout>
 #include <QLine>
+#include <QFileDialog>
 
 int getIndexFromRoundingMode(decimal::round mode) {
     switch (mode) {
@@ -155,12 +156,30 @@ GeneralTab::GeneralTab(QWidget *parent)
     showInexactWarningLabel->setToolTip("Show Warning when the result of a computation is inexact.");
     showInexactWarningCheckBox->setToolTip("Show Warning when the result of a computation is inexact.");
 
+    pythonModPathLabel = new QLabel(this);
+    pythonModPathListWidget = new QListWidget(this);
+    pythonModPathAddPushButton = new QPushButton(this);
+
+    pythonModPathListWidget->setToolTip("List of paths that are added to the python module search path");
+
+    pythonModPathLabel->setText("Python Module Paths");
+    pythonModPathAddPushButton->setText("Add Directory");
+
     auto *hlayout = new QHBoxLayout;
     hlayout->setSpacing(20);
     hlayout->addWidget(showInexactWarningLabel, 0);
     hlayout->addWidget(showInexactWarningCheckBox, 1);
 
     inexactWarnContainer->setLayout(hlayout);
+
+    hlayout = new QHBoxLayout;
+    hlayout->addWidget(pythonModPathLabel, 1);
+    hlayout->addWidget(pythonModPathAddPushButton, 0);
+
+    auto *pythonModPathContainerWidget = new QWidget(this);
+    pythonModPathContainerWidget->setLayout(hlayout);
+
+    pythonModPathContainerWidget->setToolTip("List of paths that are added to the python module search path on application startup");
 
     auto *layout = new QVBoxLayout();
 
@@ -173,10 +192,14 @@ GeneralTab::GeneralTab(QWidget *parent)
     layout->addWidget(roundingLabel);
     layout->addWidget(roundingComboBox);
     layout->addWidget(inexactWarnContainer);
+    layout->addWidget(pythonModPathContainerWidget);
+    layout->addWidget(pythonModPathListWidget);
 
     layout->addWidget(new QWidget(this), 1);
 
     setLayout(layout);
+
+    connect(pythonModPathAddPushButton, SIGNAL(pressed()), this, SLOT(addModPathPressed()));
 }
 
 int GeneralTab::getPrecision() {
@@ -209,4 +232,61 @@ int GeneralTab::getExponentMax() {
 
 int GeneralTab::getExponentMin() {
     return exponentMinSpinBox->value();
+}
+
+void GeneralTab::setPythonModPaths(const std::set<std::string> &paths) {
+    pythonModPathListWidget->clear();
+    for (auto &path: paths) {
+        addItem(path.c_str());
+    }
+}
+
+std::set<std::string> GeneralTab::getPythonModPaths() {
+    std::set<std::string> ret;
+    for (auto i = 0; i < pythonModPathListWidget->count(); i++) {
+        auto *item = pythonModPathListWidget->item(i);
+        auto *widget = dynamic_cast<StringEditItemWidget *>(pythonModPathListWidget->itemWidget(item));
+        ret.insert(widget->getText().toStdString());
+    }
+    return ret;
+}
+
+void GeneralTab::addModPathPressed() {
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::Directory);
+
+    QStringList fileNames;
+    if (dialog.exec())
+        fileNames = dialog.selectedFiles();
+
+    for (auto &path: fileNames) {
+        addItem(path);
+    }
+}
+
+void GeneralTab::addItem(const QString &path) {
+    auto *itemWidget = new StringEditItemWidget(pythonModPathListWidget);
+    itemWidget->setReadOnly(true);
+    itemWidget->setDeletable(true);
+    itemWidget->setText(path);
+
+    connect(itemWidget, SIGNAL(deleteString(const QString &)), this, SLOT(removeItem(const QString &)));
+
+    auto *item = new QListWidgetItem();
+    item->setSizeHint(itemWidget->minimumSizeHint());
+
+    pythonModPathListWidget->addItem(item);
+    pythonModPathListWidget->setItemWidget(item, itemWidget);
+}
+
+void GeneralTab::removeItem(const QString &path) {
+    for (auto i = 0; i < pythonModPathListWidget->count(); i++) {
+        auto *item = pythonModPathListWidget->item(i);
+        auto *itemWidget = dynamic_cast<StringEditItemWidget *>(pythonModPathListWidget->itemWidget(item));
+
+        if (itemWidget->getText() == path) {
+            pythonModPathListWidget->removeItemWidget(item);
+            pythonModPathListWidget->takeItem(i);
+        }
+    }
 }

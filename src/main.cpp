@@ -18,6 +18,8 @@
  */
 
 #include <QApplication>
+#include <QMessageBox>
+#include <QFileDialog>
 
 #include "gui/calculatorwindow.hpp"
 
@@ -26,6 +28,8 @@
 #include "pycx/modules/exprtkmodule.hpp"
 
 #include "io/paths.hpp"
+#include "io/serializer.hpp"
+#include "io/fileoperations.hpp"
 
 std::vector<std::string> parseArgs(int argc, char *argv[]) {
     std::vector<std::string> ret;
@@ -36,13 +40,80 @@ std::vector<std::string> parseArgs(int argc, char *argv[]) {
     return ret;
 }
 
+std::wstring getPythonDefaultPath() {
+    auto path = Paths::getAppConfigDirectory() + "/pythonDefaultPath.txt";
+
+    QDir("/").mkpath(Paths::getAppConfigDirectory().c_str());
+
+    std::string str;
+
+    if (QFile(path.c_str()).exists()) {
+        str = FileOperations::fileReadAllText(path);
+    } else {
+        if (QMessageBox::question(nullptr,
+                                  "Override default python module path",
+                                  ("Do you want to configure a python default module path? (Overrides the default os dependent module path, Output is written to " +
+                                   path + " )").c_str()) ==
+            QMessageBox::StandardButton::Yes) {
+            QFileDialog dialog(nullptr);
+            dialog.setWindowTitle("Select default python module directories");
+            dialog.setFileMode(QFileDialog::Directory);
+
+            std::set<std::string> ret;
+
+            if (dialog.exec()) {
+                for (auto &p: dialog.selectedFiles()) {
+                    ret.insert(p.toStdString());
+                }
+                while (QMessageBox::question(nullptr,
+                                             "Add Paths",
+                                             "Do you want to add more paths?") == QMessageBox::Yes) {
+                    if (dialog.exec()) {
+                        for (auto &p: dialog.selectedFiles()) {
+                            ret.insert(p.toStdString());
+                        }
+                    }
+                }
+            } else {
+                QMessageBox::information(nullptr,
+                                         "Configuration Cancelled",
+                                         "Cancelled python default module path configuration");
+            }
+
+            for (auto &p: ret) {
+                str += p + Interpreter::getDefaultModulePathSeparator();
+            }
+
+            if (!str.empty()) {
+                str.pop_back();
+                FileOperations::fileWriteAllText(path, str);
+            }
+        } else {
+            FileOperations::fileWriteAllText(path, "");
+        }
+    }
+
+    std::wstring wret;
+    for (auto &c: str) {
+        wret += c;
+    }
+    return wret;
+}
+
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    QApplication::setOrganizationName("Xenotux");
+    QApplication::setOrganizationName("QCalculator");
     QApplication::setApplicationName("qcalc");
     QApplication::setApplicationDisplayName("QCalculator");
-    QApplication::setApplicationVersion("v0.5.0");
+    QApplication::setApplicationVersion("v0.6.0");
+
+    // User configurable default python module path for platforms that do have standard paths for python (Eg. Win32)
+    // Needs to be separate from other user module paths because the default path cannot be changed after initializing the interpreter.
+    auto pyDefaultModuleDir = getPythonDefaultPath();
+    if (!pyDefaultModuleDir.empty()) {
+        Interpreter::setDefaultModuleDir(pyDefaultModuleDir);
+    }
 
     StdRedirModule::initialize();
     ExprtkModule::initialize();

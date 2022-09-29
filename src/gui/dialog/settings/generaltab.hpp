@@ -27,7 +27,11 @@
 #include <QComboBox>
 #include <QStringListModel>
 #include <QCheckBox>
+#include <QListWidget>
 
+#include <set>
+
+#include "gui/widgets/stringedititemwidget.hpp"
 #include "math/arithmetictype.hpp"
 
 class GeneralTab : public QWidget {
@@ -41,6 +45,11 @@ public slots:
     void setExponentMax(int max);
 
     void setExponentMin(int min);
+
+    void setShowInexactWarning(bool showWarning);
+
+    void setPythonModPaths(const std::set<std::string> &paths);
+
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
 
@@ -52,9 +61,16 @@ public:
 
     int getExponentMin();
 
-    void setShowInexactWarning(bool showWarning);
-
     bool getShowInexactWarning();
+
+    std::set<std::string> getPythonModPaths();
+
+private slots:
+    void addModPathPressed();
+
+    void addItem(const QString &path);
+
+    void removeItem(const QString &path);
 
 private:
     QStringListModel roundingModel;
@@ -73,6 +89,10 @@ private:
 
     QLabel *showInexactWarningLabel;
     QCheckBox *showInexactWarningCheckBox;
+
+    QLabel *pythonModPathLabel;
+    QPushButton *pythonModPathAddPushButton;
+    QListWidget *pythonModPathListWidget;
 };
 
 #endif //QCALC_GENERALTAB_HPP

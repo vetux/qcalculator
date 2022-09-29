@@ -56,7 +56,6 @@ static const std::string ADDONS_FILE = "/addons.json";
 static const std::string SETTINGS_FILE = "/settings.json";
 static const std::string SYMBOL_TABLE_HISTORY_FILE = "/symboltablehistory.json";
 
-static const int MAX_FORMATTING_PRECISION = 100000;
 static const int MAX_SYMBOL_TABLE_HISTORY = 100;
 
 //TODO:Feature: Completion and history navigation for input line edit with eg. up / down arrows.
@@ -102,6 +101,10 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     saveSymbolTablePathHistory();
 
     updateSymbolHistoryMenu();
+
+    for (auto &path : settings.value(SETTING_PYTHON_MODPATHS).toStringList()){
+        Interpreter::addModuleDir(path);
+    }
 
     ExprtkModule::setGlobalTable(symbolTable,
                                  [this]() {
@@ -181,15 +184,25 @@ void CalculatorWindow::onActionSettings() {
     dialog.setRoundingMode(Serializer::deserializeRoundingMode(
             settings.value(SETTING_ROUNDING).toInt()));
     dialog.setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
+    dialog.setPythonModPaths(settings.value(SETTING_PYTHON_MODPATHS).toStringList());
 
     dialog.show();
 
     if (dialog.exec() == QDialog::Accepted) {
+        for (auto &path : settings.value(SETTING_PYTHON_MODPATHS).toStringList()){
+            Interpreter::removeModuleDir(path);
+        }
+
         settings.update(SETTING_PRECISION.key, dialog.getPrecision());
         settings.update(SETTING_EXPONENT_MAX.key, dialog.getExponentMax());
         settings.update(SETTING_EXPONENT_MIN.key, dialog.getExponentMin());
         settings.update(SETTING_ROUNDING.key, dialog.getRoundingMode());
         settings.update(SETTING_WARN_INEXACT.key, dialog.getShowInexactWarning());
+        settings.update(SETTING_PYTHON_MODPATHS.key, dialog.getPythonModPaths());
+
+        for (auto &path : settings.value(SETTING_PYTHON_MODPATHS).toStringList()){
+            Interpreter::addModuleDir(path);
+        }
 
         decimal::context.prec(settings.value(SETTING_PRECISION).toInt());
         decimal::context.round(settings.value(SETTING_ROUNDING).toInt());

@@ -137,6 +137,14 @@ bool SettingsDialog::getShowInexactWarning() {
     return generalTab->getShowInexactWarning();
 }
 
+void SettingsDialog::setPythonModPaths(const std::set<std::string> &paths) {
+    generalTab->setPythonModPaths(paths);
+}
+
+std::set<std::string> SettingsDialog::getPythonModPaths() {
+    return generalTab->getPythonModPaths();
+}
+
 void SettingsDialog::onModuleEnableChanged(AddonItemWidget *item) {
     std::string name = item->getModuleName().toStdString();
     bool enabled = item->getModuleEnabled();

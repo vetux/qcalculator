@@ -40,7 +40,8 @@ set(HDR_GUI src/gui/calculatorwindow.hpp
         src/gui/widgets/namedvalueeditor.hpp
         src/gui/widgets/scriptseditor.hpp
         src/gui/widgets/symbolseditor.hpp
-        src/gui/widgets/terminalwidget.hpp)
+        src/gui/widgets/terminalwidget.hpp
+        src/gui/widgets/stringedititemwidget.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
 

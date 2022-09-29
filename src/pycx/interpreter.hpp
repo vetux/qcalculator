@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <string>
+#include <set>
 
 namespace Interpreter {
     enum ParseStyle {
@@ -35,11 +36,21 @@ namespace Interpreter {
 
     void finalize();
 
+    char getDefaultModulePathSeparator();
+
+    void setDefaultModuleDir(const std::wstring &path);
+
+    void setDefaultModuleDirs(const std::set<std::string> &path);
+
+    std::wstring getDefaultModuleDir();
+
     void setModuleDirs(const std::vector<std::string> &moduleDirectories);
 
     std::vector<std::string> getModuleDirs();
 
     void addModuleDir(const std::string &dir);
+
+    void removeModuleDir(const std::string &dir);
 
     int runInteractiveLoop();
 

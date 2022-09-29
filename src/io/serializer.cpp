@@ -105,6 +105,9 @@ std::string Serializer::serializeSettings(const Settings &settings) {
             case Settings::STRING:
                 j[p.first] = p.second.toString();
                 break;
+            case Settings::STRING_LIST:
+                j[p.first] = p.second.toStringList();
+                break;
         }
     }
     return nlohmann::to_string(j);
@@ -122,6 +125,8 @@ Settings Serializer::deserializeSettings(const std::string &str) {
             ret.update(key, entry.value().get<float>());
         } else if (value.is_string()) {
             ret.update(key, entry.value().get<std::string>());
+        } else {
+            ret.update(key, entry.value().get<std::set<std::string>>());
         }
     }
     return ret;

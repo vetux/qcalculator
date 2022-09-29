@@ -22,6 +22,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 
 struct Setting;
 
@@ -31,32 +32,38 @@ public:
         NONE,
         INT,
         FLOAT,
-        STRING
+        STRING,
+        STRING_LIST
     };
 
     class Entry {
     public:
-        Entry() : entryType(NONE), intValue(0), floatValue(0), strValue() {};
+        Entry() : entryType(NONE) {};
 
-        Entry(int value) : entryType(INT), intValue(value), floatValue(0), strValue() {}
+        Entry(int value) : entryType(INT), intValue(value) {}
 
-        Entry(float value) : entryType(FLOAT), intValue(0), floatValue(value), strValue() {}
+        Entry(float value) : entryType(FLOAT), floatValue(value) {}
 
-        Entry(std::string value) : entryType(STRING), intValue(0), floatValue(0), strValue(std::move(value)) {}
+        Entry(std::string value) : entryType(STRING), strValue(std::move(value)) {}
+
+        Entry(std::set<std::string> value) : entryType(STRING_LIST), strListValue(std::move(value)) {}
 
         int toInt() const { return intValue; }
 
         float toFloat() const { return floatValue; }
 
-        std::string toString() const { return strValue; }
+        const std::string &toString() const { return strValue; }
+
+        const std::set<std::string> &toStringList() const { return strListValue; }
 
         Type type() const { return entryType; }
 
     private:
         Type entryType;
-        int intValue;
-        float floatValue;
+        int intValue = 0;
+        float floatValue = 0;
         std::string strValue;
+        std::set<std::string> strListValue;
     };
 
     Settings() : data() {}
@@ -73,14 +80,14 @@ public:
 
     void clear(const Setting &s);
 
-    Entry value(const std::string &key, const Entry &defaultValue = 0) const {
+    const Entry &value(const std::string &key, const Entry &defaultValue = 0) const {
         if (data.find(key) == data.end())
             return defaultValue;
         else
             return data.at(key);
     }
 
-    Entry value(const Setting &setting) const;
+    const Entry &value(const Setting &setting) const;
 
     const std::map<std::string, Entry> &entries() const {
         return data;

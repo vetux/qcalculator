@@ -28,5 +28,6 @@ const Setting SETTING_EXPONENT_MIN = {"_qcalc_exponent_min", -999999};
 const Setting SETTING_ROUNDING = {"_qcalc_rounding_internal", MPD_ROUND_HALF_EVEN};
 const Setting SETTING_SAVE_SYM_HISTORY = {"_qcalc_save_sym_hist", true};
 const Setting SETTING_WARN_INEXACT = {"_qcalc_warn_inexact", true};
+const Setting SETTING_PYTHON_MODPATHS = {"_qcalc_python_modpaths", std::set<std::string>()};
 
 #endif //QCALC_SETTINGCONSTANTS_HPP

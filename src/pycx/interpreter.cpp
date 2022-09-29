@@ -37,10 +37,52 @@ void Interpreter::finalize() {
     pyInitialized = false;
 }
 
+char Interpreter::getDefaultModulePathSeparator() {
+// https://docs.python.org/3/c-api/init.html PyGetPath:
+// "The returned string consists of a series of directory names separated by a platform dependent delimiter character.
+// The delimiter character is ':' on Unix and macOS, ';' on Windows."
+#if _WIN32
+    return ';';
+#elif defined unix || defined __APPLE__
+    return ':';
+#else
+#error "Unsupported target operating system"
+#endif
+}
+
+void Interpreter::setDefaultModuleDir(const std::wstring &path) {
+    Py_SetPath(path.c_str());
+}
+
+void Interpreter::setDefaultModuleDirs(const std::set<std::string> &paths) {
+    auto sep = getDefaultModulePathSeparator();
+    std::string str;
+    for (auto &path: paths) {
+        str += path;
+        str += sep;
+    }
+    if (!str.empty())
+        str.pop_back();
+    std::wstring wstr;
+    for (auto &c: str) {
+        wstr += c;
+    }
+    setDefaultModuleDir(wstr);
+}
+
+std::wstring Interpreter::getDefaultModuleDir() {
+    return {Py_GetPath()};
+}
+
 void Interpreter::setModuleDirs(const std::vector<std::string> &moduleDirectories) {
-    PyObject *sys_path = PySys_GetObject("path");
-    //PyList_Remove ??!!
-    throw std::runtime_error("Not implemented");
+    PyObject *list = PyList_New(0);
+    for (auto &v: moduleDirectories) {
+        PyObject *str = PyUnicode_FromString(v.c_str());
+        PyList_Append(list, str);
+        Py_DECREF(str);
+    }
+    PySys_SetObject("path", list);
+    Py_DECREF(list);
 }
 
 std::vector<std::string> Interpreter::getModuleDirs() {
@@ -59,6 +101,21 @@ std::vector<std::string> Interpreter::getModuleDirs() {
 void Interpreter::addModuleDir(const std::string &dir) {
     PyObject *sys_path = PySys_GetObject("path");
     PyList_Append(sys_path, PyUnicode_FromString(dir.c_str()));
+}
+
+void Interpreter::removeModuleDir(const std::string &dir) {
+    PyObject *sys_path = PySys_GetObject("path");
+    auto size = PyList_Size(sys_path);
+
+    PyObject *npath = PyList_New(0);
+    for (auto i = 0; i < size; i++) {
+        auto *obj = PyList_GetItem(sys_path, i);
+        auto str = PyUnicode_AsUTF8(obj);
+        if (str != dir) {
+            PyList_Append(npath, obj);
+        }
+    }
+    PySys_SetObject("path", npath);
 }
 
 int Interpreter::runInteractiveLoop() {

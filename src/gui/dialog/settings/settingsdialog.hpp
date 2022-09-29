@@ -64,6 +64,10 @@ public:
 
     bool getShowInexactWarning();
 
+    void setPythonModPaths(const std::set<std::string> &paths);
+
+    std::set<std::string> getPythonModPaths();
+
 private slots:
 
     void onModuleEnableChanged(AddonItemWidget *item);
