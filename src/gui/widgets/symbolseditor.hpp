@@ -22,11 +22,12 @@
 
 #include <QWidget>
 
-#include "../../math/symboltable.hpp"
+#include "math/symboltable.hpp"
 
-#include "namedvalueeditor.hpp"
-#include "functionseditor.hpp"
-#include "scriptseditor.hpp"
+#include "gui/widgets/namedvalueeditor.hpp"
+#include "gui/widgets/functionseditor.hpp"
+#include "gui/widgets/scriptseditor.hpp"
+#include "gui/widgets/builtinseditor.hpp"
 
 /**
  * The symbols editor exposes and parses the variable and constant values with
@@ -70,6 +71,8 @@ private slots:
 
     void onCurrentFunctionChanged(const QString &name);
 
+    void onUseBuiltInsChanged(bool useBuiltIns);
+
 private:
     SymbolTable symbolTable;
 
@@ -77,6 +80,7 @@ private:
     NamedValueEditor *constantsEditor;
     FunctionsEditor *functionsEditor;
     ScriptsEditor *scriptsEditor;
+    BuiltInsEditor *builtInsEditor;
 
     QString currentFunction;
 };

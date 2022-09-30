@@ -38,6 +38,7 @@ set(HDR_GUI src/gui/calculatorwindow.hpp
         src/gui/widgets/functionseditor.hpp
         src/gui/widgets/namedvalueeditor.hpp
         src/gui/widgets/scriptseditor.hpp
+        src/gui/widgets/builtinseditor.hpp
         src/gui/widgets/symbolseditor.hpp
         src/gui/widgets/terminalwidget.hpp
         src/gui/widgets/stringedititemwidget.hpp)

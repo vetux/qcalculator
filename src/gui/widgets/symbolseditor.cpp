@@ -42,11 +42,13 @@ SymbolsEditor::SymbolsEditor(QWidget *parent) : QWidget(parent) {
     constantsEditor = new NamedValueEditor(tabs);
     functionsEditor = new FunctionsEditor(tabs);
     scriptsEditor = new ScriptsEditor(tabs);
+    builtInsEditor = new BuiltInsEditor(tabs);
 
     tabs->addTab(variablesEditor, "Variables");
     tabs->addTab(constantsEditor, "Constants");
     tabs->addTab(functionsEditor, "Functions");
     tabs->addTab(scriptsEditor, "Scripts");
+    tabs->addTab(builtInsEditor, "Built-Ins");
 
     layout()->addWidget(tabs);
 
@@ -96,6 +98,11 @@ SymbolsEditor::SymbolsEditor(QWidget *parent) : QWidget(parent) {
             SIGNAL(onCurrentFunctionChanged(const QString &)),
             this,
             SLOT(onCurrentFunctionChanged(const QString &)));
+
+    connect(builtInsEditor,
+            SIGNAL(onUseBuiltInConstantChanged(bool)),
+            this,
+            SLOT(onUseBuiltInsChanged(bool)));
 }
 
 void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
@@ -106,6 +113,7 @@ void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
     functionsEditor->setFunctions(symbolTable.getFunctions());
     functionsEditor->setCurrentFunction(currentFunction);
     scriptsEditor->setScripts(symbolTable.getScripts());
+    builtInsEditor->setUseBuiltInConstants(symbolTable.getUseBuiltInConstants());
 }
 
 void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
@@ -308,4 +316,9 @@ void SymbolsEditor::onFunctionArgsChanged(const QString &name, const std::vector
 
 void SymbolsEditor::onCurrentFunctionChanged(const QString &name) {
     currentFunction = name;
+}
+
+void SymbolsEditor::onUseBuiltInsChanged(bool useBuiltIns) {
+    symbolTable.setUseBuiltInConstants(useBuiltIns);
+    emit onSymbolsChanged(symbolTable);
 }
