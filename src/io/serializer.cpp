@@ -25,6 +25,8 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     nlohmann::json j;
     j["version"] = 0;
 
+    j["useBuiltInConstants"] = table.getUseBuiltInConstants();
+
     std::vector<nlohmann::json> tmp;
     for (auto &p: table.getVariables()) {
         nlohmann::json t;
@@ -60,6 +62,8 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
 SymbolTable Serializer::deserializeTable(const std::string &str) {
     nlohmann::json j = nlohmann::json::parse(str);
     SymbolTable ret;
+
+    ret.setUseBuiltInConstants(j["useBuiltInConstants"]);
 
     auto tmp = j["variables"].get<std::vector<nlohmann::json>>();
     for (auto &v: tmp) {

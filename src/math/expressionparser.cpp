@@ -119,11 +119,13 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
         symbols.add_constant(constant.first, constant.second);
     }
 
-    symbols.add_constants();
-
     std::map<std::string, ArithmeticType> variables = symbolTable.getVariables();
     for (auto &variable: variables) {
         symbols.add_variable(variable.first, variable.second);
+    }
+
+    if (symbolTable.getUseBuiltInConstants()) {
+        symbols.add_constants();
     }
 
     exprtk::expression<ArithmeticType> expression;

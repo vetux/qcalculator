@@ -102,3 +102,11 @@ void SymbolTable::remove(const std::string &name) {
     functions.erase(name);
     scripts.erase(name);
 }
+
+bool SymbolTable::getUseBuiltInConstants() const {
+    return useBuiltInConstants;
+}
+
+void SymbolTable::setUseBuiltInConstants(bool useBuiltIns) {
+    useBuiltInConstants = useBuiltIns;
+}

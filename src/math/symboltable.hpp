@@ -48,6 +48,8 @@ public:
 
     SymbolTable &operator=(SymbolTable &&other) = default;
 
+    bool getUseBuiltInConstants() const;
+
     const std::map<std::string, ArithmeticType> &getVariables() const;
 
     const std::map<std::string, ArithmeticType> &getConstants() const;
@@ -55,6 +57,8 @@ public:
     const std::map<std::string, Function> &getFunctions() const;
 
     const std::map<std::string, Script> &getScripts() const;
+
+    void setUseBuiltInConstants(bool useBuiltIns);
 
     void setVariable(const std::string &name, ArithmeticType value);
 
@@ -75,6 +79,7 @@ public:
     void remove(const std::string &name);
 
 private:
+    bool useBuiltInConstants = true;
     std::map<std::string, ArithmeticType> variables;
     std::map<std::string, ArithmeticType> constants;
     std::map<std::string, Function> functions;
