@@ -70,7 +70,7 @@ namespace exprtk {
             // Used only for initialization of the constants, expression decimals use decimal::context.
             // Possible problem: Clang complains that context_template is uninitialized when constructing the context
             // but exprtk requires the constants to be initialized statically
-            static decimal::Context mpdecimal_context = decimal::Context(4000,99999, -99999);
+            static decimal::Context mpdecimal_context = decimal::Context(1000,99999, -99999);
 
             static const decimal::Decimal e = decimal::Decimal("2.71828182845904523536028747135266249775724709369995",
                                                                mpdecimal_context);

@@ -114,7 +114,7 @@ std::wstring getUserPythonPath(Settings &settings) {
 
 bool checkPythonInit(std::string &stdErr) {
     QProcess proc;
-    proc.start(QApplication::applicationFilePath(), {"--check_python_init"}, QIODevice::ReadOnly);
+    proc.start(QApplication::applicationFilePath(), {"--run_python_init_check"}, QIODevice::ReadOnly);
     proc.waitForFinished();
     auto ret = proc.exitCode();
     stdErr = proc.readAllStandardError().toStdString();
@@ -123,9 +123,6 @@ bool checkPythonInit(std::string &stdErr) {
 
 void configurePythonPath() {
     auto settings = Settings::readSettings();
-
-    // User configurable default python module path for platforms that do have standard paths for python (Eg. Win32)
-    // Needs to be separate from other user module paths because the default path cannot be changed after initializing the interpreter.
     auto pythonPath = getUserPythonPath(settings);
 
     std::string stdErr;
@@ -145,7 +142,7 @@ void configurePythonPath() {
     }
 }
 
-int configurePythonPathInitCheck() {
+int runPythonInitCheck() {
     auto settings = Settings::readSettings();
     if (settings.check(SETTING_PYTHON_PATH.key)) {
         auto str = settings.value(SETTING_PYTHON_PATH.key).toString();
@@ -171,11 +168,11 @@ int main(int argc, char *argv[]) {
 
     auto args = parseArgs(argc, argv);
 
-    if (args.size() > 1 && args.at(1) == "--check_python_init") {
-        return configurePythonPathInitCheck();
-    } else {
-        configurePythonPath();
+    if (args.size() > 1 && args.at(1) == "--run_python_init_check") {
+        return runPythonInitCheck();
     }
+
+    configurePythonPath();
 
     StdRedirModule::initialize();
     ExprtkModule::initialize();
@@ -192,9 +189,6 @@ int main(int argc, char *argv[]) {
             TerminalWindow w;
             w.show();
             return QApplication::exec();
-        } else {
-            std::cout << "Invalid argument " + std::string(args.at(1));
-            return 1;
         }
     } else {
         CalculatorWindow w;
