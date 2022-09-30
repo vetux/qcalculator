@@ -168,7 +168,9 @@ GeneralTab::GeneralTab(QWidget *parent)
     pythonPathLabel = new QLabel(this);
     pythonPathEdit = new QLineEdit(this);
 
-    pythonPathLabel->setText("Python Default Path");
+    pythonPathEdit->setPlaceholderText("Override default path...");
+
+    pythonPathLabel->setText("Python Path");
 
     auto *hlayout = new QHBoxLayout;
     hlayout->setSpacing(20);
@@ -188,7 +190,7 @@ GeneralTab::GeneralTab(QWidget *parent)
     pythonModPathContainerWidget->setLayout(hlayout);
 
     pythonModPathContainerWidget->setToolTip(
-            "List of paths that are added to the python module search path on application startup");
+            "List of paths that are added to the python module search path");
 
     auto *layout = new QVBoxLayout();
 
