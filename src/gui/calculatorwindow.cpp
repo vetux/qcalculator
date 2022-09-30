@@ -313,7 +313,7 @@ void CalculatorWindow::onActionSymbolTableHistory() {
 void CalculatorWindow::onActionOpenTerminal() {
     auto *d = new TerminalWindow(this);
     d->setAttribute(Qt::WA_DeleteOnClose);
-    d->setWindowTitle("Console");
+    d->setWindowTitle("Python Terminal");
     d->show();
 }
 
