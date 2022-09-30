@@ -36,13 +36,13 @@ namespace Interpreter {
 
     void finalize();
 
-    char getDefaultModulePathSeparator();
+    char getPathSeparator();
 
-    void setDefaultModuleDir(const std::wstring &path);
+    void setPath(const std::wstring &path);
 
-    void setDefaultModuleDirs(const std::set<std::string> &path);
+    void setPaths(const std::set<std::string> &path);
 
-    std::wstring getDefaultModuleDir();
+    std::wstring getPath();
 
     void setModuleDirs(const std::vector<std::string> &moduleDirectories);
 

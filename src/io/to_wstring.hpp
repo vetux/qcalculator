@@ -17,28 +17,16 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "paths.hpp"
+#ifndef QCALCULATOR_TO_WSTRING_HPP
+#define QCALCULATOR_TO_WSTRING_HPP
 
-#include <QStandardPaths>
-#include <QCoreApplication>
-#include <QDir>
+#include <string>
 
-std::string Paths::getAppDataDirectory() {
-    auto ret = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir().mkpath(ret);
-    return ret.toStdString();
+inline std::wstring to_wstring(const std::string &str) {
+    std::wstring ret;
+    for (auto &c: str)
+        ret += c;
+    return ret;
 }
 
-std::string Paths::getAppConfigDirectory() {
-    auto ret = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QDir().mkpath(ret);
-    return ret.toStdString();
-}
-
-std::string Paths::getAddonDirectory() {
-    return QCoreApplication::applicationDirPath().append("/addons").toStdString();
-}
-
-std::string Paths::getLibDirectory() {
-    return QCoreApplication::applicationDirPath().append("/libraries").toStdString();
-}
+#endif //QCALCULATOR_TO_WSTRING_HPP

@@ -68,6 +68,10 @@ public:
 
     std::set<std::string> getPythonModPaths();
 
+    void setPythonPath(const std::string &path);
+
+    std::string getPythonPath();
+
 private slots:
 
     void onModuleEnableChanged(AddonItemWidget *item);

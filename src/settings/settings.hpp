@@ -28,6 +28,10 @@ struct Setting;
 
 class Settings {
 public:
+    static Settings readSettings();
+
+    static void saveSettings(const Settings &settings);
+
     enum Type {
         NONE,
         INT,
@@ -80,7 +84,7 @@ public:
 
     void clear(const Setting &s);
 
-    const Entry &value(const std::string &key, const Entry &defaultValue = 0) const {
+    const Entry &value(const std::string &key, const Entry &defaultValue) const {
         if (data.find(key) == data.end())
             return defaultValue;
         else
@@ -91,6 +95,14 @@ public:
 
     const std::map<std::string, Entry> &entries() const {
         return data;
+    }
+
+    const Entry &value(const std::string &key) const {
+        return data.at(key);
+    }
+
+    bool check(const std::string &key) const {
+        return data.find(key) != data.end();
     }
 
 private:

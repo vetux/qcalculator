@@ -22,8 +22,11 @@
 
 #include <string>
 
-namespace Paths
-{
+namespace Paths {
+    static const std::string ADDONS_FILE = "/addons.json";
+    static const std::string SETTINGS_FILE = "/settings.json";
+    static const std::string SYMBOL_TABLE_HISTORY_FILE = "/symboltablehistory.json";
+
     std::string getAppDataDirectory();
 
     std::string getAppConfigDirectory();
@@ -31,6 +34,18 @@ namespace Paths
     std::string getAddonDirectory();
 
     std::string getLibDirectory();
+
+    inline std::string getAddonsFile() {
+        return getAppConfigDirectory() + ADDONS_FILE;
+    }
+
+    inline std::string getSettingsFile() {
+        return getAppConfigDirectory() + SETTINGS_FILE;
+    }
+
+    inline std::string getSymbolTableHistoryFile() {
+        return getAppConfigDirectory() + SYMBOL_TABLE_HISTORY_FILE;
+    }
 }
 
 #endif //QCALC_PATHS_HPP

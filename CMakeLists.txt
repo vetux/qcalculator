@@ -22,9 +22,8 @@ file(GLOB ADDON_SRC python/addon/*.py)
 file(GLOB ADDON_META python/addon/*.json)
 file(GLOB_RECURSE SYSTEM_SRC python/lib/*.py)
 
-file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/python/addon) # Copy addon scripts
-file(COPY ${ADDON_META} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/python/addon) # Copy addon metadata
-file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/python/lib) # Copy system scripts
+file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addons) # Copy addon scripts
+file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/libraries) # Copy addon libraries
 
 set(HDR_GUI src/gui/calculatorwindow.hpp
         src/gui/symbolseditorwindow.hpp

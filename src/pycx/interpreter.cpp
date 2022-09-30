@@ -37,7 +37,7 @@ void Interpreter::finalize() {
     pyInitialized = false;
 }
 
-char Interpreter::getDefaultModulePathSeparator() {
+char Interpreter::getPathSeparator() {
 // https://docs.python.org/3/c-api/init.html PyGetPath:
 // "The returned string consists of a series of directory names separated by a platform dependent delimiter character.
 // The delimiter character is ':' on Unix and macOS, ';' on Windows."
@@ -50,14 +50,14 @@ char Interpreter::getDefaultModulePathSeparator() {
 #endif
 }
 
-void Interpreter::setDefaultModuleDir(const std::wstring &path) {
+void Interpreter::setPath(const std::wstring &path) {
     Py_SetPath(path.c_str());
 }
 
-void Interpreter::setDefaultModuleDirs(const std::set<std::string> &paths) {
-    auto sep = getDefaultModulePathSeparator();
+void Interpreter::setPaths(const std::set<std::string> &path) {
+    auto sep = getPathSeparator();
     std::string str;
-    for (auto &path: paths) {
+    for (auto &path: path) {
         str += path;
         str += sep;
     }
@@ -67,10 +67,10 @@ void Interpreter::setDefaultModuleDirs(const std::set<std::string> &paths) {
     for (auto &c: str) {
         wstr += c;
     }
-    setDefaultModuleDir(wstr);
+    setPath(wstr);
 }
 
-std::wstring Interpreter::getDefaultModuleDir() {
+std::wstring Interpreter::getPath() {
     return {Py_GetPath()};
 }
 

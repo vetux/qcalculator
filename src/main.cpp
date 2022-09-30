@@ -20,6 +20,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QProcess>
 
 #include "gui/calculatorwindow.hpp"
 
@@ -31,6 +32,8 @@
 #include "io/serializer.hpp"
 #include "io/fileoperations.hpp"
 
+#include "settings/settingconstants.hpp"
+
 std::vector<std::string> parseArgs(int argc, char *argv[]) {
     std::vector<std::string> ret;
     ret.reserve(argc);
@@ -40,23 +43,20 @@ std::vector<std::string> parseArgs(int argc, char *argv[]) {
     return ret;
 }
 
-std::wstring getPythonDefaultPath() {
-    auto path = Paths::getAppConfigDirectory() + "/pythonDefaultPath.txt";
-
-    QDir("/").mkpath(Paths::getAppConfigDirectory().c_str());
+std::wstring getUserPythonPath(Settings &settings) {
+    auto path = Paths::getSettingsFile();
 
     std::string str;
 
-    if (QFile(path.c_str()).exists()) {
-        str = FileOperations::fileReadAllText(path);
+    if (settings.check(SETTING_PYTHON_PATH.key)) {
+        str = settings.value(SETTING_PYTHON_PATH.key).toString();
     } else {
         if (QMessageBox::question(nullptr,
-                                  "Override default python module path",
-                                  ("Do you want to configure a python default module path? (Overrides the default os dependent module path, Output is written to " +
-                                   path + " )").c_str()) ==
-            QMessageBox::StandardButton::Yes) {
+                                  "Configure python default path",
+                                  "Do you want to override the python default path?")
+            == QMessageBox::StandardButton::Yes) {
             QFileDialog dialog(nullptr);
-            dialog.setWindowTitle("Select default python module directories");
+            dialog.setWindowTitle("Select directories to add");
             dialog.setFileMode(QFileDialog::Directory);
 
             std::set<std::string> ret;
@@ -66,53 +66,115 @@ std::wstring getPythonDefaultPath() {
                     ret.insert(p.toStdString());
                 }
                 while (QMessageBox::question(nullptr,
-                                             "Add Paths",
-                                             "Do you want to add more paths?") == QMessageBox::Yes) {
+                                             "Add directories",
+                                             "Do you want to add more directories to the path?") == QMessageBox::Yes) {
                     if (dialog.exec()) {
                         for (auto &p: dialog.selectedFiles()) {
                             ret.insert(p.toStdString());
                         }
+                    } else {
+                        QMessageBox::information(nullptr,
+                                                 "Path configuration cancelled",
+                                                 "Cancelled python default path configuration");
+                        return {};
                     }
                 }
             } else {
                 QMessageBox::information(nullptr,
-                                         "Configuration Cancelled",
-                                         "Cancelled python default module path configuration");
+                                         "Path configuration cancelled",
+                                         "Cancelled python default path configuration");
+                return {};
             }
 
             for (auto &p: ret) {
-                str += p + Interpreter::getDefaultModulePathSeparator();
+                str += p + Interpreter::getPathSeparator();
             }
 
             if (!str.empty()) {
                 str.pop_back();
-                FileOperations::fileWriteAllText(path, str);
+                settings.update(SETTING_PYTHON_PATH.key, str);
             }
         } else {
-            FileOperations::fileWriteAllText(path, "");
+            settings.update(SETTING_PYTHON_PATH.key, std::string());
         }
     }
 
-    std::wstring wret;
-    for (auto &c: str) {
-        wret += c;
+    Settings::saveSettings(settings);
+
+    if (str.empty()) {
+        return {};
+    } else {
+        std::wstring wret;
+        for (auto &c: str) {
+            wret += c;
+        }
+        return wret;
     }
-    return wret;
+}
+
+bool checkPythonInit(std::string &stdErr) {
+    QProcess proc;
+    proc.start(QApplication::applicationFilePath(), {"--check_python_init"}, QIODevice::ReadOnly);
+    proc.waitForFinished();
+    auto ret = proc.exitCode();
+    stdErr = proc.readAllStandardError().toStdString();
+    return !ret;
+}
+
+void configurePythonPath() {
+    auto settings = Settings::readSettings();
+
+    // User configurable default python module path for platforms that do have standard paths for python (Eg. Win32)
+    // Needs to be separate from other user module paths because the default path cannot be changed after initializing the interpreter.
+    auto pythonPath = getUserPythonPath(settings);
+
+    std::string stdErr;
+    while (!checkPythonInit(stdErr)) {
+        if (QMessageBox::question(nullptr, "Python initialization failed",
+                                  ("Python failed to initialize do you want to reconfigure the python path?\n\n" +
+                                   stdErr).c_str())
+            == QMessageBox::Yes) {
+            settings.clear(SETTING_PYTHON_PATH);
+            pythonPath = getUserPythonPath(settings);
+        } else {
+            break;
+        }
+    }
+    if (!pythonPath.empty()) {
+        Interpreter::setPath(pythonPath);
+    }
+}
+
+int configurePythonPathInitCheck() {
+    auto settings = Settings::readSettings();
+    if (settings.check(SETTING_PYTHON_PATH.key)) {
+        auto str = settings.value(SETTING_PYTHON_PATH.key).toString();
+        if (!str.empty()){
+            std::wstring wstr;
+            for (auto &c: str) {
+                wstr += c;
+            }
+            Interpreter::setPath(wstr);
+        }
+    }
+    Interpreter::initialize();
+    Interpreter::finalize();
+    return 0;
 }
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    QApplication::setOrganizationName("QCalculator");
-    QApplication::setApplicationName("qcalc");
+    QApplication::setApplicationName("qcalculator");
     QApplication::setApplicationDisplayName("QCalculator");
     QApplication::setApplicationVersion("v0.6.0");
 
-    // User configurable default python module path for platforms that do have standard paths for python (Eg. Win32)
-    // Needs to be separate from other user module paths because the default path cannot be changed after initializing the interpreter.
-    auto pyDefaultModuleDir = getPythonDefaultPath();
-    if (!pyDefaultModuleDir.empty()) {
-        Interpreter::setDefaultModuleDir(pyDefaultModuleDir);
+    auto args = parseArgs(argc, argv);
+
+    if (args.size() > 1 && args.at(1) == "--check_python_init") {
+        return configurePythonPathInitCheck();
+    } else {
+        configurePythonPath();
     }
 
     StdRedirModule::initialize();
@@ -121,7 +183,6 @@ int main(int argc, char *argv[]) {
     Interpreter::addModuleDir(Paths::getAddonDirectory());
     Interpreter::addModuleDir(Paths::getLibDirectory());
 
-    auto args = parseArgs(argc, argv);
     if (args.size() > 1) {
         if (args.at(1) == "--interpreter" || args.at(1) == "-i") {
             // Run the application as an interactive python interpreter

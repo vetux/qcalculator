@@ -52,9 +52,7 @@
 
 #include "extern/exprtk_mpdecimal_adaptor.hpp"
 
-static const std::string ADDONS_FILE = "/addons.json";
-static const std::string SETTINGS_FILE = "/settings.json";
-static const std::string SYMBOL_TABLE_HISTORY_FILE = "/symboltablehistory.json";
+#include "io/to_wstring.hpp"
 
 static const int MAX_SYMBOL_TABLE_HISTORY = 100;
 
@@ -102,7 +100,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
 
     updateSymbolHistoryMenu();
 
-    for (auto &path : settings.value(SETTING_PYTHON_MODPATHS).toStringList()){
+    for (auto &path: settings.value(SETTING_PYTHON_MODPATHS).toStringList()) {
         Interpreter::addModuleDir(path);
     }
 
@@ -120,7 +118,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
                                                       return onAddonUnloadFail(module, error);
                                                   });
 
-    enabledAddonsFilePath = Paths::getAppDataDirectory().append(ADDONS_FILE).c_str();
+    enabledAddonsFilePath = Paths::getAddonsFile().c_str();
 
     std::set<std::string> enabledAddons = loadEnabledAddons();
 
@@ -185,11 +183,12 @@ void CalculatorWindow::onActionSettings() {
             settings.value(SETTING_ROUNDING).toInt()));
     dialog.setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
     dialog.setPythonModPaths(settings.value(SETTING_PYTHON_MODPATHS).toStringList());
+    dialog.setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
 
     dialog.show();
 
     if (dialog.exec() == QDialog::Accepted) {
-        for (auto &path : settings.value(SETTING_PYTHON_MODPATHS).toStringList()){
+        for (auto &path: settings.value(SETTING_PYTHON_MODPATHS).toStringList()) {
             Interpreter::removeModuleDir(path);
         }
 
@@ -199,8 +198,13 @@ void CalculatorWindow::onActionSettings() {
         settings.update(SETTING_ROUNDING.key, dialog.getRoundingMode());
         settings.update(SETTING_WARN_INEXACT.key, dialog.getShowInexactWarning());
         settings.update(SETTING_PYTHON_MODPATHS.key, dialog.getPythonModPaths());
+        settings.update(SETTING_PYTHON_PATH.key, dialog.getPythonPath());
 
-        for (auto &path : settings.value(SETTING_PYTHON_MODPATHS).toStringList()){
+        auto str = settings.value(SETTING_PYTHON_PATH).toString();
+        if (!str.empty()) {
+            Interpreter::setPath(to_wstring(str));
+        }
+        for (auto &path: settings.value(SETTING_PYTHON_MODPATHS).toStringList()) {
             Interpreter::addModuleDir(path);
         }
 
@@ -348,7 +352,7 @@ QString CalculatorWindow::evaluateExpression(const QString &expression) {
 }
 
 void CalculatorWindow::loadSettings() {
-    std::string settingsFilePath = Paths::getAppConfigDirectory().append(SETTINGS_FILE);
+    std::string settingsFilePath = Paths::getAppConfigDirectory().append(Paths::getSettingsFile());
     if (QFile(settingsFilePath.c_str()).exists()) {
         try {
             settings = Serializer::deserializeSettings(FileOperations::fileReadAllText(settingsFilePath));
@@ -391,12 +395,7 @@ void CalculatorWindow::loadSettings() {
 
 void CalculatorWindow::saveSettings() {
     try {
-        std::string dir = Paths::getAppConfigDirectory();
-
-        if (!QDir(dir.c_str()).exists())
-            QDir().mkpath(dir.c_str());
-
-        FileOperations::fileWriteAllText(dir.append(SETTINGS_FILE), Serializer::serializeSettings(settings));
+        FileOperations::fileWriteAllText(Paths::getSettingsFile(), Serializer::serializeSettings(settings));
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to save settings", e.what());
     }
@@ -418,12 +417,7 @@ std::set<std::string> CalculatorWindow::loadEnabledAddons() {
 
 void CalculatorWindow::saveEnabledAddons(const std::set<std::string> &addons) {
     try {
-        std::string dataDir = Paths::getAppDataDirectory();
-
-        if (!QDir(dataDir.c_str()).exists())
-            QDir().mkpath(dataDir.c_str());
-
-        FileOperations::fileWriteAllText(dataDir.append(ADDONS_FILE), Serializer::serializeSet(addons));
+        FileOperations::fileWriteAllText(Paths::getAddonsFile(), Serializer::serializeSet(addons));
     }
     catch (const std::runtime_error &e) {
         QMessageBox::warning(this, "Failed to save enabled addons", e.what());
@@ -431,7 +425,7 @@ void CalculatorWindow::saveEnabledAddons(const std::set<std::string> &addons) {
 }
 
 void CalculatorWindow::loadSymbolTablePathHistory() {
-    std::string filePath = Paths::getAppDataDirectory().append(SYMBOL_TABLE_HISTORY_FILE);
+    std::string filePath = Paths::getSymbolTableHistoryFile();
 
     if (!std::filesystem::exists(filePath)) {
         symbolTablePathHistory = {};
@@ -472,12 +466,7 @@ void CalculatorWindow::saveSymbolTablePathHistory() {
     }
 
     try {
-        std::string dataDir = Paths::getAppDataDirectory();
-
-        if (!QDir(dataDir.c_str()).exists())
-            QDir().mkpath(dataDir.c_str());
-
-        FileOperations::fileWriteAllText(dataDir.append(SYMBOL_TABLE_HISTORY_FILE),
+        FileOperations::fileWriteAllText(Paths::getSymbolTableHistoryFile(),
                                          Serializer::serializeSet(symbolTablePathHistory));
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to save symbol table history", e.what());

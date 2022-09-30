@@ -50,6 +50,8 @@ public slots:
 
     void setPythonModPaths(const std::set<std::string> &paths);
 
+    void setPythonPath(const std::string &path);
+
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
 
@@ -64,6 +66,8 @@ public:
     bool getShowInexactWarning();
 
     std::set<std::string> getPythonModPaths();
+
+    std::string getPythonPath();
 
 private slots:
     void addModPathPressed();
@@ -89,6 +93,9 @@ private:
 
     QLabel *showInexactWarningLabel;
     QCheckBox *showInexactWarningCheckBox;
+
+    QLabel *pythonPathLabel;
+    QLineEdit *pythonPathEdit;
 
     QLabel *pythonModPathLabel;
     QPushButton *pythonModPathAddPushButton;

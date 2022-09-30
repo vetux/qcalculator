@@ -165,6 +165,11 @@ GeneralTab::GeneralTab(QWidget *parent)
     pythonModPathLabel->setText("Python Module Paths");
     pythonModPathAddPushButton->setText("Add Directory");
 
+    pythonPathLabel = new QLabel(this);
+    pythonPathEdit = new QLineEdit(this);
+
+    pythonPathLabel->setText("Python Default Path");
+
     auto *hlayout = new QHBoxLayout;
     hlayout->setSpacing(20);
     hlayout->addWidget(showInexactWarningLabel, 0);
@@ -176,10 +181,14 @@ GeneralTab::GeneralTab(QWidget *parent)
     hlayout->addWidget(pythonModPathLabel, 1);
     hlayout->addWidget(pythonModPathAddPushButton, 0);
 
+    hlayout->setMargin(0);
+    hlayout->setContentsMargins(5, 10, 5, 0);
+
     auto *pythonModPathContainerWidget = new QWidget(this);
     pythonModPathContainerWidget->setLayout(hlayout);
 
-    pythonModPathContainerWidget->setToolTip("List of paths that are added to the python module search path on application startup");
+    pythonModPathContainerWidget->setToolTip(
+            "List of paths that are added to the python module search path on application startup");
 
     auto *layout = new QVBoxLayout();
 
@@ -192,10 +201,11 @@ GeneralTab::GeneralTab(QWidget *parent)
     layout->addWidget(roundingLabel);
     layout->addWidget(roundingComboBox);
     layout->addWidget(inexactWarnContainer);
+    layout->addSpacing(10);
+    layout->addWidget(pythonPathLabel);
+    layout->addWidget(pythonPathEdit);
     layout->addWidget(pythonModPathContainerWidget);
-    layout->addWidget(pythonModPathListWidget);
-
-    layout->addWidget(new QWidget(this), 1);
+    layout->addWidget(pythonModPathListWidget, 1);
 
     setLayout(layout);
 
@@ -249,6 +259,14 @@ std::set<std::string> GeneralTab::getPythonModPaths() {
         ret.insert(widget->getText().toStdString());
     }
     return ret;
+}
+
+void GeneralTab::setPythonPath(const std::string &path) {
+    pythonPathEdit->setText(path.c_str());
+}
+
+std::string GeneralTab::getPythonPath() {
+    return pythonPathEdit->text().toStdString();
 }
 
 void GeneralTab::addModPathPressed() {

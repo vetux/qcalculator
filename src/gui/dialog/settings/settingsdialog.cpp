@@ -145,6 +145,14 @@ std::set<std::string> SettingsDialog::getPythonModPaths() {
     return generalTab->getPythonModPaths();
 }
 
+void SettingsDialog::setPythonPath(const std::string &path) {
+    generalTab->setPythonPath(path);
+}
+
+std::string SettingsDialog::getPythonPath() {
+    return generalTab->getPythonPath();
+}
+
 void SettingsDialog::onModuleEnableChanged(AddonItemWidget *item) {
     std::string name = item->getModuleName().toStdString();
     bool enabled = item->getModuleEnabled();
