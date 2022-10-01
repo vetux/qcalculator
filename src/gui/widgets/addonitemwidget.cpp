@@ -20,6 +20,7 @@
 #include "addonitemwidget.hpp"
 
 #include <QPushButton>
+#include <QSizePolicy>
 
 #include "../../addon/addonmanager.hpp"
 
@@ -31,17 +32,14 @@ AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent),
     checkbox = new QCheckBox(this);
     label = new QLabel(this);
 
+    checkbox->setStyleSheet("QCheckBox::indicator { width: 18px; height: 18px; }");
+
     layout->addWidget(checkbox, 0);
     layout->addWidget(label, 1);
 
     label->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 
     connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChange(int)));
-
-    buttonDelete = new QPushButton(this);
-    buttonDelete->setText("Uninstall");
-    connect(buttonDelete, SIGNAL(pressed()), this, SLOT(onButtonDeletePressed()));
-    layout->addWidget(buttonDelete, 0);
 
     setLayout(layout);
 }
@@ -74,8 +72,4 @@ void AddonItemWidget::setModuleDescription(const QString &description) {
 
 void AddonItemWidget::onCheckBoxStateChange(int state) {
     emit onModuleEnabledChanged(state == Qt::Checked);
-}
-
-void AddonItemWidget::onButtonDeletePressed() {
-    emit onUninstallModule(moduleName);
 }

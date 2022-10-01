@@ -29,6 +29,7 @@
 
 #include "gui/widgets/addonitemwidget.hpp"
 #include "gui/widgets/libraryitemwidget.hpp"
+#include "gui/widgets/addonwidget.hpp"
 
 #include "addon/addon.hpp"
 
@@ -52,18 +53,26 @@ public:
     explicit AddonTab(QWidget *parent = nullptr);
 
 private slots:
+    void uninstallPressed();
 
     void onAddonEnableChanged();
 
     void onModuleUninstall(const QString &name);
 
+    void listItemChange();
+
     void onAddonSearchTextChanged(const QString &text);
 
 private:
+    std::map<std::string, Addon> addons;
+    std::string selectedAddon;
+
     QPushButton *installButton;
     QPushButton *refreshButton;
+    QPushButton *uninstallButton;
     QListWidget *listWidget;
     QLineEdit *addonSearchEdit;
+    AddonWidget *addonWidget;
 };
 
 #endif //QCALC_ADDONTAB_HPP

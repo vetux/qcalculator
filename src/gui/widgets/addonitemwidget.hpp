@@ -47,20 +47,15 @@ signals:
 
     void onModuleEnabledChanged(bool enabled);
 
-    void onUninstallModule(const QString &moduleName);
-
 private:
     QString moduleName;
     QHBoxLayout *layout;
     QCheckBox *checkbox;
     QLabel *label;
-    QPushButton *buttonDelete;
 
 private slots:
 
     void onCheckBoxStateChange(int state);
-
-    void onButtonDeletePressed();
 };
 
 #endif //QCALC_ADDONITEMWIDGET_HPP

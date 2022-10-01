@@ -32,7 +32,7 @@ class CustomCallbacks:
     # when it encounters the defined symbol name in a expression.
     # The arguments are a tuple of mpreal instances.
     # Allowed return values are: float, long and mpreal
-    def evaluate(self, *args):
+    def evaluate(self):
         return 422
 
     # Our script function callback which takes at least one argument
@@ -56,18 +56,19 @@ def load():
     sym.set_constant("pyConst", 3.141)
 
     # A native function with no arguments
-    sym.set_function("pyFunc", exprtk.Function("42 + sin(32)"))
+    sym.set_function("pyFunc", exprtk.Function("42 + 32"))
 
     # A native function with 1 argument called "arg1"
-    sym.set_function("pyFuncArgs", exprtk.Function("133 + cos(arg1)", {"arg1"}))
+    sym.set_function("pyFuncArgs", exprtk.Function("133 + arg1", ["arg1"]))
 
-    # A script function with no arguments
+# A script function with no arguments
     sym.set_script_noargs("pyScript", callbacks.evaluate)
 
-    # A script function which accepts at least 1 argument
-    sym.set_script("pyScriptArgs", exprtk.ScriptFunction(callbacks.evaluate_args, True))
+# A script function which accepts at least 1 argument
+    # The script function argument names that are displayed to the user are specified here
+    sym.set_script("pyScriptArgs", exprtk.ScriptFunction(callbacks.evaluate_args, ["myArgName"]))
 
-    result = exprtk.evaluate_with_side_effects("pyVar := pyConst / pyFunc + pyFuncArgs(42) + pyScript + pyScriptArgs(42, 13)",
+    result = exprtk.evaluate_with_side_effects("pyVar := pyConst / pyFunc() + pyFuncArgs(42) + pyScript() + pyScriptArgs(42, 13)",
                                         sym)
 
     print("Variable: " + str(result[1].get_variable("pyVar")))

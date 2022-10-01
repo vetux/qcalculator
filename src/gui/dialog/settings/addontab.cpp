@@ -36,7 +36,8 @@ std::pair<char, char> getCasePair(char c) {
     }
 }
 
-void AddonTab::setAddons(const std::map<std::string, Addon> &addons) {
+void AddonTab::setAddons(const std::map<std::string, Addon> &add) {
+    addons = add;
     auto searchText = addonSearchEdit->text().toStdString();
     listWidget->clear();
     for (auto &addon: addons) {
@@ -74,7 +75,6 @@ void AddonTab::setAddons(const std::map<std::string, Addon> &addons) {
         listWidget->setItemWidget(item, itemWidget);
 
         connect(itemWidget, SIGNAL(onModuleEnabledChanged(bool)), this, SLOT(onAddonEnableChanged()));
-        connect(itemWidget, SIGNAL(onUninstallModule(const QString &)), this, SLOT(onModuleUninstall(const QString &)));
     }
     listWidget->update(); // When not calling update here the widget contents are drawn for one frame with smaller size
 }
@@ -83,18 +83,22 @@ AddonTab::AddonTab(QWidget *parent)
         : QWidget(parent) {
     installButton = new QPushButton(this);
     refreshButton = new QPushButton(this);
+    uninstallButton = new QPushButton(this);
 
     listWidget = new QListWidget(this);
 
+    listWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     installButton->setText("Install");
     refreshButton->setText("Refresh");
+    uninstallButton->setText("Uninstall");
 
     auto *addonHeader = new QWidget();
     auto *addonHeaderLayout = new QHBoxLayout();
     addonHeaderLayout->setMargin(0);
     addonHeader->setLayout(addonHeaderLayout);
     addonSearchEdit = new QLineEdit();
-    addonHeaderLayout->addWidget(new QLabel("Addons"), 1);
     addonHeaderLayout->addWidget(new QLabel("Search:"));
     addonHeaderLayout->addWidget(addonSearchEdit);
 
@@ -103,19 +107,37 @@ AddonTab::AddonTab(QWidget *parent)
             this,
             SLOT(onAddonSearchTextChanged(const QString &)));
 
-    auto *header = new QWidget(this);
-    header->setLayout(new QHBoxLayout(header));
-    header->layout()->setMargin(0);
-    header->layout()->addWidget(refreshButton);
-    header->layout()->addWidget(installButton);
+    auto btnsLayout = new QHBoxLayout;
 
-    setLayout(new QVBoxLayout(this));
-    layout()->addWidget(addonHeader);
-    layout()->addWidget(listWidget);
-    layout()->addWidget(header);
+    btnsLayout->setMargin(0);
+    btnsLayout->addWidget(refreshButton, 2);
+    btnsLayout->addWidget(installButton, 2);
+    btnsLayout->addWidget(uninstallButton, 1);
+
+    addonWidget = new AddonWidget(this);
+
+    auto *vLayout = new QVBoxLayout();
+    vLayout->addWidget(addonHeader);
+    vLayout->addWidget(listWidget);
+    vLayout->addLayout(btnsLayout);
+
+    auto *hLayout = new QHBoxLayout();
+    hLayout->addLayout(vLayout, 3);
+    hLayout->addWidget(addonWidget, 1);
+
+    setLayout(hLayout);
 
     connect(installButton, SIGNAL(pressed()), this, SIGNAL(installPressed()));
     connect(refreshButton, SIGNAL(pressed()), this, SIGNAL(refreshPressed()));
+    connect(uninstallButton, SIGNAL(pressed()), this, SLOT(uninstallPressed()));
+    connect(listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(listItemChange()));
+
+    auto sp = addonWidget->sizePolicy();
+    sp.setRetainSizeWhenHidden(true);
+    addonWidget->setSizePolicy(sp);
+
+    addonWidget->hide();
+    uninstallButton->setEnabled(false);
 }
 
 
@@ -128,5 +150,25 @@ void AddonTab::onModuleUninstall(const QString &module) {
 }
 
 void AddonTab::onAddonSearchTextChanged(const QString &text) {
-    emit refreshPressed();
+    setAddons(addons);
+}
+
+void AddonTab::listItemChange() {
+    if (!listWidget->selectedItems().empty()) {
+        auto *widget = dynamic_cast<AddonItemWidget *>(listWidget->itemWidget(listWidget->selectedItems().at(0)));
+        selectedAddon = widget->getModuleName().toStdString();
+        addonWidget->setAddon(addons.at(selectedAddon));
+        addonWidget->show();
+        listWidget->doItemsLayout();
+        listWidget->update();
+        uninstallButton->setEnabled(true);
+    } else {
+        selectedAddon.clear();
+        addonWidget->hide();
+        uninstallButton->setEnabled(false);
+    }
+}
+
+void AddonTab::uninstallPressed() {
+    emit onModuleUninstall(selectedAddon.c_str());
 }

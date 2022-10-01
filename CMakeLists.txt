@@ -33,6 +33,7 @@ set(HDR_GUI src/gui/calculatorwindow.hpp
         src/gui/dialog/settings/addontab.hpp
         src/gui/dialog/addoninstalldialog.hpp
         src/gui/widgets/addonitemwidget.hpp
+        src/gui/widgets/addonwidget.hpp
         src/gui/widgets/libraryitemwidget.hpp
         src/gui/widgets/historywidget.hpp
         src/gui/widgets/historylabel.hpp

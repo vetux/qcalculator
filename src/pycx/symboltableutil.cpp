@@ -279,43 +279,46 @@ void setFunctions(PyObject *o, SymbolTable &ret) {
 
         f.expression = expr;
 
-        if (PyObject_HasAttrString(value, "arguments")) {
-            funcAttr = PyObject_GetAttrString(value, "arguments");
-            if (PyList_Check(funcAttr)) {
-                size_t argSize = PyList_Size(funcAttr);
-                for (size_t argi = 0; argi < argSize; argi++) {
-                    PyObject *pyArgName = PyList_GetItem(funcAttr, argi);
-                    if (!PyUnicode_Check(pyArgName)) {
-                        Py_DECREF(funcAttr);
-                        Py_DECREF(attr);
-                        throw std::runtime_error("Function arguments values must be unicode strings");
-                    }
-                    const char *argumentName = PyUnicode_AsUTF8(pyArgName);
-                    if (argumentName == NULL) {
-                        //Should never happen, just in case we will steal the error indicator and throw.
-                        Py_DECREF(funcAttr);
-                        Py_DECREF(attr);
-                        throw std::runtime_error(Interpreter::getError());
-                    }
+        if (!PyObject_HasAttrString(value, "arguments")) {
+            Py_DECREF(attr);
+            throw std::runtime_error("Function must have arguments attribute");
+        }
 
-                    f.argumentNames.emplace_back(std::string(argumentName));
-
+        funcAttr = PyObject_GetAttrString(value, "arguments");
+        if (PyList_Check(funcAttr)) {
+            size_t argSize = PyList_Size(funcAttr);
+            for (auto argi = 0; argi < argSize; argi++) {
+                PyObject *pyArgName = PyList_GetItem(funcAttr, argi);
+                if (!PyUnicode_Check(pyArgName)) {
                     Py_DECREF(funcAttr);
-
-                    try {
-                        ret.setFunction(k, f);
-                    } catch (const std::exception &e) {
-                        Py_DECREF(keys);
-                        Py_DECREF(attr);
-                        throw e;
-                    }
+                    Py_DECREF(attr);
+                    throw std::runtime_error("Function arguments values must be unicode strings");
                 }
-            } else {
-                Py_DECREF(funcAttr);
+                const char *argumentName = PyUnicode_AsUTF8(pyArgName);
+                if (argumentName == NULL) {
+                    //Should never happen, just in case we will steal the error indicator and throw.
+                    Py_DECREF(funcAttr);
+                    Py_DECREF(attr);
+                    throw std::runtime_error(Interpreter::getError());
+                }
+
+                f.argumentNames.emplace_back(std::string(argumentName));
+            }
+
+            Py_DECREF(funcAttr);
+
+            try {
+                ret.setFunction(k, f);
+            } catch (const std::exception &e) {
                 Py_DECREF(keys);
                 Py_DECREF(attr);
-                throw std::runtime_error("Function arguments must be list");
+                throw e;
             }
+        } else {
+            Py_DECREF(funcAttr);
+            Py_DECREF(keys);
+            Py_DECREF(attr);
+            throw std::runtime_error("Function arguments must be list");
         }
     }
 

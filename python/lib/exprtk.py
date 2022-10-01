@@ -17,7 +17,7 @@
 import _exprtk
 
 class Function:
-    def __init__(self, expression=None, arguments=None):
+    def __init__(self, expression="", arguments=[]):
         if arguments is None:
             arguments = []
         self.expression = expression
@@ -88,7 +88,7 @@ class SymbolTable:
         self.scripts[name] = script
 
     def set_script_noargs(self, name, callback):
-        self.scripts[name] = ScriptFunction(callback, False)
+        self.scripts[name] = ScriptFunction(callback)
 
 
 def evaluate(expression, symtable=None):

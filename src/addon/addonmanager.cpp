@@ -272,7 +272,7 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
         std::vector<std::string> addonModules;
 
         for (auto &entry: bundleEntries) {
-            addonModules.emplace_back(entry.module);
+            addonModules.emplace_back(entry.module + " v" + std::to_string(entry.version));
         }
 
         if (!multipleChoiceDialog("Install addons", "Select the addons you want to install", addonModules)) {
@@ -281,7 +281,8 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
 
         auto copy = std::vector<AddonBundleEntry>();
         for (auto &entry: bundleEntries) {
-            if (std::find(addonModules.begin(), addonModules.end(), entry.module) != addonModules.end()) {
+            if (std::find(addonModules.begin(), addonModules.end(),
+                          entry.module + " v" + std::to_string(entry.version)) != addonModules.end()) {
                 copy.emplace_back(entry);
             }
         }
