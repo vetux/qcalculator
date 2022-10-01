@@ -600,8 +600,6 @@ bool CalculatorWindow::importSymbolTable(const std::string &path) {
     try {
         auto syms = Serializer::deserializeTable(FileOperations::fileReadAllText(path));
 
-        QMessageBox::information(this, "Import successful", ("Successfully imported symbols from " + path).c_str());
-
         std::set<std::string> addons = addonManager->getActiveAddons();
         addonManager->setActiveAddons({});
 
