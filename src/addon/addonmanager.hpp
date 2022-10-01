@@ -61,6 +61,17 @@ public:
      */
     std::map<std::string, Library> getLibraries();
 
+    /**
+     * Source file must contain metadata.json with the following syntax:
+     *
+     * {
+     *      "addons": [ "pathOfAddonFileinArchive" ],
+     *      "libraries": [ "pathOfLibraryPackageDirectoryInArchive" ]
+     * }
+     *
+     * @param sourceFile
+     * @param questionDialog
+     */
     void installAddon(std::istream &sourceFile,
                       std::function<bool(const std::string &, const std::string &)> questionDialog);
 

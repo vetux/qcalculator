@@ -264,7 +264,7 @@ void AddonManager::installAddon(std::istream &sourceFile,
     Archive arch(sourceFile);
 
     if (arch.entries().find(metadataFilePath) == arch.entries().end()) {
-        throw std::runtime_error("metadata.json not found in package");
+        throw std::runtime_error("metadata.json must be present in the addon package");
     }
 
     auto metadata = arch.entries().at(metadataFilePath);
@@ -296,13 +296,13 @@ void AddonManager::installAddon(std::istream &sourceFile,
         }
     }
 
-    if (j.find("libs") != j.end()) {
-        for (auto &jLib: j["libs"]) {
+    if (j.find("libraries") != j.end()) {
+        for (auto &jLib: j["libraries"]) {
             if (!jLib.is_string()) {
-                throw std::runtime_error("libs array members must be strings");
+                throw std::runtime_error("libraries array members must be strings");
             }
 
-            std::string libDirectory = jLib.get<std::string>();
+            auto libDirectory = jLib.get<std::string>();
 
             std::set<std::string> libFiles;
             for (auto &entry: arch.entries()) {

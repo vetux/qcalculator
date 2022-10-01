@@ -28,12 +28,15 @@
 #include <QMenuBar>
 #include <QApplication>
 #include <QProcess>
+#include <QProgressDialog>
 
 #include "addon/addonmanager.hpp"
 
 #include "io/paths.hpp"
 #include "io/serializer.hpp"
 #include "io/fileoperations.hpp"
+#include "io/archive.hpp"
+
 #include "settings/settingconstants.hpp"
 
 #include "math/expressionparser.hpp"
@@ -85,6 +88,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionSaveAsSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveAsSymbolTable()));
     connect(actionEditSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionEditSymbolTable()));
     connect(actionOpenTerminal, SIGNAL(triggered(bool)), this, SLOT(onActionOpenTerminal()));
+    connect(actionExtractArchive, SIGNAL(triggered(bool)), this, SLOT(onActionExtractArchive()));
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
@@ -317,6 +321,27 @@ void CalculatorWindow::onActionOpenTerminal() {
     d->show();
 }
 
+void CalculatorWindow::onActionExtractArchive() {
+    QFileDialog dialog;
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setFileMode(QFileDialog::AnyFile);
+
+    if (dialog.exec() == QFileDialog::Accepted) {
+        auto archiveFile = dialog.selectedFiles().at(0);
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
+        dialog.setFileMode(QFileDialog::Directory);
+
+        if (dialog.exec() == QFileDialog::Accepted) {
+            auto targetDirectory = dialog.selectedFiles()[0];
+            Archive::extractToDisk(archiveFile.toStdString(),
+                                   targetDirectory.toStdString(),
+                                   [](const std::string &str) {});
+            QMessageBox::information(this, "Extraction Successful",
+                                     "Extracted " + archiveFile + " to " + targetDirectory);
+        }
+    }
+}
+
 const SymbolTable &CalculatorWindow::getSymbolTable() {
     return symbolTable;
 }
@@ -539,7 +564,12 @@ void CalculatorWindow::setupMenuBar() {
     actionEditSymbols->setObjectName("actionEditSymbols");
     actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
+    actionExtractArchive = new QAction(this);
+    actionExtractArchive->setText("Extract archive");
+    actionExtractArchive->setObjectName("actionExtractArchive");
+
     menuTools->addAction(actionOpenTerminal);
+    menuTools->addAction(actionExtractArchive);
 
     menuFile->addAction(actionSettings);
     menuFile->addSeparator();

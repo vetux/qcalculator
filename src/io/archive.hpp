@@ -24,6 +24,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <functional>
 
 class Archive {
 public:
@@ -61,6 +62,8 @@ public:
         ARCHIVE_FORMAT_WARC = 0xF0000,
         ARCHIVE_FORMAT_RAR_V5 = 0x100000,
     };
+
+    static void extractToDisk(const std::string &archive, const std::string &outputDirectory, std::function<void(const std::string &)> progressCallback);
 
     Archive();
 
