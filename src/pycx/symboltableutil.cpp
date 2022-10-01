@@ -49,7 +49,7 @@ PyObject *SymbolTableUtil::New(const SymbolTable &table) {
 
     PyObject *vars = PyObject_GetAttrString(symInstance, "variables");
     for (auto &var: table.getVariables()) {
-        PyObject *o = PyFloat_FromDouble(std::stod(var.second.format("f")));
+        PyObject *o = PyUnicode_FromString(var.second.format("f").c_str());
         PyDict_SetItemString(vars, var.first.c_str(), o);
         Py_DECREF(o);
     }
@@ -57,7 +57,7 @@ PyObject *SymbolTableUtil::New(const SymbolTable &table) {
 
     vars = PyObject_GetAttrString(symInstance, "constants");
     for (auto &var: table.getConstants()) {
-        PyObject *o = PyFloat_FromDouble(std::stod(var.second.format("f")));
+        PyObject *o = PyUnicode_FromString(var.second.format("f").c_str());
         PyDict_SetItemString(vars, var.first.c_str(), o);
         Py_DECREF(o);
     }
@@ -147,13 +147,15 @@ void setVariables(PyObject *o, SymbolTable &ret) {
         }
 
         decimal::Decimal v;
-        if (PyFloat_Check(value)) {
+        if (PyUnicode_Check(value)){
+            v = decimal::Decimal(PyUnicode_AsUTF8(value));
+        } else if (PyFloat_Check(value)) {
             v = decimal::Decimal(std::to_string(PyFloat_AsDouble(value)));
         } else if (PyLong_Check(value)) {
             v = decimal::Decimal(std::to_string(PyLong_AsDouble(value)));
         } else {
             Py_DECREF(attr);
-            throw std::runtime_error("Variable value must be float or long");
+            throw std::runtime_error("Variable value must be string, float or long");
         }
 
         try {
@@ -197,7 +199,9 @@ void setConstants(PyObject *o, SymbolTable &ret) {
         }
 
         decimal::Decimal v;
-        if (PyFloat_Check(value)) {
+        if (PyUnicode_Check(value)){
+            v = decimal::Decimal(PyUnicode_AsUTF8(value));
+        } else if (PyFloat_Check(value)) {
             v = decimal::Decimal(std::to_string(PyFloat_AsDouble(value)));
         } else if (PyLong_Check(value)) {
             v = decimal::Decimal(std::to_string(PyLong_AsDouble(value)));

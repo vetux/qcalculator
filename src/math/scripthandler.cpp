@@ -28,9 +28,9 @@ ArithmeticType ScriptHandler::run(PyObject *c, const std::vector<ArithmeticType>
     }
 
     PyObject *args = PyTuple_New(a.size());
-    for (size_t i = 0; i < a.size(); i++) {
+    for (auto i = 0; i < a.size(); i++) {
         auto &v = a.at(i);
-        PyObject *f = PyFloat_FromDouble(std::stod(v.format("f")));
+        PyObject *f = PyUnicode_FromString(v.format("f").c_str());
         PyTuple_SetItem(args, i, f);
     }
 

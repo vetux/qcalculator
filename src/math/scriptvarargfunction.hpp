@@ -31,7 +31,10 @@ struct _object;
 typedef _object PyObject;
 
 /**
- * A exprtk function which executes a single python script.
+ * The ScriptVarArgFunction executes a python function a variable number of arguments.
+ * Arguments are stored in a single args list argument.
+ * Arguments are passed as string objects containing the number representation.
+ * The script must return the result value as a string, float or int.
  */
 template<typename T>
 class ScriptVarArgFunction : public exprtk::ivararg_function<T> {

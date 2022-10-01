@@ -30,7 +30,8 @@ struct _object;
 typedef _object PyObject;
 
 /**
- * A exprtk function which executes a single python script.
+ * The ScriptFunction executes a python function with no arguments.
+ * The script must return the result value as a string, float or int.
  */
 template<typename T>
 struct ScriptFunction : public exprtk::ifunction<T> {
