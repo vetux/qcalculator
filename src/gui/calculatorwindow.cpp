@@ -366,13 +366,7 @@ QString CalculatorWindow::evaluateExpression(const QString &expression) {
         decimal::context.clear_status();
         auto v = ExpressionParser::evaluate(expression.toStdString(), symbolTable);
         if (settings.value(SETTING_WARN_INEXACT).toInt() && decimal::context.status() & MPD_Inexact) {
-            std::string msg;
-            if (v.isinfinite()) {
-                msg = "Result is inexact";
-            } else {
-                msg = "Result is inexact, increase the precision to compute an exact result.";
-            }
-            QMessageBox::warning(this, "Inexact result", msg.c_str());
+            QMessageBox::warning(this, "Inexact result", "Result is inexact!");
         }
         onSymbolTableChanged(symbolTable);
 
