@@ -17,8 +17,8 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_GENERALTAB_HPP
-#define QCALC_GENERALTAB_HPP
+#ifndef QCALCULATOR_PYTHONTAB_HPP
+#define QCALCULATOR_PYTHONTAB_HPP
 
 #include <QWidget>
 
@@ -34,50 +34,34 @@
 #include "gui/widgets/stringedititemwidget.hpp"
 #include "math/arithmetictype.hpp"
 
-class GeneralTab : public QWidget {
+class PythonTab : public QWidget {
 Q_OBJECT
 public slots:
+    void setPythonModPaths(const std::set<std::string> &paths);
 
-    void setPrecision(int bits);
-
-    void setRounding(decimal::round rounding);
-
-    void setExponentMax(int max);
-
-    void setExponentMin(int min);
-
-    void setShowInexactWarning(bool showWarning);
+    void setPythonPath(const std::string &path);
 
 public:
-    explicit GeneralTab(QWidget *parent = nullptr);
+    explicit PythonTab(QWidget *parent = nullptr);
 
-    int getPrecision();
+    std::set<std::string> getPythonModPaths();
 
-    decimal::round getRounding();
+    std::string getPythonPath();
 
-    int getExponentMax();
+private slots:
+    void addModPathPressed();
 
-    int getExponentMin();
+    void addItem(const QString &path);
 
-    bool getShowInexactWarning();
+    void removeItem(const QString &path);
 
 private:
-    QStringListModel roundingModel;
+    QLabel *pythonPathLabel;
+    QLineEdit *pythonPathEdit;
 
-    QLabel *precisionLabel;
-    QSpinBox *precisionSpinBox;
-
-    QLabel *exponentMinLabel;
-    QSpinBox *exponentMinSpinBox;
-
-    QLabel *exponentMaxLabel;
-    QSpinBox *exponentMaxSpinBox;
-
-    QLabel *roundingLabel;
-    QComboBox *roundingComboBox;
-
-    QLabel *showInexactWarningLabel;
-    QCheckBox *showInexactWarningCheckBox;
+    QLabel *pythonModPathLabel;
+    QPushButton *pythonModPathAddPushButton;
+    QListWidget *pythonModPathListWidget;
 };
 
-#endif //QCALC_GENERALTAB_HPP
+#endif //QCALCULATOR_PYTHONTAB_HPP

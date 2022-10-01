@@ -49,12 +49,14 @@ SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
 
     generalTab = new GeneralTab(this);
     addonTab = new AddonTab(this);
+    pythonTab = new PythonTab(this);
 
     okButton->setText("Ok");
     cancelButton->setText("Cancel");
 
     tabWidget->addTab(generalTab, "General");
     tabWidget->addTab(addonTab, "Addons");
+    tabWidget->addTab(pythonTab, "Python");
 
     tabWidget->setTabPosition(QTabWidget::West);
 
@@ -136,19 +138,19 @@ bool SettingsDialog::getShowInexactWarning() {
 }
 
 void SettingsDialog::setPythonModPaths(const std::set<std::string> &paths) {
-    generalTab->setPythonModPaths(paths);
+    pythonTab->setPythonModPaths(paths);
 }
 
 std::set<std::string> SettingsDialog::getPythonModPaths() {
-    return generalTab->getPythonModPaths();
+    return pythonTab->getPythonModPaths();
 }
 
 void SettingsDialog::setPythonPath(const std::string &path) {
-    generalTab->setPythonPath(path);
+    pythonTab->setPythonPath(path);
 }
 
 std::string SettingsDialog::getPythonPath() {
-    return generalTab->getPythonPath();
+    return pythonTab->getPythonPath();
 }
 
 void SettingsDialog::onModuleEnableChanged(AddonItemWidget *item) {

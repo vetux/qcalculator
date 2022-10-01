@@ -31,6 +31,7 @@ set(HDR_GUI src/gui/calculatorwindow.hpp
         src/gui/dialog/settings/settingsdialog.hpp
         src/gui/dialog/settings/generaltab.hpp
         src/gui/dialog/settings/addontab.hpp
+        src/gui/dialog/settings/pythontab.hpp
         src/gui/dialog/addoninstalldialog.hpp
         src/gui/widgets/addonitemwidget.hpp
         src/gui/widgets/addonwidget.hpp

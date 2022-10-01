@@ -30,7 +30,8 @@
 #include "addon/addonmanager.hpp"
 
 #include "gui/dialog/settings/generaltab.hpp"
-#include "addontab.hpp"
+#include "gui/dialog/settings/addontab.hpp"
+#include "gui/dialog/settings/pythontab.hpp"
 
 class SettingsDialog : public QDialog {
 Q_OBJECT
@@ -96,6 +97,7 @@ private:
 
     GeneralTab *generalTab;
     AddonTab *addonTab;
+    PythonTab *pythonTab;
 
     AddonManager &addonManager;
 
