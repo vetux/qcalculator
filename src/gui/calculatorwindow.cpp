@@ -323,21 +323,29 @@ void CalculatorWindow::onActionOpenTerminal() {
 
 void CalculatorWindow::onActionExtractArchive() {
     QFileDialog dialog;
+    dialog.setWindowTitle("Select archive file...");
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::AnyFile);
 
     if (dialog.exec() == QFileDialog::Accepted) {
         auto archiveFile = dialog.selectedFiles().at(0);
+        dialog.setWindowTitle("Select output directory...");
         dialog.setAcceptMode(QFileDialog::AcceptSave);
         dialog.setFileMode(QFileDialog::Directory);
 
         if (dialog.exec() == QFileDialog::Accepted) {
             auto targetDirectory = dialog.selectedFiles()[0];
-            Archive::extractToDisk(archiveFile.toStdString(),
-                                   targetDirectory.toStdString(),
-                                   [](const std::string &str) {});
-            QMessageBox::information(this, "Extraction Successful",
-                                     "Extracted " + archiveFile + " to " + targetDirectory);
+            try {
+                Archive::extractToDisk(archiveFile.toStdString(),
+                                       targetDirectory.toStdString(),
+                                       [](const std::string &str) {});
+                QMessageBox::information(this, "Extraction Successful",
+                                         "Extracted " + archiveFile + " to " + targetDirectory);
+            } catch (const std::exception &e) {
+                QMessageBox::warning(this,
+                                     "Extraction failed",
+                                     e.what());
+            }
         }
     }
 }
@@ -565,7 +573,7 @@ void CalculatorWindow::setupMenuBar() {
     actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
     actionExtractArchive = new QAction(this);
-    actionExtractArchive->setText("Extract archive");
+    actionExtractArchive->setText("Extract archive...");
     actionExtractArchive->setObjectName("actionExtractArchive");
 
     menuTools->addAction(actionOpenTerminal);
