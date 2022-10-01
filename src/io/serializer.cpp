@@ -31,7 +31,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     for (auto &p: table.getVariables()) {
         nlohmann::json t;
         t["name"] = p.first;
-        t["value"] = p.second.repr();
+        t["value"] = p.second.format("f");
         tmp.emplace_back(t);
     }
     j["variables"] = tmp;
@@ -40,7 +40,7 @@ std::string Serializer::serializeTable(const SymbolTable &table) {
     for (auto &p: table.getConstants()) {
         nlohmann::json t;
         t["name"] = p.first;
-        t["value"] = p.second.repr();
+        t["value"] = p.second.format("f");
         tmp.emplace_back(t);
     }
     j["constants"] = tmp;
@@ -75,7 +75,7 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
     tmp = j["constants"].get<std::vector<nlohmann::json>>();
     for (auto &v: tmp) {
         std::string name = v["name"];
-        ArithmeticType value = decimal::Decimal(v["value"].get<std::string>());
+        ArithmeticType value = ArithmeticType(v["value"].get<std::string>());
 
         ret.setConstant(name, value);
     }
