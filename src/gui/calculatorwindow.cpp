@@ -638,9 +638,6 @@ bool CalculatorWindow::saveSymbolTable(const std::string &path) {
 
         actionSaveSymbols->setEnabled(true);
 
-        QMessageBox::information(this,
-                                 "Export successful",
-                                 ("Successfully saved symbols to " + path).c_str());
         return true;
     }
     catch (const std::exception &e) {
