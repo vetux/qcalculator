@@ -22,8 +22,8 @@ file(GLOB ADDON_SRC python/addon/*.py)
 file(GLOB ADDON_META python/addon/*.json)
 file(GLOB_RECURSE SYSTEM_SRC python/lib/*.py)
 
-file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addons) # Copy addon scripts
-file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/libraries) # Copy addon libraries
+file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy addon scripts
+file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/lib/) # Copy system libraries
 
 set(HDR_GUI src/gui/calculatorwindow.hpp
         src/gui/symbolseditorwindow.hpp
@@ -31,6 +31,7 @@ set(HDR_GUI src/gui/calculatorwindow.hpp
         src/gui/dialog/settings/settingsdialog.hpp
         src/gui/dialog/settings/generaltab.hpp
         src/gui/dialog/settings/addontab.hpp
+        src/gui/dialog/addoninstalldialog.hpp
         src/gui/widgets/addonitemwidget.hpp
         src/gui/widgets/libraryitemwidget.hpp
         src/gui/widgets/historywidget.hpp
@@ -41,7 +42,8 @@ set(HDR_GUI src/gui/calculatorwindow.hpp
         src/gui/widgets/builtinseditor.hpp
         src/gui/widgets/symbolseditor.hpp
         src/gui/widgets/terminalwidget.hpp
-        src/gui/widgets/stringedititemwidget.hpp)
+        src/gui/widgets/stringedititemwidget.hpp
+        src/gui/widgets/installaddonitemwidget.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
 

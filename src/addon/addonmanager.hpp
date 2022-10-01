@@ -27,14 +27,19 @@
 #include <map>
 
 #include "addon.hpp"
-#include "addon/library.hpp"
+
+struct AddonBundleEntry {
+    std::string module;
+    std::string modulePath;
+    std::vector<std::string> packages;
+    int version;
+};
 
 class AddonManager {
 public:
     typedef std::function<void(const std::string &, const std::string &)> Listener;
 
     AddonManager(const std::string &addonDirectory,
-                 const std::string &libDirectory,
                  Listener onAddonLoadFail,
                  Listener onAddonUnloadFail);
 
@@ -57,41 +62,58 @@ public:
     std::set<std::string> getActiveAddons();
 
     /**
-     * @return The set of available libraries.
-     */
-    std::map<std::string, Library> getLibraries();
-
-    /**
-     * Source file must contain metadata.json with the following syntax:
+     * Install addons from a addon bundle.
+     * A addon bundle must be an archive format supported by libarchive
+     * and contain the file metadata.json of the following format:
      *
      * {
-     *      "addons": [ "pathOfAddonFileinArchive" ],
-     *      "libraries": [ "pathOfLibraryPackageDirectoryInArchive" ]
+     *      "addons": [
+     *          // Addon Declaration
+     *          {
+     *              // The path to the addon module file in the archive
+     *              "module": "MyAddon.py",
+     *
+     *              // The list of packages that are copied into the addon specific folder that is added to the path
+     *              "packages": [
+     *                  "MyDirectory/OtherDirectory/MyModule/", // The path to the module, the last directory is placed on the import path eg. MyModule in this case
+     *                  ...
+     *              ],
+     *
+     *              // The version of this release of the addon (optional)
+     *              "version": 1
+     *          },
+     *          ...
+     *      ],
+     *      "bundleVersion": 0
      * }
      *
      * @param sourceFile
      * @param questionDialog
      */
-    void installAddon(std::istream &sourceFile,
-                      std::function<bool(const std::string &, const std::string &)> questionDialog);
+    size_t installAddonBundle(std::istream &sourceFile,
+                           std::function<bool(const std::string &, const std::string &)> questionDialog,
+                           std::function<bool(const std::string &,
+                                   const std::string &,
+                                              std::vector<std::string> &)> multipleChoiceDialog);
+
 
     void uninstallAddon(const std::string &moduleName);
 
-    void uninstallLibrary(const std::string &libraryPackage);
+    void loadAddonLibraryPaths();
+
+    void unloadAddonLibraryPaths();
 
 private:
     void readAddons();
 
     std::string addonDir;
-    std::string libDir;
 
     std::map<std::string, Addon> addons;
     std::set<std::string> loadedModules;
+    std::set<std::string> addonLibraryPaths;
 
     Listener onAddonLoadFail;
     Listener onAddonUnloadFail;
-
-    std::map<std::string, Library> libraries;
 };
 
 #endif //QCALC_ADDONMANAGER_HPP

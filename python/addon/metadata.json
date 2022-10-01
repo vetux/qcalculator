@@ -1,0 +1,22 @@
+{
+  "addons": [
+    {
+      "module": "scripts/factorial.py"
+    },
+    {
+      "module": "scripts/nilakantha.py"
+    },
+    {
+      "module": "gui/keypad.py"
+    },
+    {
+      "module": "gui/numberview.py"
+    },
+    {
+      "module": "sample_exprtk.py"
+    },
+    {
+      "module": "sample_gui.py"
+    }
+  ]
+}

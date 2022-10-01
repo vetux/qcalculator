@@ -17,53 +17,44 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_ADDONTAB_HPP
-#define QCALC_ADDONTAB_HPP
+#ifndef QCALCULATOR_INSTALLADDONITEMWIDGET_HPP
+#define QCALCULATOR_INSTALLADDONITEMWIDGET_HPP
 
 #include <QWidget>
-#include <QPushButton>
+#include <QLabel>
 #include <QListWidget>
-#include <QLineEdit>
+#include <QCheckBox>
+#include <QHBoxLayout>
 
-#include <set>
-
-#include "gui/widgets/addonitemwidget.hpp"
-#include "gui/widgets/libraryitemwidget.hpp"
-
-#include "addon/addon.hpp"
-
-class AddonTab : public QWidget {
+class InstallAddonItemWidget : public QWidget {
 Q_OBJECT
-signals:
+public:
+    InstallAddonItemWidget(QWidget *parent = nullptr) : QWidget(parent) {
+        label = new QLabel(this);
+        checkBox = new QCheckBox(this);
+        auto *l = new QHBoxLayout(this);
+        l->addWidget(label, 1);
+        l->addWidget(checkBox);
+        setLayout(l);
+    }
 
-    void addonEnableChanged(AddonItemWidget *item);
-
-    void addonUninstall(const QString &module);
-
-    void installPressed();
-
-    void refreshPressed();
+    bool getChecked() {
+        return checkBox->checkState() == Qt::Checked;
+    }
 
 public slots:
 
-    void setAddons(const std::map<std::string, Addon> &addonMetadata);
+    void setText(const QString &str) {
+        label->setText(str);
+    }
 
-public:
-    explicit AddonTab(QWidget *parent = nullptr);
-
-private slots:
-
-    void onAddonEnableChanged();
-
-    void onModuleUninstall(const QString &name);
-
-    void onAddonSearchTextChanged(const QString &text);
+    void setChecked(bool checked) {
+        checkBox->setCheckState(checked ? Qt::Checked : Qt::Unchecked);
+    }
 
 private:
-    QPushButton *installButton;
-    QPushButton *refreshButton;
-    QListWidget *listWidget;
-    QLineEdit *addonSearchEdit;
+    QLabel *label;
+    QCheckBox *checkBox;
 };
 
-#endif //QCALC_ADDONTAB_HPP
+#endif //QCALCULATOR_INSTALLADDONITEMWIDGET_HPP

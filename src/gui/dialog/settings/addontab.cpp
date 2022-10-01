@@ -79,55 +79,12 @@ void AddonTab::setAddons(const std::map<std::string, Addon> &addons) {
     listWidget->update(); // When not calling update here the widget contents are drawn for one frame with smaller size
 }
 
-void AddonTab::setLibraries(const std::map<std::string, Library> &libs) {
-    auto searchText = libSearchEdit->text().toStdString();
-
-    libListWidget->clear();
-    for (auto &pair: libs) {
-        auto &lib = pair.second;
-        auto package = lib.package;
-        if (!searchText.empty()) {
-            bool cont = false;
-            if (searchText.size() > package.size()) {
-                continue;
-            }
-            for (int i = 0; i < searchText.size(); i++) {
-                auto c = getCasePair(searchText.at(i));
-                if (package.at(i) != c.first && package.at(i) != c.second) {
-                    cont = true;
-                    break;
-                }
-            }
-            if (cont)
-                continue;
-        }
-
-        auto *itemWidget = new LibraryItemWidget(libListWidget);
-        itemWidget->setLibrary(package.c_str());
-        itemWidget->setVersion(lib.version);
-
-        auto *item = new QListWidgetItem();
-        item->setSizeHint(itemWidget->minimumSizeHint());
-
-        libListWidget->addItem(item);
-        libListWidget->setItemWidget(item, itemWidget);
-
-        connect(itemWidget,
-                SIGNAL(onUninstallLibrary(const QString &)),
-                this,
-                SIGNAL(libraryUninstall(const QString &)));
-    }
-    libListWidget->update(); // When not calling update here the widget contents are drawn for one frame with smaller size
-}
-
 AddonTab::AddonTab(QWidget *parent)
         : QWidget(parent) {
     installButton = new QPushButton(this);
     refreshButton = new QPushButton(this);
 
     listWidget = new QListWidget(this);
-
-    libListWidget = new QListWidget(this);
 
     installButton->setText("Install");
     refreshButton->setText("Refresh");
@@ -141,24 +98,10 @@ AddonTab::AddonTab(QWidget *parent)
     addonHeaderLayout->addWidget(new QLabel("Search:"));
     addonHeaderLayout->addWidget(addonSearchEdit);
 
-    auto *libHeader = new QWidget();
-    auto *libHeaderLayout = new QHBoxLayout();
-    libHeaderLayout->setMargin(0);
-    libHeader->setLayout(libHeaderLayout);
-    libSearchEdit = new QLineEdit();
-    libHeaderLayout->addWidget(new QLabel("Libraries"), 1);
-    libHeaderLayout->addWidget(new QLabel("Search:"));
-    libHeaderLayout->addWidget(libSearchEdit);
-
     connect(addonSearchEdit,
             SIGNAL(textChanged(const QString &)),
             this,
             SLOT(onAddonSearchTextChanged(const QString &)));
-
-    connect(libSearchEdit,
-            SIGNAL(textChanged(const QString &)),
-            this,
-            SLOT(onLibrarySearchTextChanged(const QString &)));
 
     auto *header = new QWidget(this);
     header->setLayout(new QHBoxLayout(header));
@@ -169,8 +112,6 @@ AddonTab::AddonTab(QWidget *parent)
     setLayout(new QVBoxLayout(this));
     layout()->addWidget(addonHeader);
     layout()->addWidget(listWidget);
-    layout()->addWidget(libHeader);
-    layout()->addWidget(libListWidget);
     layout()->addWidget(header);
 
     connect(installButton, SIGNAL(pressed()), this, SIGNAL(installPressed()));
@@ -187,9 +128,5 @@ void AddonTab::onModuleUninstall(const QString &module) {
 }
 
 void AddonTab::onAddonSearchTextChanged(const QString &text) {
-    emit refreshPressed();
-}
-
-void AddonTab::onLibrarySearchTextChanged(const QString &text) {
     emit refreshPressed();
 }

@@ -28,6 +28,7 @@
 #include <fstream>
 
 #include "gui/widgets/addonitemwidget.hpp"
+#include "gui/dialog/addoninstalldialog.hpp"
 
 #include "addon/addonmanager.hpp"
 
@@ -78,8 +79,6 @@ SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
     connect(addonTab, SIGNAL(addonEnableChanged(AddonItemWidget * )), this,
             SLOT(onModuleEnableChanged(AddonItemWidget * )));
     connect(addonTab, SIGNAL(addonUninstall(const QString &)), this, SLOT(onAddonUninstall(const QString &)));
-    connect(addonTab, SIGNAL(libraryUninstall(const QString &)), this, SLOT(onLibraryUninstall(const QString &)));
-
 
     resize({700, 500});
 }
@@ -90,7 +89,6 @@ void SettingsDialog::setEnabledAddons(const std::set<std::string> &addons) {
     enabledAddons = addons;
 
     addonTab->setAddons(addonManager.getAvailableAddons());
-    addonTab->setLibraries(addonManager.getLibraries());
 }
 
 std::set<std::string> SettingsDialog::getEnabledAddons() {
@@ -198,24 +196,51 @@ void SettingsDialog::onRefreshAddonsPressed() {
         enabledAddons.erase(mod);
 
     addonTab->setAddons(adds);
-    addonTab->setLibraries(addonManager.getLibraries());
 }
 
 void SettingsDialog::onInstallAddonPressed() {
     auto *d = new QFileDialog();
-    d->setWindowTitle("Select addon package file");
+    d->setWindowTitle("Select addon bundle file");
     d->setFileMode(QFileDialog::ExistingFile);
     if (d->exec()) {
         auto file = d->selectedFiles().first().toStdString();
         delete d;
         try {
             std::ifstream ifs(file);
-            addonManager.installAddon(ifs, [this](const std::string &title, const std::string &text) {
-                return QMessageBox::question(this, title.c_str(), text.c_str()) == QMessageBox::Yes;
-            });
-            QMessageBox::information(this,
-                                     "Installation Successful",
-                                     ("Successfully installed addon package from " + file).c_str());
+            auto installedAddonCount = addonManager.installAddonBundle(ifs, [this](const std::string &title,
+                                                                                   const std::string &text) {
+                                                                           return QMessageBox::question(this, title.c_str(), text.c_str()) == QMessageBox::Yes;
+                                                                       },
+                                                                       [this](const std::string &title,
+                                                                              const std::string &text,
+                                                                              std::vector<std::string> &value) {
+                                                                           auto dialog = new AddonInstallDialog(this);
+                                                                           dialog->setWindowTitle(title.c_str());
+                                                                           dialog->setText(text.c_str());
+                                                                           dialog->setItems(value);
+
+                                                                           auto ret = dialog->exec();
+
+                                                                           if (ret == QDialog::Accepted) {
+                                                                               value = dialog->getCheckedItems();
+                                                                               return true;
+                                                                           } else {
+                                                                               return false;
+                                                                           }
+                                                                       });
+            if (installedAddonCount > 0) {
+                addonManager.unloadAddonLibraryPaths();
+                addonManager.loadAddonLibraryPaths();
+
+                QMessageBox::information(this,
+                                         "Installation Successful",
+                                         ("Successfully installed " + std::to_string(installedAddonCount) +
+                                          " addons.").c_str());
+            } else {
+                QMessageBox::information(this,
+                                         "Installation Finished",
+                                         "No addons were installed.");
+            }
         } catch (const std::exception &e) {
             QMessageBox::critical(this,
                                   "Installation Failed",
@@ -229,23 +254,8 @@ void SettingsDialog::onInstallAddonPressed() {
 
 void SettingsDialog::onAddonUninstall(const QString &name) {
     if (QMessageBox::question(this, "Uninstall Addon",
-                              ("Do you want to delete the file:\n"
-                               + Paths::getAddonDirectory()
-                               + "/"
-                               + name.toStdString()
-                               + ".py").c_str()) == QMessageBox::Yes) {
+                              "Do you want to uninstall " + name + " ?") == QMessageBox::Yes) {
         addonManager.uninstallAddon(name.toStdString());
-        onRefreshAddonsPressed();
-    }
-}
-
-void SettingsDialog::onLibraryUninstall(const QString &name) {
-    if (QMessageBox::question(this, "Uninstall Library",
-                              ("Do you want to delete the directory:\n"
-                               + Paths::getLibDirectory()
-                               + "/"
-                               + name.toStdString()).c_str()) == QMessageBox::Yes) {
-        addonManager.uninstallLibrary(name.toStdString());
         onRefreshAddonsPressed();
     }
 }

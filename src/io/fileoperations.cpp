@@ -23,30 +23,30 @@
 #include <QDir>
 #include <QTextStream>
 
+#include <filesystem>
+
 #include <stdexcept>
 
 namespace FileOperations {
     std::vector<std::string> findFilesInDirectory(const std::string &directory,
                                                   const std::string &suffix,
                                                   bool recursive) {
-        QDir dir(directory.c_str());
-
         std::vector<std::string> ret;
 
-        QFileInfoList entries = dir.entryInfoList(QDir::NoFilter, QDir::Name);
-        for (auto &entry : entries) {
-            if (entry.isDir()) {
+        for (auto &entry: std::filesystem::directory_iterator(directory)) {
+            auto p = entry.path().string();
+            if (entry.is_directory()) {
                 if (recursive) {
-                    std::vector<std::string> tmp = findFilesInDirectory(entry.absoluteFilePath().toStdString(),
+                    std::vector<std::string> tmp = findFilesInDirectory(std::filesystem::absolute(p).string(),
                                                                         suffix,
                                                                         recursive);
-                    for (auto &tmpPath : tmp) {
+                    for (auto &tmpPath: tmp) {
                         ret.emplace_back(tmpPath);
                     }
                 }
             } else {
-                if (suffix.empty() || entry.completeSuffix().toStdString() == suffix)
-                    ret.emplace_back(entry.absoluteFilePath().toStdString());
+                if (suffix.empty() || entry.path().extension().string() == suffix)
+                    ret.emplace_back(std::filesystem::absolute(p).string());
             }
         }
 

@@ -88,8 +88,6 @@ private slots:
 
     void onAddonUninstall(const QString &name);
 
-    void onLibraryUninstall(const QString &name);
-
 private:
     QPushButton *okButton;
     QPushButton *cancelButton;

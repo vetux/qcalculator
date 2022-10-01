@@ -114,7 +114,6 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
                                  });
 
     addonManager = std::make_unique<AddonManager>(Paths::getAddonDirectory(),
-                                                  Paths::getLibDirectory(),
                                                   [this](const std::string &module, const std::string &error) {
                                                       return onAddonLoadFail(module, error);
                                                   },
@@ -135,6 +134,8 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     }
 
     addonManager->setActiveAddons(availableAddons);
+
+    addonManager->loadAddonLibraryPaths();
 }
 
 CalculatorWindow::~CalculatorWindow() = default;
