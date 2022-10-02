@@ -321,13 +321,7 @@ const SymbolTable &CalculatorWindow::getSymbolTable() {
 }
 
 void CalculatorWindow::onHistoryTextDoubleClicked(const QString &text) {
-    QString tx;
-    if (inputTextContainsExpressionResult) {
-        tx = text;
-    } else {
-        tx = input->text() + text;
-    }
-    input->setText(tx);
+    input->setText(input->text() + text);
     input->setFocus();
 }
 
