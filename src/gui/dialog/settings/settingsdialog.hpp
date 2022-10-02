@@ -65,6 +65,10 @@ public:
 
     bool getShowInexactWarning();
 
+    void setSaveHistoryMax(int maxLines);
+
+    int getSaveHistoryMax();
+
     void setPythonModPaths(const std::set<std::string> &paths);
 
     std::set<std::string> getPythonModPaths();

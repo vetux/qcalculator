@@ -17,19 +17,27 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_SETTINGCONSTANTS_HPP
-#define QCALC_SETTINGCONSTANTS_HPP
+#ifndef QCALCULATOR_STRINGSPLIT_HPP
+#define QCALCULATOR_STRINGSPLIT_HPP
 
-#include "settings/settings.hpp"
+#include <vector>
+#include <string>
 
-const Setting SETTING_PRECISION = {"precision", 100};
-const Setting SETTING_EXPONENT_MAX = {"exponent_max", 999999};
-const Setting SETTING_EXPONENT_MIN = {"exponent_min", -999999};
-const Setting SETTING_ROUNDING = {"rounding", MPD_ROUND_HALF_EVEN};
-const Setting SETTING_SAVE_SYMBOLS_HISTORY = {"save_symbols_history", true};
-const Setting SETTING_WARN_INEXACT = {"warn_inexact", true};
-const Setting SETTING_PYTHON_MODULE_PATHS = {"python_module_paths", std::set<std::string>()};
-const Setting SETTING_PYTHON_PATH = {"python_path", std::string()};
-const Setting SETTING_SAVE_HISTORY_MAX_LEN =  {"history_max", 1000};
+std::vector<std::string> splitString(const std::string &str, char delimiter) {
+    std::vector<std::string> ret;
+    for (size_t it = 0; it != std::string::npos; it = str.find(delimiter, it + 1)) {
+        if (it != 0)
+            it += 1;
+        auto next = str.find(delimiter, it);
+        std::string line;
+        if (next == std::string::npos) {
+            line = str.substr(it);
+        } else {
+            line = str.substr(it, next - it);
+        }
+        ret.emplace_back(line);
+    }
+    return ret;
+}
 
-#endif //QCALC_SETTINGCONSTANTS_HPP
+#endif //QCALCULATOR_STRINGSPLIT_HPP

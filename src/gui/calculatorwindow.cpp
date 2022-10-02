@@ -30,6 +30,8 @@
 #include <QProcess>
 #include <QProgressDialog>
 
+#include "util/stringsplit.hpp"
+
 #include "addon/addonmanager.hpp"
 
 #include "io/paths.hpp"
@@ -63,6 +65,15 @@ static const int MAX_SYMBOL_TABLE_HISTORY = 100;
 CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     setObjectName("MainWindow");
 
+    addonManager = std::make_unique<AddonManager>(Paths::getAddonDirectory(),
+                                                  [this](const std::string &module, const std::string &error) {
+                                                      return onAddonLoadFail(module, error);
+                                                  },
+                                                  [this](const std::string &module, const std::string &error) {
+                                                      return onAddonUnloadFail(module, error);
+                                                  });
+
+    setupDialogs();
     setupLayout();
     setupMenuBar();
 
@@ -73,11 +84,11 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     QFont largeFont(defaultFont.family(), (int) (defaultFont.pointSize() * 1.3));
 
     input->setFont(largeFont);
-    history->setHistoryFont(largeFont);
+    historyWidget->setHistoryFont(largeFont);
 
-    QPalette historyPalette = history->palette();
-    historyPalette.setColor(history->backgroundRole(), input->palette().color(input->backgroundRole()));
-    history->setPalette(historyPalette);
+    QPalette historyPalette = historyWidget->palette();
+    historyPalette.setColor(historyWidget->backgroundRole(), input->palette().color(input->backgroundRole()));
+    historyWidget->setPalette(historyPalette);
 
     connect(actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
     connect(actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
@@ -92,7 +103,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
-    connect(history,
+    connect(historyWidget,
             SIGNAL(onTextDoubleClicked(const QString &)),
             this,
             SLOT(onHistoryTextDoubleClicked(const QString &)));
@@ -104,7 +115,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
 
     updateSymbolHistoryMenu();
 
-    for (auto &path: settings.value(SETTING_PYTHON_MODPATHS).toStringList()) {
+    for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
         Interpreter::addModuleDir(path);
     }
 
@@ -112,14 +123,6 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
                                  [this]() {
                                      onSymbolTableChanged(symbolTable);
                                  });
-
-    addonManager = std::make_unique<AddonManager>(Paths::getAddonDirectory(),
-                                                  [this](const std::string &module, const std::string &error) {
-                                                      return onAddonLoadFail(module, error);
-                                                  },
-                                                  [this](const std::string &module, const std::string &error) {
-                                                      return onAddonUnloadFail(module, error);
-                                                  });
 
     enabledAddonsFilePath = Paths::getAddonsFile().c_str();
 
@@ -134,8 +137,9 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     }
 
     addonManager->setActiveAddons(availableAddons);
-
     addonManager->loadAddonLibraryPaths();
+
+    settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
 }
 
 CalculatorWindow::~CalculatorWindow() = default;
@@ -165,7 +169,7 @@ void CalculatorWindow::onInputReturnPressed() {
     auto res = evaluateExpression(expr);
     if (!res.isEmpty()) {
         input->setText(res);
-        history->addContent(expr, res);
+        historyWidget->addContent(expr, res);
     }
 }
 
@@ -177,50 +181,8 @@ void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
 }
 
 void CalculatorWindow::onActionSettings() {
-    SettingsDialog dialog(*addonManager);
-
-    dialog.setEnabledAddons(addonManager->getActiveAddons());
-
-    dialog.setPrecision(settings.value(SETTING_PRECISION).toInt());
-    dialog.setExponentMin(settings.value(SETTING_EXPONENT_MIN).toInt());
-    dialog.setExponentMax(settings.value(SETTING_EXPONENT_MAX).toInt());
-    dialog.setRoundingMode(Serializer::deserializeRoundingMode(
-            settings.value(SETTING_ROUNDING).toInt()));
-    dialog.setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
-    dialog.setPythonModPaths(settings.value(SETTING_PYTHON_MODPATHS).toStringList());
-    dialog.setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
-
-    dialog.show();
-
-    if (dialog.exec() == QDialog::Accepted) {
-        for (auto &path: settings.value(SETTING_PYTHON_MODPATHS).toStringList()) {
-            Interpreter::removeModuleDir(path);
-        }
-
-        settings.update(SETTING_PRECISION.key, dialog.getPrecision());
-        settings.update(SETTING_EXPONENT_MAX.key, dialog.getExponentMax());
-        settings.update(SETTING_EXPONENT_MIN.key, dialog.getExponentMin());
-        settings.update(SETTING_ROUNDING.key, dialog.getRoundingMode());
-        settings.update(SETTING_WARN_INEXACT.key, dialog.getShowInexactWarning());
-        settings.update(SETTING_PYTHON_MODPATHS.key, dialog.getPythonModPaths());
-        settings.update(SETTING_PYTHON_PATH.key, dialog.getPythonPath());
-
-        auto str = settings.value(SETTING_PYTHON_PATH).toString();
-        if (!str.empty()) {
-            Interpreter::setPath(to_wstring(str));
-        }
-        for (auto &path: settings.value(SETTING_PYTHON_MODPATHS).toStringList()) {
-            Interpreter::addModuleDir(path);
-        }
-
-        decimal::context.prec(settings.value(SETTING_PRECISION).toInt());
-        decimal::context.round(settings.value(SETTING_ROUNDING).toInt());
-        decimal::context.emax(settings.value(SETTING_EXPONENT_MAX).toInt());
-        decimal::context.emin(settings.value(SETTING_EXPONENT_MIN).toInt());
-
-        saveEnabledAddons(dialog.getEnabledAddons());
-        saveSettings();
-    }
+    settingsDialog->show();
+    settingsDialog->activateWindow();
 }
 
 void CalculatorWindow::onActionExit() {
@@ -292,23 +254,8 @@ void CalculatorWindow::onActionSaveAsSymbolTable() {
 }
 
 void CalculatorWindow::onActionEditSymbolTable() {
-    if (symbolsDialog == nullptr) {
-        symbolsDialog = new SymbolsEditorWindow(symbolTable,
-                                                this);
-        symbolsDialog->setAttribute(Qt::WA_DeleteOnClose);
-        connect(symbolsDialog,
-                &QMainWindow::destroyed,
-                [this]() {
-                    symbolsDialog = nullptr;
-                });
-        connect(symbolsDialog,
-                SIGNAL(symbolsChanged(const SymbolTable &)),
-                this,
-                SLOT(onSymbolTableChanged(const SymbolTable &)));
-        symbolsDialog->show();
-    } else {
-        symbolsDialog->activateWindow();
-    }
+    symbolsDialog->show();
+    symbolsDialog->activateWindow();
 }
 
 void CalculatorWindow::onActionSymbolTableHistory() {
@@ -361,17 +308,77 @@ void CalculatorWindow::onHistoryTextDoubleClicked(const QString &text) {
     input->setFocus();
 }
 
+void CalculatorWindow::onSettingsAccepted() {
+    for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
+        Interpreter::removeModuleDir(path);
+    }
+
+    settings.update(SETTING_PRECISION.key, settingsDialog->getPrecision());
+    settings.update(SETTING_EXPONENT_MAX.key, settingsDialog->getExponentMax());
+    settings.update(SETTING_EXPONENT_MIN.key, settingsDialog->getExponentMin());
+    settings.update(SETTING_ROUNDING.key, settingsDialog->getRoundingMode());
+    settings.update(SETTING_WARN_INEXACT.key, settingsDialog->getShowInexactWarning());
+    settings.update(SETTING_SAVE_HISTORY_MAX_LEN.key, settingsDialog->getSaveHistoryMax());
+
+    settings.update(SETTING_PYTHON_MODULE_PATHS.key, settingsDialog->getPythonModPaths());
+    settings.update(SETTING_PYTHON_PATH.key, settingsDialog->getPythonPath());
+
+    saveSettings();
+    saveHistory();
+
+    auto str = settings.value(SETTING_PYTHON_PATH).toString();
+    if (!str.empty()) {
+        Interpreter::setPath(to_wstring(str));
+    }
+    for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
+        Interpreter::addModuleDir(path);
+    }
+
+    decimal::context.prec(settings.value(SETTING_PRECISION).toInt());
+    decimal::context.round(settings.value(SETTING_ROUNDING).toInt());
+    decimal::context.emax(settings.value(SETTING_EXPONENT_MAX).toInt());
+    decimal::context.emin(settings.value(SETTING_EXPONENT_MIN).toInt());
+
+    saveEnabledAddons(settingsDialog->getEnabledAddons());
+
+    settingsDialog->hide();
+}
+
+void CalculatorWindow::onSettingsCancelled() {
+    settingsDialog->hide();
+
+    settingsDialog->setPrecision(settings.value(SETTING_PRECISION).toInt());
+    settingsDialog->setExponentMin(settings.value(SETTING_EXPONENT_MIN).toInt());
+    settingsDialog->setExponentMax(settings.value(SETTING_EXPONENT_MAX).toInt());
+    settingsDialog->setRoundingMode(Serializer::deserializeRoundingMode(
+            settings.value(SETTING_ROUNDING).toInt()));
+    settingsDialog->setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
+    settingsDialog->setSaveHistoryMax(settings.value(SETTING_SAVE_HISTORY_MAX_LEN).toInt());
+
+    settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
+    settingsDialog->setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
+
+    settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
+}
+
 QString CalculatorWindow::evaluateExpression(const QString &expression) {
     try {
         decimal::context.clear_status();
+
         auto v = ExpressionParser::evaluate(expression.toStdString(), symbolTable);
+
+        QString ret = v.format("f").c_str();
+
+        history.emplace_back(std::make_pair(expression.toStdString(), ret.toStdString()));
+        saveHistory();
+
         if (settings.value(SETTING_WARN_INEXACT).toInt() && decimal::context.status() & MPD_Inexact) {
             QMessageBox::warning(this, "Inexact result", "Result is inexact!");
         }
         onSymbolTableChanged(symbolTable);
 
-        QString ret = v.format("f").c_str();
         emit signalExpressionEvaluated(expression, ret);
+
         return ret;
     } catch (const std::runtime_error &e) {
         QMessageBox::warning(this, "Failed to evaluate expression", e.what());
@@ -380,7 +387,7 @@ QString CalculatorWindow::evaluateExpression(const QString &expression) {
 }
 
 void CalculatorWindow::loadSettings() {
-    std::string settingsFilePath = Paths::getAppConfigDirectory().append(Paths::getSettingsFile());
+    std::string settingsFilePath = Paths::getSettingsFile();
     if (QFile(settingsFilePath.c_str()).exists()) {
         try {
             settings = Serializer::deserializeSettings(FileOperations::fileReadAllText(settingsFilePath));
@@ -419,6 +426,20 @@ void CalculatorWindow::loadSettings() {
     if (symbolsDialog != nullptr) {
         symbolsDialog->setSymbols(symbolTable);
     }
+
+    settingsDialog->setPrecision(settings.value(SETTING_PRECISION).toInt());
+    settingsDialog->setExponentMin(settings.value(SETTING_EXPONENT_MIN).toInt());
+    settingsDialog->setExponentMax(settings.value(SETTING_EXPONENT_MAX).toInt());
+    settingsDialog->setRoundingMode(Serializer::deserializeRoundingMode(
+            settings.value(SETTING_ROUNDING).toInt()));
+    settingsDialog->setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
+    settingsDialog->setSaveHistoryMax(settings.value(SETTING_SAVE_HISTORY_MAX_LEN).toInt());
+
+    settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
+    settingsDialog->setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
+
+    loadHistory();
+    saveHistory();
 }
 
 void CalculatorWindow::saveSettings() {
@@ -461,7 +482,10 @@ void CalculatorWindow::loadSymbolTablePathHistory() {
     }
 
     try {
-        symbolTablePathHistory = Serializer::deserializeSet(FileOperations::fileReadAllText(filePath));
+        auto lines = splitString(FileOperations::fileReadAllText(filePath), '\n');
+        for (auto &line: lines) {
+            symbolTablePathHistory.insert(line);
+        }
 
         if (symbolTablePathHistory.size() > MAX_SYMBOL_TABLE_HISTORY) {
             std::set<std::string> tmp;
@@ -489,13 +513,17 @@ void CalculatorWindow::loadSymbolTablePathHistory() {
 }
 
 void CalculatorWindow::saveSymbolTablePathHistory() {
-    if (!settings.value(SETTING_SAVE_SYM_HISTORY).toInt()) {
+    if (!settings.value(SETTING_SAVE_SYMBOLS_HISTORY).toInt()) {
         return;
     }
 
     try {
-        FileOperations::fileWriteAllText(Paths::getSymbolTableHistoryFile(),
-                                         Serializer::serializeSet(symbolTablePathHistory));
+        std::string str;
+        for (auto &path: symbolTablePathHistory) {
+            str += path + '\n';
+        }
+        str.pop_back();
+        FileOperations::fileWriteAllText(Paths::getSymbolTableHistoryFile(), str);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to save symbol table history", e.what());
     }
@@ -598,15 +626,15 @@ void CalculatorWindow::setupLayout() {
     rootWidget = new QWidget(this);
     rootWidget->setObjectName("widget_root");
 
-    history = new HistoryWidget(this);
-    history->setObjectName("widget_history");
+    historyWidget = new HistoryWidget(this);
+    historyWidget->setObjectName("widget_history");
 
     input = new QLineEdit(this);
     input->setObjectName("lineEdit_input");
 
     auto l = new QVBoxLayout();
 
-    l->addWidget(history);
+    l->addWidget(historyWidget);
     l->addWidget(input);
 
     for (int i = 0; i < 10; i++) {
@@ -616,6 +644,27 @@ void CalculatorWindow::setupLayout() {
     rootWidget->setLayout(l);
 
     setCentralWidget(rootWidget);
+}
+
+void CalculatorWindow::setupDialogs() {
+    symbolsDialog = new SymbolsEditorWindow(symbolTable,
+                                            this);
+
+    settingsDialog = new SettingsDialog(*addonManager, this);
+
+    connect(symbolsDialog,
+            SIGNAL(symbolsChanged(const SymbolTable &)),
+            this,
+            SLOT(onSymbolTableChanged(const SymbolTable &)));
+
+    connect(settingsDialog,
+            SIGNAL(accepted()),
+            this,
+            SLOT(onSettingsAccepted()));
+    connect(settingsDialog,
+            SIGNAL(rejected()),
+            this,
+            SLOT(onSettingsCancelled()));
 }
 
 void CalculatorWindow::updateSymbolHistoryMenu() {
@@ -641,9 +690,7 @@ bool CalculatorWindow::importSymbolTable(const std::string &path) {
 
         actionSaveSymbols->setEnabled(true);
 
-        if (symbolsDialog != nullptr) {
-            symbolsDialog->setSymbols(symbolTable);
-        }
+        symbolsDialog->setSymbols(symbolTable);
 
         addonManager->setActiveAddons(addons);
 
@@ -683,3 +730,38 @@ bool CalculatorWindow::saveSymbolTable(const std::string &path) {
     }
 }
 
+void CalculatorWindow::saveHistory() {
+    if (settings.value(SETTING_SAVE_HISTORY_MAX_LEN).toInt() <= 0 || history.empty())
+        return;
+    std::string outputStr;
+    auto counter = 0;
+    const auto counterMax = settings.value(SETTING_SAVE_HISTORY_MAX_LEN).toInt();
+    for (auto it = history.rbegin(); it != history.rend() && counter < counterMax; it++, counter++) {
+        auto &pair = *it;
+        std::string str = pair.first + "\n" + pair.second + "\n";
+        outputStr += str;
+    }
+    FileOperations::fileWriteAllText(Paths::getHistoryFile(), outputStr);
+}
+
+void CalculatorWindow::loadHistory() {
+    if (settings.value(SETTING_SAVE_HISTORY_MAX_LEN).toInt() <= 0)
+        return;
+    if (std::filesystem::exists(Paths::getHistoryFile())) {
+        auto str = FileOperations::fileReadAllText(Paths::getHistoryFile());
+
+        std::vector<std::string> lines = splitString(str, '\n');
+        for (auto i = 0; lines.size() > 1 && i < lines.size() - 1; i += 2) {
+            auto line = lines.at(i);
+            auto nextLine = lines.at(i + 1);
+            if (!line.empty() && !nextLine.empty()) {
+                history.insert(history.begin(), std::make_pair(line, nextLine));
+            }
+        }
+
+        historyWidget->clear();
+        for (auto &pair: history) {
+            historyWidget->addContent(pair.first.c_str(), pair.second.c_str());
+        }
+    }
+}

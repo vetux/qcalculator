@@ -56,7 +56,7 @@ public:
 public slots:
 
     void clear() {
-        for (auto *p : rows) {
+        for (auto *p: rows) {
             delete p;
         }
         rows.clear();
@@ -64,7 +64,7 @@ public slots:
 
     void setContent(const QList<QPair<QString, QString>> &c) {
         clear();
-        for (auto &pair : c) {
+        for (auto &pair: c) {
             addContent(pair.first, pair.second);
         }
     }

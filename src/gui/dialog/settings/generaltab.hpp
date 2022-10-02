@@ -48,6 +48,8 @@ public slots:
 
     void setShowInexactWarning(bool showWarning);
 
+    void setSaveHistoryMax(int saveHistory);
+
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
 
@@ -60,6 +62,12 @@ public:
     int getExponentMin();
 
     bool getShowInexactWarning();
+
+    int getSaveHistoryMax();
+
+private slots:
+
+    void saveHistoryChecked(int state);
 
 private:
     QStringListModel roundingModel;
@@ -78,6 +86,12 @@ private:
 
     QLabel *showInexactWarningLabel;
     QCheckBox *showInexactWarningCheckBox;
+
+    QLabel *saveHistoryLabel;
+    QCheckBox *saveHistoryCheckBox;
+
+    QLabel *saveHistoryMaxLabel;
+    QSpinBox *saveHistoryMaxSpin;
 };
 
 #endif //QCALC_GENERALTAB_HPP

@@ -27,7 +27,6 @@
 class SymbolsEditorWindow : public QMainWindow {
 Q_OBJECT
 signals:
-
     void symbolsChanged(const SymbolTable &symbols);
 
 public slots:

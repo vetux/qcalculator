@@ -23,6 +23,8 @@
 #include <QLine>
 #include <QFileDialog>
 
+#include "settings/settingconstants.hpp"
+
 int getIndexFromRoundingMode(decimal::round mode) {
     switch (mode) {
         default:
@@ -157,11 +159,41 @@ GeneralTab::GeneralTab(QWidget *parent)
     showInexactWarningCheckBox->setToolTip("Show Warning when the result of a computation is inexact.");
 
     auto *hlayout = new QHBoxLayout;
+    hlayout->setMargin(5);
     hlayout->setSpacing(20);
-    hlayout->addWidget(showInexactWarningLabel, 0);
-    hlayout->addWidget(showInexactWarningCheckBox, 1);
+    hlayout->addWidget(showInexactWarningCheckBox, 0);
+    hlayout->addWidget(showInexactWarningLabel, 1);
 
     inexactWarnContainer->setLayout(hlayout);
+
+    auto *saveHistoryContainer = new QWidget(this);
+
+    saveHistoryLabel = new QLabel(this);
+    saveHistoryCheckBox = new QCheckBox(this);
+    saveHistoryLabel->setText("Save history to disk");
+
+    hlayout = new QHBoxLayout;
+    hlayout->setMargin(5);
+    hlayout->setSpacing(20);
+    hlayout->addWidget(saveHistoryCheckBox, 0);
+    hlayout->addWidget(saveHistoryLabel, 1);
+
+    saveHistoryContainer->setLayout(hlayout);
+
+    saveHistoryMaxLabel = new QLabel(this);
+    saveHistoryMaxSpin = new QSpinBox(this);
+    saveHistoryMaxLabel->setText("Maximum lines of history to save to disk");
+
+    auto *saveHistoryMaxContainer = new QWidget(this);
+
+    hlayout = new QHBoxLayout;
+    hlayout->setMargin(5);
+    hlayout->setSpacing(20);
+    hlayout->addWidget(saveHistoryMaxSpin, 0);
+    hlayout->addWidget(saveHistoryMaxLabel, 1);
+    saveHistoryMaxContainer->setLayout(hlayout);
+
+    saveHistoryMaxSpin->setRange(0, std::numeric_limits<int>().max());
 
     auto *layout = new QVBoxLayout();
 
@@ -174,9 +206,13 @@ GeneralTab::GeneralTab(QWidget *parent)
     layout->addWidget(roundingLabel);
     layout->addWidget(roundingComboBox);
     layout->addWidget(inexactWarnContainer);
+    layout->addWidget(saveHistoryContainer);
+    layout->addWidget(saveHistoryMaxContainer);
     layout->addStretch(1);
 
     setLayout(layout);
+
+    connect(saveHistoryCheckBox, SIGNAL(stateChanged(int)), this, SLOT(saveHistoryChecked(int)));
 }
 
 int GeneralTab::getPrecision() {
@@ -209,4 +245,28 @@ int GeneralTab::getExponentMax() {
 
 int GeneralTab::getExponentMin() {
     return exponentMinSpinBox->value();
+}
+
+void GeneralTab::setSaveHistoryMax(int saveHistory) {
+    saveHistoryMaxSpin->setValue(saveHistory);
+
+    auto b = saveHistory > 0;
+    saveHistoryMaxLabel->setVisible(b);
+    saveHistoryMaxSpin->setVisible(b);
+
+    saveHistoryCheckBox->setCheckState(b ? Qt::Checked : Qt::Unchecked);
+
+    if (saveHistory == 0){
+        saveHistoryMaxSpin->setValue(SETTING_SAVE_HISTORY_MAX_LEN.entry.toInt());
+    }
+}
+
+int GeneralTab::getSaveHistoryMax() {
+    return saveHistoryCheckBox->checkState() == Qt::Checked ? saveHistoryMaxSpin->value() : 0;
+}
+
+void GeneralTab::saveHistoryChecked(int state) {
+    auto b = state == Qt::Checked;
+    saveHistoryMaxLabel->setVisible(b);
+    saveHistoryMaxSpin->setVisible(b);
 }

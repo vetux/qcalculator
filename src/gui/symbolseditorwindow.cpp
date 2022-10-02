@@ -48,4 +48,3 @@ SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
 void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols) {
     editor->setSymbols(symbols);
 }
-

@@ -36,11 +36,12 @@
 #include "math/symboltable.hpp"
 #include "math/numeralsystem.hpp"
 
-#include "widgets/symbolseditor.hpp"
-#include "widgets/historywidget.hpp"
+#include "gui/widgets/symbolseditor.hpp"
+#include "gui/widgets/historywidget.hpp"
 
-#include "symbolseditorwindow.hpp"
-#include "terminalwindow.hpp"
+#include "gui/symbolseditorwindow.hpp"
+#include "gui/terminalwindow.hpp"
+#include "gui/dialog/settings/settingsdialog.hpp"
 
 class CalculatorWindow : public QMainWindow {
 Q_OBJECT
@@ -61,6 +62,7 @@ public:
     const SymbolTable &getSymbolTable();
 
 signals:
+
     void signalExpressionEvaluated(const QString &expression, const QString &value);
 
 public slots:
@@ -95,6 +97,10 @@ public slots:
 
     void onHistoryTextDoubleClicked(const QString &text);
 
+    void onSettingsAccepted();
+
+    void onSettingsCancelled();
+
 private:
     QString evaluateExpression(const QString &expression);
 
@@ -114,14 +120,20 @@ private:
 
     void setupLayout();
 
+    void setupDialogs();
+
     void updateSymbolHistoryMenu();
 
     bool importSymbolTable(const std::string &path);
 
     bool saveSymbolTable(const std::string &path);
 
+    void saveHistory();
+
+    void loadHistory();
+
     QWidget *rootWidget{};
-    HistoryWidget *history{};
+    HistoryWidget *historyWidget{};
     QLineEdit *input{};
 
     QMenu *menuFile{};
@@ -147,6 +159,7 @@ private:
     QAction *actionAboutQt{};
 
     SymbolsEditorWindow *symbolsDialog = nullptr;
+    SettingsDialog *settingsDialog = nullptr;
 
     SymbolTable symbolTable;
 
@@ -158,6 +171,8 @@ private:
     std::unique_ptr<AddonManager> addonManager;
 
     QString enabledAddonsFilePath;
+
+    std::vector<std::pair<std::string, std::string>> history;
 };
 
 #endif // QCALC_MAINWINDOW_HPP

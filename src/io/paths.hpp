@@ -25,7 +25,8 @@
 namespace Paths {
     static const std::string ADDONS_FILE = "/addons.json";
     static const std::string SETTINGS_FILE = "/settings.json";
-    static const std::string SYMBOL_TABLE_HISTORY_FILE = "/symboltablehistory.json";
+    static const std::string SYMBOL_TABLE_HISTORY_FILE = "/sym_path_history.txt";
+    static const std::string HISTORY_FILE = "/history.txt";
 
     std::string getAppDataDirectory();
 
@@ -45,6 +46,10 @@ namespace Paths {
 
     inline std::string getSymbolTableHistoryFile() {
         return getAppConfigDirectory() + SYMBOL_TABLE_HISTORY_FILE;
+    }
+
+    inline std::string getHistoryFile() {
+        return getAppConfigDirectory() + HISTORY_FILE;
     }
 }
 

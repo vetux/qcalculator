@@ -92,6 +92,8 @@ namespace FileOperations {
 
             stream.flush();
 
+            file.flush();
+
             file.close();
         }
         catch (const std::exception &e) {
