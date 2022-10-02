@@ -118,13 +118,20 @@ public slots:
                 this,
                 SIGNAL(onTextDoubleClicked(const QString &)));
 
-        scroll->verticalScrollBar()->setValue(scroll->verticalScrollBar()->maximum());
-
         rows.emplace_back(row);
+
+        scrollToBottom();
     }
 
     void setHistoryFont(const QFont &font) {
         historyFont = font;
+    }
+
+    void scrollToBottom() {
+        // Hack to defer scrolling to next event loop iteration https://www.qtcentre.org/threads/18291-Force-a-Scroll-in-a-QScrollArea
+        QTimer::singleShot(0,this, [this](){
+            scroll->verticalScrollBar()->setSliderPosition(scroll->verticalScrollBar()->maximum());
+        });
     }
 
 signals:
