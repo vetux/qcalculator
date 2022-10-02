@@ -37,6 +37,8 @@ struct AddonBundleEntry {
 
 class AddonManager {
 public:
+    static void createInstallableBundle(std::vector<std::pair<std::string, std::set<std::string>>> addonPaths);
+
     typedef std::function<void(const std::string &, const std::string &)> Listener;
 
     AddonManager(const std::string &addonDirectory,
@@ -64,7 +66,8 @@ public:
     /**
      * Install addons from a addon bundle.
      * A addon bundle must be an archive format supported by libarchive
-     * and contain the file metadata.json of the following format:
+     * and contain the file
+     * "addon_install.json" of the following format:
      *
      * {
      *      "addons": [

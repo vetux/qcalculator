@@ -63,13 +63,18 @@ public:
         ARCHIVE_FORMAT_RAR_V5 = 0x100000,
     };
 
-    static void extractToDisk(const std::string &archive, const std::string &outputDirectory, std::function<void(const std::string &)> progressCallback);
+    static void extractToDisk(const std::string &archive, const std::string &outputDirectory,
+                              std::function<void(const std::string &)> progressCallback);
 
     Archive();
 
     explicit Archive(std::istream &stream);
 
     Format getFormat();
+
+    void addEntry(const std::string &name, const std::vector<char> &data) {
+        mEntries[name] = data;
+    }
 
     std::map<std::string, std::vector<char>> &entries() { return mEntries; }
 
