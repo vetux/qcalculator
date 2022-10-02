@@ -31,7 +31,7 @@ class HistoryLabel : public QLineEdit {
 Q_OBJECT
 public:
     explicit HistoryLabel(QWidget *parent = nullptr) : QLineEdit(parent) {
-        setStyleSheet("QLineEdit { border: none }");
+        setStyleSheet("QLineEdit { border: none; background: transparent; }");
     }
 
     bool event(QEvent *e) override {

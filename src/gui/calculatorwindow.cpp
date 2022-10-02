@@ -184,7 +184,10 @@ void CalculatorWindow::onInputTextChanged() {
 
     if (inputTextContainsExpressionResult) {
         inputTextContainsExpressionResult = false;
-        inputText = input->text().toStdString().substr(inputText.size());
+        if (input->text().isEmpty())
+            inputText = "";
+        else
+            inputText = input->text().toStdString().substr(inputText.size());
         input->setText(inputText.c_str());
     } else {
         inputText = input->text().toStdString();
@@ -829,7 +832,7 @@ void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
                                                 (int) inputTextAppendedHistoryValue.size()));
             input->setCursorPosition(cursor);
         }
-        auto result = history.at((int)history.size() - index - 1).second;
+        auto result = history.at((int) history.size() - index - 1).second;
 
         auto cursor = input->cursorPosition();
         auto inputStr = input->text().toStdString();
