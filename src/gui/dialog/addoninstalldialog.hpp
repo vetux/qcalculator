@@ -29,14 +29,18 @@ class AddonInstallDialog : public QDialog {
 Q_OBJECT
 public:
     explicit AddonInstallDialog(QWidget *parent = nullptr) : QDialog(parent) {
-        label = new QLabel(this);
-        listWidget = new QListWidget(this);
+        updateLabel = new QLabel(this);
+        installLabel = new QLabel(this);
+        updateListWidget = new QListWidget(this);
+        installListWidget = new QListWidget(this);
         okButton = new QPushButton(this);
         cancelButton = new QPushButton(this);
 
         auto *vlayout = new QVBoxLayout;
-        vlayout->addWidget(label);
-        vlayout->addWidget(listWidget);
+        vlayout->addWidget(updateLabel);
+        vlayout->addWidget(updateListWidget);
+        vlayout->addWidget(installLabel);
+        vlayout->addWidget(installListWidget);
 
         auto *hlayout = new QHBoxLayout;
         hlayout->addStretch(1);
@@ -46,6 +50,9 @@ public:
         vlayout->addLayout(hlayout);
 
         setLayout(vlayout);
+
+        updateLabel->setText("Addon updates (Existing addon files are replaced)");
+        installLabel->setText("New Addons");
 
         okButton->setText("Install Selected");
         cancelButton->setText("Cancel");
@@ -66,27 +73,43 @@ public:
 
 public slots:
 
-    void setText(const QString &text) {
-        label->setText(text);
-    }
-
-    void setItems(const std::vector<std::string> &vitems) {
-        listWidget->clear();
+    void setUpdates(const std::vector<std::string> &vitems) {
+        updateListWidget->setVisible(!vitems.empty());
+        updateLabel->setVisible(!vitems.empty());
+        updateListWidget->clear();
         for (auto &item: vitems) {
             auto *widget = new InstallAddonItemWidget;
             widget->setText(item.c_str());
             widget->setChecked(true);
             auto *wItem = new QListWidgetItem;
             wItem->setSizeHint(widget->minimumSizeHint());
-            listWidget->addItem(wItem);
-            listWidget->setItemWidget(wItem, widget);
+            updateListWidget->addItem(wItem);
+            updateListWidget->setItemWidget(wItem, widget);
+            items.insert(std::make_pair(item, widget));
+        }
+    }
+
+    void setInstalls(const std::vector<std::string> &vitems) {
+        installListWidget->setVisible(!vitems.empty());
+        installLabel->setVisible(!vitems.empty());
+        installListWidget->clear();
+        for (auto &item: vitems) {
+            auto *widget = new InstallAddonItemWidget;
+            widget->setText(item.c_str());
+            widget->setChecked(true);
+            auto *wItem = new QListWidgetItem;
+            wItem->setSizeHint(widget->minimumSizeHint());
+            installListWidget->addItem(wItem);
+            installListWidget->setItemWidget(wItem, widget);
             items.insert(std::make_pair(item, widget));
         }
     }
 
 private:
-    QLabel *label;
-    QListWidget *listWidget;
+    QLabel *updateLabel;
+    QListWidget *updateListWidget;
+    QLabel *installLabel;
+    QListWidget *installListWidget;
     QPushButton *okButton;
     QPushButton *cancelButton;
 

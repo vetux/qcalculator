@@ -69,6 +69,7 @@ class BitButton(QtWidgets.QPushButton):
             self.set_toggle(False)
         else:
             self.set_toggle(True)
+        return self.toggle_value
 
     def slot_button_pressed(self):
         self.signal_bit_pressed.emit(self.index)
@@ -216,7 +217,14 @@ class BitViewWidget(QtWidgets.QWidget):
         self.set_bits_value(i)
 
     def slot_bit_button_pressed(self, bit_index):
-        self.buttons[bit_index].toggle()
+        modifiers = QtWidgets.QApplication.keyboardModifiers()
+        if modifiers == QtCore.Qt.ControlModifier:
+            for i in range(0, 64):
+                self.buttons[i].set_toggle(False)
+            for i in range(0, bit_index + 1):
+                self.buttons[i].set_toggle(True)
+        else:
+            self.buttons[bit_index].toggle()
         v = self.get_bits_value()
         self.signal_set_input_text.emit(str(v))
 

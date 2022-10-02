@@ -94,7 +94,7 @@ public:
             setMultiLineInput(toggle);
         });
 
-        connect(multiButton, SIGNAL(pressed()), this, SIGNAL(onReturnPressed()));
+        connect(multiButton, SIGNAL(clicked()), this, SIGNAL(onReturnPressed()));
 
         multiCheckBox->setText("Enable Multiline Edit");
 

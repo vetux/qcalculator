@@ -236,9 +236,8 @@ static void writeToFile(const std::string &path,
 }
 
 size_t AddonManager::installAddonBundle(std::istream &sourceFile,
-                                        std::function<bool(const std::string &, const std::string &)> questionDialog,
-                                        std::function<bool(const std::string &, const std::string &,
-                                                           std::vector<std::string> &)> multipleChoiceDialog) {
+                                        const std::function<bool(const std::string &, const std::string &,
+                                                           std::vector<std::string> &)>& installDialog) {
     const char *const metadataFilePath = "metadata.json";
 
     Archive arch(sourceFile);
@@ -275,7 +274,7 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
             addonModules.emplace_back(entry.module + " v" + std::to_string(entry.version));
         }
 
-        if (!multipleChoiceDialog("Install addons", "Select the addons you want to install", addonModules)) {
+        if (!installDialog("Install addons", "Select the addons you want to install", addonModules)) {
             return 0;
         }
 
@@ -300,15 +299,7 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
             auto outputDir = concatPath(addonDir, addonFile.stem().string());
             auto outputPath = concatPath(outputDir, addonFile.filename().string());
 
-            if (std::filesystem::exists(outputPath)) {
-                if (!questionDialog("Overwrite existing addon",
-                                    "Do you want to replace the existing addon " + addonFile.stem().string() +
-                                    " ?")) {
-                    continue;
-                } else {
-                    std::filesystem::remove_all(outputPath);
-                }
-            }
+            std::filesystem::remove_all(outputPath);
 
             createPath(outputPath);
             writeToFile(outputPath, arch.entries().at(addon.modulePath));

@@ -28,7 +28,6 @@
 #include <set>
 
 #include "gui/widgets/addonitemwidget.hpp"
-#include "gui/widgets/libraryitemwidget.hpp"
 #include "gui/widgets/addonwidget.hpp"
 
 #include "addon/addon.hpp"

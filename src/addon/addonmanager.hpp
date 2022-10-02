@@ -90,11 +90,8 @@ public:
      * @param sourceFile
      * @param questionDialog
      */
-    size_t installAddonBundle(std::istream &sourceFile,
-                           std::function<bool(const std::string &, const std::string &)> questionDialog,
-                           std::function<bool(const std::string &,
-                                   const std::string &,
-                                              std::vector<std::string> &)> multipleChoiceDialog);
+    size_t installAddonBundle(std::istream &sourceFile, const std::function<bool(const std::string &, const std::string &,
+                                                                           std::vector<std::string> &)>& installDialog);
 
 
     void uninstallAddon(const std::string &moduleName);

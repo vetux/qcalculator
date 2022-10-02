@@ -53,7 +53,7 @@ NamedValueEditor::NamedValueEditor(QWidget *parent) : QWidget(parent) {
     connect(list, SIGNAL(cellChanged(int, int)), this, SLOT(onTableCellChanged(int, int)));
     connect(addLineEditName, SIGNAL(returnPressed()), this, SLOT(onAddPressed()));
     connect(addLineEditValue, SIGNAL(returnPressed()), this, SLOT(onAddPressed()));
-    connect(addPushButton, SIGNAL(pressed()), this, SLOT(onAddPressed()));
+    connect(addPushButton, SIGNAL(clicked()), this, SLOT(onAddPressed()));
 }
 
 void NamedValueEditor::setValues(const std::map<QString, QString> &values) {

@@ -127,9 +127,9 @@ AddonTab::AddonTab(QWidget *parent)
 
     setLayout(hLayout);
 
-    connect(installButton, SIGNAL(pressed()), this, SIGNAL(installPressed()));
-    connect(refreshButton, SIGNAL(pressed()), this, SIGNAL(refreshPressed()));
-    connect(uninstallButton, SIGNAL(pressed()), this, SLOT(uninstallPressed()));
+    connect(installButton, SIGNAL(clicked()), this, SIGNAL(installPressed()));
+    connect(refreshButton, SIGNAL(clicked()), this, SIGNAL(refreshPressed()));
+    connect(uninstallButton, SIGNAL(clicked()), this, SLOT(uninstallPressed()));
     connect(listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(listItemChange()));
 
     auto sp = addonWidget->sizePolicy();

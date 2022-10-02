@@ -63,7 +63,7 @@ PythonTab::PythonTab(QWidget *parent)
 
     setLayout(layout);
 
-    connect(pythonModPathAddPushButton, SIGNAL(pressed()), this, SLOT(addModPathPressed()));
+    connect(pythonModPathAddPushButton, SIGNAL(clicked()), this, SLOT(addModPathPressed()));
 }
 
 void PythonTab::setPythonModPaths(const std::set<std::string> &paths) {

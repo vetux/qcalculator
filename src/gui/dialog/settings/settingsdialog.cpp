@@ -73,8 +73,8 @@ SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
 
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onSettingsTabChanged(int)));
 
-    connect(okButton, SIGNAL(pressed()), this, SLOT(onDialogAccepted()));
-    connect(cancelButton, SIGNAL(pressed()), this, SLOT(onDialogRejected()));
+    connect(okButton, SIGNAL(clicked()), this, SLOT(onDialogAccepted()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(onDialogRejected()));
 
     connect(addonTab, SIGNAL(installPressed()), this, SLOT(onInstallAddonPressed()));
     connect(addonTab, SIGNAL(refreshPressed()), this, SLOT(onRefreshAddonsPressed()));
@@ -217,17 +217,27 @@ void SettingsDialog::onInstallAddonPressed() {
         delete d;
         try {
             std::ifstream ifs(file);
-            auto installedAddonCount = addonManager.installAddonBundle(ifs, [this](const std::string &title,
-                                                                                   const std::string &text) {
-                                                                           return QMessageBox::question(this, title.c_str(), text.c_str()) == QMessageBox::Yes;
-                                                                       },
+            auto installedAddonCount = addonManager.installAddonBundle(ifs,
                                                                        [this](const std::string &title,
                                                                               const std::string &text,
                                                                               std::vector<std::string> &value) {
                                                                            auto dialog = new AddonInstallDialog(this);
                                                                            dialog->setWindowTitle(title.c_str());
-                                                                           dialog->setText(text.c_str());
-                                                                           dialog->setItems(value);
+
+                                                                           std::vector<std::string> installs;
+                                                                           std::vector<std::string> updates;
+                                                                           auto &addons = addonManager.getAvailableAddons();
+                                                                           for (auto &s: value) {
+                                                                               if (addons.find(
+                                                                                       s.substr(0, s.size() - 3)) ==
+                                                                                   addons.end())
+                                                                                   installs.emplace_back(s);
+                                                                               else
+                                                                                   updates.emplace_back(s);
+                                                                           }
+
+                                                                           dialog->setInstalls(installs);
+                                                                           dialog->setUpdates(updates);
 
                                                                            auto ret = dialog->exec();
 
