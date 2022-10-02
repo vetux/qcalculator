@@ -37,7 +37,9 @@ AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent),
     layout->addWidget(checkbox, 0);
     layout->addWidget(label, 1);
 
-    label->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+    label->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+
+    label->setContentsMargins(5, 0 ,0, 0);
 
     connect(checkbox, SIGNAL(stateChanged(int)), this, SLOT(onCheckBoxStateChange(int)));
 
