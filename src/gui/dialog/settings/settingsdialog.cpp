@@ -137,12 +137,12 @@ bool SettingsDialog::getShowInexactWarning() {
     return generalTab->getShowInexactWarning();
 }
 
-void SettingsDialog::setSaveHistoryMax(int save) {
-    generalTab->setSaveHistoryMax(save);
+void SettingsDialog::setSaveHistory(bool save) {
+    generalTab->setSaveHistory(save);
 }
 
 int SettingsDialog::getSaveHistoryMax() {
-    return generalTab->getSaveHistoryMax();
+    return generalTab->getSaveHistory();
 }
 
 void SettingsDialog::setPythonModPaths(const std::set<std::string> &paths) {

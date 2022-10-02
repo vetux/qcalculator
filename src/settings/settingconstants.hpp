@@ -30,6 +30,6 @@ const Setting SETTING_SAVE_SYMBOLS_HISTORY = {"save_symbols_history", true};
 const Setting SETTING_WARN_INEXACT = {"warn_inexact", true};
 const Setting SETTING_PYTHON_MODULE_PATHS = {"python_module_paths", std::set<std::string>()};
 const Setting SETTING_PYTHON_PATH = {"python_path", std::string()};
-const Setting SETTING_SAVE_HISTORY_MAX_LEN =  {"history_max", 1000};
+const Setting SETTING_SAVE_HISTORY =  {"save_history", true};
 
 #endif //QCALC_SETTINGCONSTANTS_HPP

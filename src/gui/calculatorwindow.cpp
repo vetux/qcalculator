@@ -60,6 +60,7 @@
 #include "io/to_wstring.hpp"
 
 static const int MAX_SYMBOL_TABLE_HISTORY = 100;
+static const int MAX_HISTORY = 1000;
 
 //TODO:Feature: Completion and history navigation for input line edit with eg. up / down arrows.
 CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
@@ -318,7 +319,7 @@ void CalculatorWindow::onSettingsAccepted() {
     settings.update(SETTING_EXPONENT_MIN.key, settingsDialog->getExponentMin());
     settings.update(SETTING_ROUNDING.key, settingsDialog->getRoundingMode());
     settings.update(SETTING_WARN_INEXACT.key, settingsDialog->getShowInexactWarning());
-    settings.update(SETTING_SAVE_HISTORY_MAX_LEN.key, settingsDialog->getSaveHistoryMax());
+    settings.update(SETTING_SAVE_HISTORY.key, settingsDialog->getSaveHistoryMax());
 
     settings.update(SETTING_PYTHON_MODULE_PATHS.key, settingsDialog->getPythonModPaths());
     settings.update(SETTING_PYTHON_PATH.key, settingsDialog->getPythonPath());
@@ -353,7 +354,7 @@ void CalculatorWindow::onSettingsCancelled() {
     settingsDialog->setRoundingMode(Serializer::deserializeRoundingMode(
             settings.value(SETTING_ROUNDING).toInt()));
     settingsDialog->setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
-    settingsDialog->setSaveHistoryMax(settings.value(SETTING_SAVE_HISTORY_MAX_LEN).toInt());
+    settingsDialog->setSaveHistory(settings.value(SETTING_SAVE_HISTORY).toInt());
 
     settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
     settingsDialog->setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
@@ -433,7 +434,7 @@ void CalculatorWindow::loadSettings() {
     settingsDialog->setRoundingMode(Serializer::deserializeRoundingMode(
             settings.value(SETTING_ROUNDING).toInt()));
     settingsDialog->setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
-    settingsDialog->setSaveHistoryMax(settings.value(SETTING_SAVE_HISTORY_MAX_LEN).toInt());
+    settingsDialog->setSaveHistory(settings.value(SETTING_SAVE_HISTORY).toInt());
 
     settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
     settingsDialog->setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
@@ -731,11 +732,11 @@ bool CalculatorWindow::saveSymbolTable(const std::string &path) {
 }
 
 void CalculatorWindow::saveHistory() {
-    if (settings.value(SETTING_SAVE_HISTORY_MAX_LEN).toInt() <= 0 || history.empty())
+    if (!settings.value(SETTING_SAVE_HISTORY).toInt() || history.empty())
         return;
     std::string outputStr;
     auto counter = 0;
-    const auto counterMax = settings.value(SETTING_SAVE_HISTORY_MAX_LEN).toInt();
+    const auto counterMax = MAX_HISTORY;
     for (auto it = history.rbegin(); it != history.rend() && counter < counterMax; it++, counter++) {
         auto &pair = *it;
         std::string str = pair.first + "\n" + pair.second + "\n";
@@ -745,7 +746,7 @@ void CalculatorWindow::saveHistory() {
 }
 
 void CalculatorWindow::loadHistory() {
-    if (settings.value(SETTING_SAVE_HISTORY_MAX_LEN).toInt() <= 0)
+    if (!settings.value(SETTING_SAVE_HISTORY).toInt())
         return;
     if (std::filesystem::exists(Paths::getHistoryFile())) {
         auto str = FileOperations::fileReadAllText(Paths::getHistoryFile());

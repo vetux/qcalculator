@@ -65,7 +65,7 @@ public:
 
     bool getShowInexactWarning();
 
-    void setSaveHistoryMax(int maxLines);
+    void setSaveHistory(bool save);
 
     int getSaveHistoryMax();
 
