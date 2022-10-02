@@ -49,19 +49,22 @@ public:
     std::string getPythonPath();
 
 private slots:
-    void addModPathPressed();
+    void addModDirClick();
+
+    void addModFileClick();
 
     void addItem(const QString &path);
 
     void removeItem(const QString &path);
 
 private:
-    QLabel *pythonPathLabel;
-    QLineEdit *pythonPathEdit;
+    QLabel *pathLabel;
+    QLineEdit *pathEdit;
 
-    QLabel *pythonModPathLabel;
-    QPushButton *pythonModPathAddPushButton;
-    QListWidget *pythonModPathListWidget;
+    QLabel *modLabel;
+    QPushButton *modDirAddButton;
+    QPushButton *modFileAddButton;
+    QListWidget *modListWidget;
 };
 
 #endif //QCALCULATOR_PYTHONTAB_HPP
