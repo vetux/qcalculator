@@ -94,10 +94,9 @@ AddonTab::AddonTab(QWidget *parent)
     refreshButton->setText("Refresh");
     uninstallButton->setText("Uninstall");
 
-    auto *addonHeader = new QWidget();
     auto *addonHeaderLayout = new QHBoxLayout();
     addonHeaderLayout->setMargin(0);
-    addonHeader->setLayout(addonHeaderLayout);
+
     addonSearchEdit = new QLineEdit();
     addonHeaderLayout->addWidget(new QLabel("Search:"));
     addonHeaderLayout->addWidget(addonSearchEdit);
@@ -116,16 +115,16 @@ AddonTab::AddonTab(QWidget *parent)
 
     addonWidget = new AddonWidget(this);
 
-    auto *vLayout = new QVBoxLayout();
-    vLayout->addWidget(addonHeader);
-    vLayout->addWidget(listWidget);
-    vLayout->addLayout(btnsLayout);
-
     auto *hLayout = new QHBoxLayout();
-    hLayout->addLayout(vLayout, 3);
+    hLayout->addWidget(listWidget, 3);
     hLayout->addWidget(addonWidget, 1);
 
-    setLayout(hLayout);
+    auto *layout = new QVBoxLayout();
+    layout->addLayout(addonHeaderLayout);
+    layout->addLayout(hLayout);
+    layout->addLayout(btnsLayout);
+
+    setLayout(layout);
 
     connect(installButton, SIGNAL(clicked()), this, SIGNAL(installPressed()));
     connect(refreshButton, SIGNAL(clicked()), this, SIGNAL(refreshPressed()));
@@ -133,7 +132,7 @@ AddonTab::AddonTab(QWidget *parent)
     connect(listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(listItemChange()));
 
     auto sp = addonWidget->sizePolicy();
-    sp.setRetainSizeWhenHidden(true);
+    sp.setRetainSizeWhenHidden(false);
     addonWidget->setSizePolicy(sp);
 
     addonWidget->hide();
