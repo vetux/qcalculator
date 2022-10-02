@@ -37,8 +37,6 @@ struct AddonBundleEntry {
 
 class AddonManager {
 public:
-    static void createInstallableBundle(std::vector<std::pair<std::string, std::set<std::string>>> addonPaths);
-
     typedef std::function<void(const std::string &, const std::string &)> Listener;
 
     AddonManager(const std::string &addonDirectory,
@@ -67,26 +65,30 @@ public:
      * Install addons from a addon bundle.
      * A addon bundle must be an archive format supported by libarchive
      * and contain the file
-     * "addon_install.json" of the following format:
+     * "addon_bundle.json" of the following format:
      *
      * {
      *      "addons": [
-     *          // Addon Declaration
+     *          // Addon declaration, add one declaration for each addon that the user can enable, disable or uninstall any time through the gui
      *          {
-     *              // The path to the addon module file in the archive
+     *              // The path to the addon module file in the archive containing the load() / unload() callbacks
      *              "module": "MyAddon.py",
      *
-     *              // The list of packages that are copied into the addon specific folder that is added to the path
+     *              // The list of packages that are copied into a addon specific folder that is made available to the python import path
      *              "packages": [
-     *                  "MyDirectory/OtherDirectory/MyModule/", // The path to the module, the last directory is placed on the import path eg. MyModule in this case
+     *                  // The path to the package, the last directory in the path is used
+     *                  // eg. in this case the package is available as "import MyModule"
+     *                  "MyDirectory/OtherDirectory/MyPackage/",
      *                  ...
      *              ],
      *
-     *              // The version of this release of the addon (optional)
+     *              // The version displayed to the user (optional)
      *              "version": 1
      *          },
      *          ...
      *      ],
+     *
+     *      // The version of the addon install bundle format
      *      "bundleVersion": 0
      * }
      *

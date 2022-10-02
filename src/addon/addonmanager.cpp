@@ -92,14 +92,6 @@ static std::map<std::string, AddonMetadata> readAvailableAddons(const std::strin
     return ret;
 }
 
-void AddonManager::createInstallableBundle(std::vector<std::pair<std::string, std::set<std::string>>> addonPaths) {
-    Archive archive;
-    for (auto &addon: addonPaths) {
-
-    }
-    archive.addEntry()
-}
-
 AddonManager::AddonManager(const std::string &addonDirectory,
                            Listener onAddonLoadFail,
                            Listener onAddonUnloadFail)
@@ -246,7 +238,7 @@ static void writeToFile(const std::string &path,
 size_t AddonManager::installAddonBundle(std::istream &sourceFile,
                                         const std::function<bool(const std::string &, const std::string &,
                                                                  std::vector<std::string> &)> &installDialog) {
-    const char *const metadataFilePath = "addon_install.json";
+    const char *const metadataFilePath = "addon_bundle.json";
 
     Archive arch(sourceFile);
 
