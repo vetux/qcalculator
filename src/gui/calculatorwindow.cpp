@@ -187,8 +187,13 @@ void CalculatorWindow::onInputTextChanged() {
         inputTextContainsExpressionResult = false;
         if (input->text().isEmpty())
             inputText = "";
-        else
-            inputText = input->text().toStdString().substr(inputText.size());
+        else {
+            auto itext = input->text().toStdString();
+            auto size = inputText.size();
+            if (itext.size() < size)
+                size = itext.size(); // Delete remaining characters of the result if the user pressed backspace
+            inputText = itext.substr(size);
+        }
         input->setText(inputText.c_str());
     } else {
         inputText = input->text().toStdString();
