@@ -101,6 +101,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionEditSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionEditSymbolTable()));
     connect(actionOpenTerminal, SIGNAL(triggered(bool)), this, SLOT(onActionOpenTerminal()));
     connect(actionExtractArchive, SIGNAL(triggered(bool)), this, SLOT(onActionExtractArchive()));
+    connect(actionClearHistory, SIGNAL(triggered(bool)), this, SLOT(onActionClearHistory()));
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
 
@@ -362,6 +363,13 @@ void CalculatorWindow::onSettingsCancelled() {
     settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
 }
 
+void CalculatorWindow::onActionClearHistory() {
+    if (QMessageBox::question(this, "Clear History", "Do you want to clear the history?") == QMessageBox::Yes) {
+        history.clear();
+        historyWidget->clear();
+    }
+}
+
 QString CalculatorWindow::evaluateExpression(const QString &expression) {
     try {
         decimal::context.clear_status();
@@ -600,10 +608,17 @@ void CalculatorWindow::setupMenuBar() {
     actionExtractArchive->setText("Extract archive...");
     actionExtractArchive->setObjectName("actionExtractArchive");
 
+    actionClearHistory = new QAction(this);
+    actionClearHistory->setText("Clear History");
+    actionClearHistory->setObjectName("actionClearHistory");
+    actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
+
     menuTools->addAction(actionOpenTerminal);
     menuTools->addAction(actionExtractArchive);
 
     menuFile->addAction(actionSettings);
+    menuFile->addSeparator();
+    menuFile->addAction(actionClearHistory);
     menuFile->addSeparator();
     menuFile->addAction(actionExit);
 

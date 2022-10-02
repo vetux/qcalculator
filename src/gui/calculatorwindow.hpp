@@ -101,6 +101,8 @@ public slots:
 
     void onSettingsCancelled();
 
+    void onActionClearHistory();
+
 private:
     QString evaluateExpression(const QString &expression);
 
@@ -145,6 +147,8 @@ private:
 
     QAction *actionSettings{};
     QAction *actionExit{};
+
+    QAction *actionClearHistory{};
 
     QAction *actionOpenTerminal{};
 

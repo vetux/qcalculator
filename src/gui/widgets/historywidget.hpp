@@ -81,9 +81,6 @@ public slots:
         equalsLabel->setFont(historyFont);
         resultLabel->setFont(historyFont);
 
-        expressionLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-        resultLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-
         expressionLabel->setAlignment(Qt::AlignLeft);
         equalsLabel->setAlignment(Qt::AlignHCenter);
         resultLabel->setAlignment(Qt::AlignRight);
@@ -95,7 +92,7 @@ public slots:
         row->setLayout(layout);
 
         layout->addWidget(expressionLabel, 5);
-        layout->addWidget(equalsLabel, 1);
+        layout->addWidget(equalsLabel, 0);
         layout->addWidget(resultLabel, 5);
 
         container->layout()->addWidget(row);
@@ -105,9 +102,9 @@ public slots:
         // Call to processEvents is required here so that a scroll to the bottom can be done immediately.
         QCoreApplication::processEvents();
 
-        expressionLabel->setTextElided(expression);
+        expressionLabel->setText(expression);
         equalsLabel->setText("=");
-        resultLabel->setTextElided(value);
+        resultLabel->setText(value);
 
         connect(expressionLabel,
                 SIGNAL(onDoubleClick(const QString &)),

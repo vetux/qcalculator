@@ -20,59 +20,30 @@
 #ifndef QCALC_HISTORYLABEL_HPP
 #define QCALC_HISTORYLABEL_HPP
 
-#include <QLabel>
 #include <QEvent>
-
+#include <QLineEdit>
 
 /**
  * Auto elides the text and exposes a double click signal.
  */
-class HistoryLabel : public QLabel {
+class HistoryLabel : public QLineEdit {
 Q_OBJECT
 public:
-    explicit HistoryLabel(QWidget *parent = nullptr) : QLabel(parent) {
-        // Disable label contents from controlling the minimumSizeHint used by layouts for resizing by setting minimum size.
-        setMinimumSize(1, 1);
-    }
-
-    void resizeEvent(QResizeEvent *e) override {
-        updateText();
-        QLabel::resizeEvent(e);
+    explicit HistoryLabel(QWidget *parent = nullptr) : QLineEdit(parent) {
+        setStyleSheet("QLineEdit { border: none }");
     }
 
     bool event(QEvent *e) override {
         if (e->type() == QEvent::MouseButtonDblClick) {
-            emit onDoubleClick(fullTextData);
+            emit onDoubleClick(text());
             return true;
         }
-        return QLabel::event(e);
-    }
-
-    QString fullText() {
-        return fullTextData;
-    }
-
-    void setTextElided(const QString &text) {
-        fullTextData = text;
-        updateText();
+        return QLineEdit::event(e);
     }
 
 signals:
 
     void onDoubleClick(const QString &text);
-
-private:
-    void updateText() {
-        QFontMetrics metrics = QFontMetrics(font());
-        QString elitext = metrics.elidedText(fullTextData, Qt::ElideRight, width());
-        setText(elitext);
-        if (elitext != fullTextData)
-            setToolTip(fullTextData);
-        else
-            setToolTip("");
-    }
-
-    QString fullTextData;
 };
 
 #endif //QCALC_HISTORYLABEL_HPP
