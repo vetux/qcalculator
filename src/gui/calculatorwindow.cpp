@@ -102,6 +102,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionOpenTerminal, SIGNAL(triggered(bool)), this, SLOT(onActionOpenTerminal()));
     connect(actionExtractArchive, SIGNAL(triggered(bool)), this, SLOT(onActionExtractArchive()));
     connect(actionClearHistory, SIGNAL(triggered(bool)), this, SLOT(onActionClearHistory()));
+    connect(actionAboutPython, SIGNAL(triggered(bool)), this, SLOT(onActionAboutPython()));
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
     connect(input, SIGNAL(textChanged(const QString &)), this, SLOT(onInputTextChanged()));
@@ -220,6 +221,15 @@ void CalculatorWindow::onActionAbout() {
 
 void CalculatorWindow::onActionAboutQt() {
     QMessageBox::aboutQt(this);
+}
+
+void CalculatorWindow::onActionAboutPython() {
+    std::string version = Interpreter::getVersion();
+    std::string copyright = Interpreter::getCopyright();
+
+    std::string str = "Python version " + version + "\n\n" + copyright;
+
+    QMessageBox::about(this, "About Python", str.c_str());
 }
 
 void CalculatorWindow::onActionOpenSymbolTable() {
@@ -631,6 +641,10 @@ void CalculatorWindow::setupMenuBar() {
     actionClearHistory->setObjectName("actionClearHistory");
     actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
 
+    actionAboutPython = new QAction(this);
+    actionAboutPython->setText("About Python");
+    actionAboutPython->setObjectName("actionAboutPython");
+
     menuTools->addAction(actionOpenTerminal);
     menuTools->addAction(actionExtractArchive);
 
@@ -649,6 +663,7 @@ void CalculatorWindow::setupMenuBar() {
 
     menuHelp->addAction(actionAbout);
     menuHelp->addAction(actionAboutQt);
+    menuHelp->addAction(actionAboutPython);
 
     menuBar()->addMenu(menuFile);
     menuBar()->addMenu(menuSymbols);

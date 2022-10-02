@@ -273,3 +273,19 @@ std::string Interpreter::getError() {
 
     return error;
 }
+
+std::string Interpreter::getVersion() {
+    return Py_GetVersion();
+}
+
+std::string Interpreter::getCopyright() {
+    return Py_GetCopyright();
+}
+
+std::string Interpreter::getCompiler() {
+    return Py_GetCompiler();
+}
+
+std::string Interpreter::getBuildInfo() {
+    return Py_GetBuildInfo();
+}

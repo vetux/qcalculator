@@ -63,6 +63,14 @@ namespace Interpreter {
     void reloadModule(const std::string &module);
 
     std::string getError();
+
+    std::string getVersion();
+
+    std::string getCopyright();
+
+    std::string getCompiler();
+
+    std::string getBuildInfo();
 }
 
 #endif //QCALC_INTERPRETER_HPP

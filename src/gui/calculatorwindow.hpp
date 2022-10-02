@@ -83,6 +83,8 @@ public slots:
 
     void onActionAboutQt();
 
+    void onActionAboutPython();
+
     void onActionOpenSymbolTable();
 
     void onActionSaveSymbolTable();
@@ -170,6 +172,7 @@ private:
 
     QAction *actionAbout{};
     QAction *actionAboutQt{};
+    QAction *actionAboutPython{};
 
     SymbolsEditorWindow *symbolsDialog = nullptr;
     SettingsDialog *settingsDialog = nullptr;
