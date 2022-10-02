@@ -71,6 +71,8 @@ public slots:
 
     void onInputReturnPressed();
 
+    void onInputTextChanged();
+
     void onSymbolTableChanged(const SymbolTable &symbolTable);
 
     void onActionSettings();
@@ -104,6 +106,13 @@ public slots:
     void onActionClearHistory();
 
 private:
+    void keyPressEvent(QKeyEvent *event) override;
+
+private slots:
+    void onInputCursorPositionChanged(int oldPos, int newPos);
+
+private:
+
     QString evaluateExpression(const QString &expression);
 
     void loadSettings();
@@ -169,6 +178,8 @@ private:
 
     Settings settings;
 
+    std::string inputText;
+
     std::set<std::string> symbolTablePathHistory;
     std::string currentSymbolTablePath; // If the currently active symboltable was loaded from a file or saved to a file this path contains the path of the symbol table file.
 
@@ -177,6 +188,10 @@ private:
     QString enabledAddonsFilePath;
 
     std::vector<std::pair<std::string, std::string>> history;
+
+    bool inputTextContainsExpressionResult = false;
+    int inputTextHistoryIndex = 0;
+    std::string inputTextAppendedHistoryValue = "";
 };
 
 #endif // QCALC_MAINWINDOW_HPP

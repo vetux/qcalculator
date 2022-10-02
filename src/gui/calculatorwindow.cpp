@@ -104,6 +104,8 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionClearHistory, SIGNAL(triggered(bool)), this, SLOT(onActionClearHistory()));
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
+    connect(input, SIGNAL(textChanged(const QString &)), this, SLOT(onInputTextChanged()));
+    connect(input, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(onInputCursorPositionChanged(int, int)));
 
     connect(historyWidget,
             SIGNAL(onTextDoubleClicked(const QString &)),
@@ -172,6 +174,20 @@ void CalculatorWindow::onInputReturnPressed() {
     if (!res.isEmpty()) {
         input->setText(res);
         historyWidget->addContent(expr, res);
+        inputTextContainsExpressionResult = true;
+    }
+}
+
+void CalculatorWindow::onInputTextChanged() {
+    inputTextAppendedHistoryValue.clear();
+    inputTextHistoryIndex = 0;
+
+    if (inputTextContainsExpressionResult) {
+        inputTextContainsExpressionResult = false;
+        inputText = input->text().toStdString().substr(inputText.size());
+        input->setText(inputText.c_str());
+    } else {
+        inputText = input->text().toStdString();
     }
 }
 
@@ -305,8 +321,13 @@ const SymbolTable &CalculatorWindow::getSymbolTable() {
 }
 
 void CalculatorWindow::onHistoryTextDoubleClicked(const QString &text) {
-    const QString &currentText = input->text();
-    input->setText(currentText + text);
+    QString tx;
+    if (inputTextContainsExpressionResult) {
+        tx = text;
+    } else {
+        tx = input->text() + text;
+    }
+    input->setText(tx);
     input->setFocus();
 }
 
@@ -780,4 +801,54 @@ void CalculatorWindow::loadHistory() {
             historyWidget->addContent(pair.first.c_str(), pair.second.c_str());
         }
     }
+}
+
+void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
+    inputTextAppendedHistoryValue.clear();
+    inputTextHistoryIndex = 0;
+}
+
+void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
+    if (input->hasFocus() && !history.empty()) {
+        if (event->key() == Qt::Key_Up) {
+            if (!inputTextAppendedHistoryValue.empty())
+                inputTextHistoryIndex++;
+        } else if (event->key() == Qt::Key_Down) {
+            if (!inputTextAppendedHistoryValue.empty())
+                inputTextHistoryIndex--;
+        } else {
+            QWidget::keyPressEvent(event);
+            return;
+        }
+
+        if (inputTextHistoryIndex >= (int) history.size()) {
+            inputTextHistoryIndex = 0;
+        } else if (inputTextHistoryIndex < 0) {
+            inputTextHistoryIndex = (int) history.size() - 1;
+        }
+
+        auto index = inputTextHistoryIndex;
+
+        if (!inputTextAppendedHistoryValue.empty() && !input->text().isEmpty()) {
+            auto cursor = input->cursorPosition();
+            input->setText(input->text().remove(input->cursorPosition(),
+                                                (int) inputTextAppendedHistoryValue.size()));
+            input->setCursorPosition(cursor);
+        }
+        auto result = history.at((int)history.size() - index - 1).second;
+
+        auto cursor = input->cursorPosition();
+        auto inputStr = input->text().toStdString();
+        auto inputBegin = inputStr.substr(0, cursor);
+        auto inputEnd = inputStr.substr(cursor);
+        if (cursor == 0)
+            inputEnd = inputStr;
+        input->setText((inputBegin + result + inputEnd).c_str());
+        input->setCursorPosition(cursor);
+
+        inputTextAppendedHistoryValue = result;
+        inputTextHistoryIndex = index;
+    }
+
+    QWidget::keyPressEvent(event);
 }

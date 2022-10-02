@@ -106,6 +106,9 @@ public slots:
         equalsLabel->setText("=");
         resultLabel->setText(value);
 
+        expressionLabel->setCursorPosition(0);
+        resultLabel->setCursorPosition(0);
+
         connect(expressionLabel,
                 SIGNAL(onDoubleClick(const QString &)),
                 this,

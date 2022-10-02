@@ -22,6 +22,7 @@
 
 #include <QEvent>
 #include <QLineEdit>
+#include <QKeyEvent>
 
 /**
  * Auto elides the text and exposes a double click signal.
@@ -41,9 +42,25 @@ public:
         return QLineEdit::event(e);
     }
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override {
+        if (event->key() == Qt::Key_Left
+            || event->key() == Qt::Key_Right
+            || event->key() == Qt::Key_Home
+            || event->key() == Qt::Key_End
+            || (event->key() == Qt::Key_A && event->modifiers() == Qt::ControlModifier)
+            || (event->key() == Qt::Key_C && event->modifiers() == Qt::ControlModifier)
+            || event->key() == Qt::Key_Insert) {
+            QLineEdit::keyPressEvent(event);
+        } else {
+            event->ignore();
+        }
+    }
+
 signals:
 
     void onDoubleClick(const QString &text);
+
 };
 
 #endif //QCALC_HISTORYLABEL_HPP
