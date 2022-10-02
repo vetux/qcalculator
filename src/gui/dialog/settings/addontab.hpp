@@ -66,6 +66,7 @@ private:
     std::map<std::string, Addon> addons;
     std::string selectedAddon;
 
+    QWidget *addonDetail;
     QPushButton *installButton;
     QPushButton *refreshButton;
     QPushButton *uninstallButton;

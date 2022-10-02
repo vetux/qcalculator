@@ -111,13 +111,22 @@ AddonTab::AddonTab(QWidget *parent)
     btnsLayout->setMargin(0);
     btnsLayout->addWidget(refreshButton, 2);
     btnsLayout->addWidget(installButton, 2);
-    btnsLayout->addWidget(uninstallButton, 1);
+
+    addonDetail = new QWidget(this);
 
     addonWidget = new AddonWidget(this);
 
+    auto *vLayout = new QVBoxLayout;
+    vLayout->addWidget(addonWidget);
+    vLayout->addWidget(uninstallButton);
+
+    vLayout->setMargin(0);
+
+    addonDetail->setLayout(vLayout);
+
     auto *hLayout = new QHBoxLayout();
     hLayout->addWidget(listWidget, 3);
-    hLayout->addWidget(addonWidget, 1);
+    hLayout->addWidget(addonDetail, 1);
 
     auto *layout = new QVBoxLayout();
     layout->addLayout(addonHeaderLayout);
@@ -131,12 +140,11 @@ AddonTab::AddonTab(QWidget *parent)
     connect(uninstallButton, SIGNAL(clicked()), this, SLOT(uninstallPressed()));
     connect(listWidget, SIGNAL(itemSelectionChanged()), this, SLOT(listItemChange()));
 
-    auto sp = addonWidget->sizePolicy();
+    auto sp = addonDetail->sizePolicy();
     sp.setRetainSizeWhenHidden(false);
-    addonWidget->setSizePolicy(sp);
+    addonDetail->setSizePolicy(sp);
 
-    addonWidget->hide();
-    uninstallButton->setEnabled(false);
+    addonDetail->hide();
 }
 
 
@@ -160,11 +168,10 @@ void AddonTab::listItemChange() {
         addonWidget->show();
         listWidget->doItemsLayout();
         listWidget->update();
-        uninstallButton->setEnabled(true);
+        addonDetail->show();
     } else {
         selectedAddon.clear();
-        addonWidget->hide();
-        uninstallButton->setEnabled(false);
+        addonDetail->hide();
     }
 }
 
