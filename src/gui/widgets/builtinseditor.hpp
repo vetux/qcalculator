@@ -43,7 +43,7 @@ private slots:
     void stateChanged(int state);
 
 private:
-    void setListContents(const std::set<QString> &contents);
+    void setListContents(const std::vector<std::pair<QString, QString>> &contents);
 
     QCheckBox *checkBox;
     QListWidget *list;
