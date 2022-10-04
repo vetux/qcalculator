@@ -28,8 +28,6 @@ class AboutDialog : public QDialog {
 public:
     AboutDialog(QWidget *parent = nullptr)
             : QDialog(parent) {
-        setLayout(new QVBoxLayout());
-
         setModal(true);
 
         setWindowTitle("About " + QApplication::applicationDisplayName());
@@ -59,11 +57,24 @@ Powered by:
         text->setOpenExternalLinks(true);
         text->setWordWrap(true);
 
-        layout()->addWidget(text);
+        auto *btn = new QPushButton(this);
+        btn->setText("Ok");
+
+        auto *btnLayout = new QHBoxLayout;
+        btnLayout->addStretch(1);
+        btnLayout->addWidget(btn);
+
+        auto *vlayout = new QVBoxLayout();
+        vlayout->addWidget(text);
+        vlayout->addLayout(btnLayout);
+
+        setLayout(vlayout);
 
         update();
 
         window()->layout()->setSizeConstraint(QLayout::SetFixedSize);
+
+        connect(btn, SIGNAL(clicked(bool)), this, SLOT(accept()));
     }
 
 private:
