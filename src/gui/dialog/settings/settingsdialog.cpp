@@ -258,8 +258,8 @@ void SettingsDialog::onInstallAddonPressed() {
                                           " addons.").c_str());
             } else {
                 QMessageBox::information(this,
-                                         "Installation Finished",
-                                         "No addons were installed.");
+                                         "Installation Cancelled",
+                                         "Installation has been cancelled.");
             }
         } catch (const std::exception &e) {
             QMessageBox::critical(this,

@@ -51,7 +51,7 @@ public:
 
         setLayout(vlayout);
 
-        updateLabel->setText("Addon updates (Existing addon files are replaced)");
+        updateLabel->setText("Addon updates");
         installLabel->setText("New Addons");
 
         okButton->setText("Install Selected");
