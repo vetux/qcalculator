@@ -34,9 +34,11 @@ namespace FileOperations {
      */
     std::vector<std::string> findFilesInDirectory(const std::string &directory, const std::string &suffix = "", bool recursive = false);
 
-    std::string fileReadAllText(const std::string &filePath);
+    std::string fileReadAll(const std::string &filePath);
 
-    void fileWriteAllText(const std::string &filePath, const std::string &contents);
+    std::vector<char> fileReadAllVector(const std::string &filePath);
+
+    void fileWriteAll(const std::string &filePath, const std::string &contents);
 }
 
 #endif //QCALC_FILEOPERATIONS_HPP

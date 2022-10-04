@@ -26,6 +26,8 @@
 #include <memory>
 #include <functional>
 
+#include <QStringList>
+
 class Archive {
 public:
     enum Format : int {
@@ -63,6 +65,10 @@ public:
         ARCHIVE_FORMAT_RAR_V5 = 0x100000,
     };
 
+    static const QStringList & getFormatMimeTypes();
+
+    static Format getFormatFromExtension(const std::string &extension);
+
     static void extractToDisk(const std::string &archive, const std::string &outputDirectory,
                               std::function<void(const std::string &)> progressCallback);
 
@@ -76,11 +82,15 @@ public:
         mEntries[name] = data;
     }
 
+    const std::vector<char> &getEntry(const std::string &name){
+        return mEntries.at(name);
+    }
+
     std::map<std::string, std::vector<char>> &entries() { return mEntries; }
 
     const std::map<std::string, std::vector<char>> &entries() const { return mEntries; }
 
-    void save(std::ostream &stream, Format format);
+    void save(const std::string &outputFile, Format format);
 
 private:
     Format format;

@@ -28,14 +28,14 @@
 Settings Settings::readSettings() {
     auto path = Paths::getSettingsFile();
     if (QFile(path.c_str()).exists()) {
-        return Serializer::deserializeSettings(FileOperations::fileReadAllText(path));
+        return Serializer::deserializeSettings(FileOperations::fileReadAll(path));
     } else {
         return {};
     }
 }
 
 void Settings::saveSettings(const Settings &settings) {
-    return FileOperations::fileWriteAllText(Paths::getSettingsFile(), Serializer::serializeSettings(settings));
+    return FileOperations::fileWriteAll(Paths::getSettingsFile(), Serializer::serializeSettings(settings));
 }
 
 void Settings::clear(const Setting &s) {

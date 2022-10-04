@@ -51,7 +51,7 @@ static std::map<std::string, AddonMetadata> readAvailableAddons(const std::strin
         std::string addonDirPath = addonDir.path().string();
         std::vector<std::string> addonFiles = FileOperations::findFilesInDirectory(addonDirPath, ".py");
         for (auto &filePath: addonFiles) {
-            auto fileContents = FileOperations::fileReadAllText(filePath);
+            auto fileContents = FileOperations::fileReadAll(filePath);
             std::string n = R"(""")";
 
             std::string json;
@@ -90,6 +90,81 @@ static std::map<std::string, AddonMetadata> readAvailableAddons(const std::strin
     }
 
     return ret;
+}
+
+Archive AddonManager::createInstallableBundle(std::vector<InstallBundleEntry> entries) {
+    Archive archive;
+    auto bundle = nlohmann::json();
+    for (auto &entry: entries) {
+        auto j = nlohmann::json();
+
+        auto addonPath = std::filesystem::path(entry.module);
+        auto addonName = addonPath.stem().string();
+        auto moduleName = addonName + "/" + addonPath.filename().string();
+
+        j["module"] = moduleName;
+
+        auto moduleDataStr = FileOperations::fileReadAll(entry.module);
+
+        std::vector<char> moduleData(moduleDataStr.size());
+        for (auto i = 0; i < moduleData.size(); i++) {
+            moduleData.at(i) = moduleDataStr.at(i);
+        }
+
+        archive.addEntry(moduleName, moduleData);
+
+        for (auto &package: entry.packages) {
+            auto packagePath = std::filesystem::path(package);
+            auto basePath = packagePath.parent_path();
+
+            if (std::filesystem::is_directory(packagePath)) {
+                auto packageName = addonName + "/" + packagePath.filename().string() + "/";
+
+                j["packages"].emplace_back(packageName);
+
+                for (auto &packageFile: FileOperations::findFilesInDirectory(package, "", true)) {
+                    auto packageFilePath = addonName + "/" + packageFile.substr(basePath.string().size() + 1);
+                    auto packageDataStr = FileOperations::fileReadAll(packageFile);
+
+                    std::vector<char> packageData(packageDataStr.size());
+                    for (auto i = 0; i < packageData.size(); i++) {
+                        packageData.at(i) = packageDataStr.at(i);
+                    }
+
+                    archive.addEntry(packageFilePath, packageData);
+                }
+            } else {
+                auto packageFilePath = addonName + "/" + packagePath.string().substr(basePath.string().size() + 1);
+
+                j["packages"].emplace_back(packageFilePath);
+
+                auto packageDataStr = FileOperations::fileReadAll(packagePath);
+
+                std::vector<char> packageData(packageDataStr.size());
+                for (auto i = 0; i < packageData.size(); i++) {
+                    packageData.at(i) = packageDataStr.at(i);
+                }
+
+                archive.addEntry(packageFilePath, packageData);
+            }
+        }
+
+        j["version"] = entry.version;
+
+        bundle["addons"].emplace_back(j);
+    }
+
+    bundle["bundleVersion"] = 0;
+
+    std::string addonBundleStr = bundle.dump();
+    std::vector<char> addonBundle(addonBundleStr.size());
+    for (auto i = 0; i < addonBundle.size(); i++) {
+        addonBundle.at(i) = addonBundleStr.at(i);
+    }
+
+    archive.addEntry("addon_bundle.json", addonBundle);
+
+    return archive;
 }
 
 AddonManager::AddonManager(const std::string &addonDirectory,
@@ -243,7 +318,7 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
     Archive arch(sourceFile);
 
     if (arch.entries().find(metadataFilePath) == arch.entries().end()) {
-        throw std::runtime_error("metadata.json must be present in the addon package");
+        throw std::runtime_error("addon_bundle.json must be present in the addon package");
     }
 
     auto metadata = arch.entries().at(metadataFilePath);
@@ -291,7 +366,6 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
             std::filesystem::path addonFile(addon.modulePath);
 
             //Install addon
-
             if (addonFile.extension() != ".py") {
                 throw std::runtime_error("Invalid extension for addon file " + addonFile.string());
             }
@@ -306,27 +380,37 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
 
             // Install addon packages
             for (auto &package: addon.packages) {
-                auto libraryDirectory = package;
-                if (!libraryDirectory.empty() && libraryDirectory.back() == '/')
-                    libraryDirectory.pop_back();
+                if (package.back() == '/') {
+                    // Write all files in the package directory to disk
+                    auto libraryDirectory = package;
+                    if (!libraryDirectory.empty() && libraryDirectory.back() == '/')
+                        libraryDirectory.pop_back();
 
-                auto libraryPackage = std::filesystem::path(libraryDirectory).filename();
+                    auto libraryPackage = std::filesystem::path(libraryDirectory).filename();
 
-                std::set<std::string> libFiles;
-                for (auto &entry: arch.entries()) {
-                    if (entry.first.size() > libraryDirectory.size() && entry.first.find(libraryDirectory) == 0) {
-                        libFiles.insert(entry.first);
+                    std::set<std::string> libFiles;
+                    for (auto &entry: arch.entries()) {
+                        if (entry.first.size() > libraryDirectory.size() && entry.first.find(libraryDirectory) == 0) {
+                            libFiles.insert(entry.first);
+                        }
                     }
-                }
 
-                if (!libFiles.empty()) {
-                    for (auto &libFilePath: libFiles) {
-                        auto path = concatPath(outputDir, libFilePath.substr(libraryDirectory.size()));
-                        createPath(path);
-                        writeToFile(path, arch.entries().at(libFilePath));
+                    if (!libFiles.empty()) {
+                        for (auto &libFilePath: libFiles) {
+                            auto path = concatPath(outputDir, libFilePath.substr(libraryDirectory.size()));
+                            createPath(path);
+                            writeToFile(path, arch.entries().at(libFilePath));
+                        }
+                    } else {
+                        throw std::runtime_error("No packages files found for defined package " + libraryDirectory);
                     }
                 } else {
-                    throw std::runtime_error("No packages files found for defined package " + libraryDirectory);
+                    // Write the package file to disk
+                    auto packagePath = std::filesystem::path(package);
+                    auto path = concatPath(outputDir, packagePath.filename());
+
+                    createPath(path);
+                    writeToFile(path, arch.getEntry(package));
                 }
             }
         }

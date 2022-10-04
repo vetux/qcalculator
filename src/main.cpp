@@ -177,7 +177,6 @@ int main(int argc, char *argv[]) {
     StdRedirModule::initialize();
     ExprtkModule::initialize();
     Interpreter::initialize();
-    Interpreter::addModuleDir(Paths::getAddonDirectory());
     Interpreter::addModuleDir(Paths::getLibDirectory());
 
     if (args.size() > 1) {

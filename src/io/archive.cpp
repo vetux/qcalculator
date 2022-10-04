@@ -47,6 +47,55 @@ static int copy_data(struct archive *ar, struct archive *aw) {
     }
 }
 
+const QStringList &Archive::getFormatMimeTypes() {
+    static const QStringList ret = {
+            "application/zip",
+            "application/x-7z-compressed",
+            "application/x-rar-compressed",
+            "application/x-tar",
+            "application/x-iso9660-image",
+            "application/x-cpio",
+            "application/x-shar",
+    };
+    return ret;
+}
+
+Archive::Format Archive::getFormatFromExtension(const std::string &extension) {
+    auto ext = extension;
+    if (!ext.empty() && *ext.begin() == '.') {
+        ext.erase(ext.begin());
+    }
+    if (ext == "cpio") {
+        return (Archive::Format) ARCHIVE_FORMAT_CPIO;
+    } else if (ext == "shar") {
+        return (Archive::Format) ARCHIVE_FORMAT_SHAR;
+    } else if (ext == "tar") {
+        return (Archive::Format) ARCHIVE_FORMAT_TAR;
+    } else if (ext == "iso") {
+        return (Archive::Format) ARCHIVE_FORMAT_ISO9660;
+    } else if (ext == "zip") {
+        return (Archive::Format) ARCHIVE_FORMAT_ZIP;
+    } else if (ext == "ar") {
+        return (Archive::Format) ARCHIVE_FORMAT_AR;
+    } else if (ext == "raw" || ext == "bin") {
+        return (Archive::Format) ARCHIVE_FORMAT_RAW;
+    } else if (ext == "xar") {
+        return (Archive::Format) ARCHIVE_FORMAT_XAR;
+    } else if (ext == "lha") {
+        return (Archive::Format) ARCHIVE_FORMAT_LHA;
+    } else if (ext == "cab") {
+        return (Archive::Format) ARCHIVE_FORMAT_CAB;
+    } else if (ext == "rar") {
+        return (Archive::Format) ARCHIVE_FORMAT_RAR;
+    } else if (ext == "7zip") {
+        return (Archive::Format) ARCHIVE_FORMAT_7ZIP;
+    } else if (ext == "warc") {
+        return (Archive::Format) ARCHIVE_FORMAT_WARC;
+    } else {
+        throw std::runtime_error("Unsupported extension " + ext);
+    }
+}
+
 void Archive::extractToDisk(const std::string &filename,
                             const std::string &outputDirectory,
                             std::function<void(const std::string &)> progressCallback) {
@@ -171,35 +220,35 @@ Archive::Format Archive::getFormat() {
     return format;
 }
 
-void Archive::save(std::ostream &s, Archive::Format format) {
-    size_t bufferSize = 0;
-    for (auto &entry: mEntries)
-        bufferSize += entry.first.size() + entry.second.size() + 1024;
-
-    std::vector<char> buffer(bufferSize);
-    size_t used;
-
+void Archive::save(const std::string &outputFile, Archive::Format f) {
     struct archive *a = archive_write_new();
 
-    archive_write_set_format(a, format);
-    archive_write_open_memory(a, buffer.data(), bufferSize, &used);
+    archive_write_set_format(a, f);
+    auto ret = archive_write_open_filename(a, outputFile.c_str());
+    if (ret < ARCHIVE_OK)
+        throw std::runtime_error("Failed to open output file " + std::string(archive_error_string(a)));
 
     for (auto &entry: mEntries) {
         auto *e = archive_entry_new();
 
         archive_entry_set_pathname(e, entry.first.c_str());
-        archive_entry_set_size(e, entry.second.size());
         archive_entry_set_filetype(e, AE_IFREG);
         archive_entry_set_perm(e, 0644);
+        archive_entry_set_size(e, (long) entry.second.size());
 
-        archive_write_header(a, e);
-        archive_write_data(a, entry.second.data(), entry.second.size());
+        ret = archive_write_header(a, e);
+        if (ret < ARCHIVE_OK)
+            throw std::runtime_error("Failed to write archive header " + std::string(archive_error_string(a)));
+
+        auto writeCount = archive_write_data(a, entry.second.data(), entry.second.size());
+        if (writeCount < 0)
+            throw std::runtime_error("Failed to write archive data " + std::string(archive_error_string(a)));
+
+        archive_write_finish_entry(a);
 
         archive_entry_free(e);
     }
 
     archive_write_close(a);
     archive_write_free(a);
-
-    s.write(buffer.data(), used);
 }

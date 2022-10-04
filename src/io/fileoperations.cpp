@@ -53,7 +53,7 @@ namespace FileOperations {
         return ret;
     }
 
-    std::string fileReadAllText(const std::string &filePath) {
+    std::string fileReadAll(const std::string &filePath) {
         try {
             QFile file(filePath.c_str());
             if (file.exists()) {
@@ -79,7 +79,15 @@ namespace FileOperations {
         }
     }
 
-    void fileWriteAllText(const std::string &filePath, const std::string &contents) {
+    std::vector<char> fileReadAllVector(const std::string &filePath) {
+        auto ret = fileReadAll(filePath);
+        std::vector<char> rv;
+        for (auto &v: ret)
+            rv.emplace_back(v);
+        return rv;
+    }
+
+    void fileWriteAll(const std::string &filePath, const std::string &contents) {
         try {
             QFile file(filePath.c_str());
 

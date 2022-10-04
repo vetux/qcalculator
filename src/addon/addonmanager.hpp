@@ -25,6 +25,7 @@
 #include <functional>
 #include <atomic>
 #include <map>
+#include <io/archive.hpp>
 
 #include "addon.hpp"
 
@@ -37,6 +38,14 @@ struct AddonBundleEntry {
 
 class AddonManager {
 public:
+    struct InstallBundleEntry {
+        std::string module;
+        std::set<std::string> packages;
+        int version;
+    };
+
+    static Archive createInstallableBundle(std::vector<InstallBundleEntry> entries);
+
     typedef std::function<void(const std::string &, const std::string &)> Listener;
 
     AddonManager(const std::string &addonDirectory,

@@ -21,10 +21,16 @@
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-
+#include <QMessageBox>
 #include <QLineEdit>
+#include <QFileDialog>
+
+#include <filesystem>
+#include <fstream>
 
 #include "gui/widgets/addonitemwidget.hpp"
+
+#include "addon/addonmanager.hpp"
 
 std::pair<char, char> getCasePair(char c) {
     if (c >= 65 && c <= 90) {

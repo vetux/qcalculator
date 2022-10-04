@@ -29,6 +29,7 @@
 #include <QApplication>
 #include <QProcess>
 #include <QProgressDialog>
+#include <QInputDialog>
 
 #include "util/stringsplit.hpp"
 
@@ -100,7 +101,9 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionSaveAsSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveAsSymbolTable()));
     connect(actionEditSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionEditSymbolTable()));
     connect(actionOpenTerminal, SIGNAL(triggered(bool)), this, SLOT(onActionOpenTerminal()));
+    connect(actionCompressDirectory, SIGNAL(triggered(bool)), this, SLOT(onActionCompressDirectory()));
     connect(actionExtractArchive, SIGNAL(triggered(bool)), this, SLOT(onActionExtractArchive()));
+    connect(actionCreateAddonBundle, SIGNAL(triggered(bool)), this, SLOT(onActionCreateAddonBundle()));
     connect(actionClearHistory, SIGNAL(triggered(bool)), this, SLOT(onActionClearHistory()));
     connect(actionAboutPython, SIGNAL(triggered(bool)), this, SLOT(onActionAboutPython()));
 
@@ -305,17 +308,64 @@ void CalculatorWindow::onActionOpenTerminal() {
     d->show();
 }
 
+void CalculatorWindow::onActionCompressDirectory() {
+    QFileDialog dialog;
+    dialog.setWindowTitle("Select directory to compress...");
+    dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setFileMode(QFileDialog::Directory);
+
+    if (dialog.exec() == QFileDialog::Accepted) {
+        auto directory = dialog.selectedFiles().at(0);
+        auto directoryBase = std::filesystem::path(directory.toStdString()).parent_path().string();
+
+        dialog.setWindowTitle("Select output file...");
+        dialog.setAcceptMode(QFileDialog::AcceptOpen);
+        dialog.setFileMode(QFileDialog::AnyFile);
+        dialog.setMimeTypeFilters(Archive::getFormatMimeTypes());
+
+        for (;;) {
+            if (dialog.exec() == QFileDialog::Accepted) {
+                auto outputFile = dialog.selectedFiles().at(0);
+
+                Archive archive;
+                auto files = FileOperations::findFilesInDirectory(directory.toStdString(), "", false);
+                for (auto &file: files) {
+                    auto name = file.substr(directoryBase.size() + 1);
+                    archive.addEntry(name, FileOperations::fileReadAllVector(file));
+                }
+
+                try {
+                    auto format = Archive::getFormatFromExtension(
+                            std::filesystem::path(outputFile.toStdString()).extension());
+                    archive.save(outputFile.toStdString(), format);
+                    QMessageBox::information(this, "Compression success", "Saved " + outputFile);
+                    break;
+                } catch (const std::exception &e) {
+                    QMessageBox::warning(this, "Compression failed", "Failed to save file: " + QString(e.what()));
+                }
+            } else {
+                QMessageBox::information(this, "Compression cancel", "No output file selected");
+                break;
+            }
+        }
+    } else {
+        QMessageBox::information(this, "Compression cancel", "No directory selected");
+    }
+}
+
 void CalculatorWindow::onActionExtractArchive() {
     QFileDialog dialog;
     dialog.setWindowTitle("Select archive file...");
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
     dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setMimeTypeFilters(Archive::getFormatMimeTypes());
 
     if (dialog.exec() == QFileDialog::Accepted) {
         auto archiveFile = dialog.selectedFiles().at(0);
         dialog.setWindowTitle("Select output directory...");
         dialog.setAcceptMode(QFileDialog::AcceptSave);
         dialog.setFileMode(QFileDialog::Directory);
+        dialog.setMimeTypeFilters({});
 
         if (dialog.exec() == QFileDialog::Accepted) {
             auto targetDirectory = dialog.selectedFiles()[0];
@@ -330,6 +380,118 @@ void CalculatorWindow::onActionExtractArchive() {
                                      "Extraction failed",
                                      e.what());
             }
+        }
+    }
+}
+
+void CalculatorWindow::onActionCreateAddonBundle() {
+    QFileDialog dialog;
+
+    std::vector<AddonManager::InstallBundleEntry> bundleEntries;
+
+    for (;;) {
+        dialog.setWindowTitle("Select addon module file");
+        dialog.setFileMode(QFileDialog::AnyFile);
+        dialog.setOption(QFileDialog::ShowDirsOnly, false);
+        dialog.setAcceptMode(QFileDialog::AcceptOpen);
+        dialog.setMimeTypeFilters({"text/x-python"});
+
+        if (dialog.exec() == QFileDialog::Accepted) {
+            auto moduleStr = dialog.selectedFiles().at(0).toStdString();
+            auto modulePath = std::filesystem::path(moduleStr);
+            if (modulePath.extension().string() != ".py") {
+                QMessageBox::information(this, "Invalid selection",
+                                         "The selected path does not point to a python module. Select a file ending in .py");
+                continue;
+            }
+
+            QMessageBox::information(this, "Addon module added", ("Added " + modulePath.stem().string()).c_str());
+
+            std::set<std::string> packages;
+            for (;;) {
+                auto r = QMessageBox::question(this, "Add package",
+                                               "Do you want to add addon packages?",
+                                               "Add Directory",
+                                               "Add File",
+                                               "Continue");
+                if (r == 0) {
+                    dialog.setWindowTitle("Select python package directory");
+                    dialog.setFileMode(QFileDialog::Directory);
+                    dialog.setOption(QFileDialog::ShowDirsOnly, true);
+                    dialog.setMimeTypeFilters({});
+                } else if (r == 1) {
+                    dialog.setWindowTitle("Select python package file");
+                    dialog.setFileMode(QFileDialog::AnyFile);
+                    dialog.setOption(QFileDialog::ShowDirsOnly, false);
+                    dialog.setMimeTypeFilters(Archive::getFormatMimeTypes());
+                } else if (r == 2) {
+                    break;
+                }
+                if (dialog.exec() == QFileDialog::Accepted) {
+                    auto packagePath = dialog.selectedFiles().at(0);
+                    packages.insert(packagePath.toStdString());
+                    QMessageBox::information(this, "Added package", "Added " + QString(std::filesystem::path(
+                            packagePath.toStdString()).stem().string().c_str()) + " to " +
+                                                                    QString(modulePath.stem().string().c_str()));
+                }
+            }
+
+            QInputDialog inputDialog;
+            inputDialog.setWindowTitle("Set addon version");
+            inputDialog.setLabelText("Select the addon version");
+            int version = 0;
+            if (inputDialog.exec() == QInputDialog::Accepted) {
+                version = inputDialog.intValue();
+            }
+
+            AddonManager::InstallBundleEntry entry;
+            entry.module = moduleStr;
+            entry.packages = packages;
+            entry.version = version;
+
+            bundleEntries.emplace_back(entry);
+        } else {
+            break;
+        }
+
+        if (QMessageBox::question(this, "Add addon", "Do you want to add more addons?") == QMessageBox::No) {
+            break;
+        }
+    }
+
+    if (bundleEntries.empty()) {
+        QMessageBox::information(this,
+                                 "No selection",
+                                 "No addons were selected");
+        return;
+    }
+
+    dialog.setWindowTitle("Select output file");
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setOption(QFileDialog::ShowDirsOnly, false);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setMimeTypeFilters({Archive::getFormatMimeTypes()});
+
+    for (;;) {
+        if (dialog.exec() == QFileDialog::Accepted) {
+            auto outputFile = dialog.selectedFiles().at(0);
+            auto outputPath = std::filesystem::path(outputFile.toStdString());
+            try {
+                auto format = Archive::getFormatFromExtension(outputPath.extension());
+                auto archive = AddonManager::createInstallableBundle(bundleEntries);
+                archive.save(outputFile.toStdString(), format);
+                QMessageBox::information(this,
+                                         "Saving successful",
+                                         "Successfully saved addon bundle to " + outputFile);
+                break;
+            } catch (std::runtime_error &e) {
+                QMessageBox::warning(this,
+                                     "Saving failed",
+                                     (std::string("Failed to save addon bundle: ") + e.what()).c_str());
+            }
+        } else {
+            QMessageBox::information(this, "Cancelled saving", "Saving was cancelled.");
+            break;
         }
     }
 }
@@ -432,7 +594,7 @@ void CalculatorWindow::loadSettings() {
     std::string settingsFilePath = Paths::getSettingsFile();
     if (QFile(settingsFilePath.c_str()).exists()) {
         try {
-            settings = Serializer::deserializeSettings(FileOperations::fileReadAllText(settingsFilePath));
+            settings = Serializer::deserializeSettings(FileOperations::fileReadAll(settingsFilePath));
         } catch (const std::runtime_error &e) {
             QMessageBox::warning(this, "Failed to load settings", e.what());
             settings = {};
@@ -486,7 +648,7 @@ void CalculatorWindow::loadSettings() {
 
 void CalculatorWindow::saveSettings() {
     try {
-        FileOperations::fileWriteAllText(Paths::getSettingsFile(), Serializer::serializeSettings(settings));
+        FileOperations::fileWriteAll(Paths::getSettingsFile(), Serializer::serializeSettings(settings));
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to save settings", e.what());
     }
@@ -495,7 +657,7 @@ void CalculatorWindow::saveSettings() {
 std::set<std::string> CalculatorWindow::loadEnabledAddons() {
     if (QFile(enabledAddonsFilePath).exists()) {
         try {
-            return Serializer::deserializeSet(FileOperations::fileReadAllText(enabledAddonsFilePath.toStdString()));
+            return Serializer::deserializeSet(FileOperations::fileReadAll(enabledAddonsFilePath.toStdString()));
         }
         catch (const std::runtime_error &e) {
             QMessageBox::warning(this, "Failed to load enabled addons", e.what());
@@ -508,7 +670,7 @@ std::set<std::string> CalculatorWindow::loadEnabledAddons() {
 
 void CalculatorWindow::saveEnabledAddons(const std::set<std::string> &addons) {
     try {
-        FileOperations::fileWriteAllText(Paths::getAddonsFile(), Serializer::serializeSet(addons));
+        FileOperations::fileWriteAll(Paths::getAddonsFile(), Serializer::serializeSet(addons));
     }
     catch (const std::runtime_error &e) {
         QMessageBox::warning(this, "Failed to save enabled addons", e.what());
@@ -524,7 +686,7 @@ void CalculatorWindow::loadSymbolTablePathHistory() {
     }
 
     try {
-        auto lines = splitString(FileOperations::fileReadAllText(filePath), '\n');
+        auto lines = splitString(FileOperations::fileReadAll(filePath), '\n');
         for (auto &line: lines) {
             symbolTablePathHistory.insert(line);
         }
@@ -565,7 +727,7 @@ void CalculatorWindow::saveSymbolTablePathHistory() {
             str += path + '\n';
         }
         str.pop_back();
-        FileOperations::fileWriteAllText(Paths::getSymbolTableHistoryFile(), str);
+        FileOperations::fileWriteAll(Paths::getSymbolTableHistoryFile(), str);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to save symbol table history", e.what());
     }
@@ -637,9 +799,17 @@ void CalculatorWindow::setupMenuBar() {
     actionEditSymbols->setObjectName("actionEditSymbols");
     actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
+    actionCompressDirectory = new QAction(this);
+    actionCompressDirectory->setText("Compress directory...");
+    actionCompressDirectory->setObjectName("actionCompressDirectory");
+
     actionExtractArchive = new QAction(this);
     actionExtractArchive->setText("Extract archive...");
     actionExtractArchive->setObjectName("actionExtractArchive");
+
+    actionCreateAddonBundle = new QAction(this);
+    actionCreateAddonBundle->setText("Create addon bundle...");
+    actionCreateAddonBundle->setObjectName("actionCreateAddonBundle");
 
     actionClearHistory = new QAction(this);
     actionClearHistory->setText("Clear History");
@@ -651,7 +821,11 @@ void CalculatorWindow::setupMenuBar() {
     actionAboutPython->setObjectName("actionAboutPython");
 
     menuTools->addAction(actionOpenTerminal);
+    menuTools->addSeparator();
+    menuTools->addAction(actionCompressDirectory);
     menuTools->addAction(actionExtractArchive);
+    menuTools->addSeparator();
+    menuTools->addAction(actionCreateAddonBundle);
 
     menuFile->addAction(actionSettings);
     menuFile->addSeparator();
@@ -734,7 +908,7 @@ void CalculatorWindow::updateSymbolHistoryMenu() {
 
 bool CalculatorWindow::importSymbolTable(const std::string &path) {
     try {
-        auto syms = Serializer::deserializeTable(FileOperations::fileReadAllText(path));
+        auto syms = Serializer::deserializeTable(FileOperations::fileReadAll(path));
 
         std::set<std::string> addons = addonManager->getActiveAddons();
         addonManager->setActiveAddons({});
@@ -762,7 +936,7 @@ bool CalculatorWindow::importSymbolTable(const std::string &path) {
 
 bool CalculatorWindow::saveSymbolTable(const std::string &path) {
     try {
-        FileOperations::fileWriteAllText(path, Serializer::serializeTable(symbolTable));
+        FileOperations::fileWriteAll(path, Serializer::serializeTable(symbolTable));
 
         symbolTablePathHistory.insert(path);
         saveSymbolTablePathHistory();
@@ -795,14 +969,14 @@ void CalculatorWindow::saveHistory() {
         std::string str = pair.first + "\n" + pair.second + "\n";
         outputStr += str;
     }
-    FileOperations::fileWriteAllText(Paths::getHistoryFile(), outputStr);
+    FileOperations::fileWriteAll(Paths::getHistoryFile(), outputStr);
 }
 
 void CalculatorWindow::loadHistory() {
     if (!settings.value(SETTING_SAVE_HISTORY).toInt())
         return;
     if (std::filesystem::exists(Paths::getHistoryFile())) {
-        auto str = FileOperations::fileReadAllText(Paths::getHistoryFile());
+        auto str = FileOperations::fileReadAll(Paths::getHistoryFile());
 
         std::vector<std::string> lines = splitString(str, '\n');
         for (auto i = 0; lines.size() > 1 && i < lines.size() - 1; i += 2) {

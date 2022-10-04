@@ -97,7 +97,11 @@ public slots:
 
     void onActionOpenTerminal();
 
+    void onActionCompressDirectory();
+
     void onActionExtractArchive();
+
+    void onActionCreateAddonBundle();
 
     void onHistoryTextDoubleClicked(const QString &text);
 
@@ -168,7 +172,9 @@ private:
     QAction *actionSaveSymbols{};
     QAction *actionSaveAsSymbols{};
 
+    QAction *actionCompressDirectory{};
     QAction *actionExtractArchive{};
+    QAction *actionCreateAddonBundle{};
 
     QAction *actionAbout{};
     QAction *actionAboutQt{};
