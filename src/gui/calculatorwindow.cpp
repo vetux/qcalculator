@@ -75,9 +75,9 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
                                                       return onAddonUnloadFail(module, error);
                                                   });
 
+    setupMenuBar();
     setupDialogs();
     setupLayout();
-    setupMenuBar();
 
     input->setFocus();
 
@@ -96,6 +96,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
     connect(actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
     connect(actionAboutQt, SIGNAL(triggered(bool)), this, SLOT(onActionAboutQt()));
+    connect(actionClearSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionClearSymbolTable()));
     connect(actionOpenSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionOpenSymbolTable()));
     connect(actionSaveSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveSymbolTable()));
     connect(actionSaveAsSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveAsSymbolTable()));
@@ -238,6 +239,16 @@ void CalculatorWindow::onActionAboutPython() {
     std::string str = "Python version " + version + "\n\n" + copyright;
 
     QMessageBox::about(this, "About Python", str.c_str());
+}
+
+void CalculatorWindow::onActionClearSymbolTable() {
+    if (QMessageBox::question(this, "Clear symbols", "Do you want to clear the symbol table?") == QMessageBox::Yes) {
+        auto symCopy = symbolTable;
+        symCopy.clearVariables();
+        symCopy.clearConstants();
+        symCopy.clearFunctions();
+        onSymbolTableChanged(symCopy);
+    }
 }
 
 void CalculatorWindow::onActionOpenSymbolTable() {
@@ -765,6 +776,10 @@ void CalculatorWindow::setupMenuBar() {
     actionSettings->setText("Settings");
     actionSettings->setObjectName("actionSettings");
 
+    actionClearSymbols = new QAction(this);
+    actionClearSymbols->setText("Clear");
+    actionClearSymbols->setObjectName("actionClearSymbols");
+
     actionOpenSymbols = new QAction(this);
     actionOpenSymbols->setText("Open...");
     actionOpenSymbols->setObjectName("actionOpenSymbols");
@@ -814,7 +829,7 @@ void CalculatorWindow::setupMenuBar() {
     actionClearHistory = new QAction(this);
     actionClearHistory->setText("Clear History");
     actionClearHistory->setObjectName("actionClearHistory");
-    actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
+    actionClearHistory->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
 
     actionAboutPython = new QAction(this);
     actionAboutPython->setText("About Python");
@@ -834,6 +849,7 @@ void CalculatorWindow::setupMenuBar() {
     menuFile->addAction(actionExit);
 
     menuSymbols->addAction(actionEditSymbols);
+    menuSymbols->addAction(actionClearSymbols);
     menuSymbols->addSeparator();
     menuSymbols->addAction(actionOpenSymbols);
     menuSymbols->addMenu(menuOpenRecent);
@@ -1008,7 +1024,7 @@ void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
             if (!inputTextAppendedHistoryValue.empty())
                 inputTextHistoryIndex--;
         } else {
-            QWidget::keyPressEvent(event);
+            QMainWindow::keyPressEvent(event);
             return;
         }
 
@@ -1041,5 +1057,5 @@ void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
         inputTextHistoryIndex = index;
     }
 
-    QWidget::keyPressEvent(event);
+    QMainWindow::keyPressEvent(event);
 }

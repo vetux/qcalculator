@@ -103,6 +103,22 @@ void SymbolTable::remove(const std::string &name) {
     scripts.erase(name);
 }
 
+void SymbolTable::clearVariables() {
+    variables.clear();
+}
+
+void SymbolTable::clearConstants() {
+    constants.clear();
+}
+
+void SymbolTable::clearFunctions() {
+    functions.clear();
+}
+
+void SymbolTable::clearScripts() {
+    scripts.clear();
+}
+
 bool SymbolTable::getUseBuiltInConstants() const {
     return useBuiltInConstants;
 }

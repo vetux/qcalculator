@@ -20,10 +20,14 @@
 #include "symbolseditorwindow.hpp"
 
 #include <QVBoxLayout>
+#include <QMenu>
+#include <QMenuBar>
+
+#include "gui/calculatorwindow.hpp"
 
 SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
-                                         QWidget *parent)
-        : QMainWindow(parent) {
+                                         CalculatorWindow *calcWindow)
+        : QMainWindow(calcWindow) {
     setWindowTitle("Symbols Editor");
 
     auto *widget = new QWidget;
@@ -43,6 +47,23 @@ SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
             SIGNAL(onSymbolsChanged(const SymbolTable &)),
             this,
             SIGNAL(symbolsChanged(const SymbolTable &)));
+
+    auto *exitAction = new QAction("Close Editor");
+    auto *fileMenu = new QMenu("File");
+
+    fileMenu->addAction(calcWindow->actionOpenSymbols);
+    fileMenu->addMenu(calcWindow->menuOpenRecent);
+    fileMenu->addAction(calcWindow->actionSaveSymbols);
+    fileMenu->addAction(calcWindow->actionSaveAsSymbols);
+    fileMenu->addSeparator();
+    fileMenu->addAction(calcWindow->actionClearSymbols);
+    fileMenu->addSeparator();
+    fileMenu->addAction(exitAction);
+
+    menuBar()->addMenu(fileMenu);
+    menuBar()->addMenu(calcWindow->menuHelp);
+
+    connect(exitAction, SIGNAL(triggered(bool)), this, SLOT(close()));
 }
 
 void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols) {

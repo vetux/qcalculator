@@ -78,6 +78,14 @@ public:
 
     void remove(const std::string &name);
 
+    void clearVariables();
+
+    void clearConstants();
+
+    void clearFunctions();
+
+    void clearScripts();
+
 private:
     bool useBuiltInConstants = true;
     std::map<std::string, ArithmeticType> variables;

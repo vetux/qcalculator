@@ -23,6 +23,7 @@
 #include <QMainWindow>
 #include <QAction>
 #include <QMenu>
+#include <QMenuBar>
 
 #include "gui/widgets/terminalwidget.hpp"
 
@@ -39,6 +40,12 @@ public:
         widget->layout()->addWidget(term);
         widget->layout()->setMargin(0);
         setCentralWidget(widget);
+
+        auto *menu = new QMenu("File");
+        auto *action = new QAction("Exit");
+        menu->addAction(action);
+        menuBar()->addMenu(menu);
+        connect(action, SIGNAL(triggered(bool)), this, SLOT(close()));
     }
 
 private slots:

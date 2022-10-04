@@ -85,6 +85,8 @@ public slots:
 
     void onActionAboutPython();
 
+    void onActionClearSymbolTable();
+
     void onActionOpenSymbolTable();
 
     void onActionSaveSymbolTable();
@@ -149,17 +151,7 @@ private:
 
     void loadHistory();
 
-    QWidget *rootWidget{};
-    HistoryWidget *historyWidget{};
-    QLineEdit *input{};
-
-    QMenu *menuFile{};
-    QMenu *menuSymbols{};
-    QMenu *menuTools{};
-    QMenu *menuHelp{};
-
-    QMenu *menuOpenRecent{};
-
+public:
     QAction *actionSettings{};
     QAction *actionExit{};
 
@@ -171,6 +163,7 @@ private:
     QAction *actionOpenSymbols{};
     QAction *actionSaveSymbols{};
     QAction *actionSaveAsSymbols{};
+    QAction *actionClearSymbols{};
 
     QAction *actionCompressDirectory{};
     QAction *actionExtractArchive{};
@@ -179,6 +172,18 @@ private:
     QAction *actionAbout{};
     QAction *actionAboutQt{};
     QAction *actionAboutPython{};
+
+    QMenu *menuFile{};
+    QMenu *menuSymbols{};
+    QMenu *menuTools{};
+    QMenu *menuHelp{};
+
+    QMenu *menuOpenRecent{};
+
+private:
+    QWidget *rootWidget{};
+    HistoryWidget *historyWidget{};
+    QLineEdit *input{};
 
     SymbolsEditorWindow *symbolsDialog = nullptr;
     SettingsDialog *settingsDialog = nullptr;
