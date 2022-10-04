@@ -13,6 +13,9 @@
       "module": "gui/numberview.py"
     },
     {
+      "module": "gui/biteditor.py"
+    },
+    {
       "module": "sample_exprtk.py"
     },
     {
