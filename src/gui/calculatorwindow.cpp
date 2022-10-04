@@ -775,7 +775,7 @@ void CalculatorWindow::setupMenuBar() {
     actionSettings->setObjectName("actionSettings");
 
     actionClearSymbols = new QAction(this);
-    actionClearSymbols->setText("Clear");
+    actionClearSymbols->setText("Clear Symbols");
     actionClearSymbols->setObjectName("actionClearSymbols");
 
     actionOpenSymbols = new QAction(this);
@@ -808,7 +808,7 @@ void CalculatorWindow::setupMenuBar() {
     actionAboutQt->setObjectName("actionAboutQt");
 
     actionEditSymbols = new QAction(this);
-    actionEditSymbols->setText("Edit");
+    actionEditSymbols->setText("Edit Symbols");
     actionEditSymbols->setObjectName("actionEditSymbols");
     actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
