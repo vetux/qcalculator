@@ -67,8 +67,6 @@ signals:
 
 public slots:
 
-    void onEvaluateExpression(const QString &expression);
-
     void onInputReturnPressed();
 
     void onInputTextChanged();
@@ -117,6 +115,7 @@ private:
     void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
+
     void onInputCursorPositionChanged(int oldPos, int newPos);
 
 private:

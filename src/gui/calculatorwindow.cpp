@@ -169,10 +169,6 @@ void CalculatorWindow::onAddonUnloadFail(const std::string &moduleName, const st
                          ("Module " + moduleName + " failed to unload\n\n" + error).c_str());
 }
 
-void CalculatorWindow::onEvaluateExpression(const QString &expression) {
-    evaluateExpression(expression);
-}
-
 void CalculatorWindow::onInputReturnPressed() {
     auto expr = input->text();
     auto res = evaluateExpression(expr);
@@ -180,6 +176,9 @@ void CalculatorWindow::onInputReturnPressed() {
         input->setText(res);
         historyWidget->addContent(expr, res);
         inputTextContainsExpressionResult = true;
+    }
+    if (settings.value(SETTING_WARN_INEXACT).toInt() && decimal::context.status() & MPD_Inexact) {
+        QMessageBox::warning(this, "Inexact result", "Result is inexact!");
     }
 }
 
@@ -587,12 +586,11 @@ QString CalculatorWindow::evaluateExpression(const QString &expression) {
         history.emplace_back(std::make_pair(expression.toStdString(), ret.toStdString()));
         saveHistory();
 
-        if (settings.value(SETTING_WARN_INEXACT).toInt() && decimal::context.status() & MPD_Inexact) {
-            QMessageBox::warning(this, "Inexact result", "Result is inexact!");
-        }
         onSymbolTableChanged(symbolTable);
 
         emit signalExpressionEvaluated(expression, ret);
+
+        input->update();
 
         return ret;
     } catch (const std::runtime_error &e) {

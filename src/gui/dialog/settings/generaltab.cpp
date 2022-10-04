@@ -154,9 +154,9 @@ GeneralTab::GeneralTab(QWidget *parent)
 
     showInexactWarningLabel = new QLabel(this);
     showInexactWarningCheckBox = new QCheckBox(this);
-    showInexactWarningLabel->setText("Show inexact warning");
-    showInexactWarningLabel->setToolTip("Show Warning when the result of a computation is inexact.");
-    showInexactWarningCheckBox->setToolTip("Show Warning when the result of a computation is inexact.");
+    showInexactWarningLabel->setText("Show inexact result warnings");
+    showInexactWarningLabel->setToolTip("Show a warning when the result is inexact.");
+    showInexactWarningCheckBox->setToolTip("Show a warning when the result is inexact.");
 
     auto *hlayout = new QHBoxLayout;
     hlayout->setMargin(5);
