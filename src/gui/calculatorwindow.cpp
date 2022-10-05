@@ -410,7 +410,7 @@ void CalculatorWindow::onActionCreateAddonBundle() {
     std::vector<AddonManager::InstallBundleEntry> bundleEntries;
 
     for (;;) {
-        dialog.setWindowTitle("Select addon module file");
+        dialog.setWindowTitle("Select addon module file...");
         dialog.setFileMode(QFileDialog::AnyFile);
         dialog.setOption(QFileDialog::ShowDirsOnly, false);
         dialog.setAcceptMode(QFileDialog::AcceptOpen);
@@ -430,17 +430,17 @@ void CalculatorWindow::onActionCreateAddonBundle() {
             std::set<std::string> packages;
             for (;;) {
                 auto r = QMessageBox::question(this, "Add package",
-                                               "Do you want to add addon packages?",
+                                               "Do you want to add a package?",
                                                "Add Directory",
                                                "Add File",
                                                "Continue");
                 if (r == 0) {
-                    dialog.setWindowTitle("Select python package directory");
+                    dialog.setWindowTitle("Select python package directory...");
                     dialog.setFileMode(QFileDialog::Directory);
                     dialog.setOption(QFileDialog::ShowDirsOnly, true);
                     dialog.setMimeTypeFilters({});
                 } else if (r == 1) {
-                    dialog.setWindowTitle("Select python package file");
+                    dialog.setWindowTitle("Select python package file...");
                     dialog.setFileMode(QFileDialog::AnyFile);
                     dialog.setOption(QFileDialog::ShowDirsOnly, false);
                     dialog.setMimeTypeFilters(Archive::getFormatMimeTypes());
@@ -486,7 +486,7 @@ void CalculatorWindow::onActionCreateAddonBundle() {
         return;
     }
 
-    dialog.setWindowTitle("Select output file");
+    dialog.setWindowTitle("Select output file...");
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setOption(QFileDialog::ShowDirsOnly, false);
     dialog.setAcceptMode(QFileDialog::AcceptSave);

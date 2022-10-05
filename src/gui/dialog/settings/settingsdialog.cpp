@@ -210,8 +210,9 @@ void SettingsDialog::onRefreshAddonsPressed() {
 
 void SettingsDialog::onInstallAddonPressed() {
     auto *d = new QFileDialog();
-    d->setWindowTitle("Select addon bundle file");
+    d->setWindowTitle("Select addon bundle file...");
     d->setFileMode(QFileDialog::ExistingFile);
+    d->setMimeTypeFilters(Archive::getFormatMimeTypes());
     if (d->exec()) {
         auto file = d->selectedFiles().first().toStdString();
         delete d;
@@ -253,17 +254,17 @@ void SettingsDialog::onInstallAddonPressed() {
                 addonManager.loadAddonLibraryPaths();
 
                 QMessageBox::information(this,
-                                         "Installation Successful",
+                                         "Installation successful",
                                          ("Successfully installed " + std::to_string(installedAddonCount) +
                                           " addons.").c_str());
             } else {
                 QMessageBox::information(this,
-                                         "Installation Cancelled",
+                                         "Installation cancelled",
                                          "Installation has been cancelled.");
             }
         } catch (const std::exception &e) {
             QMessageBox::critical(this,
-                                  "Installation Failed",
+                                  "Installation failed",
                                   ("Failed to install addon package from " + file + "\n" + e.what()).c_str());
         }
         onRefreshAddonsPressed();
@@ -273,7 +274,7 @@ void SettingsDialog::onInstallAddonPressed() {
 }
 
 void SettingsDialog::onAddonUninstall(const QString &name) {
-    if (QMessageBox::question(this, "Uninstall Addon",
+    if (QMessageBox::question(this, "Uninstall addon",
                               "Do you want to uninstall " + name + " ?") == QMessageBox::Yes) {
         addonManager.uninstallAddon(name.toStdString());
         onRefreshAddonsPressed();
