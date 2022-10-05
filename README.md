@@ -7,7 +7,7 @@ This project aims to provide an accurate, extensible and fast calculator applica
 
 ## Features
 - 100+ built in arithmetic operations
-- Configurable precision
+- Configurable precision of up to 2'147'483'647 decimal digits
 - Warning for inexact results
 - Symbol table editor
 - Python addons
