@@ -141,7 +141,7 @@ private:
 
     void updateSymbolHistoryMenu();
 
-    bool importSymbolTable(const std::string &path);
+    bool loadSymbolTable(const std::string &path);
 
     bool saveSymbolTable(const std::string &path);
 

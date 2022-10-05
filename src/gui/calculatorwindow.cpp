@@ -207,8 +207,9 @@ void CalculatorWindow::onInputTextChanged() {
 
 void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
     this->symbolTable = symbolTableArg;
-    if (symbolsDialog != nullptr) {
-        symbolsDialog->setSymbols(symbolTable);
+    symbolsDialog->setSymbols(symbolTable);
+    if (!currentSymbolTablePath.empty()) {
+        actionSaveSymbols->setEnabled(true);
     }
 }
 
@@ -254,9 +255,10 @@ void CalculatorWindow::onActionClearSymbolTable() {
 
 void CalculatorWindow::onActionOpenSymbolTable() {
     QFileDialog dialog(this);
-    dialog.setWindowTitle("Import Symbols...");
+    dialog.setWindowTitle("Open symbol table...");
     dialog.setFileMode(QFileDialog::ExistingFile);
     dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    dialog.setMimeTypeFilters({"application/json"});
 
     if (!dialog.exec()) {
         return;
@@ -269,7 +271,7 @@ void CalculatorWindow::onActionOpenSymbolTable() {
     }
 
     auto path = list[0].toStdString();
-    if (importSymbolTable(path)) {
+    if (loadSymbolTable(path)) {
         symbolTablePathHistory.insert(path);
         saveSymbolTablePathHistory();
         updateSymbolHistoryMenu();
@@ -287,9 +289,10 @@ void CalculatorWindow::onActionSaveSymbolTable() {
 
 void CalculatorWindow::onActionSaveAsSymbolTable() {
     QFileDialog dialog(this);
-    dialog.setWindowTitle("Save Symbols as ...");
+    dialog.setWindowTitle("Save symbol table as ...");
     dialog.setFileMode(QFileDialog::AnyFile);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setMimeTypeFilters({"application/json"});
 
     if (!dialog.exec()) {
         return;
@@ -310,7 +313,7 @@ void CalculatorWindow::onActionEditSymbolTable() {
 }
 
 void CalculatorWindow::onActionSymbolTableHistory() {
-    importSymbolTable(dynamic_cast<QAction *>(sender())->data().toString().toStdString());
+    loadSymbolTable(dynamic_cast<QAction *>(sender())->data().toString().toStdString());
 }
 
 void CalculatorWindow::onActionOpenTerminal() {
@@ -350,7 +353,8 @@ void CalculatorWindow::onActionCompressDirectory() {
                     auto format = Archive::getFormatFromExtension(
                             std::filesystem::path(outputFile.toStdString()).extension().string());
                     archive.save(outputFile.toStdString(), format);
-                    QMessageBox::information(this, "Compression successful", "Successfully compressed " + directory + " to " + outputFile);
+                    QMessageBox::information(this, "Compression successful",
+                                             "Successfully compressed " + directory + " to " + outputFile);
                     break;
                 } catch (const std::exception &e) {
                     QMessageBox::warning(this, "Compression failed", "Failed to save file: " + QString(e.what()));
@@ -642,9 +646,7 @@ void CalculatorWindow::loadSettings() {
     decimal::context.emax(settings.value(SETTING_EXPONENT_MAX).toInt());
     decimal::context.emin(settings.value(SETTING_EXPONENT_MIN).toInt());
 
-    if (symbolsDialog != nullptr) {
-        symbolsDialog->setSymbols(symbolTable);
-    }
+    symbolsDialog->setSymbols(symbolTable);
 
     settingsDialog->setPrecision(settings.value(SETTING_PRECISION).toInt());
     settingsDialog->setExponentMin(settings.value(SETTING_EXPONENT_MIN).toInt());
@@ -927,7 +929,7 @@ void CalculatorWindow::updateSymbolHistoryMenu() {
     }
 }
 
-bool CalculatorWindow::importSymbolTable(const std::string &path) {
+bool CalculatorWindow::loadSymbolTable(const std::string &path) {
     try {
         auto syms = Serializer::deserializeTable(FileOperations::fileReadAll(path));
 
@@ -943,9 +945,11 @@ bool CalculatorWindow::importSymbolTable(const std::string &path) {
 
         addonManager->setActiveAddons(addons);
 
+        symbolsDialog->setCurrentSymbolsPath(currentSymbolTablePath);
+
         return true;
     } catch (const std::exception &e) {
-        std::string error = "Failed to import symbols from ";
+        std::string error = "Failed to load symbols from ";
         error += path;
         error += " Error: ";
         error += e.what();
@@ -966,6 +970,10 @@ bool CalculatorWindow::saveSymbolTable(const std::string &path) {
         currentSymbolTablePath = path;
 
         actionSaveSymbols->setEnabled(true);
+
+        symbolsDialog->setCurrentSymbolsPath(currentSymbolTablePath);
+
+        actionSaveSymbols->setEnabled(false);
 
         return true;
     }

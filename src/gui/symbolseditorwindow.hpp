@@ -29,17 +29,20 @@ class CalculatorWindow;
 class SymbolsEditorWindow : public QMainWindow {
 Q_OBJECT
 signals:
+
     void symbolsChanged(const SymbolTable &symbols);
 
 public slots:
 
     void setSymbols(const SymbolTable &symbols);
 
+    void setCurrentSymbolsPath(const std::string &path);
+
 public:
     SymbolsEditorWindow(const SymbolTable &symbols, CalculatorWindow *calcWindow);
 
 private:
-    SymbolsEditor* editor;
+    SymbolsEditor *editor;
 };
 
 #endif //QCALC_SYMBOLSDIALOG_HPP

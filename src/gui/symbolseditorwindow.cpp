@@ -69,3 +69,7 @@ SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
 void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols) {
     editor->setSymbols(symbols);
 }
+
+void SymbolsEditorWindow::setCurrentSymbolsPath(const std::string &path) {
+    setWindowTitle(("Symbols Editor - " + path).c_str());
+}
