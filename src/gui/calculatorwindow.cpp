@@ -150,7 +150,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
 
     settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
 
-    setWindowIcon(QIcon("qcalc.ico"));
+    setWindowIcon(QIcon("qcalculator.ico"));
 }
 
 CalculatorWindow::~CalculatorWindow() = default;
@@ -331,7 +331,7 @@ void CalculatorWindow::onActionCompressDirectory() {
         auto directoryBase = std::filesystem::path(directory.toStdString()).parent_path().string();
 
         dialog.setWindowTitle("Select output file...");
-        dialog.setAcceptMode(QFileDialog::AcceptOpen);
+        dialog.setAcceptMode(QFileDialog::AcceptSave);
         dialog.setFileMode(QFileDialog::AnyFile);
         dialog.setMimeTypeFilters(Archive::getFormatMimeTypes());
 
@@ -350,18 +350,18 @@ void CalculatorWindow::onActionCompressDirectory() {
                     auto format = Archive::getFormatFromExtension(
                             std::filesystem::path(outputFile.toStdString()).extension().string());
                     archive.save(outputFile.toStdString(), format);
-                    QMessageBox::information(this, "Compression success", "Saved " + outputFile);
+                    QMessageBox::information(this, "Compression successful", "Successfully compressed " + directory + " to " + outputFile);
                     break;
                 } catch (const std::exception &e) {
                     QMessageBox::warning(this, "Compression failed", "Failed to save file: " + QString(e.what()));
                 }
             } else {
-                QMessageBox::information(this, "Compression cancel", "No output file selected");
+                QMessageBox::information(this, "Compression cancelled", "The compression has been cancelled.");
                 break;
             }
         }
     } else {
-        QMessageBox::information(this, "Compression cancel", "No directory selected");
+        QMessageBox::information(this, "Compression cancelled", "The compression has been cancelled.");
     }
 }
 
@@ -385,14 +385,18 @@ void CalculatorWindow::onActionExtractArchive() {
                 Archive::extractToDisk(archiveFile.toStdString(),
                                        targetDirectory.toStdString(),
                                        [](const std::string &str) {});
-                QMessageBox::information(this, "Extraction Successful",
-                                         "Extracted " + archiveFile + " to " + targetDirectory);
+                QMessageBox::information(this, "Extraction successful",
+                                         "Successfully extracted " + archiveFile + " to " + targetDirectory);
             } catch (const std::exception &e) {
                 QMessageBox::warning(this,
                                      "Extraction failed",
                                      e.what());
             }
+        } else {
+            QMessageBox::information(this, "Extraction cancelled", "The extraction has been cancelled.");
         }
+    } else {
+        QMessageBox::information(this, "Extraction cancelled", "The extraction has been cancelled.");
     }
 }
 
@@ -786,7 +790,7 @@ void CalculatorWindow::setupMenuBar() {
     actionOpenSymbols->setShortcut(QKeySequence::Open);
 
     actionSaveSymbols = new QAction(this);
-    actionSaveSymbols->setText("Save...");
+    actionSaveSymbols->setText("Save");
     actionSaveSymbols->setObjectName("actionSaveSymbols");
     actionSaveSymbols->setShortcut(QKeySequence::Save);
     actionSaveSymbols->setEnabled(false);
@@ -815,15 +819,15 @@ void CalculatorWindow::setupMenuBar() {
     actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
     actionCompressDirectory = new QAction(this);
-    actionCompressDirectory->setText("Compress directory...");
+    actionCompressDirectory->setText("Compress...");
     actionCompressDirectory->setObjectName("actionCompressDirectory");
 
     actionExtractArchive = new QAction(this);
-    actionExtractArchive->setText("Extract archive...");
+    actionExtractArchive->setText("Extract...");
     actionExtractArchive->setObjectName("actionExtractArchive");
 
     actionCreateAddonBundle = new QAction(this);
-    actionCreateAddonBundle->setText("Create addon bundle...");
+    actionCreateAddonBundle->setText("Create addon bundle");
     actionCreateAddonBundle->setObjectName("actionCreateAddonBundle");
 
     actionClearHistory = new QAction(this);
@@ -849,16 +853,17 @@ void CalculatorWindow::setupMenuBar() {
     menuFile->addAction(actionExit);
 
     menuSymbols->addAction(actionEditSymbols);
-    menuSymbols->addAction(actionClearSymbols);
     menuSymbols->addSeparator();
     menuSymbols->addAction(actionOpenSymbols);
     menuSymbols->addMenu(menuOpenRecent);
     menuSymbols->addAction(actionSaveSymbols);
     menuSymbols->addAction(actionSaveAsSymbols);
+    menuSymbols->addSeparator();
+    menuSymbols->addAction(actionClearSymbols);
 
     menuHelp->addAction(actionAbout);
-    menuHelp->addAction(actionAboutQt);
     menuHelp->addAction(actionAboutPython);
+    menuHelp->addAction(actionAboutQt);
 
     menuBar()->addMenu(menuFile);
     menuBar()->addMenu(menuSymbols);
