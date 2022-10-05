@@ -44,13 +44,12 @@ Powered by:
 <a href="https://www.qt.io">Qt5</a>
 </p>
 )LLL";
-        text->setText("<center><h1>"
+        text->setText("<h1>"
                       + QApplication::applicationDisplayName()
                       + " "
                       + QApplication::applicationVersion()
                       + "</h1><p>Copyright (C) 2022 Julian Zampiccoli</p>"
-                      + t
-                      + "</center>");
+                      + t);
 
         text->setTextFormat(Qt::RichText);
         text->setTextInteractionFlags(Qt::TextBrowserInteraction);
