@@ -138,7 +138,7 @@ Archive AddonManager::createInstallableBundle(std::vector<InstallBundleEntry> en
 
                 j["packages"].emplace_back(packageFilePath);
 
-                auto packageDataStr = FileOperations::fileReadAll(packagePath);
+                auto packageDataStr = FileOperations::fileReadAll(packagePath.string());
 
                 std::vector<char> packageData(packageDataStr.size());
                 for (auto i = 0; i < packageData.size(); i++) {
@@ -330,7 +330,7 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
         for (auto &addon: j["addons"]) {
             AddonBundleEntry bundleEntry;
             bundleEntry.modulePath = addon["module"];
-            bundleEntry.module = std::filesystem::path(bundleEntry.modulePath).stem();
+            bundleEntry.module = std::filesystem::path(bundleEntry.modulePath).stem().string();
             bundleEntry.version = addon.value("version", 0);
 
             if (addon.find("packages") != addon.end()) {
@@ -407,7 +407,7 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
                 } else {
                     // Write the package file to disk
                     auto packagePath = std::filesystem::path(package);
-                    auto path = concatPath(outputDir, packagePath.filename());
+                    auto path = concatPath(outputDir, packagePath.filename().string());
 
                     createPath(path);
                     writeToFile(path, arch.getEntry(package));

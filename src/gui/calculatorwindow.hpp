@@ -28,7 +28,6 @@
 
 #include <bitset>
 #include <set>
-#include <bits/stl_set.h>
 
 #include "addon/addonmanager.hpp"
 #include "settings/settings.hpp"

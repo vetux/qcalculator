@@ -149,6 +149,8 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     addonManager->loadAddonLibraryPaths();
 
     settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
+
+    setWindowIcon(QIcon("qcalc.ico"));
 }
 
 CalculatorWindow::~CalculatorWindow() = default;
@@ -346,7 +348,7 @@ void CalculatorWindow::onActionCompressDirectory() {
 
                 try {
                     auto format = Archive::getFormatFromExtension(
-                            std::filesystem::path(outputFile.toStdString()).extension());
+                            std::filesystem::path(outputFile.toStdString()).extension().string());
                     archive.save(outputFile.toStdString(), format);
                     QMessageBox::information(this, "Compression success", "Saved " + outputFile);
                     break;
@@ -487,7 +489,7 @@ void CalculatorWindow::onActionCreateAddonBundle() {
             auto outputFile = dialog.selectedFiles().at(0);
             auto outputPath = std::filesystem::path(outputFile.toStdString());
             try {
-                auto format = Archive::getFormatFromExtension(outputPath.extension());
+                auto format = Archive::getFormatFromExtension(outputPath.extension().string());
                 auto archive = AddonManager::createInstallableBundle(bundleEntries);
                 archive.save(outputFile.toStdString(), format);
                 QMessageBox::information(this,

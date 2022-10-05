@@ -25,6 +25,8 @@ file(GLOB_RECURSE SYSTEM_SRC python/lib/*.py)
 file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy addon scripts
 file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/lib/) # Copy system libraries
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/qcalc.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR}) # Copy icon
+
 set(HDR_GUI src/gui/calculatorwindow.hpp
         src/gui/symbolseditorwindow.hpp
         src/gui/terminalwindow.hpp
@@ -53,7 +55,8 @@ include_directories(src/)
 include_directories(${Python_INCLUDE_DIRS}) # Python
 
 if (WIN32)
-    add_executable(qcalc WIN32 ${SRC} ${WRAP_CPP} ${WRAP_UI})
+    set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/res/app.rc")
+    add_executable(qcalc WIN32 ${SRC} ${WRAP_CPP} ${WRAP_UI}  ${app_icon_resource_windows})
 else ()
     add_executable(qcalc ${SRC} ${WRAP_CPP} ${WRAP_UI})
 endif ()
@@ -62,5 +65,5 @@ set_property(TARGET qcalc PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(qcalc Qt5::Core Qt5::Widgets)
 target_link_libraries(qcalc ${Python_LIBRARIES}) # Python
-target_link_libraries(qcalc mpdec mpdec++) # MPDECIMAL
+target_link_libraries(qcalc mpdec mpdec++) # mpdecimal
 target_link_libraries(qcalc archive) # libarchive
