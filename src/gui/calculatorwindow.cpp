@@ -340,7 +340,7 @@ void CalculatorWindow::onActionCompressDirectory() {
                 auto outputFile = dialog.selectedFiles().at(0);
 
                 Archive archive;
-                auto files = FileOperations::findFilesInDirectory(directory.toStdString(), "", false);
+                auto files = FileOperations::findFilesInDirectory(directory.toStdString(), "", true);
                 for (auto &file: files) {
                     auto name = file.substr(directoryBase.size() + 1);
                     archive.addEntry(name, FileOperations::fileReadAllVector(file));
