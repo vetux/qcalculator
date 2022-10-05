@@ -13,7 +13,7 @@ This project aims to provide an accurate, extensible and fast calculator applica
 - Python addons
 
 # Screenshots
-![img](.docs/screenshot.png)
+![img](res/screenshot.png)
 
 # Building
 For information on how to build the application see: [BUILDING.md](BUILDING.md)
