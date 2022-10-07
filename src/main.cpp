@@ -43,63 +43,65 @@ std::vector<std::string> parseArgs(int argc, char *argv[]) {
     return ret;
 }
 
-std::wstring getUserPythonPath(Settings &settings) {
-    auto path = Paths::getSettingsFile();
+void askUserPythonPath( Settings &settings) {
+    if (QMessageBox::question(nullptr,
+                              "Configure python default path",
+                              "Do you want to override the python default path?")
+        == QMessageBox::StandardButton::Yes) {
+        QFileDialog dialog(nullptr);
+        dialog.setWindowTitle("Select directories to add");
+        dialog.setFileMode(QFileDialog::Directory);
 
+        std::set<std::string> ret;
+
+        if (dialog.exec()) {
+            for (auto &p: dialog.selectedFiles()) {
+                ret.insert(p.toStdString());
+            }
+            while (QMessageBox::question(nullptr,
+                                         "Add directories",
+                                         "Do you want to add more directories to the path?") == QMessageBox::Yes) {
+                if (dialog.exec()) {
+                    for (auto &p: dialog.selectedFiles()) {
+                        ret.insert(p.toStdString());
+                    }
+                } else {
+                    QMessageBox::information(nullptr,
+                                             "Path configuration cancelled",
+                                             "Cancelled python default path configuration");
+                    return;
+                }
+            }
+        } else {
+            QMessageBox::information(nullptr,
+                                     "Path configuration cancelled",
+                                     "Cancelled python default path configuration");
+            return;
+        }
+
+        std::string str;
+
+        for (auto &p: ret) {
+            str += p + Interpreter::getPathSeparator();
+        }
+
+        if (!str.empty()) {
+            str.pop_back();
+            settings.update(SETTING_PYTHON_PATH.key, str);
+        }
+    } else {
+        settings.update(SETTING_PYTHON_PATH.key, std::string());
+    }
+
+    Settings::saveSettings(settings);
+}
+
+std::wstring getUserPythonPath(Settings &settings) {
     std::string str;
 
     if (settings.check(SETTING_PYTHON_PATH.key)) {
         str = settings.value(SETTING_PYTHON_PATH.key).toString();
-    } else {
-        if (QMessageBox::question(nullptr,
-                                  "Configure python default path",
-                                  "Do you want to override the python default path?")
-            == QMessageBox::StandardButton::Yes) {
-            QFileDialog dialog(nullptr);
-            dialog.setWindowTitle("Select directories to add");
-            dialog.setFileMode(QFileDialog::Directory);
-
-            std::set<std::string> ret;
-
-            if (dialog.exec()) {
-                for (auto &p: dialog.selectedFiles()) {
-                    ret.insert(p.toStdString());
-                }
-                while (QMessageBox::question(nullptr,
-                                             "Add directories",
-                                             "Do you want to add more directories to the path?") == QMessageBox::Yes) {
-                    if (dialog.exec()) {
-                        for (auto &p: dialog.selectedFiles()) {
-                            ret.insert(p.toStdString());
-                        }
-                    } else {
-                        QMessageBox::information(nullptr,
-                                                 "Path configuration cancelled",
-                                                 "Cancelled python default path configuration");
-                        return {};
-                    }
-                }
-            } else {
-                QMessageBox::information(nullptr,
-                                         "Path configuration cancelled",
-                                         "Cancelled python default path configuration");
-                return {};
-            }
-
-            for (auto &p: ret) {
-                str += p + Interpreter::getPathSeparator();
-            }
-
-            if (!str.empty()) {
-                str.pop_back();
-                settings.update(SETTING_PYTHON_PATH.key, str);
-            }
-        } else {
-            settings.update(SETTING_PYTHON_PATH.key, std::string());
-        }
     }
-
-    Settings::saveSettings(settings);
 
     if (str.empty()) {
         return {};
@@ -132,6 +134,7 @@ void configurePythonPath() {
                                    stdErr).c_str())
             == QMessageBox::Yes) {
             settings.clear(SETTING_PYTHON_PATH);
+            askUserPythonPath(settings);
             pythonPath = getUserPythonPath(settings);
         } else {
             break;
