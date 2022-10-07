@@ -603,7 +603,7 @@ QString CalculatorWindow::evaluateExpression(const QString &expression) {
         input->update();
 
         return ret;
-    } catch (const std::runtime_error &e) {
+    } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to evaluate expression", e.what());
     }
     return "";
