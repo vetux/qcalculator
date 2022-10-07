@@ -70,6 +70,8 @@ public slots:
 
     void onInputTextChanged();
 
+    void onInputTextEdited();
+
     void onSymbolTableChanged(const SymbolTable &symbolTable);
 
     void onActionSettings();
@@ -148,6 +150,8 @@ private:
     void saveHistory();
 
     void loadHistory();
+
+    void clearAppendedResult();
 
 public:
     QAction *actionSettings{};

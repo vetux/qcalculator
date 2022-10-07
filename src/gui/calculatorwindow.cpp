@@ -110,6 +110,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
     connect(input, SIGNAL(textChanged(const QString &)), this, SLOT(onInputTextChanged()));
+    connect(input, SIGNAL(textEdited(const QString &)), this, SLOT(onInputTextEdited()));
     connect(input, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(onInputCursorPositionChanged(int, int)));
 
     connect(historyWidget,
@@ -172,6 +173,7 @@ void CalculatorWindow::onAddonUnloadFail(const std::string &moduleName, const st
 }
 
 void CalculatorWindow::onInputReturnPressed() {
+    inputTextContainsExpressionResult = false;
     auto expr = input->text();
     auto res = evaluateExpression(expr);
     if (!res.isEmpty()) {
@@ -185,24 +187,15 @@ void CalculatorWindow::onInputReturnPressed() {
 }
 
 void CalculatorWindow::onInputTextChanged() {
-    inputTextAppendedHistoryValue.clear();
-    inputTextHistoryIndex = 0;
-
     if (inputTextContainsExpressionResult) {
         inputTextContainsExpressionResult = false;
-        if (input->text().isEmpty())
-            inputText = "";
-        else {
-            auto itext = input->text().toStdString();
-            auto size = inputText.size();
-            if (itext.size() < size)
-                size = itext.size(); // Delete remaining characters of the result if the user pressed backspace
-            inputText = itext.substr(size);
-        }
-        input->setText(inputText.c_str());
     } else {
         inputText = input->text().toStdString();
     }
+}
+
+void CalculatorWindow::onInputTextEdited() {
+    clearAppendedResult();
 }
 
 void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
@@ -1023,6 +1016,25 @@ void CalculatorWindow::loadHistory() {
     }
 }
 
+void CalculatorWindow::clearAppendedResult() {
+    if (inputTextContainsExpressionResult) {
+        inputTextContainsExpressionResult = false;
+
+        if (input->text().isEmpty())
+            inputText = "";
+        else {
+            auto itext = input->text().toStdString();
+            auto size = inputText.size();
+            if (itext.size() < size)
+                size = itext.size(); // Delete remaining characters of the result if the user pressed backspace
+            inputText = itext.substr(size);
+        }
+        input->setText(inputText.c_str());
+    } else {
+        inputText = input->text().toStdString();
+    }
+}
+
 void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
     inputTextAppendedHistoryValue.clear();
     inputTextHistoryIndex = 0;
@@ -1030,32 +1042,47 @@ void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
 
 void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
     if (input->hasFocus() && !history.empty()) {
+        bool increment;
         if (event->key() == Qt::Key_Up) {
-            if (!inputTextAppendedHistoryValue.empty())
-                inputTextHistoryIndex++;
+            increment = true;
         } else if (event->key() == Qt::Key_Down) {
-            if (!inputTextAppendedHistoryValue.empty())
-                inputTextHistoryIndex--;
+            increment = false;
         } else {
             QMainWindow::keyPressEvent(event);
             return;
         }
 
-        if (inputTextHistoryIndex >= (int) history.size()) {
+        clearAppendedResult();
+
+        if (increment)
+            inputTextHistoryIndex++;
+        else
+            inputTextHistoryIndex--;
+
+        if (inputTextHistoryIndex > (int) history.size()) {
             inputTextHistoryIndex = 0;
         } else if (inputTextHistoryIndex < 0) {
-            inputTextHistoryIndex = (int) history.size() - 1;
+            inputTextHistoryIndex = (int) history.size();
         }
 
-        auto index = inputTextHistoryIndex;
+        auto index = inputTextHistoryIndex - 1;
 
+
+
+        // Remove existing appended value
         if (!inputTextAppendedHistoryValue.empty() && !input->text().isEmpty()) {
             auto cursor = input->cursorPosition();
             input->setText(input->text().remove(input->cursorPosition(),
                                                 (int) inputTextAppendedHistoryValue.size()));
             input->setCursorPosition(cursor);
         }
-        auto result = history.at((int) history.size() - index - 1).second;
+
+        std::string result;
+        if (index < 0) {
+            result = "";
+        } else {
+            result = history.at((int) history.size() - index - 1).second;
+        }
 
         auto cursor = input->cursorPosition();
         auto inputStr = input->text().toStdString();
@@ -1067,7 +1094,7 @@ void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
         input->setCursorPosition(cursor);
 
         inputTextAppendedHistoryValue = result;
-        inputTextHistoryIndex = index;
+        inputTextHistoryIndex = index + 1;
     }
 
     QMainWindow::keyPressEvent(event);
