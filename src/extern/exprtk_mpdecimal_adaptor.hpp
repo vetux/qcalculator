@@ -21,10 +21,11 @@
 #define QCALC_EXPRTK_MPDECIMAL_ADAPTOR_HPP
 
 //TODO: Generate constants
-//TODO: Implement various arithmetic functions for decimals
+//TODO: Implement various arithmetic functions for decimals without falling back to double
 
 #include <string>
-#include "decimal.hh"
+#include <cmath>
+#include <decimal.hh>
 
 namespace exprtk {
     namespace details {
@@ -70,7 +71,7 @@ namespace exprtk {
             // Used only for initialization of the constants, expression decimals use decimal::context.
             // Possible problem: Clang complains that context_template is uninitialized when constructing the context
             // but exprtk requires the constants to be initialized statically
-            static decimal::Context mpdecimal_context = decimal::Context(100,999, -999);
+            static decimal::Context mpdecimal_context = decimal::Context(100, 999, -999);
 
             static const decimal::Decimal e = decimal::Decimal("2.71828182845904523536028747135266249775724709369995",
                                                                mpdecimal_context);
@@ -123,40 +124,61 @@ namespace exprtk {
                 inline T abs_impl(const T &v, mpdecimal_type_tag) { return v.abs(); }
 
                 template<typename T>
-                inline T acos_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("acos not implemented"); }
+                inline T acos_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::acos(std::stold(v.format("f")))));
+                }
 
                 template<typename T>
                 inline T acosh_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("acosh not implemented");
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::acosh(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
-                inline T asin_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("asin not implemented"); }
+                inline T asin_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::asin(std::stold(v.format("f")))));
+                }
 
                 template<typename T>
                 inline T asinh_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("asinh not implemented");
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::asinh(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
-                inline T atan_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("atan not implemented"); }
+                inline T atan_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::atan(std::stold(v.format("f")))));
+                }
 
                 template<typename T>
                 inline T atanh_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("atanh not implemented");
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::atanh(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T ceil_impl(const T &v, mpdecimal_type_tag) { return v.ceil(); }
 
                 template<typename T>
-                inline T cos_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("cos not implemented"); }
+                inline T cos_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::cos(std::stold(v.format("f")))));
+                }
 
                 template<typename T>
-                inline T cosh_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("cosh not implemented"); }
+                inline T cosh_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::cosh(std::stold(v.format("f")))));
+                }
 
                 template<typename T>
-                inline T exp_impl(const T &v, mpdecimal_type_tag) { return v.exp(); }
+                inline T exp_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::exp(std::stold(v.format("f")))));
+                }
 
                 template<typename T>
                 inline T floor_impl(const T &v, mpdecimal_type_tag) { return v.floor(); }
@@ -174,31 +196,55 @@ namespace exprtk {
                 inline T neg_impl(const T &v, mpdecimal_type_tag) { return -v; }
 
                 template<typename T>
-                inline T pos_impl(const T &v, mpdecimal_type_tag) { return v; }
+                inline T pos_impl(const T &v, mpdecimal_type_tag) { return +v; }
 
                 template<typename T>
-                inline T sin_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("sin not implemented"); }
+                inline T sin_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::sin(std::stold(v.format("f")))));
+                }
 
                 template<typename T>
-                inline T sinh_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("sinh not implemented"); }
+                inline T sinh_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::sinh(std::stold(v.format("f")))));
+                }
 
                 template<typename T>
                 inline T sqrt_impl(const T &v, mpdecimal_type_tag) { return v.sqrt(); }
 
                 template<typename T>
-                inline T tan_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("tan not implemented"); }
+                inline T tan_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::tan(std::stold(v.format("f")))));
+                }
 
                 template<typename T>
-                inline T tanh_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("tanh not implemented"); }
+                inline T tanh_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::tanh(std::stold(v.format("f")))));
+                }
 
                 template<typename T>
-                inline T cot_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("cot not implemented"); }
+                inline T cot_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    auto x = std::stold(v.format("f"));
+                    return T(std::to_string(std::cos(x) / std::sin(x)));
+                }
 
                 template<typename T>
-                inline T sec_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("sec not implemented"); }
+                inline T sec_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    auto x = std::stold(v.format("f"));
+                    return T(std::to_string(1 / std::cos(x)));
+                }
 
                 template<typename T>
-                inline T csc_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("csc not implemented"); }
+                inline T csc_impl(const T &v, mpdecimal_type_tag) {
+                    decimal::context.add_status(MPD_Inexact);
+                    auto x = std::stold(v.format("f"));
+                    return T(std::to_string(1 / std::sin(x)));
+                }
 
                 template<typename T>
                 inline T r2d_impl(const T &v, mpdecimal_type_tag) { return (v * exprtk::details::constant::_180_pi); }
@@ -208,24 +254,40 @@ namespace exprtk {
 
                 template<typename T>
                 inline T d2g_impl(const T &v, mpdecimal_type_tag) {
-                    return (v * decimal::Decimal(decimal::Decimal("20.0") / decimal::Decimal("9.0")));
+                    return (v * T(T("20.0") / T("9.0")));
                 }
 
                 template<typename T>
                 inline T g2d_impl(const T &v, mpdecimal_type_tag) {
-                    return (v * decimal::Decimal(decimal::Decimal("9.0") / decimal::Decimal("20.0")));
+                    return (v * T(T("9.0") / T("20.0")));
                 }
 
                 template<typename T>
                 inline T notl_impl(const T &v, mpdecimal_type_tag) {
-                    return (v != decimal::Decimal(0) ? decimal::Decimal(0) : decimal::Decimal(1));
+                    return (v != T(0) ? T(0) : T(1));
                 }
 
                 template<typename T>
-                inline T frac_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("Method not implemented"); }
+                inline T frac_impl(const T &v, mpdecimal_type_tag) {
+                    auto str = v.format("f");
+                    auto index = str.find(".");
+                    if (index == std::string::npos) {
+                        return 0;
+                    } else {
+                        return T("0" + str.substr(index));
+                    }
+                }
 
                 template<typename T>
-                inline T trunc_impl(const T &v, mpdecimal_type_tag) { throw std::runtime_error("Method not implemented"); }
+                inline T trunc_impl(const T &v, mpdecimal_type_tag) {
+                    auto str = v.format("f");
+                    auto index = str.find(".");
+                    if (index == std::string::npos) {
+                        return v;
+                    } else {
+                        return T(str.substr(0, index));
+                    }
+                }
 
                 template<typename T>
                 inline T const_pi_impl(mpdecimal_type_tag) {
@@ -246,88 +308,111 @@ namespace exprtk {
                 }
 
                 template<typename T>
-                inline T expm1_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                inline T expm1_impl(const T &v, mpdecimal_type_tag tag) {
+                    return exp_impl(v, tag) - T("1");
                 }
 
                 template<typename T>
                 inline T min_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    if (v0 < v1) {
+                        return v0;
+                    } else {
+                        return v1;
+                    }
                 }
 
                 template<typename T>
                 inline T max_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    if (v0 > v1) {
+                        return v0;
+                    } else {
+                        return v1;
+                    }
                 }
 
                 template<typename T>
                 inline T nequal_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    return (v0 != v1) ? T(1) : T(0);
                 }
 
                 template<typename T>
                 inline T sgn_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    auto zero = T("0");
+                    if (v < zero) {
+                        return T("-1");
+                    } else if (v > zero) {
+                        return T("+1");
+                    } else {
+                        return zero;
+                    }
                 }
 
                 template<typename T>
-                inline T log1p_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                inline T log1p_impl(const T &v, mpdecimal_type_tag tag) {
+                    return exp(log_impl(v, tag));
                 }
 
                 template<typename T>
                 inline T erf_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    throw std::runtime_error("erf not implemented");
                 }
 
                 template<typename T>
                 inline T erfc_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    throw std::runtime_error("erfc not implemented");
                 }
 
                 template<typename T>
                 inline T ncdf_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    throw std::runtime_error("ncdf not implemented");
                 }
 
                 template<typename T>
                 inline T modulus_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    return v0 - (v1 * (v0/v1).to_integral_exact());
                 }
 
                 template<typename T>
                 inline T pow_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    return v0.pow(v1);
                 }
 
                 template<typename T>
-                inline T logn_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                inline T logn_impl(const T &v0, const T &v1, mpdecimal_type_tag tag) {
+                    return log_impl(v0, tag) / log_impl(v1, tag);
                 }
 
                 template<typename T>
-                inline T sinc_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                inline T sinc_impl(const T &v, mpdecimal_type_tag tag) {
+                    if (abs_impl(v, tag) >= epsilon_type<T>::value())
+                        return (sin_impl(v, tag) / v);
+                    else
+                        return T("1");
                 }
 
                 template<typename T>
                 inline T xor_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    return (is_false_impl(v0) != is_false_impl(v1)) ? T("1") : T("0");
                 }
 
                 template<typename T>
                 inline T xnor_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    const bool v0_true = is_true_impl(v0);
+                    const bool v1_true = is_true_impl(v1);
+                    if ((v0_true && v1_true) || (!v0_true && !v1_true))
+                        return T(1);
+                    else
+                        return T(0);
                 }
 
                 template<typename T>
                 inline T equal_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    return decimal::Decimal(std::to_string(v0 == v1));
+                    return T(std::to_string(v0 == v1));
                 }
 
                 template<typename T>
                 inline T round_impl(const T &v, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    return v.to_integral_exact();
                 }
 
                 template<typename T>
@@ -345,48 +430,50 @@ namespace exprtk {
                 }
 
                 template<typename T>
-                inline T root_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                inline T root_impl(const T &v0, const T &v1, mpdecimal_type_tag tag) {
+                    return pow_impl(v0, T("1") / v1, tag);
                 }
 
                 template<typename T>
-                inline T hypot_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                inline T hypot_impl(const T &v0, const T &v1, mpdecimal_type_tag tag) {
+                    return sqrt_impl(v0 * v0 + v1 * v1, tag);
                 }
 
                 template<typename T>
                 inline T atan2_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    decimal::context.add_status(MPD_Inexact);
+                    return T(std::to_string(std::atan2(std::stold(v0.format("f")),
+                                                       std::stold(v1.format("f")))));
                 }
 
                 template<typename T>
-                inline T shr_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                inline T shr_impl(const T &v0, const T &v1, mpdecimal_type_tag tag) {
+                    return v0 * (T("1") / pow_impl(T("2.0"), v1, tag));
                 }
 
                 template<typename T>
-                inline T shl_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                inline T shl_impl(const T &v0, const T &v1, mpdecimal_type_tag tag) {
+                    return v0 * pow_impl(T("2.0"), v1, tag);
                 }
 
                 template<typename T>
                 inline T and_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    return (is_true_impl(v0) && is_true_impl(v1)) ? T("1") : T("0");
                 }
 
                 template<typename T>
                 inline T nand_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    return (is_false_impl(v0) || is_false_impl(v1)) ? T("1") : T("0");
                 }
 
                 template<typename T>
                 inline T or_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    return (is_true_impl(v0) || is_true_impl(v1)) ? T("1") : T("0");
                 }
 
                 template<typename T>
                 inline T nor_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    throw std::runtime_error("Method not implemented");
+                    return (is_false_impl(v0) && is_false_impl(v1)) ? T("1") : T("0");
                 }
             }
         }
