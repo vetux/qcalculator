@@ -243,6 +243,7 @@ containerWidget = QtWidgets.QWidget
 def load():
     global containerWidget
     global widget
+
     containerWidget = QtWidgets.QWidget(gui.wnd)
     widget = BitViewWidget(containerWidget)
 
@@ -263,14 +264,13 @@ def load():
                               gui.input_line_edit,
                               QtCore.SLOT("setText(QString)"))
 
-    gui.root.layout().insertWidget(3, containerWidget)
+    gui.insert_widget_footer(containerWidget, 1, 0)
 
     widget.slot_input_text_changed(gui.input_line_edit.text())
 
-
 def unload():
     global widget
-    gui.root.layout().removeWidget(containerWidget)
+    gui.remove_widget_footer(containerWidget)
 
     gui.wnd.disconnect(widget)
     gui.input_line_edit.disconnect(widget)

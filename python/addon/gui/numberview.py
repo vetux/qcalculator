@@ -218,7 +218,7 @@ def load():
     containerWidget.layout().addWidget(numWidget, 1)
     containerWidget.layout().setMargin(0)
 
-    gui.root.layout().insertWidget(3, containerWidget)
+    gui.insert_widget_footer(containerWidget, 0, 0)
 
     QtWidgets.QWidget.connect(gui.input_line_edit,
                               QtCore.SIGNAL("textChanged(const QString &)"),
@@ -235,9 +235,8 @@ def load():
 
     numWidget.slot_input_text_changed(gui.input_line_edit.text())
 
-
 def unload():
-    gui.root.layout().removeWidget(containerWidget)
+    gui.remove_widget_footer(containerWidget)
 
     numWidget.disconnect(gui.input_line_edit)
     numWidget.disconnect(gui.wnd)

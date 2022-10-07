@@ -890,6 +890,13 @@ void CalculatorWindow::setupLayout() {
 
     rootWidget->setLayout(l);
 
+
+    auto *footerWidget = new QWidget(this);
+    footerWidget->setLayout(new QVBoxLayout);
+    footerWidget->setObjectName("footerWidget");
+    footerWidget->layout()->setMargin(0);
+    l->addWidget(footerWidget);
+
     setCentralWidget(rootWidget);
 }
 

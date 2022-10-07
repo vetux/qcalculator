@@ -204,17 +204,16 @@ def load():
     handler = KeyPadHandler()
     keyPadWidget = KeyPadWidget(gui.wnd)
 
-    gui.root.layout().insertWidget(gui.root.layout().count() - 1, keyPadWidget)
+    gui.insert_widget_footer(keyPadWidget, 0, 1)
 
     QtCore.QObject.connect(keyPadWidget, QtCore.SIGNAL("signal_key_pressed(int)"), handler,
                            QtCore.SLOT("slot_key_press(int)"))
-
 
 def unload():
     global handler
     global keyPadWidget
 
-    gui.root.layout().removeWidget(keyPadWidget)
+    gui.remove_widget_footer(keyPadWidget)
 
     keyPadWidget.disconnect(handler)
     keyPadWidget.deleteLater()
