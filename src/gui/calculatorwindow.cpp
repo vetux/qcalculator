@@ -233,7 +233,10 @@ void CalculatorWindow::onActionAboutPython() {
 
     std::string str = "Python version " + version + "\n\n" + copyright;
 
-    QMessageBox::about(this, "About Python", str.c_str());
+    QMessageBox box;
+    box.setWindowTitle("About Python");
+    box.setText(str.c_str());
+    box.exec();
 }
 
 void CalculatorWindow::onActionClearSymbolTable() {

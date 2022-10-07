@@ -67,7 +67,14 @@ Powered by:
         vlayout->addWidget(text);
         vlayout->addLayout(btnLayout);
 
-        setLayout(vlayout);
+        auto *icon = new QLabel;
+        icon->setPixmap(QIcon("qcalculator.ico").pixmap(256));
+
+        auto *hlayout = new QHBoxLayout;
+        hlayout->addWidget(icon);
+        hlayout->addLayout(vlayout);
+
+        setLayout(hlayout);
 
         update();
 
