@@ -68,7 +68,8 @@ Powered by:
         vlayout->addLayout(btnLayout);
 
         auto *icon = new QLabel;
-        icon->setPixmap(QIcon("qcalculator.ico").pixmap(256));
+        icon->setPixmap(QIcon("qcalculator.ico").pixmap(64));
+        icon->setAlignment(Qt::AlignTop);
 
         auto *hlayout = new QHBoxLayout;
         hlayout->addWidget(icon);
