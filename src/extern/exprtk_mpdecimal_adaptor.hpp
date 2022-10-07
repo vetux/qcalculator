@@ -24,8 +24,15 @@
 //TODO: Implement various arithmetic functions for decimals without falling back to double
 
 #include <string>
+#include <sstream>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
 #include <cmath>
+
 #include <decimal.hh>
+
+using namespace std;
 
 namespace exprtk {
     namespace details {
@@ -64,6 +71,14 @@ namespace exprtk {
 }
 
 #include "exprtk.hpp"
+
+static std::string convertDoubleToString(const long double &value){
+    std::stringstream ss;
+    ss << setprecision(100) << value;
+    string str;
+    ss >> str;
+    return str;
+}
 
 namespace exprtk {
     namespace details {
@@ -126,37 +141,37 @@ namespace exprtk {
                 template<typename T>
                 inline T acos_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::acos(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(acosl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T acosh_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::acosh(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(acoshl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T asin_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::asin(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(asinl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T asinh_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::asinh(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(asinhl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T atan_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::atan(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(atanl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T atanh_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::atanh(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(atanhl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
@@ -165,19 +180,19 @@ namespace exprtk {
                 template<typename T>
                 inline T cos_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::cos(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(cosl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T cosh_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::cosh(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(coshl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T exp_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::exp(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(expl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
@@ -201,13 +216,13 @@ namespace exprtk {
                 template<typename T>
                 inline T sin_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::sin(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(sinl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T sinh_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::sinh(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(sinhl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
@@ -216,34 +231,34 @@ namespace exprtk {
                 template<typename T>
                 inline T tan_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::tan(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(tanl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T tanh_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::tanh(std::stold(v.format("f")))));
+                    return T(convertDoubleToString(tanhl(std::stold(v.format("f")))));
                 }
 
                 template<typename T>
                 inline T cot_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
                     auto x = std::stold(v.format("f"));
-                    return T(std::to_string(std::cos(x) / std::sin(x)));
+                    return T(convertDoubleToString(cosl(x) / std::sin(x)));
                 }
 
                 template<typename T>
                 inline T sec_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
                     auto x = std::stold(v.format("f"));
-                    return T(std::to_string(1 / std::cos(x)));
+                    return T(convertDoubleToString(1 / cosl(x)));
                 }
 
                 template<typename T>
                 inline T csc_impl(const T &v, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
                     auto x = std::stold(v.format("f"));
-                    return T(std::to_string(1 / std::sin(x)));
+                    return T(convertDoubleToString(1 / sinl(x)));
                 }
 
                 template<typename T>
@@ -407,7 +422,7 @@ namespace exprtk {
 
                 template<typename T>
                 inline T equal_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    return T(std::to_string(v0 == v1));
+                    return T(convertDoubleToString(v0 == v1));
                 }
 
                 template<typename T>
@@ -442,7 +457,7 @@ namespace exprtk {
                 template<typename T>
                 inline T atan2_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
-                    return T(std::to_string(std::atan2(std::stold(v0.format("f")),
+                    return T(convertDoubleToString(atan2l(std::stold(v0.format("f")),
                                                        std::stold(v1.format("f")))));
                 }
 
