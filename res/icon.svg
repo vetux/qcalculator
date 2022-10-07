@@ -26,18 +26,19 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="-350.15766"
-     inkscape:cy="471.30106"
+     inkscape:zoom="0.175"
+     inkscape:cx="2644.4732"
+     inkscape:cy="-551.87669"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
-     showgrid="true"
+     showgrid="false"
      inkscape:window-width="2556"
      inkscape:window-height="1396"
      inkscape:window-x="0"
      inkscape:window-y="20"
-     inkscape:window-maximized="0">
+     inkscape:window-maximized="0"
+     showguides="true">
     <inkscape:grid
        type="xygrid"
        id="grid835" />
@@ -57,7 +58,8 @@
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     style="display:inline">
     <rect
        style="fill:none;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="rect833"
@@ -130,7 +132,7 @@
        cy="81.197777"
        r="0" />
     <rect
-       style="fill:#aaeeff;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="fill:#008000;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="rect953"
        width="53.710411"
        height="12.109776"
@@ -138,63 +140,63 @@
        y="16.574041"
        ry="3.4599354" />
     <ellipse
-       style="fill:#aaeeff;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632"
        cx="32.014668"
        cy="41.684799"
        rx="5.833333"
        ry="5.6666665" />
     <ellipse
-       style="fill:#aaeeff;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-3"
        cx="50.512165"
        cy="41.684799"
        rx="5.833333"
        ry="5.6666665" />
     <ellipse
-       style="fill:#aaeeff;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-6"
        cx="68.763748"
        cy="41.684799"
        rx="5.833333"
        ry="5.6666665" />
     <ellipse
-       style="fill:#aaeeff;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-7"
        cx="68.763748"
        cy="59.054199"
        rx="5.833333"
        ry="5.6666665" />
     <ellipse
-       style="fill:#aaeeff;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-5"
        cx="68.763748"
        cy="77.074196"
        rx="5.833333"
        ry="5.6666665" />
     <ellipse
-       style="fill:#aaeeff;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-35"
        cx="50.512165"
        cy="77.074196"
        rx="5.833333"
        ry="5.6666665" />
     <ellipse
-       style="fill:#aaeeff;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-62"
        cx="32.014668"
        cy="77.074196"
        rx="5.833333"
        ry="5.6666665" />
     <ellipse
-       style="fill:#aaeeff;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-9"
        cx="32.014668"
        cy="59.054199"
        rx="5.833333"
        ry="5.6666665" />
     <ellipse
-       style="fill:#aaeeff;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="fill:#b3b3b3;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-1"
        cx="50.512165"
        cy="59.054199"
