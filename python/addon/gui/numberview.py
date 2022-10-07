@@ -174,14 +174,14 @@ class NumeralSystemWidget(QtWidgets.QWidget):
             return
 
         if signal:
-            self.signal_value_changed.emit(str(r))
+            self.signal_value_changed.emit(format(r, 'f'))
 
         self.scitext.setText('%E' % r)
 
         ri = r.to_integral_value()
 
-        if r == ri:
-            value = int(str(ri))
+        if r.is_finite() and r == ri:
+            value = int(format(ri, 'f'))
             if value < 0x10FFFF and value > 0:
                 self.unitext.setText(chr(value))
             else:
