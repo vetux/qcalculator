@@ -804,7 +804,7 @@ void CalculatorWindow::setupMenuBar() {
     actionExit->setShortcut(QKeySequence::Quit);
 
     actionAbout = new QAction(this);
-    actionAbout->setText("About QCalculator");
+    actionAbout->setText("About qCalculator");
     actionAbout->setObjectName("actionAbout");
 
     actionAboutQt = new QAction(this);

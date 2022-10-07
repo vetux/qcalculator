@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
     QApplication::setApplicationName("qcalculator");
-    QApplication::setApplicationDisplayName("QCalculator");
+    QApplication::setApplicationDisplayName("qCalculator");
     QApplication::setApplicationVersion("v0.6.0");
 
     auto args = parseArgs(argc, argv);

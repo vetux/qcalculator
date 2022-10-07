@@ -2,7 +2,7 @@
   <img src="res/icon.png" alt="icon"/>
 </div>
 
-# QCalculator
+# qCalculator
 This project aims to provide an accurate, extensible and fast calculator application.
 
 ## Features

@@ -34,7 +34,7 @@ public:
 
         text = new QLabel();
 
-        auto t = R"LLL(<p>QCalculator comes with ABSOLUTELY NO WARRANTY; This is free software, and you are welcome to redistribute it under certain conditions; check <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL-2.0</a> for details</p>
+        auto t = R"LLL(<p>qCalculator comes with ABSOLUTELY NO WARRANTY; This is free software, and you are welcome to redistribute it under certain conditions; check <a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt">GPL-2.0</a> for details</p>
 <p><a href="https://www.github.com/vetux/qcalculator">Source Code</a></p>
 <p>
 Powered by:
