@@ -187,8 +187,6 @@ void CalculatorWindow::onInputReturnPressed() {
     }
     if (decimal::context.status() & MPD_Inexact) {
         inputMessage->setText("Inexact");
-        inputMessage->show();
-        historyWidget->scrollToBottom();
     }
 }
 
@@ -199,7 +197,6 @@ void CalculatorWindow::onInputTextChanged() {
         inputText = input->text().toStdString();
     }
     inputMessage->setText("");
-    inputMessage->hide();
 }
 
 void CalculatorWindow::onInputTextEdited() {
@@ -611,8 +608,6 @@ QString CalculatorWindow::evaluateExpression(const QString &expression) {
         return ret;
     } catch (const std::exception &e) {
         inputMessage->setText(e.what());
-        inputMessage->show();
-        historyWidget->scrollToBottom();
     }
     return "";
 }
@@ -886,16 +881,12 @@ void CalculatorWindow::setupLayout() {
 
     historyWidget = new HistoryWidget(this);
     historyWidget->setObjectName("widget_history");
-    historyWidget->setContentsMargins(6,0,6, 0);
 
     input = new QLineEdit(this);
     input->setObjectName("lineEdit_input");
-    input->setTextMargins(6, 0, 0, 0);
 
     inputMessage = new QLabel(this);
     inputMessage->setObjectName("label_input_message");
-    inputMessage->setContentsMargins(6, 0, 6, 0);
-    inputMessage->hide();
     inputMessage->setStyleSheet("QLabel { color : red; }");
 
     auto l = new QVBoxLayout();
@@ -903,8 +894,6 @@ void CalculatorWindow::setupLayout() {
     l->addWidget(historyWidget);
     l->addWidget(input);
     l->addWidget(inputMessage);
-
-    l->setMargin(3);
 
     rootWidget->setLayout(l);
 
