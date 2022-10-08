@@ -38,8 +38,9 @@
 #include "widgets/historywidget.hpp"
 
 #include "windows/symbolseditorwindow.hpp"
-#include "windows/terminalwindow.hpp"
+#include "windows/pythonconsolewindow.hpp"
 #include "windows/settingsdialog.hpp"
+#include "windows/calculatorwindowactions.hpp"
 
 class CalculatorWindow : public QMainWindow {
 Q_OBJECT
@@ -153,42 +154,12 @@ private:
     void loadHistory();
 
     void clearResultFromInputText();
-
-public:
-    QAction *actionSettings{};
-    QAction *actionExit{};
-
-    QAction *actionClearHistory{};
-
-    QAction *actionOpenTerminal{};
-
-    QAction *actionEditSymbols{};
-    QAction *actionOpenSymbols{};
-    QAction *actionSaveSymbols{};
-    QAction *actionSaveAsSymbols{};
-    QAction *actionClearSymbols{};
-
-    QAction *actionCompressDirectory{};
-    QAction *actionExtractArchive{};
-    QAction *actionCreateAddonBundle{};
-
-    QAction *actionAbout{};
-    QAction *actionAboutQt{};
-    QAction *actionAboutPython{};
-
-    QMenu *menuFile{};
-    QMenu *menuSymbols{};
-    QMenu *menuTools{};
-    QMenu *menuHelp{};
-
-    QMenu *menuOpenRecent{};
-
 private:
     QWidget *rootWidget{};
     HistoryWidget *historyWidget{};
     QLineEdit *input{};
 
-    TerminalWindow *terminalDialog = nullptr;
+    PythonConsoleWindow *terminalDialog = nullptr;
     SymbolsEditorWindow *symbolsDialog = nullptr;
     SettingsDialog *settingsDialog = nullptr;
 
@@ -210,6 +181,8 @@ private:
     bool inputTextContainsExpressionResult = false;
     int inputTextHistoryIndex = 0;
     std::string inputTextAppendedHistoryValue = "";
+
+    CalculatorWindowActions actions;
 };
 
 #endif // QCALC_MAINWINDOW_HPP

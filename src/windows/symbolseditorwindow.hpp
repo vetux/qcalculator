@@ -23,8 +23,7 @@
 #include <QMainWindow>
 
 #include "widgets/symbolseditor.hpp"
-
-class CalculatorWindow;
+#include "windows/calculatorwindowactions.hpp"
 
 class SymbolsEditorWindow : public QMainWindow {
 Q_OBJECT
@@ -39,7 +38,9 @@ public slots:
     void setCurrentSymbolsPath(const std::string &path);
 
 public:
-    SymbolsEditorWindow(const SymbolTable &symbols, CalculatorWindow *calcWindow);
+    SymbolsEditorWindow(const SymbolTable &symbols,
+                        CalculatorWindowActions &actions,
+                        QWidget *parent);
 
 private:
     SymbolsEditor *editor;

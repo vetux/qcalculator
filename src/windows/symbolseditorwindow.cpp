@@ -26,8 +26,9 @@
 #include "calculatorwindow.hpp"
 
 SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
-                                         CalculatorWindow *calcWindow)
-        : QMainWindow(calcWindow) {
+                                         CalculatorWindowActions &actions,
+                                         QWidget *parent)
+        : QMainWindow(parent) {
     setWindowTitle("Symbols Editor");
 
     auto *widget = new QWidget;
@@ -48,20 +49,20 @@ SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
             this,
             SIGNAL(symbolsChanged(const SymbolTable &)));
 
-    auto *exitAction = new QAction("Close Editor");
+    auto *exitAction = new QAction("Close Window");
     auto *fileMenu = new QMenu("File");
 
-    fileMenu->addAction(calcWindow->actionOpenSymbols);
-    fileMenu->addMenu(calcWindow->menuOpenRecent);
-    fileMenu->addAction(calcWindow->actionSaveSymbols);
-    fileMenu->addAction(calcWindow->actionSaveAsSymbols);
+    fileMenu->addAction(actions.actionOpenSymbols);
+    fileMenu->addMenu(actions.menuOpenRecent);
+    fileMenu->addAction(actions.actionSaveSymbols);
+    fileMenu->addAction(actions.actionSaveAsSymbols);
     fileMenu->addSeparator();
-    fileMenu->addAction(calcWindow->actionClearSymbols);
+    fileMenu->addAction(actions.actionClearSymbols);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
     menuBar()->addMenu(fileMenu);
-    menuBar()->addMenu(calcWindow->menuHelp);
+    menuBar()->addMenu(actions.menuHelp);
 
     connect(exitAction, SIGNAL(triggered(bool)), this, SLOT(close()));
 }

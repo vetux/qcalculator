@@ -29,7 +29,7 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/qcalculator.ico DESTINATION ${CMAKE_CU
 
 set(HDR_GUI src/windows/calculatorwindow.hpp
         src/windows/symbolseditorwindow.hpp
-        src/windows/terminalwindow.hpp
+        src/windows/pythonconsolewindow.hpp
         src/windows/settingsdialog.hpp
         src/windows/addoninstalldialog.hpp
         src/widgets/generaltab.hpp

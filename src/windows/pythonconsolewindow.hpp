@@ -26,13 +26,14 @@
 #include <QMenuBar>
 
 #include "widgets/terminalwidget.hpp"
+#include "windows/calculatorwindowactions.hpp"
 
 #include "pycx/interpreter.hpp"
 
-class TerminalWindow : public QMainWindow {
+class PythonConsoleWindow : public QMainWindow {
 Q_OBJECT
 public:
-    explicit TerminalWindow(QWidget *parent = nullptr) : QMainWindow(parent) {
+    explicit PythonConsoleWindow(CalculatorWindowActions &actions, QWidget *parent = nullptr) : QMainWindow(parent) {
         term = new TerminalWidget();
         connect(term, SIGNAL(onReturnPressed()), this, SLOT(onTerminalReturnPressed()));
         auto *widget = new QWidget;
@@ -42,10 +43,19 @@ public:
         setCentralWidget(widget);
 
         auto *menu = new QMenu("File");
-        auto *action = new QAction("Exit");
+        auto *action = new QAction("Close Window");
         menu->addAction(action);
         menuBar()->addMenu(menu);
+        menu = new QMenu("Tools");
+        menu->addAction(actions.actionCompressDirectory);
+        menu->addAction(actions.actionExtractArchive);
+        menu->addSeparator();
+        menu->addAction(actions.actionCreateAddonBundle);
+        menuBar()->addMenu(menu);
+        menuBar()->addMenu(actions.menuHelp);
         connect(action, SIGNAL(triggered(bool)), this, SLOT(close()));
+
+        setWindowTitle("Python Console");
     }
 
 signals:

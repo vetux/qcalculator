@@ -87,21 +87,21 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     historyPalette.setColor(historyWidget->backgroundRole(), input->palette().color(input->backgroundRole()));
     historyWidget->setPalette(historyPalette);
 
-    connect(actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
-    connect(actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
-    connect(actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
-    connect(actionAboutQt, SIGNAL(triggered(bool)), this, SLOT(onActionAboutQt()));
-    connect(actionClearSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionClearSymbolTable()));
-    connect(actionOpenSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionOpenSymbolTable()));
-    connect(actionSaveSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveSymbolTable()));
-    connect(actionSaveAsSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveAsSymbolTable()));
-    connect(actionEditSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionEditSymbolTable()));
-    connect(actionOpenTerminal, SIGNAL(triggered(bool)), this, SLOT(onActionOpenTerminal()));
-    connect(actionCompressDirectory, SIGNAL(triggered(bool)), this, SLOT(onActionCompressDirectory()));
-    connect(actionExtractArchive, SIGNAL(triggered(bool)), this, SLOT(onActionExtractArchive()));
-    connect(actionCreateAddonBundle, SIGNAL(triggered(bool)), this, SLOT(onActionCreateAddonBundle()));
-    connect(actionClearHistory, SIGNAL(triggered(bool)), this, SLOT(onActionClearHistory()));
-    connect(actionAboutPython, SIGNAL(triggered(bool)), this, SLOT(onActionAboutPython()));
+    connect(actions.actionSettings, SIGNAL(triggered(bool)), this, SLOT(onActionSettings()));
+    connect(actions.actionExit, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
+    connect(actions.actionAbout, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
+    connect(actions.actionAboutQt, SIGNAL(triggered(bool)), this, SLOT(onActionAboutQt()));
+    connect(actions.actionClearSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionClearSymbolTable()));
+    connect(actions.actionOpenSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionOpenSymbolTable()));
+    connect(actions.actionSaveSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveSymbolTable()));
+    connect(actions.actionSaveAsSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionSaveAsSymbolTable()));
+    connect(actions.actionEditSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionEditSymbolTable()));
+    connect(actions.actionOpenTerminal, SIGNAL(triggered(bool)), this, SLOT(onActionOpenTerminal()));
+    connect(actions.actionCompressDirectory, SIGNAL(triggered(bool)), this, SLOT(onActionCompressDirectory()));
+    connect(actions.actionExtractArchive, SIGNAL(triggered(bool)), this, SLOT(onActionExtractArchive()));
+    connect(actions.actionCreateAddonBundle, SIGNAL(triggered(bool)), this, SLOT(onActionCreateAddonBundle()));
+    connect(actions.actionClearHistory, SIGNAL(triggered(bool)), this, SLOT(onActionClearHistory()));
+    connect(actions.actionAboutPython, SIGNAL(triggered(bool)), this, SLOT(onActionAboutPython()));
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
     connect(input, SIGNAL(textChanged(const QString &)), this, SLOT(onInputTextChanged()));
@@ -206,7 +206,7 @@ void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
     this->symbolTable = symbolTableArg;
     symbolsDialog->setSymbols(symbolTable);
     if (!currentSymbolTablePath.empty()) {
-        actionSaveSymbols->setEnabled(true);
+        actions.actionSaveSymbols->setEnabled(true);
     }
 }
 
@@ -757,124 +757,124 @@ void CalculatorWindow::saveSymbolTablePathHistory() {
 void CalculatorWindow::setupMenuBar() {
     menuBar()->setObjectName("menubar");
 
-    menuFile = new QMenu(this);
-    menuFile->setObjectName("menuFile");
-    menuFile->setTitle("File");
+    actions.menuFile = new QMenu(this);
+    actions.menuFile->setObjectName("actions.menuFile");
+    actions.menuFile->setTitle("File");
 
-    menuSymbols = new QMenu(this);
-    menuSymbols->setObjectName("menuSymbols");
-    menuSymbols->setTitle("Symbols");
+    actions.menuSymbols = new QMenu(this);
+    actions.menuSymbols->setObjectName("actions.menuSymbols");
+    actions.menuSymbols->setTitle("Symbols");
 
-    menuHelp = new QMenu(this);
-    menuHelp->setObjectName("menuHelp");
-    menuHelp->setTitle("Help");
+    actions.menuHelp = new QMenu(this);
+    actions.menuHelp->setObjectName("actions.menuHelp");
+    actions.menuHelp->setTitle("Help");
 
-    menuOpenRecent = new QMenu(this);
-    menuOpenRecent->setObjectName("menuOpenRecent");
-    menuOpenRecent->setTitle("Open Recent");
+    actions.menuOpenRecent = new QMenu(this);
+    actions.menuOpenRecent->setObjectName("actions.menuOpenRecent");
+    actions.menuOpenRecent->setTitle("Open Recent");
 
-    menuTools = new QMenu(this);
-    menuTools->setObjectName("menuTools");
-    menuTools->setTitle("Tools");
+    actions.menuTools = new QMenu(this);
+    actions.menuTools->setObjectName("actions.menuTools");
+    actions.menuTools->setTitle("Tools");
 
-    actionOpenTerminal = new QAction(this);
-    actionOpenTerminal->setText("Open Python Console");
-    actionOpenTerminal->setObjectName("actionOpenTerminal");
-    actionOpenTerminal->setShortcut(QKeySequence(Qt::CTRL + Qt::Key::Key_T));
+    actions.actionOpenTerminal = new QAction(this);
+    actions.actionOpenTerminal->setText("Open Python Console");
+    actions.actionOpenTerminal->setObjectName("actions.actionOpenTerminal");
+    actions.actionOpenTerminal->setShortcut(QKeySequence(Qt::CTRL + Qt::Key::Key_T));
 
-    actionSettings = new QAction(this);
-    actionSettings->setText("Settings");
-    actionSettings->setObjectName("actionSettings");
+    actions.actionSettings = new QAction(this);
+    actions.actionSettings->setText("Settings");
+    actions.actionSettings->setObjectName("actions.actionSettings");
 
-    actionClearSymbols = new QAction(this);
-    actionClearSymbols->setText("Clear Symbols");
-    actionClearSymbols->setObjectName("actionClearSymbols");
+    actions.actionClearSymbols = new QAction(this);
+    actions.actionClearSymbols->setText("Clear Symbols");
+    actions.actionClearSymbols->setObjectName("actions.actionClearSymbols");
 
-    actionOpenSymbols = new QAction(this);
-    actionOpenSymbols->setText("Open...");
-    actionOpenSymbols->setObjectName("actionOpenSymbols");
-    actionOpenSymbols->setShortcut(QKeySequence::Open);
+    actions.actionOpenSymbols = new QAction(this);
+    actions.actionOpenSymbols->setText("Open...");
+    actions.actionOpenSymbols->setObjectName("actions.actionOpenSymbols");
+    actions.actionOpenSymbols->setShortcut(QKeySequence::Open);
 
-    actionSaveSymbols = new QAction(this);
-    actionSaveSymbols->setText("Save");
-    actionSaveSymbols->setObjectName("actionSaveSymbols");
-    actionSaveSymbols->setShortcut(QKeySequence::Save);
-    actionSaveSymbols->setEnabled(false);
+    actions.actionSaveSymbols = new QAction(this);
+    actions.actionSaveSymbols->setText("Save");
+    actions.actionSaveSymbols->setObjectName("actions.actionSaveSymbols");
+    actions.actionSaveSymbols->setShortcut(QKeySequence::Save);
+    actions.actionSaveSymbols->setEnabled(false);
 
-    actionSaveAsSymbols = new QAction(this);
-    actionSaveAsSymbols->setText("Save As...");
-    actionSaveAsSymbols->setObjectName("actionSaveAsSymbols");
-    actionSaveAsSymbols->setShortcut(QKeySequence::SaveAs);
+    actions.actionSaveAsSymbols = new QAction(this);
+    actions.actionSaveAsSymbols->setText("Save As...");
+    actions.actionSaveAsSymbols->setObjectName("actions.actionSaveAsSymbols");
+    actions.actionSaveAsSymbols->setShortcut(QKeySequence::SaveAs);
 
-    actionExit = new QAction(this);
-    actionExit->setText("Exit");
-    actionExit->setObjectName("actionExit");
-    actionExit->setShortcut(QKeySequence::Quit);
+    actions.actionExit = new QAction(this);
+    actions.actionExit->setText("Exit");
+    actions.actionExit->setObjectName("actions.actionExit");
+    actions.actionExit->setShortcut(QKeySequence::Quit);
 
-    actionAbout = new QAction(this);
-    actionAbout->setText("About qCalculator");
-    actionAbout->setObjectName("actionAbout");
+    actions.actionAbout = new QAction(this);
+    actions.actionAbout->setText("About qCalculator");
+    actions.actionAbout->setObjectName("actions.actionAbout");
 
-    actionAboutQt = new QAction(this);
-    actionAboutQt->setText("About Qt");
-    actionAboutQt->setObjectName("actionAboutQt");
+    actions.actionAboutQt = new QAction(this);
+    actions.actionAboutQt->setText("About Qt");
+    actions.actionAboutQt->setObjectName("actions.actionAboutQt");
 
-    actionEditSymbols = new QAction(this);
-    actionEditSymbols->setText("Edit Symbols");
-    actionEditSymbols->setObjectName("actionEditSymbols");
-    actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
+    actions.actionEditSymbols = new QAction(this);
+    actions.actionEditSymbols->setText("Edit Symbols");
+    actions.actionEditSymbols->setObjectName("actions.actionEditSymbols");
+    actions.actionEditSymbols->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_E));
 
-    actionCompressDirectory = new QAction(this);
-    actionCompressDirectory->setText("Compress...");
-    actionCompressDirectory->setObjectName("actionCompressDirectory");
+    actions.actionCompressDirectory = new QAction(this);
+    actions.actionCompressDirectory->setText("Compress...");
+    actions.actionCompressDirectory->setObjectName("actions.actionCompressDirectory");
 
-    actionExtractArchive = new QAction(this);
-    actionExtractArchive->setText("Extract...");
-    actionExtractArchive->setObjectName("actionExtractArchive");
+    actions.actionExtractArchive = new QAction(this);
+    actions.actionExtractArchive->setText("Extract...");
+    actions.actionExtractArchive->setObjectName("actions.actionExtractArchive");
 
-    actionCreateAddonBundle = new QAction(this);
-    actionCreateAddonBundle->setText("Create addon bundle");
-    actionCreateAddonBundle->setObjectName("actionCreateAddonBundle");
+    actions.actionCreateAddonBundle = new QAction(this);
+    actions.actionCreateAddonBundle->setText("Create Addon Bundle");
+    actions.actionCreateAddonBundle->setObjectName("actions.actionCreateAddonBundle");
 
-    actionClearHistory = new QAction(this);
-    actionClearHistory->setText("Clear History");
-    actionClearHistory->setObjectName("actionClearHistory");
-    actionClearHistory->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
+    actions.actionClearHistory = new QAction(this);
+    actions.actionClearHistory->setText("Clear History");
+    actions.actionClearHistory->setObjectName("actions.actionClearHistory");
+    actions.actionClearHistory->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
 
-    actionAboutPython = new QAction(this);
-    actionAboutPython->setText("About Python");
-    actionAboutPython->setObjectName("actionAboutPython");
+    actions.actionAboutPython = new QAction(this);
+    actions.actionAboutPython->setText("About Python");
+    actions.actionAboutPython->setObjectName("actions.actionAboutPython");
 
-    menuTools->addAction(actionOpenTerminal);
-    menuTools->addSeparator();
-    menuTools->addAction(actionCompressDirectory);
-    menuTools->addAction(actionExtractArchive);
-    menuTools->addSeparator();
-    menuTools->addAction(actionCreateAddonBundle);
+    actions.menuTools->addAction(actions.actionOpenTerminal);
+    actions.menuTools->addSeparator();
+    actions.menuTools->addAction(actions.actionCompressDirectory);
+    actions.menuTools->addAction(actions.actionExtractArchive);
+    actions.menuTools->addSeparator();
+    actions.menuTools->addAction(actions.actionCreateAddonBundle);
 
-    menuFile->addAction(actionSettings);
-    menuFile->addSeparator();
-    menuFile->addAction(actionClearHistory);
-    menuFile->addSeparator();
-    menuFile->addAction(actionExit);
+    actions.menuFile->addAction(actions.actionSettings);
+    actions.menuFile->addSeparator();
+    actions.menuFile->addAction(actions.actionClearHistory);
+    actions.menuFile->addSeparator();
+    actions.menuFile->addAction(actions.actionExit);
 
-    menuSymbols->addAction(actionEditSymbols);
-    menuSymbols->addSeparator();
-    menuSymbols->addAction(actionOpenSymbols);
-    menuSymbols->addMenu(menuOpenRecent);
-    menuSymbols->addAction(actionSaveSymbols);
-    menuSymbols->addAction(actionSaveAsSymbols);
-    menuSymbols->addSeparator();
-    menuSymbols->addAction(actionClearSymbols);
+    actions.menuSymbols->addAction(actions.actionEditSymbols);
+    actions.menuSymbols->addSeparator();
+    actions.menuSymbols->addAction(actions.actionOpenSymbols);
+    actions.menuSymbols->addMenu(actions.menuOpenRecent);
+    actions.menuSymbols->addAction(actions.actionSaveSymbols);
+    actions.menuSymbols->addAction(actions.actionSaveAsSymbols);
+    actions.menuSymbols->addSeparator();
+    actions.menuSymbols->addAction(actions.actionClearSymbols);
 
-    menuHelp->addAction(actionAbout);
-    menuHelp->addAction(actionAboutPython);
-    menuHelp->addAction(actionAboutQt);
+    actions.menuHelp->addAction(actions.actionAbout);
+    actions.menuHelp->addAction(actions.actionAboutPython);
+    actions.menuHelp->addAction(actions.actionAboutQt);
 
-    menuBar()->addMenu(menuFile);
-    menuBar()->addMenu(menuSymbols);
-    menuBar()->addMenu(menuTools);
-    menuBar()->addMenu(menuHelp);
+    menuBar()->addMenu(actions.menuFile);
+    menuBar()->addMenu(actions.menuSymbols);
+    menuBar()->addMenu(actions.menuTools);
+    menuBar()->addMenu(actions.menuHelp);
 }
 
 void CalculatorWindow::setupLayout() {
@@ -909,14 +909,9 @@ void CalculatorWindow::setupLayout() {
 }
 
 void CalculatorWindow::setupDialogs() {
-    symbolsDialog = new SymbolsEditorWindow(symbolTable,
-                                            this);
-
+    symbolsDialog = new SymbolsEditorWindow(symbolTable, actions, this);
     settingsDialog = new SettingsDialog(*addonManager, this);
-
-    terminalDialog = new TerminalWindow(this);
-
-    terminalDialog->setWindowTitle("Python Console");
+    terminalDialog = new PythonConsoleWindow(actions, this);
 
     connect(symbolsDialog,
             SIGNAL(symbolsChanged(const SymbolTable &)),
@@ -937,7 +932,7 @@ void CalculatorWindow::setupDialogs() {
 }
 
 void CalculatorWindow::updateSymbolHistoryMenu() {
-    auto menu = menuOpenRecent;
+    auto menu = actions.menuOpenRecent;
     menu->clear();
     for (auto rev = symbolTablePathHistory.rbegin(); rev != symbolTablePathHistory.rend(); rev++) {
         auto path = rev->c_str();
@@ -957,7 +952,7 @@ bool CalculatorWindow::loadSymbolTable(const std::string &path) {
         symbolTable = syms;
         currentSymbolTablePath = path;
 
-        actionSaveSymbols->setEnabled(true);
+        actions.actionSaveSymbols->setEnabled(true);
 
         symbolsDialog->setSymbols(symbolTable);
 
@@ -987,11 +982,11 @@ bool CalculatorWindow::saveSymbolTable(const std::string &path) {
 
         currentSymbolTablePath = path;
 
-        actionSaveSymbols->setEnabled(true);
+        actions.actionSaveSymbols->setEnabled(true);
 
         symbolsDialog->setCurrentSymbolsPath(currentSymbolTablePath);
 
-        actionSaveSymbols->setEnabled(false);
+        actions.actionSaveSymbols->setEnabled(false);
 
         return true;
     }
