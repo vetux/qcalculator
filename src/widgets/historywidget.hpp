@@ -55,31 +55,28 @@ public:
         //scroll->setStyleSheet("QScrollArea > QWidget > QScrollBar { background: palette(base); }");
 
         scroll->setStyleSheet(std::string(
-                "QScrollArea{ background: transparent; border: none; }"
+                "QScrollArea{ background: palette(window); border: none; }"
                 "QScrollBar:vertical {"
-                "    background: transparent;"
-                "    width: 20px;" // <<<<<<<<<<<
-                "    margin: 0px 0px 0px 0px;"
+                "    background: palette(window);"
+                "    width: 19px;" // <<<<<<<<<<<
+                "    margin: 8px 0px 8px 0px;"
                 "}"
                 "QScrollBar::handle:vertical {"
-                "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                "    stop: 0 palette(base), stop: 0.5 palette(base), stop:1 palette(base));"
+                "    background: palette(text);"
                 "    min-height: 0px;"
-                "    margin: 0px 4px 0px 4px;" // <<<<<<<<<<<
-                "    width: 10px;" // <<<<<<<<<<<
+                "    margin: 0px 6px 0px 6px;" // <<<<<<<<<<<
+                "    width: 7px;" // <<<<<<<<<<<
                 "    border-width: 1px;" // <<<<<<<<<<<
-                "    border-radius: 5px;" // <<<<<<<<<<<
+                "    border-radius: 2px;" // <<<<<<<<<<<
                 "}"
                 "QScrollBar::add-line:vertical {"
-                "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                "    stop: 0 palette(base), stop: 0.5 palette(base), stop:1 palette(base));"
+                "    background: palette(base);"
                 "    height: 0px;"
                 "    subcontrol-position: bottom;"
                 "    subcontrol-origin: margin;"
                 "}"
                 "QScrollBar::sub-line:vertical {"
-                "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                "    stop: 0 palette(base), stop: 0.5 palette(base), stop:1 palette(base));"
+                "    background: palette(base);"
                 "    height: 0 px;"
                 "    subcontrol-position: top;"
                 "    subcontrol-origin: margin;"
@@ -87,6 +84,7 @@ public:
         ).c_str());
 
         container->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+        container->layout()->setContentsMargins(8, 0, 8, 8);
     }
 
 public slots:

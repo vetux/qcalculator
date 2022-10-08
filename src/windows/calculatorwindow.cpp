@@ -884,25 +884,48 @@ void CalculatorWindow::setupLayout() {
 
     input = new QLineEdit(this);
     input->setObjectName("lineEdit_input");
+    input->setStyleSheet(
+            "QLineEdit{ border-width: 1px; border-style: solid; border-color: palette(base) transparent palette(base) transparent; }");
+
+    auto inputBg = input->palette().color(QPalette::ColorRole::Base);
 
     inputMessage = new QLabel(this);
     inputMessage->setObjectName("label_input_message");
-    inputMessage->setStyleSheet("QLabel { color : red; }");
+    inputMessage->setStyleSheet("QLabel { color : red; background-color : " + inputBg.name() + "; }");
     inputMessage->setText("F"); // Hack to fix label being slightly smaller before the first non-empty text is set
     inputMessage->setText("");
 
+    input->setContentsMargins(0, 0, 0, 0);
+    input->setTextMargins(8, 8, 8, 8);
+    inputMessage->setContentsMargins(12, 0, 8, 8);
+
+    inputMessage->setFont(QFont(inputMessage->font().family(), inputMessage->font().pointSize() - 2));
+
     auto l = new QVBoxLayout();
 
+    auto *line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Raised);
+
     l->addWidget(historyWidget);
+    l->addWidget(line);
     l->addWidget(input);
     l->addWidget(inputMessage);
+
+    line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Raised);
+
+    l->addWidget(line);
+
+    l->setMargin(0);
+    l->setSpacing(0);
 
     rootWidget->setLayout(l);
 
     auto *footerWidget = new QWidget(this);
     footerWidget->setLayout(new QVBoxLayout);
     footerWidget->setObjectName("footerWidget");
-    footerWidget->layout()->setMargin(0);
     l->addWidget(footerWidget);
 
     setCentralWidget(rootWidget);
