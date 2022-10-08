@@ -25,8 +25,6 @@
 #include <set>
 #include <string>
 
-#include "math/arithmetictype.hpp"
-
 #include "addon/addonmanager.hpp"
 
 #include "gui/dialog/settings/generaltab.hpp"

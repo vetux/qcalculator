@@ -22,7 +22,7 @@
 #include "pycx/include.hpp"
 #include "pycx/interpreter.hpp"
 
-ArithmeticType ScriptHandler::run(PyObject *c, const std::vector<ArithmeticType> &a) {
+decimal::Decimal ScriptHandler::run(PyObject *c, const std::vector<decimal::Decimal> &a) {
     if (c == NULL) {
         throw std::runtime_error("Null callback in script handler");
     }

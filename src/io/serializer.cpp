@@ -68,14 +68,14 @@ SymbolTable Serializer::deserializeTable(const std::string &str) {
     auto tmp = j["variables"].get<std::vector<nlohmann::json>>();
     for (auto &v: tmp) {
         std::string name = v["name"];
-        ArithmeticType value = ArithmeticType (v["value"].get<std::string>());
+        decimal::Decimal value = decimal::Decimal (v["value"].get<std::string>());
         ret.setVariable(name, value);
     }
 
     tmp = j["constants"].get<std::vector<nlohmann::json>>();
     for (auto &v: tmp) {
         std::string name = v["name"];
-        ArithmeticType value = ArithmeticType(v["value"].get<std::string>());
+        decimal::Decimal value = decimal::Decimal(v["value"].get<std::string>());
 
         ret.setConstant(name, value);
     }

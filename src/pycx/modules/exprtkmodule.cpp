@@ -50,7 +50,7 @@ PyObject *evaluate(PyObject *self, PyObject *args) {
 
         SymbolTable symTable = SymbolTableUtil::Convert(pySymTable);
 
-        ArithmeticType value = ExpressionParser::evaluate(expression, symTable);
+        decimal::Decimal value = ExpressionParser::evaluate(expression, symTable);
 
         PyObject *ret = PyTuple_New(2);
 

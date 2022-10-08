@@ -24,14 +24,14 @@
 #include <stdexcept>
 #include <vector>
 
-#include "arithmetictype.hpp"
+#include <decimal.hh>
 
 struct _object;
 typedef _object PyObject;
 
 class ScriptHandler {
 public:
-    static ArithmeticType run(PyObject *callback, const std::vector<ArithmeticType> &args);
+    static decimal::Decimal run(PyObject *callback, const std::vector<decimal::Decimal> &args);
 };
 
 #endif //QCALC_SCRIPTHANDLER_HPP

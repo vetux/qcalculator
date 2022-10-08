@@ -31,8 +31,9 @@
 
 #include <set>
 
+#include <decimal.hh>
+
 #include "gui/widgets/stringedititemwidget.hpp"
-#include "math/arithmetictype.hpp"
 
 class GeneralTab : public QWidget {
 Q_OBJECT

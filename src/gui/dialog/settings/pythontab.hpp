@@ -32,7 +32,6 @@
 #include <set>
 
 #include "gui/widgets/stringedititemwidget.hpp"
-#include "math/arithmetictype.hpp"
 
 class PythonTab : public QWidget {
 Q_OBJECT

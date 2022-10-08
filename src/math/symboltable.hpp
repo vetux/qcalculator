@@ -23,9 +23,10 @@
 #include <map>
 #include <string>
 
+#include <decimal.hh>
+
 #include "function.hpp"
 #include "script.hpp"
-#include "arithmetictype.hpp"
 
 /**
  * The symbol table is responsible for managing 4 map objects.
@@ -50,9 +51,9 @@ public:
 
     bool getUseBuiltInConstants() const;
 
-    const std::map<std::string, ArithmeticType> &getVariables() const;
+    const std::map<std::string, decimal::Decimal> &getVariables() const;
 
-    const std::map<std::string, ArithmeticType> &getConstants() const;
+    const std::map<std::string, decimal::Decimal> &getConstants() const;
 
     const std::map<std::string, Function> &getFunctions() const;
 
@@ -60,9 +61,9 @@ public:
 
     void setUseBuiltInConstants(bool useBuiltIns);
 
-    void setVariable(const std::string &name, ArithmeticType value);
+    void setVariable(const std::string &name, decimal::Decimal value);
 
-    void setConstant(const std::string &name, ArithmeticType value);
+    void setConstant(const std::string &name, decimal::Decimal value);
 
     void setFunction(const std::string &name, const Function &value);
 
@@ -88,8 +89,8 @@ public:
 
 private:
     bool useBuiltInConstants = true;
-    std::map<std::string, ArithmeticType> variables;
-    std::map<std::string, ArithmeticType> constants;
+    std::map<std::string, decimal::Decimal> variables;
+    std::map<std::string, decimal::Decimal> constants;
     std::map<std::string, Function> functions;
     std::map<std::string, Script> scripts;
 };

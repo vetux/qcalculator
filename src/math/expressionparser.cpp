@@ -25,10 +25,10 @@
 #include "scriptfunction.hpp"
 #include "scriptvarargfunction.hpp"
 
-ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &symbolTable) {
-    exprtk::parser<ArithmeticType> parser;
-    exprtk::function_compositor<ArithmeticType> compositor;
-    exprtk::symbol_table<ArithmeticType> symbols = compositor.symbol_table();
+decimal::Decimal ExpressionParser::evaluate(const std::string &expr, SymbolTable &symbolTable) {
+    exprtk::parser<decimal::Decimal> parser;
+    exprtk::function_compositor<decimal::Decimal> compositor;
+    exprtk::symbol_table<decimal::Decimal> symbols = compositor.symbol_table();
 
     int varArgScriptCount = 0;
     int scriptCount = 0;
@@ -41,23 +41,23 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
 
     //Use vectors with fixed size to store the function objects as the symbol table itself only stores references.
     int varArgScriptIndex = 0;
-    std::vector<ScriptVarArgFunction<ArithmeticType>> varArgScriptFunctions;
+    std::vector<ScriptVarArgFunction<decimal::Decimal>> varArgScriptFunctions;
     varArgScriptFunctions.resize(varArgScriptCount);
 
     int scriptIndex = 0;
-    std::vector<ScriptFunction<ArithmeticType>> scriptFunctions;
+    std::vector<ScriptFunction<decimal::Decimal>> scriptFunctions;
     scriptFunctions.resize(scriptCount);
 
     for (auto &v: symbolTable.getScripts()) {
         if (v.second.arguments.empty()) {
             int index = scriptIndex++;
             assert(index < scriptCount);
-            scriptFunctions.at(index) = ScriptFunction<ArithmeticType>(v.second.callback);
+            scriptFunctions.at(index) = ScriptFunction<decimal::Decimal>(v.second.callback);
             symbols.add_function(v.first, scriptFunctions.at(index));
         } else {
             int index = varArgScriptIndex++;
             assert(index < varArgScriptCount);
-            varArgScriptFunctions.at(index) = ScriptVarArgFunction<ArithmeticType>(v.second.callback);
+            varArgScriptFunctions.at(index) = ScriptVarArgFunction<decimal::Decimal>(v.second.callback);
             symbols.add_function(v.first, varArgScriptFunctions.at(index));
         }
     }
@@ -69,23 +69,23 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
         switch (v.second.argumentNames.size()) {
             case 0:
                 compositor.add(
-                        typename exprtk::function_compositor<ArithmeticType>::function(v.first, v.second.expression));
+                        typename exprtk::function_compositor<decimal::Decimal>::function(v.first, v.second.expression));
                 break;
             case 1:
-                compositor.add(typename exprtk::function_compositor<ArithmeticType>::function(v.first,
+                compositor.add(typename exprtk::function_compositor<decimal::Decimal>::function(v.first,
                                                                                               v.second.expression,
                                                                                               v.second.argumentNames[0]));
                 break;
             case 2:
                 compositor.add(
-                        typename exprtk::function_compositor<ArithmeticType>::function(v.first,
+                        typename exprtk::function_compositor<decimal::Decimal>::function(v.first,
                                                                                        v.second.expression,
                                                                                        v.second.argumentNames[0],
                                                                                        v.second.argumentNames[1]));
                 break;
             case 3:
                 compositor.add(
-                        typename exprtk::function_compositor<ArithmeticType>::function(v.first,
+                        typename exprtk::function_compositor<decimal::Decimal>::function(v.first,
                                                                                        v.second.expression,
                                                                                        v.second.argumentNames[0],
                                                                                        v.second.argumentNames[1],
@@ -93,7 +93,7 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
                 break;
             case 4:
                 compositor.add(
-                        typename exprtk::function_compositor<ArithmeticType>::function(v.first,
+                        typename exprtk::function_compositor<decimal::Decimal>::function(v.first,
                                                                                        v.second.expression,
                                                                                        v.second.argumentNames[0],
                                                                                        v.second.argumentNames[1],
@@ -102,7 +102,7 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
                 break;
             case 5:
                 compositor.add(
-                        typename exprtk::function_compositor<ArithmeticType>::function(v.first,
+                        typename exprtk::function_compositor<decimal::Decimal>::function(v.first,
                                                                                        v.second.expression,
                                                                                        v.second.argumentNames[0],
                                                                                        v.second.argumentNames[1],
@@ -119,7 +119,7 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
         symbols.add_constant(constant.first, constant.second);
     }
 
-    std::map<std::string, ArithmeticType> variables = symbolTable.getVariables();
+    std::map<std::string, decimal::Decimal> variables = symbolTable.getVariables();
     for (auto &variable: variables) {
         symbols.add_variable(variable.first, variable.second);
     }
@@ -128,11 +128,11 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
         symbols.add_constants();
     }
 
-    exprtk::expression<ArithmeticType> expression;
+    exprtk::expression<decimal::Decimal> expression;
     expression.register_symbol_table(symbols);
 
     if (parser.compile(expr, expression)) {
-        ArithmeticType ret = expression.value();
+        decimal::Decimal ret = expression.value();
         for (auto &v: variables) {
             if (symbolTable.getVariables().at(v.first) == v.second)
                 continue;
@@ -144,9 +144,9 @@ ArithmeticType ExpressionParser::evaluate(const std::string &expr, SymbolTable &
     }
 }
 
-ArithmeticType ExpressionParser::evaluate(const std::string &expr) {
-    exprtk::parser<ArithmeticType> parser;
-    exprtk::expression<ArithmeticType> expression;
+decimal::Decimal ExpressionParser::evaluate(const std::string &expr) {
+    exprtk::parser<decimal::Decimal> parser;
+    exprtk::expression<decimal::Decimal> expression;
 
     if (parser.compile(expr, expression)) {
         return expression.value();

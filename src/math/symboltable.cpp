@@ -21,11 +21,11 @@
 
 SymbolTable::SymbolTable() = default;
 
-const std::map<std::string, ArithmeticType> &SymbolTable::getVariables() const {
+const std::map<std::string, decimal::Decimal> &SymbolTable::getVariables() const {
     return variables;
 }
 
-const std::map<std::string, ArithmeticType> &SymbolTable::getConstants() const {
+const std::map<std::string, decimal::Decimal> &SymbolTable::getConstants() const {
     return constants;
 }
 
@@ -37,7 +37,7 @@ const std::map<std::string, Script> &SymbolTable::getScripts() const {
     return scripts;
 }
 
-void SymbolTable::setVariable(const std::string &name, ArithmeticType value) {
+void SymbolTable::setVariable(const std::string &name, decimal::Decimal value) {
     if (name.empty())
         throw std::runtime_error("Symbol name cannot be empty.");
 
@@ -47,7 +47,7 @@ void SymbolTable::setVariable(const std::string &name, ArithmeticType value) {
     variables[name] = value;
 }
 
-void SymbolTable::setConstant(const std::string &name, ArithmeticType value) {
+void SymbolTable::setConstant(const std::string &name, decimal::Decimal value) {
     if (name.empty())
         throw std::runtime_error("Symbol name cannot be empty.");
 

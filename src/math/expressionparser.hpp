@@ -22,8 +22,9 @@
 
 #include <string>
 
+#include <decimal.hh>
+
 #include "symboltable.hpp"
-#include "arithmetictype.hpp"
 
 /**
  * The expression parser evaluates expressions in string form using an optionally supplied symbol table.
@@ -43,9 +44,9 @@ namespace ExpressionParser {
      *
      * @return The value of the expression.
      */
-    ArithmeticType evaluate(const std::string &expr, SymbolTable &symbolTable);
+    decimal::Decimal evaluate(const std::string &expr, SymbolTable &symbolTable);
 
-    ArithmeticType evaluate(const std::string &expr);
+    decimal::Decimal evaluate(const std::string &expr);
 }
 
 #endif // QCALC_EXPRESSIONPARSER_HPP
