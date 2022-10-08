@@ -114,7 +114,8 @@ class NumeralSystemWidget(QtWidgets.QWidget):
         if self.scitext.isModified():
             try:
                 self.slot_set_value(decimal.Decimal(str(decimal.Decimal(self.scitext.text()))))
-            except:
+            except Exception as e:
+                print(str(e))
                 self.unitext.setText("")
                 self.hextext.setText("")
                 self.octtext.setText("")
@@ -123,8 +124,9 @@ class NumeralSystemWidget(QtWidgets.QWidget):
     def slot_unicode_editing_finished(self):
         if self.unitext.isModified():
             try:
-                self.slot_set_value(QtCore.QChar(self.unitext.text()[0]).digitValue())
-            except:
+                self.slot_set_value(ord(self.unitext.text()[0]))
+            except Exception as e:
+                print(str(e))
                 self.scitext.setText("")
                 self.hextext.setText("")
                 self.octtext.setText("")
@@ -134,7 +136,8 @@ class NumeralSystemWidget(QtWidgets.QWidget):
         if self.hextext.isModified():
             try:
                 self.slot_set_value(decimal.Decimal(int(self.hextext.text(), 16)))
-            except:
+            except Exception as e:
+                print(str(e))
                 self.scitext.setText("")
                 self.unitext.setText("")
                 self.octtext.setText("")
@@ -144,7 +147,8 @@ class NumeralSystemWidget(QtWidgets.QWidget):
         if self.octtext.isModified():
             try:
                 self.slot_set_value(decimal.Decimal(int(self.octtext.text(), 8)))
-            except:
+            except Exception as e:
+                print(str(e))
                 self.scitext.setText("")
                 self.unitext.setText("")
                 self.hextext.setText("")
@@ -154,7 +158,8 @@ class NumeralSystemWidget(QtWidgets.QWidget):
         if self.bintext.isModified():
             try:
                 self.slot_set_value(decimal.Decimal(int(self.bintext.text(), 2)))
-            except:
+            except Exception as e:
+                print(str(e))
                 self.scitext.setText("")
                 self.unitext.setText("")
                 self.hextext.setText("")
@@ -164,7 +169,8 @@ class NumeralSystemWidget(QtWidgets.QWidget):
         r = decimal.Decimal(0)
         try:
             r = decimal.Decimal(value)
-        except:
+        except Exception as e:
+            print(str(e))
             if not signal:
                 self.scitext.setText("")
                 self.unitext.setText("")
