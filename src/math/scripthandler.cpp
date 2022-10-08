@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "scripthandler.hpp"
+#include "math/scripthandler.hpp"
 
 #include "pycx/include.hpp"
 #include "pycx/interpreter.hpp"

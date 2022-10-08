@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "symboltable.hpp"
+#include "math/symboltable.hpp"
 
 SymbolTable::SymbolTable() = default;
 
@@ -37,7 +37,7 @@ const std::map<std::string, Script> &SymbolTable::getScripts() const {
     return scripts;
 }
 
-void SymbolTable::setVariable(const std::string &name, decimal::Decimal value) {
+void SymbolTable::setVariable(const std::string &name, const decimal::Decimal &value) {
     if (name.empty())
         throw std::runtime_error("Symbol name cannot be empty.");
 
@@ -47,7 +47,7 @@ void SymbolTable::setVariable(const std::string &name, decimal::Decimal value) {
     variables[name] = value;
 }
 
-void SymbolTable::setConstant(const std::string &name, decimal::Decimal value) {
+void SymbolTable::setConstant(const std::string &name, const decimal::Decimal &value) {
     if (name.empty())
         throw std::runtime_error("Symbol name cannot be empty.");
 

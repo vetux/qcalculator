@@ -25,8 +25,8 @@
 
 #include <decimal.hh>
 
-#include "function.hpp"
-#include "script.hpp"
+#include "math/function.hpp"
+#include "math/script.hpp"
 
 /**
  * The symbol table is responsible for managing 4 map objects.
@@ -61,9 +61,9 @@ public:
 
     void setUseBuiltInConstants(bool useBuiltIns);
 
-    void setVariable(const std::string &name, decimal::Decimal value);
+    void setVariable(const std::string &name, const decimal::Decimal &value);
 
-    void setConstant(const std::string &name, decimal::Decimal value);
+    void setConstant(const std::string &name, const decimal::Decimal &value);
 
     void setFunction(const std::string &name, const Function &value);
 

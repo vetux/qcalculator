@@ -24,7 +24,7 @@
 
 #include <decimal.hh>
 
-#include "symboltable.hpp"
+#include "math/symboltable.hpp"
 
 /**
  * The expression parser evaluates expressions in string form using an optionally supplied symbol table.
