@@ -23,14 +23,12 @@
 #include <string>
 
 #include <QFile>
-#include <QDir>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QMenuBar>
 #include <QApplication>
-#include <QProcess>
-#include <QProgressDialog>
 #include <QInputDialog>
+#include <QCompleter>
 
 #include "addon/addonmanager.hpp"
 
@@ -49,16 +47,13 @@
 #include "windows/aboutdialog.hpp"
 
 #include "widgets/historywidget.hpp"
-#include "widgets/symbolseditor.hpp"
 
 #include "pycx/modules/exprtkmodule.hpp"
-#include "pycx/modules/stdredirmodule.hpp"
 #include "pycx/interpreter.hpp"
 
 static const int MAX_SYMBOL_TABLE_HISTORY = 100;
 static const int MAX_HISTORY = 1000;
 
-//TODO:Feature: Completion and history navigation for input line edit with eg. up / down arrows.
 CalculatorWindow::CalculatorWindow(const QString &initErrorMessage, QWidget *parent) : QMainWindow(parent) {
     setObjectName("MainWindow");
 
@@ -185,16 +180,18 @@ void CalculatorWindow::onAddonUnloadFail(const std::string &moduleName, const st
 }
 
 void CalculatorWindow::onInputReturnPressed() {
-    inputTextContainsExpressionResult = false;
-    auto expr = input->text();
-    auto res = evaluateExpression(expr);
-    if (!res.isEmpty()) {
-        input->setText(res);
-        historyWidget->addContent(expr, res);
-        inputTextContainsExpressionResult = true;
-    }
-    if (decimal::context.status() & MPD_Inexact) {
-        inputMessage->setText("Inexact");
+    if (completerWord.isEmpty()) {
+        inputTextContainsExpressionResult = false;
+        auto expr = input->text();
+        auto res = evaluateExpression(expr);
+        if (!res.isEmpty()) {
+            input->setText(res);
+            historyWidget->addContent(expr, res);
+            inputTextContainsExpressionResult = true;
+            if (decimal::context.status() & MPD_Inexact) {
+                inputMessage->setText("Inexact");
+            }
+        }
     }
 }
 
@@ -209,6 +206,76 @@ void CalculatorWindow::onInputTextChanged() {
 
 void CalculatorWindow::onInputTextEdited() {
     clearResultFromInputText();
+
+    auto cursorPos = input->cursorPosition();
+    auto text = input->text().toStdString();
+    auto wordStart = text.rfind(' ', cursorPos - 1) + 1;
+    if (wordStart == std::string::npos)
+        wordStart = 0;
+    auto word = text.substr(wordStart, cursorPos - wordStart);
+
+    bool found = false;
+
+    QStringList contents;
+    for (auto &var: symbolTable.getVariables()) {
+        contents.append(var.first.c_str());
+        if (!found && var.first.find(word) == 0)
+            found = true;
+    }
+    for (auto &var: symbolTable.getConstants()) {
+        contents.append(var.first.c_str());
+        if (!found && var.first.find(word) == 0)
+            found = true;
+    }
+    for (auto &var: symbolTable.getFunctions()) {
+        contents.append(var.first.c_str());
+        if (!found && var.first.find(word) == 0)
+            found = true;
+    }
+    for (auto &var: symbolTable.getScripts()) {
+        contents.append(var.first.c_str());
+        if (!found && var.first.find(word) == 0)
+            found = true;
+    }
+    contents.append("pi");
+    contents.append("epsilon");
+    contents.append("inf");
+    for (auto &var: SymbolTable::getBuiltIns()) {
+        contents.append(var.first.c_str());
+        if (!found && var.first.find(word) == 0)
+            found = true;
+    }
+
+    if (found
+        && !text.empty()
+        && !word.empty()
+        && (cursorPos >= text.size()
+            || text.at(cursorPos) == ' ')) {
+        completerWord = QString(word.c_str());
+
+        if (completer == nullptr) {
+            completer = new QCompleter(contents, input);
+            completer->setWidget(input);
+            completer->setCaseSensitivity(Qt::CaseInsensitive);
+            completer->setCompletionMode(QCompleter::PopupCompletion);
+
+            connect(completer,
+                    SIGNAL(activated(const QString &)),
+                    this,
+                    SLOT(insertInputText(const QString &)));
+        }
+
+        completer->setCompletionPrefix(completerWord);
+        completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
+        completer->complete();
+    } else {
+        completerWord = "";
+        if (completer != nullptr) {
+            completer->popup()->hide();
+            completer->disconnect(this);
+            completer = nullptr;
+        }
+    }
 }
 
 void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
@@ -598,6 +665,18 @@ void CalculatorWindow::onActionClearHistory() {
         history.clear();
         historyWidget->clear();
     }
+}
+
+void CalculatorWindow::insertInputText(const QString &v) {
+    auto cursor = input->cursorPosition() - completerWord.size();
+    auto text = input->text().toStdString();
+    auto textBegin = text.substr(0, cursor);
+    auto textEnd = text.substr(input->cursorPosition());
+    input->setText(QString(textBegin.c_str()) + v + QString(textEnd.c_str()));
+    input->setCursorPosition(cursor + v.size());
+    completer->popup()->hide();
+    completer = nullptr;
+    completerWord = "";
 }
 
 QString CalculatorWindow::evaluateExpression(const QString &expression) {

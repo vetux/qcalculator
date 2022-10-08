@@ -112,6 +112,8 @@ public slots:
 
     void onActionClearHistory();
 
+    void insertInputText(const QString &text);
+
 private:
     void keyPressEvent(QKeyEvent *event) override;
 
@@ -185,6 +187,9 @@ private:
     std::string inputTextAppendedHistoryValue = "";
 
     CalculatorWindowActions actions;
+
+    QCompleter *completer = nullptr;
+    QString completerWord;
 };
 
 #endif // QCALC_MAINWINDOW_HPP
