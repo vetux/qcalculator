@@ -27,7 +27,6 @@ const Setting SETTING_EXPONENT_MAX = {"exponent_max", 999999};
 const Setting SETTING_EXPONENT_MIN = {"exponent_min", -999999};
 const Setting SETTING_ROUNDING = {"rounding", MPD_ROUND_HALF_EVEN};
 const Setting SETTING_SAVE_SYMBOLS_HISTORY = {"save_symbols_history", true};
-const Setting SETTING_WARN_INEXACT = {"warn_inexact", true};
 const Setting SETTING_PYTHON_MODULE_PATHS = {"python_module_paths", std::set<std::string>()};
 const Setting SETTING_PYTHON_PATH = {"python_path", std::string()};
 const Setting SETTING_SAVE_HISTORY =  {"save_history", true};

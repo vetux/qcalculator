@@ -185,8 +185,10 @@ void CalculatorWindow::onInputReturnPressed() {
         historyWidget->addContent(expr, res);
         inputTextContainsExpressionResult = true;
     }
-    if (settings.value(SETTING_WARN_INEXACT).toInt() && decimal::context.status() & MPD_Inexact) {
-        QMessageBox::warning(this, "Inexact result", "Result is inexact!");
+    if (decimal::context.status() & MPD_Inexact) {
+        inputMessage->setText("Inexact");
+        inputMessage->show();
+        historyWidget->scrollToBottom();
     }
 }
 
@@ -196,6 +198,8 @@ void CalculatorWindow::onInputTextChanged() {
     } else {
         inputText = input->text().toStdString();
     }
+    inputMessage->setText("");
+    inputMessage->hide();
 }
 
 void CalculatorWindow::onInputTextEdited() {
@@ -538,7 +542,6 @@ void CalculatorWindow::onSettingsAccepted() {
     settings.update(SETTING_EXPONENT_MAX.key, settingsDialog->getExponentMax());
     settings.update(SETTING_EXPONENT_MIN.key, settingsDialog->getExponentMin());
     settings.update(SETTING_ROUNDING.key, settingsDialog->getRoundingMode());
-    settings.update(SETTING_WARN_INEXACT.key, settingsDialog->getShowInexactWarning());
     settings.update(SETTING_SAVE_HISTORY.key, settingsDialog->getSaveHistoryMax());
 
     settings.update(SETTING_PYTHON_MODULE_PATHS.key, settingsDialog->getPythonModPaths());
@@ -573,7 +576,6 @@ void CalculatorWindow::onSettingsCancelled() {
     settingsDialog->setExponentMax(settings.value(SETTING_EXPONENT_MAX).toInt());
     settingsDialog->setRoundingMode(Serializer::deserializeRoundingMode(
             settings.value(SETTING_ROUNDING).toInt()));
-    settingsDialog->setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
     settingsDialog->setSaveHistory(settings.value(SETTING_SAVE_HISTORY).toInt());
 
     settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
@@ -608,7 +610,9 @@ QString CalculatorWindow::evaluateExpression(const QString &expression) {
 
         return ret;
     } catch (const std::exception &e) {
-        QMessageBox::warning(this, "Failed to evaluate expression", e.what());
+        inputMessage->setText(e.what());
+        inputMessage->show();
+        historyWidget->scrollToBottom();
     }
     return "";
 }
@@ -657,7 +661,6 @@ void CalculatorWindow::loadSettings() {
     settingsDialog->setExponentMax(settings.value(SETTING_EXPONENT_MAX).toInt());
     settingsDialog->setRoundingMode(Serializer::deserializeRoundingMode(
             settings.value(SETTING_ROUNDING).toInt()));
-    settingsDialog->setShowInexactWarning(settings.value(SETTING_WARN_INEXACT).toInt());
     settingsDialog->setSaveHistory(settings.value(SETTING_SAVE_HISTORY).toInt());
 
     settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
@@ -883,21 +886,27 @@ void CalculatorWindow::setupLayout() {
 
     historyWidget = new HistoryWidget(this);
     historyWidget->setObjectName("widget_history");
+    historyWidget->setContentsMargins(6,0,6, 0);
 
     input = new QLineEdit(this);
     input->setObjectName("lineEdit_input");
+    input->setTextMargins(6, 0, 0, 0);
+
+    inputMessage = new QLabel(this);
+    inputMessage->setObjectName("label_input_message");
+    inputMessage->setContentsMargins(6, 0, 6, 0);
+    inputMessage->hide();
+    inputMessage->setStyleSheet("QLabel { color : red; }");
 
     auto l = new QVBoxLayout();
 
     l->addWidget(historyWidget);
     l->addWidget(input);
+    l->addWidget(inputMessage);
 
-    for (int i = 0; i < 10; i++) {
-        l->addSpacing(0);
-    }
+    l->setMargin(3);
 
     rootWidget->setLayout(l);
-
 
     auto *footerWidget = new QWidget(this);
     footerWidget->setLayout(new QVBoxLayout);

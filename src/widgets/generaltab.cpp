@@ -148,29 +148,13 @@ GeneralTab::GeneralTab(QWidget *parent)
     exponentMinSpinBox->setRange(std::numeric_limits<int>().min(), -1);
     exponentMaxSpinBox->setRange(1, std::numeric_limits<int>().max());
 
-    auto *inexactWarnContainer = new QWidget(this);
-
-    showInexactWarningLabel = new QLabel(this);
-    showInexactWarningCheckBox = new QCheckBox(this);
-    showInexactWarningLabel->setText("Show inexact result warnings");
-    showInexactWarningLabel->setToolTip("Show a warning when the result is inexact.");
-    showInexactWarningCheckBox->setToolTip("Show a warning when the result is inexact.");
-
-    auto *hlayout = new QHBoxLayout;
-    hlayout->setMargin(5);
-    hlayout->setSpacing(20);
-    hlayout->addWidget(showInexactWarningCheckBox, 0);
-    hlayout->addWidget(showInexactWarningLabel, 1);
-
-    inexactWarnContainer->setLayout(hlayout);
-
     auto *saveHistoryContainer = new QWidget(this);
 
     saveHistoryLabel = new QLabel(this);
     saveHistoryCheckBox = new QCheckBox(this);
     saveHistoryLabel->setText("Save history to disk");
 
-    hlayout = new QHBoxLayout;
+    auto *hlayout = new QHBoxLayout;
     hlayout->setMargin(5);
     hlayout->setSpacing(20);
     hlayout->addWidget(saveHistoryCheckBox, 0);
@@ -188,7 +172,6 @@ GeneralTab::GeneralTab(QWidget *parent)
     layout->addWidget(exponentMinSpinBox);
     layout->addWidget(roundingLabel);
     layout->addWidget(roundingComboBox);
-    layout->addWidget(inexactWarnContainer);
     layout->addWidget(saveHistoryContainer);
     layout->addStretch(1);
 
@@ -201,14 +184,6 @@ int GeneralTab::getPrecision() {
 
 decimal::round GeneralTab::getRounding() {
     return getRoundingModeFromIndex(roundingComboBox->currentIndex());
-}
-
-void GeneralTab::setShowInexactWarning(bool showWarning) {
-    showInexactWarningCheckBox->setCheckState(showWarning ? Qt::Checked : Qt::Unchecked);
-}
-
-bool GeneralTab::getShowInexactWarning() {
-    return showInexactWarningCheckBox->checkState() == Qt::Checked;
 }
 
 void GeneralTab::setExponentMax(int max) {

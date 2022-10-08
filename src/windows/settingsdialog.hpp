@@ -59,10 +59,6 @@ public:
 
     decimal::round getRoundingMode();
 
-    void setShowInexactWarning(bool showWarning);
-
-    bool getShowInexactWarning();
-
     void setSaveHistory(bool save);
 
     int getSaveHistoryMax();

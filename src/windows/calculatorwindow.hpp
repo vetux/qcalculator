@@ -154,10 +154,12 @@ private:
     void loadHistory();
 
     void clearResultFromInputText();
+
 private:
     QWidget *rootWidget{};
     HistoryWidget *historyWidget{};
     QLineEdit *input{};
+    QLabel *inputMessage{};
 
     PythonConsoleWindow *terminalDialog = nullptr;
     SymbolsEditorWindow *symbolsDialog = nullptr;

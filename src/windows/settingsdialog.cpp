@@ -128,14 +128,6 @@ decimal::round SettingsDialog::getRoundingMode() {
     return generalTab->getRounding();
 }
 
-void SettingsDialog::setShowInexactWarning(bool showWarning) {
-    generalTab->setShowInexactWarning(showWarning);
-}
-
-bool SettingsDialog::getShowInexactWarning() {
-    return generalTab->getShowInexactWarning();
-}
-
 void SettingsDialog::setSaveHistory(bool save) {
     generalTab->setSaveHistory(save);
 }

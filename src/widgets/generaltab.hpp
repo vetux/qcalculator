@@ -47,8 +47,6 @@ public slots:
 
     void setExponentMin(int min);
 
-    void setShowInexactWarning(bool showWarning);
-
     void setSaveHistory(bool saveHistory);
 
 public:
@@ -61,8 +59,6 @@ public:
     int getExponentMax();
 
     int getExponentMin();
-
-    bool getShowInexactWarning();
 
     bool getSaveHistory();
 
@@ -80,9 +76,6 @@ private:
 
     QLabel *roundingLabel;
     QComboBox *roundingComboBox;
-
-    QLabel *showInexactWarningLabel;
-    QCheckBox *showInexactWarningCheckBox;
 
     QLabel *saveHistoryLabel;
     QCheckBox *saveHistoryCheckBox;
