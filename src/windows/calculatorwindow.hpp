@@ -33,7 +33,6 @@
 #include "settings/settings.hpp"
 
 #include "math/symboltable.hpp"
-#include "math/numeralsystem.hpp"
 
 #include "widgets/symbolseditor.hpp"
 #include "widgets/historywidget.hpp"

@@ -32,15 +32,13 @@
 #include <QProgressDialog>
 #include <QInputDialog>
 
-#include "util/stringsplit.hpp"
-
 #include "addon/addonmanager.hpp"
 
 #include "io/paths.hpp"
 #include "io/serializer.hpp"
 #include "io/fileoperations.hpp"
 #include "io/archive.hpp"
-#include "io/to_wstring.hpp"
+#include "io/stringutil.hpp"
 
 #include "settings/settingconstants.hpp"
 
@@ -545,7 +543,7 @@ void CalculatorWindow::onSettingsAccepted() {
 
     auto str = settings.value(SETTING_PYTHON_PATH).toString();
     if (!str.empty()) {
-        Interpreter::setPath(to_wstring(str));
+        Interpreter::setPath(StringUtil::to_wstring(str));
     }
     for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
         Interpreter::addModuleDir(path);
@@ -703,7 +701,7 @@ void CalculatorWindow::loadSymbolTablePathHistory() {
     }
 
     try {
-        auto lines = splitString(FileOperations::fileReadAll(filePath), '\n');
+        auto lines = StringUtil::splitString(FileOperations::fileReadAll(filePath), '\n');
         for (auto &line: lines) {
             symbolTablePathHistory.insert(line);
         }
@@ -1021,7 +1019,7 @@ void CalculatorWindow::loadHistory() {
     if (std::filesystem::exists(Paths::getHistoryFile())) {
         auto str = FileOperations::fileReadAll(Paths::getHistoryFile());
 
-        std::vector<std::string> lines = splitString(str, '\n');
+        std::vector<std::string> lines = StringUtil::splitString(str, '\n');
         for (auto i = 0; lines.size() > 1 && i < lines.size() - 1; i += 2) {
             auto line = lines.at(i);
             auto nextLine = lines.at(i + 1);

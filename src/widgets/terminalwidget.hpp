@@ -31,13 +31,7 @@
 #include <QTextEdit>
 #include <QCheckBox>
 
-static void replace_all(std::string &str, const std::string &s, const std::string &r) {
-    auto it = str.find(s);
-    while (it != std::string::npos) {
-        str.replace(it, s.size(), r);;
-        it = str.find(s, it + r.size());
-    }
-}
+#include "io/stringutil.hpp"
 
 class TerminalWidget : public QWidget {
 Q_OBJECT
@@ -127,9 +121,9 @@ public slots:
 
     void printError(const QString &err) {
         auto str = err.toStdString();
-        replace_all(str, "<", "&lt;");
-        replace_all(str, ">", "&gt;");
-        replace_all(str, "\n", "<br>");
+        StringUtil::replace_all(str, "<", "&lt;");
+        StringUtil::replace_all(str, ">", "&gt;");
+        StringUtil::replace_all(str, "\n", "<br>");
         //Remove trailing newline
         if (!str.empty() && str.rfind("<br>") == str.size() - 4) {
             str = str.substr(0, str.size() - 4);
@@ -145,9 +139,9 @@ public slots:
 
     void printOutput(const QString &out) {
         auto str = out.toStdString();
-        replace_all(str, "<", "&lt;");
-        replace_all(str, ">", "&gt;");
-        replace_all(str, "\n", "<br>");
+        StringUtil::replace_all(str, "<", "&lt;");
+        StringUtil::replace_all(str, ">", "&gt;");
+        StringUtil::replace_all(str, "\n", "<br>");
         //Remove trailing newline
         if (!str.empty() && str.rfind("<br>") == str.size() - 4) {
             str = str.substr(0, str.size() - 4);
