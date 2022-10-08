@@ -40,7 +40,7 @@ PythonTab::PythonTab(QWidget *parent)
     pathLabel = new QLabel(this);
     pathEdit = new QLineEdit(this);
 
-    pathEdit->setPlaceholderText("Override default path...");
+    pathEdit->setPlaceholderText("Override the default path... (Restart is required to apply changes)");
 
     pathLabel->setText("Python Path");
 
