@@ -1098,7 +1098,7 @@ void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
 
 void CalculatorWindow::onEvaluatePython(const std::string &expr, Interpreter::ParseStyle style) {
     if (!Interpreter::isInitialized()) {
-        terminalDialog->printError("Python is not initialized, ensure that the configured path is correct. The console contains the error message.\n");
+        terminalDialog->printError("Python is not initialized.\n");
     } else {
         try {
             Interpreter::runString(expr, style);

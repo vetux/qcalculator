@@ -35,7 +35,7 @@ void Addon::callFunctionNoArgs(const std::string &name) {
     if (Interpreter::isInitialized()) {
         Interpreter::callFunctionNoArgs(moduleName, name);
     } else {
-        throw std::runtime_error("Python is not initialized, ensure that the configured path is correct. The console contains the error message.");
+        throw std::runtime_error("Python is not initialized (The console contains the error message), ensure that the correct path is configured in the settings.");
     }
 }
 
