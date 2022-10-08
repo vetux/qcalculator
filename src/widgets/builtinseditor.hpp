@@ -21,6 +21,7 @@
 #define QCALCULATOR_BUILTINSEDITOR_HPP
 
 #include <set>
+#include <string>
 
 #include <QWidget>
 #include <QListWidget>
@@ -43,7 +44,7 @@ private slots:
     void stateChanged(int state);
 
 private:
-    void setListContents(const std::vector<std::pair<QString, QString>> &contents);
+    void setListContents(const std::map<std::string, std::string> &contents);
 
     QCheckBox *checkBox;
     QListWidget *list;

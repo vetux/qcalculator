@@ -39,6 +39,8 @@
  */
 class SymbolTable {
 public:
+    static const std::map<std::string, std::string> &getBuiltIns();
+
     SymbolTable();
 
     SymbolTable(const SymbolTable &other) = default;
