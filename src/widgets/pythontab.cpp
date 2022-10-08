@@ -31,18 +31,21 @@ PythonTab::PythonTab(QWidget *parent)
     modDirAddButton = new QPushButton(this);
     modFileAddButton = new QPushButton(this);
 
-    modListWidget->setToolTip("List of paths that are added to the python module search path");
+    pathLabel = new QLabel(this);
+    pathEdit = new QLineEdit(this);
+
+    modListWidget->setToolTip(
+            "List of paths that are added to the python sys module path (sys.path) after the interpreter initialized.");
 
     modLabel->setText("Python Module Paths");
     modFileAddButton->setText("Add File");
     modDirAddButton->setText("Add Directory");
 
-    pathLabel = new QLabel(this);
-    pathEdit = new QLineEdit(this);
+    pathEdit->setPlaceholderText("Override the built-in path... (Restart is required to apply changes)");
+    pathEdit->setToolTip(R"(The default path used to initialize python. For separating paths use ";" on windows and ":" on unix.)");
 
-    pathEdit->setPlaceholderText("Override the default path... (Restart is required to apply changes)");
-
-    pathLabel->setText("Python Path");
+    pathLabel->setText("Python Default Path");
+    pathLabel->setToolTip(R"(The default path used to initialize python. For separating paths use ";" on windows and ":" on unix.)");
 
     auto *hlayout = new QHBoxLayout;
     hlayout->addWidget(modLabel, 1);
@@ -56,7 +59,7 @@ PythonTab::PythonTab(QWidget *parent)
     pythonModPathContainerWidget->setLayout(hlayout);
 
     pythonModPathContainerWidget->setToolTip(
-            "List of paths that are added to the python module search path");
+            "List of paths that are added to the python sys module path (sys.path) after the interpreter initialized.");
 
     auto *layout = new QVBoxLayout();
     layout->addWidget(pathLabel);
