@@ -52,8 +52,6 @@ public:
 
         layout()->setMargin(0);
 
-        //scroll->setStyleSheet("QScrollArea > QWidget > QScrollBar { background: palette(base); }");
-
         scroll->setStyleSheet(std::string(
                 "QScrollArea{ background: palette(window); border: none; }"
                 "QScrollBar:vertical {"
