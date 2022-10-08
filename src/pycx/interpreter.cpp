@@ -126,9 +126,9 @@ int Interpreter::runInteractiveLoop() {
     return ret;
 }
 
-std::string Interpreter::runString(const std::string &expression,
-                                   Interpreter::ParseStyle style,
-                                   const std::string &context) {
+void Interpreter::runString(const std::string &expression,
+                            Interpreter::ParseStyle style,
+                            const std::string &context) {
     PyObject *n = PyUnicode_FromString(context.c_str());
     PyObject *m = PyImport_GetModule(n);
 
@@ -152,20 +152,10 @@ std::string Interpreter::runString(const std::string &expression,
             pyStyle = Py_func_type_input;
             break;
     }
-    std::string output;
-
-    StdRedirModule::startRedirect([&output](const std::string &str) {
-                                      output += str;
-                                  },
-                                  [&output](const std::string &str) {
-                                      output += str;
-                                  });
 
     PyObject *g = PyModule_GetDict(m); //Borrowed
 
     PyObject *r = PyRun_String(expression.c_str(), pyStyle, g, g);
-
-    StdRedirModule::stopRedirect();
 
     if (r == NULL) {
         Py_DECREF(m);
@@ -178,8 +168,6 @@ std::string Interpreter::runString(const std::string &expression,
 
     Py_DECREF(m);
     Py_DECREF(n);
-
-    return output;
 }
 
 void Interpreter::callFunctionNoArgs(const std::string &m, const std::string &f) {
@@ -228,11 +216,36 @@ void Interpreter::reloadModule(const std::string &module) {
     Py_DECREF(nMod);
 }
 
+static std::function<void(const std::string &)> _outCallback;
+static std::function<void(const std::string &)> _errCallback;
+
+void Interpreter::setStdStreams(const std::function<void(const std::string &)> outCallback,
+                                const std::function<void(const std::string &)> errCallback) {
+    StdRedirModule::startRedirect(outCallback, errCallback);
+}
+
+void Interpreter::clearStdStreams() {
+    StdRedirModule::stopRedirect();
+}
+
 std::string Interpreter::getError() {
     PyObject *pType, *pValue, *pTraceback;
     PyErr_Fetch(&pType, &pValue, &pTraceback);
 
     std::string error;
+    if (pTraceback != NULL) {
+        PyObject *pTracebackStr = PyObject_Str(pTraceback);
+        const char *pErrorTraceback = PyUnicode_AsUTF8(pTracebackStr);
+
+        error += pErrorTraceback;
+
+        Py_DECREF(pTracebackStr);
+        Py_DECREF(pTraceback);
+    } else {
+        error += "NoTraceback";
+    }
+
+    error += "\n\t";
     if (pType != NULL) {
         PyObject *pTypeStr = PyObject_Str(pType);
         const char *pErrorType = PyUnicode_AsUTF8(pTypeStr);
@@ -245,7 +258,7 @@ std::string Interpreter::getError() {
         error += "NoType";
     }
 
-    error += "\n  ";
+    error += "\n\t";
     if (pValue != NULL) {
         PyObject *pValueStr = PyObject_Str(pValue);
         const char *pErrorValue = PyUnicode_AsUTF8(pValueStr);
@@ -256,19 +269,6 @@ std::string Interpreter::getError() {
         Py_DECREF(pValue);
     } else {
         error += "NoValue";
-    }
-
-    error += "\n  ";
-    if (pTraceback != NULL) {
-        PyObject *pTracebackStr = PyObject_Str(pTraceback);
-        const char *pErrorTraceback = PyUnicode_AsUTF8(pTracebackStr);
-
-        error += pErrorTraceback;
-
-        Py_DECREF(pTracebackStr);
-        Py_DECREF(pTraceback);
-    } else {
-        error += "NoTraceback";
     }
 
     return error;

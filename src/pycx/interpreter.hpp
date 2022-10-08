@@ -23,6 +23,7 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <functional>
 
 namespace Interpreter {
     enum ParseStyle {
@@ -54,13 +55,18 @@ namespace Interpreter {
 
     int runInteractiveLoop();
 
-    std::string runString(const std::string &expression,
-                          ParseStyle style = SINGLE_INPUT,
-                          const std::string &context = "__main__");
+    void runString(const std::string &expression,
+                   ParseStyle style = SINGLE_INPUT,
+                   const std::string &context = "__main__");
 
     void callFunctionNoArgs(const std::string &module, const std::string &function);
 
     void reloadModule(const std::string &module);
+
+    void setStdStreams(std::function<void(const std::string &)> outCallback,
+                       std::function<void(const std::string &)> errCallback);
+
+    void clearStdStreams();
 
     std::string getError();
 

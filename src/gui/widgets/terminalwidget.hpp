@@ -31,6 +31,14 @@
 #include <QTextEdit>
 #include <QCheckBox>
 
+static void replace_all(std::string &str, const std::string &s, const std::string &r) {
+    auto it = str.find(s);
+    while (it != std::string::npos) {
+        str.replace(it, s.size(), r);;
+        it = str.find(s, it + r.size());
+    }
+}
+
 class TerminalWidget : public QWidget {
 Q_OBJECT
 public:
@@ -80,6 +88,7 @@ public:
         historyLabel->setContentsMargins(0, 0, 0, 0);
         historyLabel->setAlignment(Qt::AlignmentFlag::AlignBottom);
         historyLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        historyLabel->setTextFormat(Qt::RichText);
 
         inputEdit->setStyleSheet("QLineEdit { background-color: rgba(0, 0, 0, 0); }");
         inputEdit->setFrame(false);
@@ -99,7 +108,8 @@ public:
         multiCheckBox->setText("Enable Multiline Edit");
 
         auto l = new QVBoxLayout();
-        l->setMargin(0);
+        l->setMargin(6);
+        l->setSpacing(0);
         l->addWidget(scroll, 1);
         l->addWidget(singleLineContainer);
         l->addWidget(multiLineContainer);
@@ -115,15 +125,36 @@ signals:
 
 public slots:
 
-    void appendHistory(const QString &command, const QString &result) {
-        historyLabel->setText(historyLabel->text() + "\n>>> " + command + "\n" + result);
-        if (historyLabel->text().endsWith("\n"))
-            historyLabel->setText(historyLabel->text().chopped(1));
+    void printError(const QString &err) {
+        auto str = err.toStdString();
+        replace_all(str, "<", "&lt;");
+        replace_all(str, ">", "&gt;");
+        replace_all(str, "\n", "<br>");
+        //Remove trailing newline
+        if (!str.empty() && str.rfind("<br>") == str.size() - 4) {
+            str = str.substr(0, str.size() - 4);
+        }
+        if (!str.empty()) {
+            historyLabel->setText(historyLabel->text()
+                                  + "<br><font color=\"red\">"
+                                  + QString(str.c_str())
+                                  + "</font>");
+        }
 
-        if (multiCheckBox->isChecked())
-            multiEdit->setText("");
-        else
-            inputEdit->setText("");
+    }
+
+    void printOutput(const QString &out) {
+        auto str = out.toStdString();
+        replace_all(str, "<", "&lt;");
+        replace_all(str, ">", "&gt;");
+        replace_all(str, "\n", "<br>");
+        //Remove trailing newline
+        if (!str.empty() && str.rfind("<br>") == str.size() - 4) {
+            str = str.substr(0, str.size() - 4);
+        }
+        if (!str.empty()) {
+            historyLabel->setText(historyLabel->text() + "<br>" + QString(str.c_str()));
+        }
     }
 
     QString getInputText() {
@@ -134,7 +165,10 @@ public slots:
     }
 
     void setInputText(const QString &text) {
-        inputEdit->setText(text);
+        if (multiCheckBox->isChecked())
+            multiEdit->setText(text);
+        else
+            inputEdit->setText(text);
     }
 
     QString getPrompt() {

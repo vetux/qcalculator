@@ -162,6 +162,10 @@ int runPythonInitCheck() {
     return 0;
 }
 
+void printUsage() {
+    std::cout << "Usage: PROGRAM [ --interpreter, -i ]\n";
+}
+
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
@@ -187,10 +191,9 @@ int main(int argc, char *argv[]) {
             // Run the application as an interactive python interpreter
             // Does not work on win32 if the application is not using the console subsystem
             return Interpreter::runInteractiveLoop();
-        } else if (args.at(1) == "--terminal" || args.at(1) == "-t") {
-            TerminalWindow w;
-            w.show();
-            return QApplication::exec();
+        } else {
+            printUsage();
+            return 0;
         }
     } else {
         CalculatorWindow w;

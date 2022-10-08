@@ -125,6 +125,15 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
 
     updateSymbolHistoryMenu();
 
+    Interpreter::setStdStreams([this](const std::string &str) {
+                                   terminalDialog->printOutput(str.c_str());
+                               },
+                               [this](const std::string &str) {
+                                   terminalDialog->printError(str.c_str());
+                                   terminalDialog->show();
+                                   terminalDialog->activateWindow();
+                               });
+
     for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
         Interpreter::addModuleDir(path);
     }
@@ -313,10 +322,8 @@ void CalculatorWindow::onActionSymbolTableHistory() {
 }
 
 void CalculatorWindow::onActionOpenTerminal() {
-    auto *d = new TerminalWindow(this);
-    d->setAttribute(Qt::WA_DeleteOnClose);
-    d->setWindowTitle("Python Terminal");
-    d->show();
+    terminalDialog->show();
+    terminalDialog->activateWindow();
 }
 
 void CalculatorWindow::onActionCompressDirectory() {
@@ -906,11 +913,14 @@ void CalculatorWindow::setupDialogs() {
 
     settingsDialog = new SettingsDialog(*addonManager, this);
 
+    terminalDialog = new TerminalWindow(this);
+
+    terminalDialog->setWindowTitle("Python Console");
+
     connect(symbolsDialog,
             SIGNAL(symbolsChanged(const SymbolTable &)),
             this,
             SLOT(onSymbolTableChanged(const SymbolTable &)));
-
     connect(settingsDialog,
             SIGNAL(accepted()),
             this,
@@ -919,6 +929,10 @@ void CalculatorWindow::setupDialogs() {
             SIGNAL(rejected()),
             this,
             SLOT(onSettingsCancelled()));
+    connect(terminalDialog,
+            SIGNAL(evaluatePython(const std::string &, Interpreter::ParseStyle)),
+            this,
+            SLOT(onEvaluatePython(const std::string &, Interpreter::ParseStyle)));
 }
 
 void CalculatorWindow::updateSymbolHistoryMenu() {
@@ -1048,6 +1062,14 @@ void CalculatorWindow::clearAppendedResult() {
 void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
     inputTextAppendedHistoryValue.clear();
     inputTextHistoryIndex = 0;
+}
+
+void CalculatorWindow::onEvaluatePython(const string &expr, Interpreter::ParseStyle style) {
+    try {
+        Interpreter::runString(expr, style);
+    } catch (const std::exception &e) {
+        terminalDialog->printError(QString(e.what()) + "\n");
+    }
 }
 
 void CalculatorWindow::keyPressEvent(QKeyEvent *event) {

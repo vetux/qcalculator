@@ -48,16 +48,26 @@ public:
         connect(action, SIGNAL(triggered(bool)), this, SLOT(close()));
     }
 
+signals:
+
+    void evaluatePython(const std::string &expr, Interpreter::ParseStyle parseStyle);
+
+public slots:
+
+    void printError(const QString &err) {
+        term->printError(err);
+    }
+
+    void printOutput(const QString &out) {
+        term->printOutput(out);
+    }
+
 private slots:
 
     void onTerminalReturnPressed() {
-        std::string expr = term->getInputText().toStdString();
-        try {
-            auto res = Interpreter::runString(expr, term->getMultiLineInput() ? Interpreter::FILE_INPUT : Interpreter::SINGLE_INPUT);
-            term->appendHistory(expr.c_str(), res.c_str());
-        } catch (const std::exception &e) {
-            term->appendHistory(expr.c_str(), e.what());
-        }
+        term->printOutput(">>> " + term->getInputText() + "\n");
+        emit evaluatePython(term->getInputText().toStdString(), term->getMultiLineInput() ? Interpreter::FILE_INPUT : Interpreter::SINGLE_INPUT);
+        term->setInputText("");
     }
 
 private:

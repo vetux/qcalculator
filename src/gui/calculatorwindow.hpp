@@ -119,6 +119,8 @@ private slots:
 
     void onInputCursorPositionChanged(int oldPos, int newPos);
 
+    void onEvaluatePython(const std::string &expr, Interpreter::ParseStyle style);
+
 private:
 
     QString evaluateExpression(const QString &expression);
@@ -187,6 +189,7 @@ private:
     HistoryWidget *historyWidget{};
     QLineEdit *input{};
 
+    TerminalWindow *terminalDialog = nullptr;
     SymbolsEditorWindow *symbolsDialog = nullptr;
     SettingsDialog *settingsDialog = nullptr;
 
