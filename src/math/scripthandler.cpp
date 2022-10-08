@@ -24,7 +24,7 @@
 
 decimal::Decimal ScriptHandler::run(PyObject *c, const std::vector<decimal::Decimal> &a) {
     if (!Interpreter::isInitialized()){
-        throw std::runtime_error("Python is not initialized.");
+        throw std::runtime_error("Python is not initialized, ensure that the configured path is correct. The console contains the error message.");
     }
 
     if (c == NULL) {

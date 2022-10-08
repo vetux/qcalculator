@@ -55,6 +55,8 @@ def insert_widget_footer(widget, column, row):
 
     widget_row_mapping[widget] = row
 
+    footer_widget.show()
+
 def remove_widget_footer(widget):
     global widget_row_mapping
 
@@ -68,3 +70,6 @@ def remove_widget_footer(widget):
         del footer_rows[row]
 
     del widget_row_mapping[widget]
+
+    if len(widget_row_mapping) == 0:
+        footer_widget.hide()

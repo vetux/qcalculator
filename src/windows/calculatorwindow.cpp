@@ -938,6 +938,7 @@ void CalculatorWindow::setupLayout() {
     auto *footerWidget = new QWidget(this);
     footerWidget->setLayout(new QVBoxLayout);
     footerWidget->setObjectName("footerWidget");
+    footerWidget->hide();
     l->addWidget(footerWidget);
 
     setCentralWidget(rootWidget);
@@ -1097,7 +1098,7 @@ void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
 
 void CalculatorWindow::onEvaluatePython(const std::string &expr, Interpreter::ParseStyle style) {
     if (!Interpreter::isInitialized()) {
-        terminalDialog->printError("Python is not initialized.\n");
+        terminalDialog->printError("Python is not initialized, ensure that the configured path is correct. The console contains the error message.\n");
     } else {
         try {
             Interpreter::runString(expr, style);

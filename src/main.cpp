@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
             // Run the application as an interactive python interpreter
             // Does not work on win32 if the application is not using the console subsystem
             if (!Interpreter::isInitialized()) {
-                std::cout << "Python is not initialized\n";
+                std::cout << "Python is not initialized.\n";
                 return 1;
             }
             return Interpreter::runInteractiveLoop();
