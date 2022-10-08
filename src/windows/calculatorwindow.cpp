@@ -888,6 +888,8 @@ void CalculatorWindow::setupLayout() {
     inputMessage = new QLabel(this);
     inputMessage->setObjectName("label_input_message");
     inputMessage->setStyleSheet("QLabel { color : red; }");
+    inputMessage->setText("F"); // Hack to fix label being slightly smaller before the first non-empty text is set
+    inputMessage->setText("");
 
     auto l = new QVBoxLayout();
 
