@@ -33,6 +33,7 @@ menu or by creating an archive containing the addon_bundle.json and modules / pa
 
 # Screenshots
 ![img](res/screenshot.png)
+![img](res/screenshot_1.png)
 
 # Building
 For information on how to build the application see: [BUILDING.md](BUILDING.md)
