@@ -1097,10 +1097,10 @@ void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
 
         // Remove existing appended value
         if (!inputTextAppendedHistoryValue.empty() && !input->text().isEmpty()) {
-            auto cursor = input->cursorPosition() - inputTextAppendedHistoryValue.size();
+            auto cursor = input->cursorPosition() - (int) inputTextAppendedHistoryValue.size();
             input->setText(input->text().remove(cursor,
                                                 (int) inputTextAppendedHistoryValue.size()));
-            input->setCursorPosition((int) cursor);
+            input->setCursorPosition(cursor);
         }
 
         std::string result;
@@ -1111,13 +1111,14 @@ void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
         }
 
         auto inputStr = input->text().toStdString();
-        auto cursor = input->cursorPosition() + result.size();
-        auto inputBegin = inputStr.substr(0, cursor - result.size());
+        auto cursorPos = input->cursorPosition();
+        auto newCursorPos = cursorPos + (int)result.size();
+        auto inputBegin = inputStr.substr(0, cursorPos);
         std::string inputEnd;
-        if (cursor < inputStr.size())
-            inputEnd = inputStr.substr(cursor);
+        if (cursorPos < inputStr.size())
+            inputEnd = inputStr.substr(cursorPos);
         input->setText((inputBegin + result + inputEnd).c_str());
-        input->setCursorPosition(cursor);
+        input->setCursorPosition(newCursorPos);
 
         inputTextAppendedHistoryValue = result;
         inputTextHistoryIndex = index + 1;
