@@ -199,7 +199,7 @@ void CalculatorWindow::onInputTextChanged() {
 }
 
 void CalculatorWindow::onInputTextEdited() {
-    clearAppendedResult();
+    clearResultFromInputText();
 }
 
 void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
@@ -519,6 +519,7 @@ const SymbolTable &CalculatorWindow::getSymbolTable() {
 }
 
 void CalculatorWindow::onHistoryTextDoubleClicked(const QString &text) {
+    clearResultFromInputText();
     input->setText(input->text() + text);
     input->setFocus();
 }
@@ -1035,7 +1036,7 @@ void CalculatorWindow::loadHistory() {
     }
 }
 
-void CalculatorWindow::clearAppendedResult() {
+void CalculatorWindow::clearResultFromInputText() {
     if (inputTextContainsExpressionResult) {
         inputTextContainsExpressionResult = false;
 
@@ -1079,7 +1080,7 @@ void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
             return;
         }
 
-        clearAppendedResult();
+        clearResultFromInputText();
 
         if (increment)
             inputTextHistoryIndex++;

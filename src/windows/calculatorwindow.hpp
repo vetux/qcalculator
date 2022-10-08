@@ -152,7 +152,7 @@ private:
 
     void loadHistory();
 
-    void clearAppendedResult();
+    void clearResultFromInputText();
 
 public:
     QAction *actionSettings{};
