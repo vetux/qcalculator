@@ -17,13 +17,11 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "generaltab.hpp"
+#include "widgets/generaltab.hpp"
 
 #include <QVBoxLayout>
 #include <QLine>
 #include <QFileDialog>
-
-#include "settings/settingconstants.hpp"
 
 int getIndexFromRoundingMode(decimal::round mode) {
     switch (mode) {

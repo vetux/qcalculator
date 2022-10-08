@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "addontab.hpp"
+#include "widgets/addontab.hpp"
 
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -28,7 +28,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include "gui/widgets/addonitemwidget.hpp"
+#include "addonitemwidget.hpp"
 
 #include "addon/addonmanager.hpp"
 

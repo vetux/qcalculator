@@ -33,7 +33,7 @@
 
 #include <decimal.hh>
 
-#include "gui/widgets/stringedititemwidget.hpp"
+#include "widgets/stringedititemwidget.hpp"
 
 class GeneralTab : public QWidget {
 Q_OBJECT

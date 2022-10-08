@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "gui/widgets/functionseditor.hpp"
+#include "widgets/functionseditor.hpp"
 
 #include <QHBoxLayout>
 #include <QHeaderView>

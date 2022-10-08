@@ -27,7 +27,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 
-#include "../../math/function.hpp"
+#include "math/function.hpp"
 
 class FunctionsEditor : public QWidget {
 Q_OBJECT

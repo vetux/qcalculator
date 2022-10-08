@@ -17,12 +17,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "addonitemwidget.hpp"
+#include "widgets/addonitemwidget.hpp"
 
 #include <QPushButton>
 #include <QSizePolicy>
 
-#include "../../addon/addonmanager.hpp"
+#include "addon/addonmanager.hpp"
 
 AddonItemWidget::AddonItemWidget(QWidget *parent) : QWidget(parent),
                                                     layout(nullptr),

@@ -22,14 +22,13 @@
 #include <QFileDialog>
 #include <QProcess>
 
-#include "gui/calculatorwindow.hpp"
+#include "windows/calculatorwindow.hpp"
 
 #include "pycx/interpreter.hpp"
 #include "pycx/modules/stdredirmodule.hpp"
 #include "pycx/modules/exprtkmodule.hpp"
 
 #include "io/paths.hpp"
-#include "io/serializer.hpp"
 #include "io/fileoperations.hpp"
 
 #include "settings/settingconstants.hpp"

@@ -27,9 +27,9 @@
 
 #include "addon/addonmanager.hpp"
 
-#include "gui/dialog/settings/generaltab.hpp"
-#include "gui/dialog/settings/addontab.hpp"
-#include "gui/dialog/settings/pythontab.hpp"
+#include "widgets/generaltab.hpp"
+#include "widgets/addontab.hpp"
+#include "widgets/pythontab.hpp"
 
 class SettingsDialog : public QDialog {
 Q_OBJECT

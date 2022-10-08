@@ -25,7 +25,7 @@
 #include <QMenu>
 #include <QMenuBar>
 
-#include "gui/widgets/terminalwidget.hpp"
+#include "widgets/terminalwidget.hpp"
 
 #include "pycx/interpreter.hpp"
 

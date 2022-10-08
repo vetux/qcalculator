@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "symbolseditor.hpp"
+#include "widgets/symbolseditor.hpp"
 
 #include <QTabWidget>
 #include <QVBoxLayout>

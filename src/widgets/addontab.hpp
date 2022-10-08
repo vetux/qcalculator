@@ -27,8 +27,8 @@
 
 #include <set>
 
-#include "gui/widgets/addonitemwidget.hpp"
-#include "gui/widgets/addonwidget.hpp"
+#include "widgets/addonitemwidget.hpp"
+#include "widgets/addonwidget.hpp"
 
 #include "addon/addon.hpp"
 

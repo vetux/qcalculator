@@ -27,26 +27,26 @@ file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/lib/) # Copy sys
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/qcalculator.ico DESTINATION ${CMAKE_CURRENT_BINARY_DIR}) # Copy icon
 
-set(HDR_GUI src/gui/calculatorwindow.hpp
-        src/gui/symbolseditorwindow.hpp
-        src/gui/terminalwindow.hpp
-        src/gui/dialog/settings/settingsdialog.hpp
-        src/gui/dialog/settings/generaltab.hpp
-        src/gui/dialog/settings/addontab.hpp
-        src/gui/dialog/settings/pythontab.hpp
-        src/gui/dialog/addoninstalldialog.hpp
-        src/gui/widgets/addonitemwidget.hpp
-        src/gui/widgets/addonwidget.hpp
-        src/gui/widgets/historywidget.hpp
-        src/gui/widgets/historylabel.hpp
-        src/gui/widgets/functionseditor.hpp
-        src/gui/widgets/namedvalueeditor.hpp
-        src/gui/widgets/scriptseditor.hpp
-        src/gui/widgets/builtinseditor.hpp
-        src/gui/widgets/symbolseditor.hpp
-        src/gui/widgets/terminalwidget.hpp
-        src/gui/widgets/stringedititemwidget.hpp
-        src/gui/widgets/installaddonitemwidget.hpp)
+set(HDR_GUI src/windows/calculatorwindow.hpp
+        src/windows/symbolseditorwindow.hpp
+        src/windows/terminalwindow.hpp
+        src/windows/settingsdialog.hpp
+        src/windows/addoninstalldialog.hpp
+        src/widgets/generaltab.hpp
+        src/widgets/addontab.hpp
+        src/widgets/pythontab.hpp
+        src/widgets/addonitemwidget.hpp
+        src/widgets/addonwidget.hpp
+        src/widgets/historywidget.hpp
+        src/widgets/historylabel.hpp
+        src/widgets/functionseditor.hpp
+        src/widgets/namedvalueeditor.hpp
+        src/widgets/scriptseditor.hpp
+        src/widgets/builtinseditor.hpp
+        src/widgets/symbolseditor.hpp
+        src/widgets/terminalwidget.hpp
+        src/widgets/stringedititemwidget.hpp
+        src/widgets/installaddonitemwidget.hpp)
 
 qt5_wrap_cpp(WRAP_CPP ${HDR_GUI})
 

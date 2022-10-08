@@ -17,23 +17,22 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "settingsdialog.hpp"
+#include "windows/settingsdialog.hpp"
 
 #include <QSettings>
 #include <QMessageBox>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFileDialog>
 
 #include <fstream>
 
-#include "gui/widgets/addonitemwidget.hpp"
-#include "gui/dialog/addoninstalldialog.hpp"
+#include "windows/addoninstalldialog.hpp"
+
+#include "widgets/addonitemwidget.hpp"
 
 #include "addon/addonmanager.hpp"
 
 #include "io/archive.hpp"
-
 #include "io/paths.hpp"
 
 SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :

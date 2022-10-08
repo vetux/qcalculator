@@ -17,25 +17,32 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_SCRIPTSEDITOR_HPP
-#define QCALC_SCRIPTSEDITOR_HPP
+#ifndef QCALC_SYMBOLSDIALOG_HPP
+#define QCALC_SYMBOLSDIALOG_HPP
 
-#include <QWidget>
-#include <QListWidget>
+#include <QMainWindow>
 
-#include "../../math/script.hpp"
+#include "widgets/symbolseditor.hpp"
 
-class ScriptsEditor : public QWidget {
+class CalculatorWindow;
+
+class SymbolsEditorWindow : public QMainWindow {
 Q_OBJECT
-public:
-    explicit ScriptsEditor(QWidget *parent = nullptr);
+signals:
+
+    void symbolsChanged(const SymbolTable &symbols);
 
 public slots:
 
-    void setScripts(const std::map<std::string, Script> &scripts);
+    void setSymbols(const SymbolTable &symbols);
+
+    void setCurrentSymbolsPath(const std::string &path);
+
+public:
+    SymbolsEditorWindow(const SymbolTable &symbols, CalculatorWindow *calcWindow);
 
 private:
-    QListWidget *list;
+    SymbolsEditor *editor;
 };
 
-#endif //QCALC_SCRIPTSEDITOR_HPP
+#endif //QCALC_SYMBOLSDIALOG_HPP

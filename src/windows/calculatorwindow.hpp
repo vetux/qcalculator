@@ -35,12 +35,12 @@
 #include "math/symboltable.hpp"
 #include "math/numeralsystem.hpp"
 
-#include "gui/widgets/symbolseditor.hpp"
-#include "gui/widgets/historywidget.hpp"
+#include "widgets/symbolseditor.hpp"
+#include "widgets/historywidget.hpp"
 
-#include "gui/symbolseditorwindow.hpp"
-#include "gui/terminalwindow.hpp"
-#include "gui/dialog/settings/settingsdialog.hpp"
+#include "windows/symbolseditorwindow.hpp"
+#include "windows/terminalwindow.hpp"
+#include "windows/settingsdialog.hpp"
 
 class CalculatorWindow : public QMainWindow {
 Q_OBJECT

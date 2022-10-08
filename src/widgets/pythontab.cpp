@@ -18,7 +18,7 @@
  */
 
 
-#include "pythontab.hpp"
+#include "widgets/pythontab.hpp"
 
 #include <QVBoxLayout>
 #include <QLine>

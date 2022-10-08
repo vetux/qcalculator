@@ -28,7 +28,7 @@
 #include <QTimer>
 #include <QCoreApplication>
 
-#include "historylabel.hpp"
+#include "widgets/historylabel.hpp"
 
 class HistoryWidget : public QWidget {
 Q_OBJECT

@@ -17,13 +17,13 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "symbolseditorwindow.hpp"
+#include "windows/symbolseditorwindow.hpp"
 
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QMenuBar>
 
-#include "gui/calculatorwindow.hpp"
+#include "calculatorwindow.hpp"
 
 SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
                                          CalculatorWindow *calcWindow)

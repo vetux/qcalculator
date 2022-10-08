@@ -23,7 +23,7 @@
 #include <QDialog>
 #include <QPushButton>
 
-#include "gui/widgets/installaddonitemwidget.hpp"
+#include "widgets/installaddonitemwidget.hpp"
 
 class AddonInstallDialog : public QDialog {
 Q_OBJECT

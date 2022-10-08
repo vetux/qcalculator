@@ -17,9 +17,10 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "calculatorwindow.hpp"
+#include "windows/calculatorwindow.hpp"
 
 #include <filesystem>
+#include <string>
 
 #include <QFile>
 #include <QDir>
@@ -39,26 +40,22 @@
 #include "io/serializer.hpp"
 #include "io/fileoperations.hpp"
 #include "io/archive.hpp"
+#include "io/to_wstring.hpp"
 
 #include "settings/settingconstants.hpp"
 
 #include "math/expressionparser.hpp"
 
-#include "dialog/settings/settingsdialog.hpp"
-#include "symbolseditorwindow.hpp"
-#include "dialog/aboutdialog.hpp"
+#include "windows/settingsdialog.hpp"
+#include "windows/symbolseditorwindow.hpp"
+#include "windows/aboutdialog.hpp"
 
 #include "widgets/historywidget.hpp"
 #include "widgets/symbolseditor.hpp"
 
 #include "pycx/modules/exprtkmodule.hpp"
 #include "pycx/modules/stdredirmodule.hpp"
-
 #include "pycx/interpreter.hpp"
-
-#include "extern/exprtk_mpdecimal_adaptor.hpp"
-
-#include "io/to_wstring.hpp"
 
 static const int MAX_SYMBOL_TABLE_HISTORY = 100;
 static const int MAX_HISTORY = 1000;
@@ -1064,7 +1061,7 @@ void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
     inputTextHistoryIndex = 0;
 }
 
-void CalculatorWindow::onEvaluatePython(const string &expr, Interpreter::ParseStyle style) {
+void CalculatorWindow::onEvaluatePython(const std::string &expr, Interpreter::ParseStyle style) {
     try {
         Interpreter::runString(expr, style);
     } catch (const std::exception &e) {
