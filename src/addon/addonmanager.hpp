@@ -61,9 +61,9 @@ public:
     std::map<std::string, Addon> &getAvailableAddons();
 
     /**
-     * @param inputModules The set of module names which should currently be loaded.
+     * @param inputAddons The set of addon module names which should currently be loaded.
      */
-    void setActiveAddons(const std::set<std::string> &inputModules);
+    void setActiveAddons(const std::set<std::string> &inputAddons);
 
     /**
      * @return The set of currently loaded module names.
@@ -120,7 +120,7 @@ private:
     std::string addonDir;
 
     std::map<std::string, Addon> addons;
-    std::set<std::string> loadedModules;
+    std::set<std::string> activeAddons;
     std::set<std::string> addonLibraryPaths;
 
     Listener onAddonLoadFail;

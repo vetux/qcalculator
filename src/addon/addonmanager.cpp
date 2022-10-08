@@ -181,46 +181,40 @@ AddonManager::~AddonManager() {
 }
 
 void AddonManager::reloadModules() {
-    std::set<std::string> rAddons;
+    auto active = activeAddons;
 
-    // Reload loaded addon modules
-    for (auto addon: addons) {
-        if (addon.second.isModuleLoaded()) {
-            try {
-                addon.second.reload();
-            } catch (const std::exception &e) {
-                if (onAddonLoadFail)
-                    onAddonLoadFail(addon.first, e.what());
-                rAddons.insert(addon.first);
-            }
-        }
-    }
-
-    auto tmp = loadedModules;
-
-    // Remove addons which failed to reload
-    for (auto &r: rAddons)
-        tmp.erase(r);
-
+    // Unload all addons
     setActiveAddons({});
+
+    // Unset library paths
+    unloadAddonLibraryPaths();
 
     // Reload available addon definitions
     readAddons();
 
-    auto mods = std::set<std::string>();
+    // Reset library paths
+    loadAddonLibraryPaths();
 
-    for (const auto &addon: tmp) {
-        auto it = addons.find(addon);
-        if (it != addons.end()) {
-            // Check for addons which are not available anymore
-            mods.insert(addon);
+    // Check for addon reload failure of active addons
+    std::set<std::string> workingAddons;
+    for (auto &mod: active) {
+        if (addons.find(mod) == addons.end()) {
+            // Addon is not available on disk anymore.
+            continue;
         }
+        auto addon = addons.at(mod);
+        try {
+            addon.reload();
+        } catch (const std::exception &e) {
+            if (onAddonLoadFail)
+                onAddonLoadFail(mod, e.what());
+            continue;
+        }
+        workingAddons.insert(mod);
     }
 
-    setActiveAddons(mods);
-
-    unloadAddonLibraryPaths();
-    loadAddonLibraryPaths();
+    // Reload working addons
+    setActiveAddons(workingAddons);
 }
 
 const std::map<std::string, Addon> &AddonManager::getAvailableAddons() const {
@@ -231,9 +225,9 @@ std::map<std::string, Addon> &AddonManager::getAvailableAddons() {
     return addons;
 }
 
-void AddonManager::setActiveAddons(const std::set<std::string> &inputModules) {
-    for (auto &module: loadedModules) {
-        if (inputModules.find(module) == inputModules.end()) {
+void AddonManager::setActiveAddons(const std::set<std::string> &inputAddons) {
+    for (auto &module: activeAddons) {
+        if (inputAddons.find(module) == inputAddons.end()) {
             try {
                 addons.at(module).unload();
             } catch (const std::exception &e) {
@@ -245,8 +239,8 @@ void AddonManager::setActiveAddons(const std::set<std::string> &inputModules) {
     }
 
     std::set<std::string> rMods;
-    for (auto &module: inputModules) {
-        if (loadedModules.find(module) == loadedModules.end()) {
+    for (auto &module: inputAddons) {
+        if (activeAddons.find(module) == activeAddons.end()) {
             try {
                 addons.at(module).load();
             } catch (const std::exception &e) {
@@ -258,15 +252,15 @@ void AddonManager::setActiveAddons(const std::set<std::string> &inputModules) {
         }
     }
 
-    loadedModules = inputModules;
+    activeAddons = inputAddons;
 
     //Remove modules which failed to load
     for (auto &mod: rMods)
-        loadedModules.erase(mod);
+        activeAddons.erase(mod);
 }
 
 std::set<std::string> AddonManager::getActiveAddons() {
-    return loadedModules;
+    return activeAddons;
 }
 
 void AddonManager::readAddons() {
@@ -420,8 +414,8 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
 }
 
 void AddonManager::uninstallAddon(const std::string &moduleName) {
-    if (loadedModules.find(moduleName) != loadedModules.end()) {
-        auto v = loadedModules;
+    if (activeAddons.find(moduleName) != activeAddons.end()) {
+        auto v = activeAddons;
         v.erase(moduleName);
         setActiveAddons(v);
     }
@@ -431,7 +425,7 @@ void AddonManager::uninstallAddon(const std::string &moduleName) {
     std::filesystem::remove_all(addonFile);
 
     addons.erase(moduleName);
-    loadedModules.erase(moduleName);
+    activeAddons.erase(moduleName);
 }
 
 void AddonManager::loadAddonLibraryPaths() {
