@@ -19,7 +19,6 @@
 
 #include <QApplication>
 #include <QMessageBox>
-#include <QFileDialog>
 #include <QProcess>
 
 #include "windows/calculatorwindow.hpp"
@@ -40,59 +39,6 @@ std::vector<std::string> parseArgs(int argc, char *argv[]) {
         ret.emplace_back(argv[i]);
     }
     return ret;
-}
-
-void askUserPythonPath( Settings &settings) {
-    if (QMessageBox::question(nullptr,
-                              "Configure python default path",
-                              "Do you want to override the python default path?")
-        == QMessageBox::StandardButton::Yes) {
-        QFileDialog dialog(nullptr);
-        dialog.setWindowTitle("Select directories to add");
-        dialog.setFileMode(QFileDialog::Directory);
-
-        std::set<std::string> ret;
-
-        if (dialog.exec()) {
-            for (auto &p: dialog.selectedFiles()) {
-                ret.insert(p.toStdString());
-            }
-            while (QMessageBox::question(nullptr,
-                                         "Add directories",
-                                         "Do you want to add more directories to the path?") == QMessageBox::Yes) {
-                if (dialog.exec()) {
-                    for (auto &p: dialog.selectedFiles()) {
-                        ret.insert(p.toStdString());
-                    }
-                } else {
-                    QMessageBox::information(nullptr,
-                                             "Path configuration cancelled",
-                                             "Cancelled python default path configuration");
-                    return;
-                }
-            }
-        } else {
-            QMessageBox::information(nullptr,
-                                     "Path configuration cancelled",
-                                     "Cancelled python default path configuration");
-            return;
-        }
-
-        std::string str;
-
-        for (auto &p: ret) {
-            str += p + Interpreter::getPathSeparator();
-        }
-
-        if (!str.empty()) {
-            str.pop_back();
-            settings.update(SETTING_PYTHON_PATH.key, str);
-        }
-    } else {
-        settings.update(SETTING_PYTHON_PATH.key, std::string());
-    }
-
-    Settings::saveSettings(settings);
 }
 
 std::wstring getUserPythonPath(Settings &settings) {
@@ -122,33 +68,31 @@ bool checkPythonInit(std::string &stdErr) {
     return !ret;
 }
 
-void configurePythonPath() {
+std::string configurePython() {
     auto settings = Settings::readSettings();
     auto pythonPath = getUserPythonPath(settings);
 
     std::string stdErr;
-    while (!checkPythonInit(stdErr)) {
-        if (QMessageBox::question(nullptr, "Python initialization failed",
-                                  ("Python failed to initialize do you want to reconfigure the python path?\n\n" +
-                                   stdErr).c_str())
-            == QMessageBox::Yes) {
-            settings.clear(SETTING_PYTHON_PATH);
-            askUserPythonPath(settings);
-            pythonPath = getUserPythonPath(settings);
-        } else {
-            break;
+
+    if (checkPythonInit(stdErr)) {
+        if (!pythonPath.empty()) {
+            Interpreter::setPath(pythonPath);
         }
+
+        StdRedirModule::initialize();
+        ExprtkModule::initialize();
+        Interpreter::initialize();
+        Interpreter::addModuleDir(Paths::getLibDirectory());
     }
-    if (!pythonPath.empty()) {
-        Interpreter::setPath(pythonPath);
-    }
+
+    return stdErr;
 }
 
 int runPythonInitCheck() {
     auto settings = Settings::readSettings();
     if (settings.check(SETTING_PYTHON_PATH.key)) {
         auto str = settings.value(SETTING_PYTHON_PATH.key).toString();
-        if (!str.empty()){
+        if (!str.empty()) {
             std::wstring wstr;
             for (auto &c: str) {
                 wstr += c;
@@ -178,24 +122,23 @@ int main(int argc, char *argv[]) {
         return runPythonInitCheck();
     }
 
-    configurePythonPath();
-
-    StdRedirModule::initialize();
-    ExprtkModule::initialize();
-    Interpreter::initialize();
-    Interpreter::addModuleDir(Paths::getLibDirectory());
+    auto err = configurePython();
 
     if (args.size() > 1) {
         if (args.at(1) == "--interpreter" || args.at(1) == "-i") {
             // Run the application as an interactive python interpreter
             // Does not work on win32 if the application is not using the console subsystem
+            if (!Interpreter::isInitialized()) {
+                std::cout << "Python is not initialized\n";
+                return 1;
+            }
             return Interpreter::runInteractiveLoop();
         } else {
             printUsage();
             return 0;
         }
     } else {
-        CalculatorWindow w;
+        CalculatorWindow w((err).c_str());
         w.show();
         return QApplication::exec();
     }

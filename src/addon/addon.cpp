@@ -20,6 +20,7 @@
 #include "addon.hpp"
 
 #include <utility>
+#include <stdexcept>
 
 #include "pycx/interpreter.hpp"
 
@@ -31,7 +32,11 @@ Addon::Addon(std::string moduleName, std::string displayName, std::string descri
 
 void Addon::callFunctionNoArgs(const std::string &name) {
     moduleLoaded = true;
-    Interpreter::callFunctionNoArgs(moduleName, name);
+    if (Interpreter::isInitialized()) {
+        Interpreter::callFunctionNoArgs(moduleName, name);
+    } else {
+        throw std::runtime_error("Python is not initialized.");
+    }
 }
 
 void Addon::reload() {
@@ -39,7 +44,9 @@ void Addon::reload() {
     if (l)
         unload();
 
-    Interpreter::reloadModule(moduleName);
+    if (Interpreter::isInitialized()) {
+        Interpreter::reloadModule(moduleName);
+    }
 
     if (l)
         load();

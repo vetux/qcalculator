@@ -46,7 +46,7 @@ class CalculatorWindow : public QMainWindow {
 Q_OBJECT
 
 public:
-    explicit CalculatorWindow(QWidget *parent = nullptr);
+    explicit CalculatorWindow(const QString &initErrorMessage, QWidget *parent = nullptr);
 
     ~CalculatorWindow() override;
 

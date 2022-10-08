@@ -37,6 +37,8 @@ namespace Interpreter {
 
     void finalize();
 
+    bool isInitialized();
+
     char getPathSeparator();
 
     void setPath(const std::wstring &path);

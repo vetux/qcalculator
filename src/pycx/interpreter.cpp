@@ -37,6 +37,10 @@ void Interpreter::finalize() {
     pyInitialized = false;
 }
 
+bool Interpreter::isInitialized() {
+    return pyInitialized;
+}
+
 char Interpreter::getPathSeparator() {
 // https://docs.python.org/3/c-api/init.html PyGetPath:
 // "The returned string consists of a series of directory names separated by a platform dependent delimiter character.

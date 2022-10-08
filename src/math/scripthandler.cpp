@@ -23,6 +23,10 @@
 #include "pycx/interpreter.hpp"
 
 decimal::Decimal ScriptHandler::run(PyObject *c, const std::vector<decimal::Decimal> &a) {
+    if (!Interpreter::isInitialized()){
+        throw std::runtime_error("Python is not initialized.");
+    }
+
     if (c == NULL) {
         throw std::runtime_error("Null callback in script handler");
     }

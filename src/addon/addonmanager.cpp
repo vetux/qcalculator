@@ -433,14 +433,18 @@ void AddonManager::setAddonLibraryPaths() {
         if (entry.is_directory()) {
             auto path = entry.path().string();
             addonLibraryPaths.insert(path);
-            Interpreter::addModuleDir(path);
+            if (Interpreter::isInitialized()) {
+                Interpreter::addModuleDir(path);
+            }
         }
     }
 }
 
 void AddonManager::unsetAddonLibraryPaths() {
     for (auto &path: addonLibraryPaths) {
-        Interpreter::removeModuleDir(path);
+        if (Interpreter::isInitialized()) {
+            Interpreter::removeModuleDir(path);
+        }
     }
     addonLibraryPaths.clear();
 }

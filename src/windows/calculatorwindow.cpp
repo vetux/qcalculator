@@ -59,7 +59,7 @@ static const int MAX_SYMBOL_TABLE_HISTORY = 100;
 static const int MAX_HISTORY = 1000;
 
 //TODO:Feature: Completion and history navigation for input line edit with eg. up / down arrows.
-CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
+CalculatorWindow::CalculatorWindow(const QString &initErrorMessage, QWidget *parent) : QMainWindow(parent) {
     setObjectName("MainWindow");
 
     addonManager = std::make_unique<AddonManager>(Paths::getAddonDirectory(),
@@ -120,17 +120,19 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
 
     updateSymbolHistoryMenu();
 
-    Interpreter::setStdStreams([this](const std::string &str) {
-                                   terminalDialog->printOutput(str.c_str());
-                               },
-                               [this](const std::string &str) {
-                                   terminalDialog->printError(str.c_str());
-                                   terminalDialog->show();
-                                   terminalDialog->activateWindow();
-                               });
+    if (Interpreter::isInitialized()) {
+        Interpreter::setStdStreams([this](const std::string &str) {
+                                       terminalDialog->printOutput(str.c_str());
+                                   },
+                                   [this](const std::string &str) {
+                                       terminalDialog->printError(str.c_str());
+                                       terminalDialog->show();
+                                       terminalDialog->activateWindow();
+                                   });
 
-    for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
-        Interpreter::addModuleDir(path);
+        for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
+            Interpreter::addModuleDir(path);
+        }
     }
 
     ExprtkModule::setGlobalTable(symbolTable,
@@ -156,6 +158,12 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
 
     setWindowIcon(QIcon("qcalculator.ico"));
+
+    if (initErrorMessage.isEmpty()) {
+        terminalDialog->printOutput("Initialized Python " + QString(Interpreter::getVersion().c_str()));
+    } else {
+        terminalDialog->printError("Failed to initialize Python:\n" + initErrorMessage);
+    }
 }
 
 CalculatorWindow::~CalculatorWindow() = default;
@@ -531,8 +539,10 @@ void CalculatorWindow::onHistoryTextDoubleClicked(const QString &text) {
 }
 
 void CalculatorWindow::onSettingsAccepted() {
-    for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
-        Interpreter::removeModuleDir(path);
+    if (Interpreter::isInitialized()) {
+        for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
+            Interpreter::removeModuleDir(path);
+        }
     }
 
     settings.update(SETTING_PRECISION.key, settingsDialog->getPrecision());
@@ -547,12 +557,14 @@ void CalculatorWindow::onSettingsAccepted() {
     saveSettings();
     saveHistory();
 
-    auto str = settings.value(SETTING_PYTHON_PATH).toString();
-    if (!str.empty()) {
-        Interpreter::setPath(StringUtil::to_wstring(str));
-    }
-    for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
-        Interpreter::addModuleDir(path);
+    if (Interpreter::isInitialized()) {
+        auto str = settings.value(SETTING_PYTHON_PATH).toString();
+        if (!str.empty()) {
+            Interpreter::setPath(StringUtil::to_wstring(str));
+        }
+        for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
+            Interpreter::addModuleDir(path);
+        }
     }
 
     decimal::context.prec(settings.value(SETTING_PRECISION).toInt());
@@ -1084,10 +1096,14 @@ void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
 }
 
 void CalculatorWindow::onEvaluatePython(const std::string &expr, Interpreter::ParseStyle style) {
-    try {
-        Interpreter::runString(expr, style);
-    } catch (const std::exception &e) {
-        terminalDialog->printError(QString(e.what()) + "\n");
+    if (!Interpreter::isInitialized()) {
+        terminalDialog->printError("Python is not initialized.\n");
+    } else {
+        try {
+            Interpreter::runString(expr, style);
+        } catch (const std::exception &e) {
+            terminalDialog->printError(QString(e.what()) + "\n");
+        }
     }
 }
 
