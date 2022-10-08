@@ -520,8 +520,13 @@ const SymbolTable &CalculatorWindow::getSymbolTable() {
 
 void CalculatorWindow::onHistoryTextDoubleClicked(const QString &text) {
     clearResultFromInputText();
-    input->setText(input->text() + text);
+    auto cursor = input->cursorPosition();
+    auto fullText = input->text().toStdString();
+    auto textBegin = QString(fullText.substr(0, cursor).c_str());
+    auto textEnd = QString(fullText.substr(cursor).c_str());
+    input->setText(textBegin + text + textEnd);
     input->setFocus();
+    input->setCursorPosition(cursor + text.size());
 }
 
 void CalculatorWindow::onSettingsAccepted() {
@@ -1112,7 +1117,7 @@ void CalculatorWindow::keyPressEvent(QKeyEvent *event) {
 
         auto inputStr = input->text().toStdString();
         auto cursorPos = input->cursorPosition();
-        auto newCursorPos = cursorPos + (int)result.size();
+        auto newCursorPos = cursorPos + (int) result.size();
         auto inputBegin = inputStr.substr(0, cursorPos);
         std::string inputEnd;
         if (cursorPos < inputStr.size())
