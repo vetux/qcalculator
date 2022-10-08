@@ -151,7 +151,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     }
 
     addonManager->setActiveAddons(availableAddons);
-    addonManager->loadAddonLibraryPaths();
+    addonManager->setAddonLibraryPaths();
 
     settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
 

@@ -195,16 +195,16 @@ void SettingsDialog::onRefreshAddonsPressed() {
 
     enabledAddons = addonManager.getActiveAddons();
 
-    std::map<std::string, Addon> adds = addonManager.getAvailableAddons();
+    std::map<std::string, Addon> availableAddons = addonManager.getAvailableAddons();
 
     std::set<std::string> rMod;
     for (auto &mod: enabledAddons)
-        if (adds.find(mod) == adds.end())
+        if (availableAddons.find(mod) == availableAddons.end())
             rMod.insert(mod);
     for (auto &mod: rMod)
         enabledAddons.erase(mod);
 
-    addonTab->setAddons(adds);
+    addonTab->setAddons(availableAddons);
 }
 
 void SettingsDialog::onInstallAddonPressed() {
@@ -249,8 +249,8 @@ void SettingsDialog::onInstallAddonPressed() {
                                                                            }
                                                                        });
             if (installedAddonCount > 0) {
-                addonManager.unloadAddonLibraryPaths();
-                addonManager.loadAddonLibraryPaths();
+                addonManager.unsetAddonLibraryPaths();
+                addonManager.setAddonLibraryPaths();
 
                 QMessageBox::information(this,
                                          "Installation successful",

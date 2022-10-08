@@ -187,13 +187,13 @@ void AddonManager::reloadModules() {
     setActiveAddons({});
 
     // Unset library paths
-    unloadAddonLibraryPaths();
+    unsetAddonLibraryPaths();
 
     // Reload available addon definitions
     readAddons();
 
     // Reset library paths
-    loadAddonLibraryPaths();
+    setAddonLibraryPaths();
 
     // Check for addon reload failure of active addons
     std::set<std::string> workingAddons;
@@ -428,7 +428,7 @@ void AddonManager::uninstallAddon(const std::string &moduleName) {
     activeAddons.erase(moduleName);
 }
 
-void AddonManager::loadAddonLibraryPaths() {
+void AddonManager::setAddonLibraryPaths() {
     for (auto &entry: std::filesystem::directory_iterator(addonDir)) {
         if (entry.is_directory()) {
             auto path = entry.path().string();
@@ -438,7 +438,7 @@ void AddonManager::loadAddonLibraryPaths() {
     }
 }
 
-void AddonManager::unloadAddonLibraryPaths() {
+void AddonManager::unsetAddonLibraryPaths() {
     for (auto &path: addonLibraryPaths) {
         Interpreter::removeModuleDir(path);
     }

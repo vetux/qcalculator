@@ -110,9 +110,9 @@ public:
 
     void uninstallAddon(const std::string &moduleName);
 
-    void loadAddonLibraryPaths();
+    void setAddonLibraryPaths();
 
-    void unloadAddonLibraryPaths();
+    void unsetAddonLibraryPaths();
 
 private:
     void readAddons();
