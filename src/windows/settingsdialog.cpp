@@ -38,6 +38,7 @@
 SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
         QDialog(parent), addonManager(addonManager) {
     setWindowTitle("Settings");
+    setModal(true);
 
     setLayout(new QVBoxLayout(this));
 
