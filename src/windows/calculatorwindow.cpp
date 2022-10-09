@@ -21,6 +21,7 @@
 
 #include <filesystem>
 #include <string>
+#include <cstdlib>
 
 #include <QFile>
 #include <QMessageBox>
@@ -161,15 +162,13 @@ CalculatorWindow::CalculatorWindow(const QString &initErrorMessage, QWidget *par
     }
 }
 
-CalculatorWindow::~CalculatorWindow() {
-    cleanupDialogs();
-};
+CalculatorWindow::~CalculatorWindow() {}
 
 void CalculatorWindow::closeEvent(QCloseEvent *event) {
+    cleanupDialogs();
 }
 
-void CalculatorWindow::resizeEvent(QResizeEvent *event) {
-}
+void CalculatorWindow::resizeEvent(QResizeEvent *event) {}
 
 void CalculatorWindow::onAddonLoadFail(const std::string &moduleName, const std::string &error) {
     QMessageBox::warning(this, "Failed to load module",
@@ -1048,8 +1047,8 @@ void CalculatorWindow::setupDialogs() {
 }
 
 void CalculatorWindow::cleanupDialogs() {
-    symbolsDialog->deleteLater();
-    terminalDialog->deleteLater();
+    symbolsDialog->close();
+    terminalDialog->close();
 }
 
 void CalculatorWindow::updateSymbolHistoryMenu() {
