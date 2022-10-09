@@ -171,7 +171,7 @@ private:
 
     Settings settings;
 
-    std::string inputText;
+    std::string previousResult;
 
     std::set<std::string> symbolTablePathHistory;
     std::string currentSymbolTablePath; // If the currently active symboltable was loaded from a file or saved to a file this path contains the path of the symbol table file.

@@ -188,6 +188,7 @@ void CalculatorWindow::onInputReturnPressed() {
             input->setText(res);
             historyWidget->addContent(expr, res);
             inputTextContainsExpressionResult = true;
+            previousResult = res.toStdString();
             if (decimal::context.status() & MPD_Inexact) {
                 inputMessage->setText("Inexact");
             }
@@ -198,8 +199,6 @@ void CalculatorWindow::onInputReturnPressed() {
 void CalculatorWindow::onInputTextChanged() {
     if (inputTextContainsExpressionResult) {
         inputTextContainsExpressionResult = false;
-    } else {
-        inputText = input->text().toStdString();
     }
     inputMessage->setText("");
 }
@@ -982,7 +981,9 @@ void CalculatorWindow::setupLayout() {
 
     inputMessage = new QLabel(this);
     inputMessage->setObjectName("label_input_message");
-    inputMessage->setStyleSheet("QLabel { font-weight: bold; color : red; background-color : " + inputBg.name() + "; }");
+    inputMessage->setStyleSheet("QLabel { font-weight: bold; color : red; background-color : "
+                                + inputBg.name()
+                                + "; }");
     inputMessage->setText("F"); // Hack to fix label being slightly smaller before the first non-empty text is set
     inputMessage->setText("");
 
@@ -1153,22 +1154,27 @@ void CalculatorWindow::clearResultFromInputText() {
     if (inputTextContainsExpressionResult) {
         inputTextContainsExpressionResult = false;
 
-        if (input->text().isEmpty())
-            inputText = "";
-        else {
-            auto itext = input->text().toStdString();
-            auto size = inputText.size();
-            if (itext.size() < size)
-                size = itext.size(); // Delete remaining characters of the result if the user pressed backspace
-            inputText = itext.substr(size);
+        auto inputText = input->text().toStdString();
+
+        if (inputText.empty()) {
+            input->setText("");
+        } else {
+            auto size = previousResult.size();
+
+            if (inputText.size() < size) {
+                size = inputText.size(); // Delete remaining characters of the result
+            }
+
+            // Remove the previous input text contents from the new edited input text
+            // This assumes the user can only append to the input line edit when it contains the result
+            // When the user moves the text cursor the inputTextContainsExpressionResult flag is reset
+            input->setText(inputText.substr(size).c_str());
         }
-        input->setText(inputText.c_str());
-    } else {
-        inputText = input->text().toStdString();
     }
 }
 
 void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
+    inputTextContainsExpressionResult = false;
     inputTextAppendedHistoryValue.clear();
     inputTextHistoryIndex = 0;
 }
