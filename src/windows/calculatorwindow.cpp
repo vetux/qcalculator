@@ -982,15 +982,13 @@ void CalculatorWindow::setupLayout() {
 
     inputMessage = new QLabel(this);
     inputMessage->setObjectName("label_input_message");
-    inputMessage->setStyleSheet("QLabel { color : red; background-color : " + inputBg.name() + "; }");
+    inputMessage->setStyleSheet("QLabel { font-weight: bold; color : red; background-color : " + inputBg.name() + "; }");
     inputMessage->setText("F"); // Hack to fix label being slightly smaller before the first non-empty text is set
     inputMessage->setText("");
 
     input->setContentsMargins(0, 0, 0, 0);
     input->setTextMargins(8, 8, 8, 8);
     inputMessage->setContentsMargins(12, 0, 8, 8);
-
-    inputMessage->setFont(QFont(inputMessage->font().family(), inputMessage->font().pointSize() - 2));
 
     auto l = new QVBoxLayout();
 
