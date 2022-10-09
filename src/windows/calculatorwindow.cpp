@@ -161,7 +161,9 @@ CalculatorWindow::CalculatorWindow(const QString &initErrorMessage, QWidget *par
     }
 }
 
-CalculatorWindow::~CalculatorWindow() = default;
+CalculatorWindow::~CalculatorWindow() {
+    cleanupDialogs();
+};
 
 void CalculatorWindow::closeEvent(QCloseEvent *event) {
 }
@@ -1023,9 +1025,9 @@ void CalculatorWindow::setupLayout() {
 }
 
 void CalculatorWindow::setupDialogs() {
-    symbolsDialog = new SymbolsEditorWindow(symbolTable, actions, this);
+    symbolsDialog = new SymbolsEditorWindow(symbolTable, actions);
+    terminalDialog = new PythonConsoleWindow(actions);
     settingsDialog = new SettingsDialog(*addonManager, this);
-    terminalDialog = new PythonConsoleWindow(actions, this);
 
     connect(symbolsDialog,
             SIGNAL(symbolsChanged(const SymbolTable &)),
@@ -1043,6 +1045,11 @@ void CalculatorWindow::setupDialogs() {
             SIGNAL(evaluatePython(const std::string &, Interpreter::ParseStyle)),
             this,
             SLOT(onEvaluatePython(const std::string &, Interpreter::ParseStyle)));
+}
+
+void CalculatorWindow::cleanupDialogs() {
+    symbolsDialog->deleteLater();
+    terminalDialog->deleteLater();
 }
 
 void CalculatorWindow::updateSymbolHistoryMenu() {

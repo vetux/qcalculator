@@ -145,6 +145,8 @@ private:
 
     void setupDialogs();
 
+    void cleanupDialogs();
+
     void updateSymbolHistoryMenu();
 
     bool loadSymbolTable(const std::string &path);

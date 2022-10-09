@@ -40,7 +40,7 @@ public slots:
 public:
     SymbolsEditorWindow(const SymbolTable &symbols,
                         CalculatorWindowActions &actions,
-                        QWidget *parent);
+                        QWidget *parent = nullptr);
 
 private:
     SymbolsEditor *editor;
