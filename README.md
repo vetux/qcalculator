@@ -1,7 +1,4 @@
-<div align="center">
-  <img src="res/icon.png" alt="icon"/>
-</div>
-
+<img src="res/images/calculator.png" alt="Icon" width="64" height="64">
 # qCalculator
 This project aims to provide an accurate, extensible and fast calculator application. 
 
@@ -32,8 +29,8 @@ Addon developers can create addon bundles by selecting the "Create Addon Bundle"
 menu or by creating an archive containing the addon_bundle.json and modules / package files.
 
 # Screenshots
-![img](res/screenshot.png)
-![img](res/screenshot_1.png)
+![img](res/images/screenshot.png)
+![img](res/images/screenshot_1.png)
 
 # Building
 For information on how to build the application see: [BUILDING.md](BUILDING.md)

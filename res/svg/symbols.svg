@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg901"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
+   sodipodi:docname="symbols.svg">
+  <defs
+     id="defs895" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.8"
+     inkscape:cx="47.161942"
+     inkscape:cy="40.846229"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer4"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="2556"
+     inkscape:window-height="1396"
+     inkscape:window-x="0"
+     inkscape:window-y="20"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata898">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Base"
+     style="display:inline">
+    <path
+       id="rect1636"
+       style="fill:#004455;fill-opacity:1;stroke:none;stroke-width:1.93478;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="M 6.1473305,2.3039344e-5 H 26.522304 c 1.804051,0 1.718983,-0.02650978934 1.718983,1.718945160656 V 25.330442 c -0.64428,1.177397 -0.680909,1.334887 -0.758131,2.809975 0.181972,1.298055 0.256317,1.623072 0.758131,2.809976 0.02789,0.71584 -0.766666,0.660621 -1.718983,0.660621 H 5.6181571 C 4.6658399,31.611014 3.37,30.315201 3.37,29.362906 V 2.7772927 C 3.37,1.3320473 4.9463898,2.3039344e-5 6.1473305,2.3039344e-5 Z"
+       sodipodi:nodetypes="ssscccsssss"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="Inside">
+    <path
+       id="rect1661"
+       style="fill:#0088aa;stroke:none;stroke-width:2.0192;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="M 6.1996872,25.972952 H 26.820147 c -0.49464,1.579971 -0.563551,2.996908 0,4.526888 H 6.1996872 c -0.9519422,0 -1.7183078,-0.766347 -1.7183078,-1.71827 v -1.090348 c 0,-0.951921 0.7663656,-1.71827 1.7183078,-1.71827 z"
+       sodipodi:nodetypes="sccssss"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <path
+       id="rect1663"
+       style="fill:#0088aa;stroke:none;stroke-width:2.01973;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="m 6.2535979,1.0976822 c 6.9598511,2.7e-5 13.9197021,1.4e-4 20.8795531,1.4e-4 8.6e-5,8.5719623 0,16.1771938 0,23.7808098 -6.959851,5.9e-5 -13.919702,2.64e-4 -20.8795531,4.15e-4 -1.3515467,2.9e-5 -1.7287599,0.790853 -1.7287599,0.516839 v -2.245483 l 7.9e-5,-20.3240787 c 4e-6,-0.9576673 0.7709917,-1.7286421 1.7286809,-1.7286421 z"
+       sodipodi:nodetypes="ccccscsc"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Overlay">
+    <path
+       id="rect1669"
+       style="fill:#004455;fill-opacity:1;stroke:none;stroke-width:1.86768;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="m 12.779877,4.5891512 h 0.465905 c 0.188197,0 0.339706,0.1515058 0.339706,0.3396993 V 9.856662 c 0,0.188193 -0.151509,0.339699 -0.339706,0.339699 h -0.465905 c -0.188197,0 -0.339706,-0.151506 -0.339706,-0.339699 V 4.9288505 c 0,-0.1881935 0.151509,-0.3396993 0.339706,-0.3396993 z"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <path
+       id="rect1669-3"
+       style="fill:#004455;fill-opacity:1;stroke:none;stroke-width:1.86768;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="M 10.209164,7.6257039 V 7.1598096 c 0,-0.1881935 0.151509,-0.3396993 0.339706,-0.3396993 h 4.92792 c 0.188197,0 0.339706,0.1515058 0.339706,0.3396993 v 0.4658933 c 0,0.1881944 -0.151509,0.3396992 -0.339706,0.3396992 h -4.92792 c -0.188197,0 -0.339706,-0.1515048 -0.339706,-0.3396982 z"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <path
+       id="rect1669-6"
+       style="fill:#55ddff;fill-opacity:1;stroke:none;stroke-width:1.86768;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="M 16.959502,6.4236555 V 5.9577612 c 0,-0.1881935 0.151509,-0.3396992 0.339707,-0.3396992 h 4.927919 c 0.188198,0 0.339707,0.1515057 0.339707,0.3396992 v 0.4658943 c 0,0.1881935 -0.151509,0.3396993 -0.339707,0.3396993 h -4.927919 c -0.188198,0 -0.339707,-0.1515058 -0.339707,-0.3396993 z"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <path
+       id="rect1669-7"
+       style="fill:#55ddff;fill-opacity:1;stroke:none;stroke-width:1.86768;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="M 16.944796,8.732791 V 8.2668967 c 0,-0.1881935 0.151509,-0.3396993 0.339707,-0.3396993 h 4.927919 c 0.188198,0 0.339707,0.1515058 0.339707,0.3396993 V 8.732791 c 0,0.1881935 -0.151509,0.3396993 -0.339707,0.3396993 h -4.927919 c -0.188198,0 -0.339707,-0.1515058 -0.339707,-0.3396993 z"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <path
+       id="rect1669-5"
+       style="fill:#aaeeff;fill-opacity:1;stroke:none;stroke-width:2.10956;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="m 15.363502,11.441579 0.329445,0.329438 c 0.133074,0.133073 0.103529,0.37688 -0.06625,0.546652 l -4.445581,4.445484 c -0.169777,0.169773 -0.41359,0.199319 -0.546665,0.06625 l -0.329445,-0.329437 c -0.133075,-0.133073 -0.103529,-0.37688 0.06625,-0.546653 l 4.44558,-4.445483 c 0.169778,-0.169774 0.41359,-0.19932 0.546666,-0.06625 z"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <path
+       id="rect1669-5-6"
+       style="fill:#aaeeff;fill-opacity:1;stroke:none;stroke-width:2.10956;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="m 15.692946,16.499965 -0.329445,0.329437 c -0.133076,0.133073 -0.376888,0.103527 -0.546665,-0.06625 l -4.44558,-4.445485 c -0.169777,-0.169773 -0.199324,-0.41358 -0.06625,-0.546653 l 0.329445,-0.329438 c 0.133075,-0.133072 0.376888,-0.103527 0.546664,0.06625 l 4.445581,4.445483 c 0.169777,0.169775 0.199323,0.413581 0.06625,0.546654 z"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <path
+       id="rect1669-7-2"
+       style="fill:#d5f6ff;fill-opacity:1;stroke:none;stroke-width:1.86768;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="m 16.944273,14.361771 v -0.465894 c 0,-0.188194 0.151509,-0.3397 0.339707,-0.3397 h 4.927919 c 0.188197,0 0.339707,0.151506 0.339707,0.3397 v 0.465894 c 0,0.188193 -0.15151,0.339699 -0.339707,0.339699 H 17.28398 c -0.188198,0 -0.339707,-0.151506 -0.339707,-0.339699 z"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <rect
+       style="fill:#006680;fill-opacity:1;stroke:none;stroke-width:2.00001;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       id="rect1770"
+       width="14.654164"
+       height="3.3526807"
+       x="9.0855656"
+       y="19.2451"
+       ry="0.73943782"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <rect
+       style="fill:#006680;fill-opacity:1;stroke:none;stroke-width:2.00001;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       id="rect1772"
+       width="1.1870979"
+       height="21.472691"
+       x="5.6109076"
+       y="2.2998054"
+       ry="0.59353596"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <rect
+       style="fill:#00aad4;fill-opacity:1;stroke:none;stroke-width:1.94405;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       id="rect1774"
+       width="20.323734"
+       height="0.38395831"
+       x="6.1079154"
+       y="26.596752"
+       ry="0.19197915"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <rect
+       style="fill:#55ddff;fill-opacity:1;stroke:none;stroke-width:1.97709;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       id="rect1774-7"
+       width="21.020248"
+       height="0.38395831"
+       x="4.9083447"
+       y="27.554268"
+       ry="0.19197915"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <rect
+       style="fill:#aaeeff;fill-opacity:1;stroke:none;stroke-width:1.9759;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       id="rect1774-6"
+       width="20.995039"
+       height="0.38395831"
+       x="4.900434"
+       y="28.494476"
+       ry="0.19197915"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+    <rect
+       style="fill:#2ad4ff;fill-opacity:1;stroke:none;stroke-width:1.94268;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       id="rect1774-2"
+       width="20.295107"
+       height="0.38395831"
+       x="6.0938759"
+       y="29.48193"
+       ry="0.19197915"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/symbols.png"
+       inkscape:export-xdpi="205.69405"
+       inkscape:export-ydpi="205.69405" />
+  </g>
+</svg>

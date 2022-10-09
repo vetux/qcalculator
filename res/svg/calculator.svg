@@ -14,10 +14,10 @@
    version="1.1"
    id="svg8"
    inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
-   sodipodi:docname="icon.svg"
-   inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/icon.png"
-   inkscape:export-xdpi="65.024002"
-   inkscape:export-ydpi="65.024002">
+   sodipodi:docname="calculator.svg"
+   inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/calculator.png"
+   inkscape:export-xdpi="76.679245"
+   inkscape:export-ydpi="76.679245">
   <defs
      id="defs2">
     <rect
@@ -62,9 +62,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="134.48343"
-     inkscape:cy="228.51442"
+     inkscape:zoom="1.979899"
+     inkscape:cx="167.24771"
+     inkscape:cy="112.97871"
      inkscape:document-units="mm"
      inkscape:current-layer="layer6"
      inkscape:document-rotation="0"
@@ -97,7 +97,7 @@
      inkscape:label="Body"
      style="display:inline">
     <rect
-       style="display:inline;fill:#162d50;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="display:inline;fill:#0088aa;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="rect839"
        width="62.202358"
        height="82.825401"
@@ -112,7 +112,10 @@
     <path
        id="rect839-7"
        style="display:inline;fill:none;stroke:#4d4d4d;stroke-width:1.97464;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill"
-       d="m 21.436062,0.98732579 h 41.927876 c 5.616032,0 10.137243,4.40374901 10.137243,9.87387821 v 63.077607 c 10e-7,5.470128 -4.52121,9.873876 -10.137243,9.873876 H 21.436062 c -5.616033,0 -10.137243,-4.403748 -10.137243,-9.873876 V 10.861204 c 0,-5.4701292 4.52121,-9.87387821 10.137243,-9.87387821 z" />
+       d="m 21.436062,0.98732579 h 41.927876 c 5.616032,0 10.137243,4.40374901 10.137243,9.87387821 v 63.077607 c 10e-7,5.470128 -4.52121,9.873876 -10.137243,9.873876 H 21.436062 c -5.616033,0 -10.137243,-4.403748 -10.137243,-9.873876 V 10.861204 c 0,-5.4701292 4.52121,-9.87387821 10.137243,-9.87387821 z"
+       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/calculator.png"
+       inkscape:export-xdpi="76.679245"
+       inkscape:export-ydpi="76.679245" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -120,74 +123,74 @@
      inkscape:label="Buttons"
      style="display:inline">
     <ellipse
-       style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="display:inline;fill:#4d4d4d;stroke:#4d4d4d;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers stroke fill"
        id="path1632"
        cx="23.622143"
        cy="36.171467"
-       rx="5.5416603"
-       ry="5.3833332" />
+       rx="6.415164"
+       ry="6.2318811" />
     <ellipse
        style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-3"
        cx="42.119602"
        cy="36.171467"
-       rx="5.5416603"
-       ry="5.3833332" />
+       rx="6.415164"
+       ry="6.2318811" />
     <ellipse
        style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-6"
        cx="60.371178"
        cy="36.171467"
-       rx="5.5416603"
-       ry="5.3833332" />
+       rx="6.415164"
+       ry="6.2318811" />
     <ellipse
        style="display:inline;fill:#4d4d4d;stroke:#4d4d4d;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers stroke fill"
        id="path1632-7"
        cx="60.371178"
        cy="53.540867"
-       rx="5.5416603"
-       ry="5.3833332" />
+       rx="6.415164"
+       ry="6.2318811" />
     <ellipse
        style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-5"
        cx="60.371178"
        cy="71.56086"
-       rx="5.5416603"
-       ry="5.3833332" />
+       rx="6.415164"
+       ry="6.2318811" />
     <ellipse
        style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-35"
        cx="42.119602"
        cy="71.56086"
-       rx="5.5416603"
-       ry="5.3833332" />
+       rx="6.415164"
+       ry="6.2318811" />
     <ellipse
        style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-62"
        cx="23.622143"
        cy="71.56086"
-       rx="5.5416603"
-       ry="5.3833332" />
+       rx="6.415164"
+       ry="6.2318811" />
     <ellipse
        style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-9"
        cx="23.622143"
        cy="53.540867"
-       rx="5.5416603"
-       ry="5.3833332" />
+       rx="6.415164"
+       ry="6.2318811" />
     <ellipse
        style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-1"
        cx="42.119602"
        cy="53.540867"
-       rx="5.5416603"
-       ry="5.3833332" />
+       rx="6.415164"
+       ry="6.2318811" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer7"
      inkscape:label="Buttons Outlines"
-     style="display:inline">
+     style="display:none">
     <ellipse
        style="display:inline;fill:none;stroke:#666666;stroke-width:1.425;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
        id="path1632-53"
@@ -337,7 +340,7 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="TextBase"
-     style="display:inline;opacity:0.128664">
+     style="display:none;opacity:0.128664">
     <text
        xml:space="preserve"
        id="text3034"
@@ -351,7 +354,7 @@
      inkscape:groupmode="layer"
      id="layer3"
      inkscape:label="TextOverlay"
-     style="display:inline">
+     style="display:none">
     <text
        xml:space="preserve"
        id="text3034-4"
