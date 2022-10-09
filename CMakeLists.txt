@@ -18,11 +18,8 @@ endif (WIN32)
 
 file(GLOB_RECURSE SRC src/*.cpp)
 
-file(GLOB ADDON_SRC python/addon/*.py)
-file(GLOB ADDON_META python/addon/*.json)
 file(GLOB_RECURSE SYSTEM_SRC python/lib/*.py)
 
-file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy addon scripts
 file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/lib/) # Copy system libraries
 
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR}) # Copy icons
