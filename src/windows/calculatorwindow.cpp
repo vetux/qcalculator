@@ -152,7 +152,7 @@ CalculatorWindow::CalculatorWindow(const QString &initErrorMessage, QWidget *par
 
     settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
 
-    setWindowIcon(QIcon("qcalculator.ico"));
+    setWindowIcon(QIcon(Paths::getCalculatorIconFile().c_str()));
 
     if (initErrorMessage.isEmpty()) {
         terminalDialog->printOutput("Initialized Python " + QString(Interpreter::getVersion().c_str()));

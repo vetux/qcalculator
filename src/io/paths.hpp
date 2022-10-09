@@ -27,6 +27,11 @@ namespace Paths {
     static const std::string SETTINGS_FILE = "/settings.json";
     static const std::string SYMBOL_TABLE_HISTORY_FILE = "/sym_path_history.txt";
     static const std::string HISTORY_FILE = "/history.txt";
+    static const std::string CALCULATOR_ICON_FILE = "/icons/calculator.ico";
+    static const std::string SYMBOLS_ICON_FILE = "/icons/symbols.ico";
+    static const std::string TERMINAL_ICON_FILE = "/icons/terminal.ico";
+
+    std::string getApplicationDirectory();
 
     std::string getAppDataDirectory();
 
@@ -50,6 +55,18 @@ namespace Paths {
 
     inline std::string getHistoryFile() {
         return getAppConfigDirectory() + HISTORY_FILE;
+    }
+
+    inline std::string getCalculatorIconFile() {
+        return getApplicationDirectory() + CALCULATOR_ICON_FILE;
+    }
+
+    inline std::string getSymbolsIconFile() {
+        return getApplicationDirectory() + SYMBOLS_ICON_FILE;
+    }
+
+    inline std::string getTerminalIconFile() {
+        return getApplicationDirectory() + TERMINAL_ICON_FILE;
     }
 }
 

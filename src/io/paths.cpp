@@ -23,6 +23,10 @@
 #include <QCoreApplication>
 #include <QDir>
 
+std::string Paths::getApplicationDirectory() {
+    return QCoreApplication::applicationDirPath().toStdString();
+}
+
 std::string Paths::getAppDataDirectory() {
     auto ret = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir().mkpath(ret);

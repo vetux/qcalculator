@@ -25,7 +25,7 @@ file(GLOB_RECURSE SYSTEM_SRC python/lib/*.py)
 file(COPY ${ADDON_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/addon) # Copy addon scripts
 file(COPY ${SYSTEM_SRC} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/lib/) # Copy system libraries
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/icons/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}) # Copy icons
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR}) # Copy icons
 
 set(HDR_GUI src/windows/calculatorwindow.hpp
         src/windows/symbolseditorwindow.hpp

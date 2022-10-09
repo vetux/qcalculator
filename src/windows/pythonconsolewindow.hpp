@@ -30,6 +30,8 @@
 
 #include "pycx/interpreter.hpp"
 
+#include "io/paths.hpp"
+
 class PythonConsoleWindow : public QMainWindow {
 Q_OBJECT
 public:
@@ -56,6 +58,8 @@ public:
         connect(action, SIGNAL(triggered(bool)), this, SLOT(close()));
 
         setWindowTitle("Python Console");
+
+        setWindowIcon(QIcon(Paths::getTerminalIconFile().c_str()));
     }
 
 signals:

@@ -23,7 +23,9 @@
 #include <QMenu>
 #include <QMenuBar>
 
-#include "calculatorwindow.hpp"
+#include "windows/calculatorwindowactions.hpp"
+
+#include "io/paths.hpp"
 
 SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
                                          CalculatorWindowActions &actions,
@@ -65,6 +67,8 @@ SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
     menuBar()->addMenu(actions.menuHelp);
 
     connect(exitAction, SIGNAL(triggered(bool)), this, SLOT(close()));
+
+    setWindowIcon(QIcon(Paths::getSymbolsIconFile().c_str()));
 }
 
 void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols) {
