@@ -1,4 +1,5 @@
-<img src="res/images/calculator.png" alt="Icon" width="64" height="64">
+<img src="res/images/calculator.png" alt="Icon" width="64" height="64"> 
+
 # qCalculator
 This project aims to provide an accurate, extensible and fast calculator application. 
 
