@@ -190,6 +190,8 @@ void CalculatorWindow::onInputReturnPressed() {
             historyWidget->addContent(expr, res);
             inputTextContainsExpressionResult = true;
             previousResult = res.toStdString();
+            input->setStyleSheet(
+                    "QLineEdit{ font-weight: bold; border-width: 1px; border-style: solid; border-color: palette(base) transparent palette(base) transparent; }");
             if (decimal::context.status() & MPD_Inexact) {
                 auto inputBg = input->palette().color(QPalette::ColorRole::Base);
                 inputMessage->setStyleSheet("QLabel { font-weight: bold; color : red; background-color : "
@@ -290,7 +292,7 @@ void CalculatorWindow::onInputTextEdited() {
 
 void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
     this->symbolTable = symbolTableArg;
-    symbolsDialog->setSymbols(symbolTable, !currentSymbolTablePath.empty(),currentSymbolTablePath);
+    symbolsDialog->setSymbols(symbolTable, !currentSymbolTablePath.empty(), currentSymbolTablePath);
     if (!currentSymbolTablePath.empty()) {
         actions.actionSaveSymbols->setEnabled(true);
     }
@@ -1088,7 +1090,7 @@ bool CalculatorWindow::loadSymbolTable(const std::string &path) {
 
         actions.actionSaveSymbols->setEnabled(true);
 
-        symbolsDialog->setSymbols(symbolTable, false,currentSymbolTablePath);
+        symbolsDialog->setSymbols(symbolTable, false, currentSymbolTablePath);
 
         addonManager->setActiveAddons(addons);
 
@@ -1186,6 +1188,9 @@ void CalculatorWindow::clearResultFromInputText() {
             // When the user moves the text cursor the inputTextContainsExpressionResult flag is reset
             input->setText(inputText.substr(size).c_str());
         }
+
+        input->setStyleSheet(
+                "QLineEdit{ border-width: 1px; border-style: solid; border-color: palette(base) transparent palette(base) transparent; }");
     }
 }
 
@@ -1193,6 +1198,9 @@ void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
     inputTextContainsExpressionResult = false;
     inputTextAppendedHistoryValue.clear();
     inputTextHistoryIndex = 0;
+    inputMessage->setText("");
+    input->setStyleSheet(
+            "QLineEdit{ border-width: 1px; border-style: solid; border-color: palette(base) transparent palette(base) transparent; }");
 }
 
 void CalculatorWindow::onEvaluatePython(const std::string &expr, Interpreter::ParseStyle style) {
