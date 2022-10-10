@@ -16,8 +16,8 @@
    inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
    sodipodi:docname="calculator.svg"
    inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/calculator.png"
-   inkscape:export-xdpi="76.679245"
-   inkscape:export-ydpi="76.679245">
+   inkscape:export-xdpi="78.507698"
+   inkscape:export-ydpi="78.507698">
   <defs
      id="defs2">
     <rect
@@ -62,11 +62,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="167.24771"
-     inkscape:cy="112.97871"
+     inkscape:zoom="0.98994952"
+     inkscape:cx="186.86714"
+     inkscape:cy="274.15059"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer6"
+     inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="2556"
@@ -93,29 +93,30 @@
   </metadata>
   <g
      inkscape:groupmode="layer"
+     id="layer8"
+     inkscape:label="Frame"
+     style="opacity:0">
+    <rect
+       style="fill:#cccccc;stroke-width:0;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       id="rect2064"
+       width="82.824997"
+       height="82.824997"
+       x="-5.5511151e-17"
+       y="0" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Body"
      style="display:inline">
     <rect
-       style="display:inline;fill:#0088aa;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="display:inline;fill:#164450;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="rect839"
        width="62.202358"
        height="82.825401"
-       x="11.29882"
-       y="0.98732597"
+       x="10.311501"
+       y="5e-07"
        ry="9.8738737" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer6"
-     inkscape:label="BodyOutline">
-    <path
-       id="rect839-7"
-       style="display:inline;fill:none;stroke:#4d4d4d;stroke-width:1.97464;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill"
-       d="m 21.436062,0.98732579 h 41.927876 c 5.616032,0 10.137243,4.40374901 10.137243,9.87387821 v 63.077607 c 10e-7,5.470128 -4.52121,9.873876 -10.137243,9.873876 H 21.436062 c -5.616033,0 -10.137243,-4.403748 -10.137243,-9.873876 V 10.861204 c 0,-5.4701292 4.52121,-9.87387821 10.137243,-9.87387821 z"
-       inkscape:export-filename="/home/nemesis/src/cpp/qcalculator/res/images/calculator.png"
-       inkscape:export-xdpi="76.679245"
-       inkscape:export-ydpi="76.679245" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -123,68 +124,68 @@
      inkscape:label="Buttons"
      style="display:inline">
     <ellipse
-       style="display:inline;fill:#4d4d4d;stroke:#4d4d4d;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers stroke fill"
+       style="display:inline;fill:#2c89a0;stroke:#4d4d4d;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers stroke fill"
        id="path1632"
-       cx="23.622143"
-       cy="36.171467"
-       rx="6.415164"
-       ry="6.2318811" />
+       cx="24.290506"
+       cy="35.31778"
+       rx="6.0944057"
+       ry="5.9202871" />
     <ellipse
-       style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="display:inline;fill:#2c89a0;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-3"
-       cx="42.119602"
-       cy="36.171467"
-       rx="6.415164"
-       ry="6.2318811" />
+       cx="41.78569"
+       cy="35.31778"
+       rx="6.0944057"
+       ry="5.9202871" />
     <ellipse
-       style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="display:inline;fill:#2c89a0;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-6"
-       cx="60.371178"
-       cy="36.171467"
-       rx="6.415164"
-       ry="6.2318811" />
+       cx="59.034992"
+       cy="35.31778"
+       rx="6.0944057"
+       ry="5.9202871" />
     <ellipse
-       style="display:inline;fill:#4d4d4d;stroke:#4d4d4d;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers stroke fill"
+       style="display:inline;fill:#2c89a0;stroke:#4d4d4d;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;stroke-opacity:1;paint-order:markers stroke fill"
        id="path1632-7"
-       cx="60.371178"
-       cy="53.540867"
-       rx="6.415164"
-       ry="6.2318811" />
+       cx="59.034992"
+       cy="52.553543"
+       rx="6.0944057"
+       ry="5.9202871" />
     <ellipse
-       style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="display:inline;fill:#2c89a0;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-5"
-       cx="60.371178"
-       cy="71.56086"
-       rx="6.415164"
-       ry="6.2318811" />
+       cx="59.034992"
+       cy="69.654213"
+       rx="6.0944057"
+       ry="5.9202871" />
     <ellipse
-       style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="display:inline;fill:#2c89a0;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-35"
-       cx="42.119602"
-       cy="71.56086"
-       rx="6.415164"
-       ry="6.2318811" />
+       cx="41.78569"
+       cy="69.654213"
+       rx="6.0944057"
+       ry="5.9202871" />
     <ellipse
-       style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="display:inline;fill:#2c89a0;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-62"
-       cx="23.622143"
-       cy="71.56086"
-       rx="6.415164"
-       ry="6.2318811" />
+       cx="24.290506"
+       cy="69.654213"
+       rx="6.0944057"
+       ry="5.9202871" />
     <ellipse
-       style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="display:inline;fill:#2c89a0;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-9"
-       cx="23.622143"
-       cy="53.540867"
-       rx="6.415164"
-       ry="6.2318811" />
+       cx="24.290506"
+       cy="52.553543"
+       rx="6.0944057"
+       ry="5.9202871" />
     <ellipse
-       style="display:inline;fill:#4d4d4d;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
+       style="display:inline;fill:#2c89a0;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
        id="path1632-1"
-       cx="42.119602"
-       cy="53.540867"
-       rx="6.415164"
-       ry="6.2318811" />
+       cx="41.78569"
+       cy="52.553543"
+       rx="6.0944057"
+       ry="5.9202871" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -315,26 +316,13 @@
        cy="74.698135"
        r="0" />
     <rect
-       style="fill:#008000;stroke:#000000;stroke-width:0;stroke-linecap:square;stroke-linejoin:bevel;paint-order:markers stroke fill"
-       id="rect953"
-       width="51.795994"
-       height="16.70071"
-       x="16.504915"
-       y="7.3369522"
-       ry="3.0364945" />
-    <g
-       id="rect953-7"
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#4d4d4d;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       transform="matrix(0.8778694,0,0,0.94733025,-3.4130186,2.8060568)">
-      <path
-         style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#4d4d4d;stroke-width:2;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
-         d="m 25.910156,4.7832031 c -1.784332,0 -3.220703,1.4363711 -3.220703,3.2207031 V 19.222656 c 0,1.784332 1.436371,3.220703 3.220703,3.220703 h 52.591797 c 1.784332,0 3.220703,-1.436371 3.220703,-3.220703 V 8.0039062 c 0,-1.784332 -1.436371,-3.2207031 -3.220703,-3.2207031 z m 0,0.03125 h 52.591797 c 1.767158,0 3.189453,1.4222956 3.189453,3.1894531 V 19.222656 c 0,1.767158 -1.422295,3.189453 -3.189453,3.189453 H 25.910156 c -1.767157,0 -3.189453,-1.422295 -3.189453,-3.189453 V 8.0039062 c 0,-1.7671575 1.422296,-3.1894531 3.189453,-3.1894531 z"
-         id="path928" />
-      <path
-         style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-variant-east-asian:normal;font-feature-settings:normal;font-variation-settings:normal;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;writing-mode:lr-tb;direction:ltr;text-orientation:mixed;dominant-baseline:auto;baseline-shift:baseline;text-anchor:start;white-space:normal;shape-padding:0;shape-margin:0;inline-size:0;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#4d4d4d;stroke-width:2;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
-         d="m 25.910831,4.7985379 h 52.591304 c 1.77574,0 3.205307,1.4295714 3.205307,3.2053163 V 19.222462 c 0,1.775746 -1.429567,3.205315 -3.205307,3.205315 H 25.910831 c -1.775741,0 -3.205307,-1.429569 -3.205307,-3.205315 V 8.0038542 c 0,-1.7757449 1.429566,-3.2053163 3.205307,-3.2053163 z"
-         id="path930" />
-    </g>
+       style="fill:#37abc8;fill-opacity:1;stroke:none;stroke-width:0;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill"
+       id="rect2066"
+       width="48.414112"
+       height="17.007563"
+       x="17.197916"
+       y="6.8729181"
+       ry="4.0802794" />
   </g>
   <g
      inkscape:groupmode="layer"

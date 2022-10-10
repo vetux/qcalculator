@@ -26,11 +26,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6"
-     inkscape:cx="-10.945415"
-     inkscape:cy="48.709587"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="-218.9572"
+     inkscape:cy="198.50659"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer4"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="2556"
@@ -50,6 +50,19 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="Frame"
+     style="display:inline;opacity:0">
+    <rect
+       style="fill:#cccccc;stroke-width:0;stroke-linecap:square;stroke-linejoin:round;paint-order:markers stroke fill"
+       id="rect847"
+       width="26"
+       height="26"
+       x="0"
+       y="0" />
+  </g>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
