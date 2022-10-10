@@ -72,12 +72,19 @@ namespace exprtk {
 
 #include "exprtk.hpp"
 
-static std::string convertDoubleToString(const long double &value){
-    std::stringstream ss;
-    ss << setprecision(100) << value;
-    string str;
-    ss >> str;
-    return str;
+static std::string convertDoubleToString(const long double &value) {
+    // Avoid platform dependent NaN and Infinity string representation
+    if (std::isnan(value)) {
+        return "NaN";
+    } else if (std::isinf(value)) {
+        return "Inf";
+    } else {
+        std::stringstream ss;
+        ss << setprecision(100) << value;
+        string str;
+        ss >> str;
+        return str;
+    }
 }
 
 namespace exprtk {
@@ -384,7 +391,7 @@ namespace exprtk {
 
                 template<typename T>
                 inline T modulus_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
-                    return v0 - (v1 * (v0/v1).to_integral_exact());
+                    return v0 - (v1 * (v0 / v1).to_integral_exact());
                 }
 
                 template<typename T>
@@ -458,7 +465,7 @@ namespace exprtk {
                 inline T atan2_impl(const T &v0, const T &v1, mpdecimal_type_tag) {
                     decimal::context.add_status(MPD_Inexact);
                     return T(convertDoubleToString(atan2l(std::stold(v0.format("f")),
-                                                       std::stold(v1.format("f")))));
+                                                          std::stold(v1.format("f")))));
                 }
 
                 template<typename T>
