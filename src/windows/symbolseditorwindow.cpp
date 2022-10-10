@@ -27,10 +27,15 @@
 
 #include "io/paths.hpp"
 
+#define WINDOW_TITLE "Symbols Editor"
+static const auto *WINDOW_TITLE_PREFIX = WINDOW_TITLE " - ";
+static const auto *WINDOW_TITLE_PREFIX_UNSAVED = WINDOW_TITLE " - *";
+
 SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
                                          CalculatorWindowActions &actions,
                                          QWidget *parent)
-        : QMainWindow(parent) {
+        : QMainWindow(parent),
+          actions(actions) {
     setWindowTitle("Symbols Editor");
 
     auto *widget = new QWidget;
@@ -67,14 +72,25 @@ SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
     menuBar()->addMenu(actions.menuHelp);
 
     connect(exitAction, SIGNAL(triggered(bool)), this, SLOT(close()));
+    connect(actions.actionSaveSymbols, SIGNAL(triggered(bool)), this, SLOT(onSaveSymbolsTriggered()));
 
     setWindowIcon(QIcon(Paths::getSymbolsIconFile().c_str()));
 }
 
-void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols) {
+void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols, bool modified, const std::string &path) {
+    symbolsPath = path;
     editor->setSymbols(symbols);
+    if (!path.empty()) {
+        if (modified) {
+            setWindowTitle((WINDOW_TITLE_PREFIX_UNSAVED + path).c_str());
+        } else {
+            setWindowTitle((WINDOW_TITLE_PREFIX + path).c_str());
+        }
+    } else {
+        setWindowTitle(WINDOW_TITLE);
+    }
 }
 
-void SymbolsEditorWindow::setCurrentSymbolsPath(const std::string &path) {
-    setWindowTitle(("Symbols Editor - " + path).c_str());
+void SymbolsEditorWindow::onSaveSymbolsTriggered() {
+    setWindowTitle((WINDOW_TITLE_PREFIX + symbolsPath).c_str());
 }

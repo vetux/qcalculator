@@ -280,7 +280,7 @@ void CalculatorWindow::onInputTextEdited() {
 
 void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
     this->symbolTable = symbolTableArg;
-    symbolsDialog->setSymbols(symbolTable);
+    symbolsDialog->setSymbols(symbolTable, !currentSymbolTablePath.empty(),currentSymbolTablePath);
     if (!currentSymbolTablePath.empty()) {
         actions.actionSaveSymbols->setEnabled(true);
     }
@@ -740,7 +740,7 @@ void CalculatorWindow::loadSettings() {
     decimal::context.emax(settings.value(SETTING_EXPONENT_MAX).toInt());
     decimal::context.emin(settings.value(SETTING_EXPONENT_MIN).toInt());
 
-    symbolsDialog->setSymbols(symbolTable);
+    symbolsDialog->setSymbols(symbolTable, false, currentSymbolTablePath);
 
     settingsDialog->setPrecision(settings.value(SETTING_PRECISION).toInt());
     settingsDialog->setExponentMin(settings.value(SETTING_EXPONENT_MIN).toInt());
@@ -1074,11 +1074,9 @@ bool CalculatorWindow::loadSymbolTable(const std::string &path) {
 
         actions.actionSaveSymbols->setEnabled(true);
 
-        symbolsDialog->setSymbols(symbolTable);
+        symbolsDialog->setSymbols(symbolTable, false,currentSymbolTablePath);
 
         addonManager->setActiveAddons(addons);
-
-        symbolsDialog->setCurrentSymbolsPath(currentSymbolTablePath);
 
         return true;
     } catch (const std::exception &e) {
@@ -1103,8 +1101,6 @@ bool CalculatorWindow::saveSymbolTable(const std::string &path) {
         currentSymbolTablePath = path;
 
         actions.actionSaveSymbols->setEnabled(true);
-
-        symbolsDialog->setCurrentSymbolsPath(currentSymbolTablePath);
 
         actions.actionSaveSymbols->setEnabled(false);
 

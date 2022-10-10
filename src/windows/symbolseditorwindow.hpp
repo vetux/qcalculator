@@ -33,17 +33,20 @@ signals:
 
 public slots:
 
-    void setSymbols(const SymbolTable &symbols);
-
-    void setCurrentSymbolsPath(const std::string &path);
+    void setSymbols(const SymbolTable &symbols, bool modified, const std::string &path);
 
 public:
     SymbolsEditorWindow(const SymbolTable &symbols,
                         CalculatorWindowActions &actions,
                         QWidget *parent = nullptr);
 
+private slots:
+    void onSaveSymbolsTriggered();
+
 private:
     SymbolsEditor *editor;
+    CalculatorWindowActions &actions;
+    std::string symbolsPath;
 };
 
 #endif //QCALC_SYMBOLSDIALOG_HPP
