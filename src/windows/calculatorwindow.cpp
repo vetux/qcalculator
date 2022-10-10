@@ -516,7 +516,7 @@ void CalculatorWindow::onActionCreateAddonBundle() {
                                                "Do you want to add a package?",
                                                "Add Directory",
                                                "Add File",
-                                               "Continue");
+                                               "No");
                 if (r == 0) {
                     dialog.setWindowTitle("Select python package directory...");
                     dialog.setFileMode(QFileDialog::Directory);
@@ -845,7 +845,8 @@ void CalculatorWindow::saveSymbolTablePathHistory() {
         for (auto &path: symbolTablePathHistory) {
             str += path + '\n';
         }
-        str.pop_back();
+        if (!str.empty())
+            str.pop_back();
         FileOperations::fileWriteAll(Paths::getSymbolTableHistoryFile(), str);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to save symbol table history", e.what());

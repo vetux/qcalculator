@@ -173,8 +173,6 @@ Archive::Archive(std::istream &stream) {
     archive_read_support_format_all(a);
     archive_read_open_memory(a, buf.data(), buf.size());
 
-    std::vector<char> readBuffer(100000 * 500);
-
     struct archive_entry *entry;
     // Read Entry Headers
     for (;;) {
@@ -198,7 +196,7 @@ Archive::Archive(std::istream &stream) {
                 if (ret == ARCHIVE_EOF)
                     break;
                 if (ret < ARCHIVE_OK)
-                    throw std::runtime_error("Failed to read archive data");
+                    throw std::runtime_error("Failed to read archive data: " + std::string(archive_error_string(a)));
 
                 // Copy data to archive
                 auto prevSize = e.size();
