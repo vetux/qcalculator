@@ -191,7 +191,17 @@ void CalculatorWindow::onInputReturnPressed() {
             inputTextContainsExpressionResult = true;
             previousResult = res.toStdString();
             if (decimal::context.status() & MPD_Inexact) {
+                auto inputBg = input->palette().color(QPalette::ColorRole::Base);
+                inputMessage->setStyleSheet("QLabel { font-weight: bold; color : red; background-color : "
+                                            + inputBg.name()
+                                            + "; }");
                 inputMessage->setText("Inexact");
+            } else {
+                auto inputBg = input->palette().color(QPalette::ColorRole::Base);
+                inputMessage->setStyleSheet("QLabel { font-weight: bold; color : green; background-color : "
+                                            + inputBg.name()
+                                            + "; }");
+                inputMessage->setText("Exact");
             }
         }
     }
@@ -698,6 +708,10 @@ QString CalculatorWindow::evaluateExpression(const QString &expression) {
 
         return ret;
     } catch (const std::exception &e) {
+        auto inputBg = input->palette().color(QPalette::ColorRole::Base);
+        inputMessage->setStyleSheet("QLabel { font-weight: bold; color : red; background-color : "
+                                    + inputBg.name()
+                                    + "; }");
         inputMessage->setText(e.what());
     }
     return "";
