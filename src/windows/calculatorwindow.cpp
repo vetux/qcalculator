@@ -187,23 +187,16 @@ void CalculatorWindow::onInputReturnPressed() {
         auto res = evaluateExpression(expr);
         if (!res.isEmpty()) {
             input->setText(res);
-            historyWidget->addContent(expr, res);
-            inputTextContainsExpressionResult = true;
-            previousResult = res.toStdString();
             input->setStyleSheet(
                     "QLineEdit{ font-weight: bold; border-width: 1px; border-style: solid; border-color: palette(base) transparent palette(base) transparent; }");
+
+            historyWidget->addContent(expr, res);
+
+            inputTextContainsExpressionResult = true;
+            previousResult = res.toStdString();
+
             if (decimal::context.status() & MPD_Inexact) {
-                auto inputBg = input->palette().color(QPalette::ColorRole::Base);
-                inputMessage->setStyleSheet("QLabel { font-weight: bold; color : red; background-color : "
-                                            + inputBg.name()
-                                            + "; }");
                 inputMessage->setText("Inexact");
-            } else {
-                auto inputBg = input->palette().color(QPalette::ColorRole::Base);
-                inputMessage->setStyleSheet("QLabel { font-weight: bold; color : green; background-color : "
-                                            + inputBg.name()
-                                            + "; }");
-                inputMessage->setText("Exact");
             }
         }
     }
@@ -214,9 +207,13 @@ void CalculatorWindow::onInputTextChanged() {
         inputTextContainsExpressionResult = false;
     }
     inputMessage->setText("");
+    input->setStyleSheet(
+            "QLineEdit{ border-width: 1px; border-style: solid; border-color: palette(base) transparent palette(base) transparent; }");
 }
 
 void CalculatorWindow::onInputTextEdited() {
+    inputMessage->setText("");
+
     clearResultFromInputText();
 
     auto cursorPos = input->cursorPosition();
@@ -710,10 +707,6 @@ QString CalculatorWindow::evaluateExpression(const QString &expression) {
 
         return ret;
     } catch (const std::exception &e) {
-        auto inputBg = input->palette().color(QPalette::ColorRole::Base);
-        inputMessage->setStyleSheet("QLabel { font-weight: bold; color : red; background-color : "
-                                    + inputBg.name()
-                                    + "; }");
         inputMessage->setText(e.what());
     }
     return "";
@@ -1188,9 +1181,6 @@ void CalculatorWindow::clearResultFromInputText() {
             // When the user moves the text cursor the inputTextContainsExpressionResult flag is reset
             input->setText(inputText.substr(size).c_str());
         }
-
-        input->setStyleSheet(
-                "QLineEdit{ border-width: 1px; border-style: solid; border-color: palette(base) transparent palette(base) transparent; }");
     }
 }
 
@@ -1198,9 +1188,6 @@ void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
     inputTextContainsExpressionResult = false;
     inputTextAppendedHistoryValue.clear();
     inputTextHistoryIndex = 0;
-    inputMessage->setText("");
-    input->setStyleSheet(
-            "QLineEdit{ border-width: 1px; border-style: solid; border-color: palette(base) transparent palette(base) transparent; }");
 }
 
 void CalculatorWindow::onEvaluatePython(const std::string &expr, Interpreter::ParseStyle style) {
