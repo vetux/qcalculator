@@ -182,7 +182,12 @@ class NumeralSystemWidget(QtWidgets.QWidget):
         if signal:
             self.signal_value_changed.emit(format(r, 'f'))
 
-        self.scitext.setText('%E' % r)
+        if r.is_nan():
+            self.scitext.setText("NaN")
+        elif not r.is_finite():
+            self.scitext.setText("Inf")
+        else:
+            self.scitext.setText('%E' % r)
 
         ri = r.to_integral_value()
 
