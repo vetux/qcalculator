@@ -129,6 +129,8 @@ void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
         QMessageBox::warning(this, "Failed to add variable", "A script with the name already exists.");
     } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
         QMessageBox::warning(this, "Failed to add variable", "Variable name cannot contain whitespace.");
+    } else if (name.at(0) >= '0' && name.at(0) <= '9') {
+        QMessageBox::warning(this, "Failed to add variable", "Variable name cannot start with number.");
     } else {
         decimal::Decimal valueConverted;;
         if (value.isEmpty()) {
@@ -168,6 +170,9 @@ void SymbolsEditor::onVariableNameChanged(const QString &originalName, const QSt
     } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
         QMessageBox::warning(this, "Failed to add variable", "Variable name cannot contain whitespace.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
+    } else if (name.at(0) >= '0' && name.at(0) <= '9') {
+        QMessageBox::warning(this, "Failed to add variable", "Variable name cannot start with number.");
+        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else {
         decimal::Decimal value = symbolTable.getVariables().at(originalName.toStdString());
         symbolTable.setVariable(name.toStdString(), value);
@@ -202,6 +207,8 @@ void SymbolsEditor::onConstantAdded(const QString &name, const QString &value) {
         QMessageBox::warning(this, "Failed to add constant", "A script with the name already exists.");
     } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
         QMessageBox::warning(this, "Failed to add constant", "Constant name cannot contain whitespace.");
+    } else if (name.at(0) >= '0' && name.at(0) <= '9') {
+        QMessageBox::warning(this, "Failed to add constant", "Constant name cannot start with number.");
     } else {
         decimal::Decimal valueConverted;
         if (value.isEmpty()) {
@@ -241,6 +248,9 @@ void SymbolsEditor::onConstantNameChanged(const QString &originalName, const QSt
     } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
         QMessageBox::warning(this, "Failed to add constant", "Constant name cannot contain whitespace.");
         constantsEditor->setValues(convertMap(symbolTable.getConstants()));
+    } else if (name.at(0) >= '0' && name.at(0) <= '9') {
+        QMessageBox::warning(this, "Failed to add constant", "Constant name cannot start with number.");
+        constantsEditor->setValues(convertMap(symbolTable.getConstants()));
     } else {
         decimal::Decimal value = symbolTable.getConstants().at(originalName.toStdString());
         symbolTable.setConstant(name.toStdString(), value);
@@ -275,6 +285,8 @@ void SymbolsEditor::onFunctionAdded(const QString &name) {
         QMessageBox::warning(this, "Failed to add function", "A script with the name already exists.");
     } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
         QMessageBox::warning(this, "Failed to add function", "Function name cannot contain whitespace.");
+    } else if (name.at(0) >= '0' && name.at(0) <= '9') {
+        QMessageBox::warning(this, "Failed to add function", "Function name cannot start with number.");
     } else {
         symbolTable.setFunction(name.toStdString(), {});
         emit onSymbolsChanged(symbolTable);
@@ -306,6 +318,10 @@ void SymbolsEditor::onFunctionNameChanged(const QString &originalName, const QSt
         functionsEditor->setCurrentFunction(currentFunction);
     } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
         QMessageBox::warning(this, "Failed to add function", "Function name cannot contain whitespace.");
+        functionsEditor->setFunctions(symbolTable.getFunctions());
+        functionsEditor->setCurrentFunction(currentFunction);
+    } else if (name.at(0) >= '0' && name.at(0) <= '9') {
+        QMessageBox::warning(this, "Failed to add function", "Function name cannot start with number.");
         functionsEditor->setFunctions(symbolTable.getFunctions());
         functionsEditor->setCurrentFunction(currentFunction);
     } else {
