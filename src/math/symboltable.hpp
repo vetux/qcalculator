@@ -89,6 +89,21 @@ public:
 
     void clearScripts();
 
+    bool equals(const SymbolTable &other) const {
+        return useBuiltInConstants == other.useBuiltInConstants
+               && variables == other.variables
+               && constants == other.constants
+               && functions == other.functions
+               && scripts == other.scripts;
+    }
+
+    bool equalsExcludeScripts(const SymbolTable &other) const {
+        return useBuiltInConstants == other.useBuiltInConstants
+               && variables == other.variables
+               && constants == other.constants
+               && functions == other.functions;
+    }
+
 private:
     bool useBuiltInConstants = true;
     std::map<std::string, decimal::Decimal> variables;

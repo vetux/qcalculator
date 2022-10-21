@@ -275,7 +275,7 @@ void CalculatorWindow::onInputTextEdited() {
 
 void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
     this->symbolTable = symbolTableArg;
-    symbolsDialog->setSymbols(symbolTable, !currentSymbolTablePath.empty(), currentSymbolTablePath);
+    symbolsDialog->setSymbols(symbolTable, true, currentSymbolTablePath);
     if (!currentSymbolTablePath.empty()) {
         actions.actionSaveSymbols->setEnabled(true);
     }
@@ -677,14 +677,17 @@ QString CalculatorWindow::evaluateExpression(const QString &expression) {
     try {
         decimal::context.clear_status();
 
-        auto v = ExpressionParser::evaluate(expression.toStdString(), symbolTable);
+        auto exprSymbols = symbolTable;
+        auto v = ExpressionParser::evaluate(expression.toStdString(), exprSymbols);
 
         QString ret = v.format("f").c_str();
 
         history.emplace_back(std::make_pair(expression.toStdString(), ret.toStdString()));
         saveHistory();
 
-        onSymbolTableChanged(symbolTable);
+        if (!exprSymbols.equals(symbolTable)) {
+            onSymbolTableChanged(exprSymbols);
+        }
 
         emit signalExpressionEvaluated(expression, ret);
 

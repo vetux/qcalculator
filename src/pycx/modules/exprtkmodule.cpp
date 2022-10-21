@@ -77,10 +77,14 @@ PyObject *set_global_symtable(PyObject *self, PyObject *args) {
         return NULL;
     }
     SymbolTable &t = *symbolTable;
-    t = SymbolTableUtil::Convert(pysym);
+    auto table = SymbolTableUtil::Convert(pysym);
 
-    if (symbolTableCallback)
+    if (symbolTableCallback
+        && !table.equalsExcludeScripts((t))) {
         symbolTableCallback();
+    }
+
+    t = table;
 
     return PyLong_FromLong(0);
 }
