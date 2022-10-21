@@ -181,7 +181,7 @@ void CalculatorWindow::onAddonUnloadFail(const std::string &moduleName, const st
 }
 
 void CalculatorWindow::onInputReturnPressed() {
-    if (completerWord.isEmpty()) {
+    if (completer->popup()->isHidden() || completerWord.isEmpty()) {
         inputTextContainsExpressionResult = false;
         auto expr = input->text();
         auto res = evaluateExpression(expr);
@@ -255,6 +255,8 @@ void CalculatorWindow::onInputTextEdited() {
             found = true;
     }
 
+    completerModel->setStringList(contents);
+
     if (found
         && !text.empty()
         && !word.empty()
@@ -262,28 +264,12 @@ void CalculatorWindow::onInputTextEdited() {
             || text.at(cursorPos) == ' ')) {
         completerWord = QString(word.c_str());
 
-        if (completer == nullptr) {
-            completer = new QCompleter(contents, input);
-            completer->setWidget(input);
-            completer->setCaseSensitivity(Qt::CaseInsensitive);
-            completer->setCompletionMode(QCompleter::PopupCompletion);
-
-            connect(completer,
-                    SIGNAL(activated(const QString &)),
-                    this,
-                    SLOT(insertInputText(const QString &)));
-        }
-
         completer->setCompletionPrefix(completerWord);
         completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
         completer->complete();
     } else {
         completerWord = "";
-        if (completer != nullptr) {
-            completer->popup()->hide();
-            completer->disconnect(this);
-            completer = nullptr;
-        }
+        completer->popup()->hide();
     }
 }
 
@@ -684,7 +670,6 @@ void CalculatorWindow::insertInputText(const QString &v) {
     input->setText(QString(textBegin.c_str()) + v + QString(textEnd.c_str()));
     input->setCursorPosition(cursor + v.size());
     completer->popup()->hide();
-    completer = nullptr;
     completerWord = "";
 }
 
@@ -1031,6 +1016,17 @@ void CalculatorWindow::setupLayout() {
     l->addWidget(footerWidget);
 
     setCentralWidget(rootWidget);
+
+    completerModel = new QStringListModel();
+    completer = new QCompleter(completerModel, input);
+    completer->setWidget(input);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setCompletionMode(QCompleter::PopupCompletion);
+
+    connect(completer,
+            SIGNAL(activated(const QString &)),
+            this,
+            SLOT(insertInputText(const QString &)));
 }
 
 void CalculatorWindow::setupDialogs() {

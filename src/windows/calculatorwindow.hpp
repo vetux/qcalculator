@@ -191,6 +191,7 @@ private:
     CalculatorWindowActions actions;
 
     QCompleter *completer = nullptr;
+    QStringListModel *completerModel = nullptr;
     QString completerWord;
 };
 
