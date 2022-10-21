@@ -118,7 +118,7 @@ void SymbolsEditor::setSymbols(const SymbolTable &symtable) {
 
 void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
     if (name.isEmpty()) {
-        QMessageBox::warning(this, "Failed to add variable", "The variable name cannot be empty.");
+        QMessageBox::warning(this, "Failed to add variable", "Variable name cannot be empty.");
     } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add variable", "A variable with the name already exists.");
     } else if (symbolTable.hasConstant(name.toStdString())) {
@@ -127,6 +127,8 @@ void SymbolsEditor::onVariableAdded(const QString &name, const QString &value) {
         QMessageBox::warning(this, "Failed to add variable", "A function with the name already exists.");
     } else if (symbolTable.hasScript(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add variable", "A script with the name already exists.");
+    } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
+        QMessageBox::warning(this, "Failed to add variable", "Variable name cannot contain whitespace.");
     } else {
         decimal::Decimal valueConverted;;
         if (value.isEmpty()) {
@@ -163,6 +165,9 @@ void SymbolsEditor::onVariableNameChanged(const QString &originalName, const QSt
     } else if (symbolTable.hasScript(name.toStdString())) {
         QMessageBox::warning(this, "Failed to changed variable name", "A script with the name already exists.");
         variablesEditor->setValues(convertMap(symbolTable.getVariables()));
+    } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
+        QMessageBox::warning(this, "Failed to add variable", "Variable name cannot contain whitespace.");
+        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
     } else {
         decimal::Decimal value = symbolTable.getVariables().at(originalName.toStdString());
         symbolTable.setVariable(name.toStdString(), value);
@@ -186,7 +191,7 @@ void SymbolsEditor::onVariableValueChanged(const QString &name, const QString &v
 
 void SymbolsEditor::onConstantAdded(const QString &name, const QString &value) {
     if (name.isEmpty()) {
-        QMessageBox::warning(this, "Failed to add constant", "The constant name cannot be empty.");
+        QMessageBox::warning(this, "Failed to add constant", "Constant name cannot be empty.");
     } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add constant", "A variable with the name already exists.");
     } else if (symbolTable.hasConstant(name.toStdString())) {
@@ -195,6 +200,8 @@ void SymbolsEditor::onConstantAdded(const QString &name, const QString &value) {
         QMessageBox::warning(this, "Failed to add constant", "A function with the name already exists.");
     } else if (symbolTable.hasScript(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add constant", "A script with the name already exists.");
+    } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
+        QMessageBox::warning(this, "Failed to add constant", "Constant name cannot contain whitespace.");
     } else {
         decimal::Decimal valueConverted;
         if (value.isEmpty()) {
@@ -221,16 +228,19 @@ void SymbolsEditor::onConstantNameChanged(const QString &originalName, const QSt
         emit onSymbolsChanged(symbolTable);
     } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change constant name", "A variable with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
+        constantsEditor->setValues(convertMap(symbolTable.getConstants()));
     } else if (symbolTable.hasConstant(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change constant name", "A constant with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
+        constantsEditor->setValues(convertMap(symbolTable.getConstants()));
     } else if (symbolTable.hasFunction(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change constant name", "A function with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
+        constantsEditor->setValues(convertMap(symbolTable.getConstants()));
     } else if (symbolTable.hasScript(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change constant name", "A script with the name already exists.");
-        variablesEditor->setValues(convertMap(symbolTable.getVariables()));
+        constantsEditor->setValues(convertMap(symbolTable.getConstants()));
+    } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
+        QMessageBox::warning(this, "Failed to add constant", "Constant name cannot contain whitespace.");
+        constantsEditor->setValues(convertMap(symbolTable.getConstants()));
     } else {
         decimal::Decimal value = symbolTable.getConstants().at(originalName.toStdString());
         symbolTable.setConstant(name.toStdString(), value);
@@ -254,7 +264,7 @@ void SymbolsEditor::onConstantValueChanged(const QString &name, const QString &v
 
 void SymbolsEditor::onFunctionAdded(const QString &name) {
     if (name.isEmpty()) {
-        QMessageBox::warning(this, "Failed to add function", "The function name cannot be empty.");
+        QMessageBox::warning(this, "Failed to add function", "Function name cannot be empty.");
     } else if (symbolTable.hasVariable(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add function", "A variable with the name already exists.");
     } else if (symbolTable.hasConstant(name.toStdString())) {
@@ -263,6 +273,8 @@ void SymbolsEditor::onFunctionAdded(const QString &name) {
         QMessageBox::warning(this, "Failed to add function", "A function with the name already exists.");
     } else if (symbolTable.hasScript(name.toStdString())) {
         QMessageBox::warning(this, "Failed to add function", "A script with the name already exists.");
+    } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
+        QMessageBox::warning(this, "Failed to add function", "Function name cannot contain whitespace.");
     } else {
         symbolTable.setFunction(name.toStdString(), {});
         emit onSymbolsChanged(symbolTable);
@@ -290,6 +302,10 @@ void SymbolsEditor::onFunctionNameChanged(const QString &originalName, const QSt
         functionsEditor->setCurrentFunction(currentFunction);
     } else if (symbolTable.hasScript(name.toStdString())) {
         QMessageBox::warning(this, "Failed to change function name", "A script with the name already exists.");
+        functionsEditor->setFunctions(symbolTable.getFunctions());
+        functionsEditor->setCurrentFunction(currentFunction);
+    } else if (std::find(name.begin(), name.end(), ' ') != name.end()) {
+        QMessageBox::warning(this, "Failed to add function", "Function name cannot contain whitespace.");
         functionsEditor->setFunctions(symbolTable.getFunctions());
         functionsEditor->setCurrentFunction(currentFunction);
     } else {
