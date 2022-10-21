@@ -83,6 +83,7 @@ std::string configurePython() {
         ExprtkModule::initialize();
         Interpreter::initialize();
         Interpreter::addModuleDir(Paths::getLibDirectory());
+        Interpreter::addModuleDir(Paths::getAddonDirectory());
     }
 
     return stdErr;

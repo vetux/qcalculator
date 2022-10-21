@@ -33,7 +33,7 @@ Addon::Addon(std::string moduleName, std::string displayName, std::string descri
 void Addon::callFunctionNoArgs(const std::string &name) {
     moduleLoaded = true;
     if (Interpreter::isInitialized()) {
-        Interpreter::callFunctionNoArgs(moduleName, name);
+        Interpreter::callFunctionNoArgs(moduleName + "." + moduleName, name);
     } else {
         throw std::runtime_error("Python is not initialized (The console contains the error message), ensure that the correct path is configured in the settings.");
     }
@@ -45,7 +45,7 @@ void Addon::reload() {
         unload();
 
     if (Interpreter::isInitialized()) {
-        Interpreter::reloadModule(moduleName);
+        Interpreter::reloadModule(moduleName + "." + moduleName);
     }
 
     if (l)

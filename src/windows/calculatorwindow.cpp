@@ -149,7 +149,6 @@ CalculatorWindow::CalculatorWindow(const QString &initErrorMessage, QWidget *par
     }
 
     addonManager->setActiveAddons(availableAddons);
-    addonManager->setAddonLibraryPaths();
 
     settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
 
@@ -479,51 +478,15 @@ void CalculatorWindow::onActionCreateAddonBundle() {
     std::vector<AddonManager::InstallBundleEntry> bundleEntries;
 
     for (;;) {
-        dialog.setWindowTitle("Select addon module file...");
-        dialog.setFileMode(QFileDialog::AnyFile);
-        dialog.setOption(QFileDialog::ShowDirsOnly, false);
+        dialog.setWindowTitle("Select addon package directory...");
+        dialog.setFileMode(QFileDialog::Directory);
         dialog.setAcceptMode(QFileDialog::AcceptOpen);
-        dialog.setMimeTypeFilters({"text/x-python"});
 
         if (dialog.exec() == QFileDialog::Accepted) {
-            auto moduleStr = dialog.selectedFiles().at(0).toStdString();
-            auto modulePath = std::filesystem::path(moduleStr);
-            if (modulePath.extension().string() != ".py") {
-                QMessageBox::information(this, "Invalid selection",
-                                         "The selected path does not point to a python module. Select a file ending in .py");
-                continue;
-            }
+            auto selectedFile = dialog.selectedFiles().at(0).toStdString();
+            auto packagePath = std::filesystem::path(selectedFile);
 
-            QMessageBox::information(this, "Addon module added", ("Added " + modulePath.stem().string()).c_str());
-
-            std::set<std::string> packages;
-            for (;;) {
-                auto r = QMessageBox::question(this, "Add package",
-                                               "Do you want to add a package?",
-                                               "Add Directory",
-                                               "Add File",
-                                               "No");
-                if (r == 0) {
-                    dialog.setWindowTitle("Select python package directory...");
-                    dialog.setFileMode(QFileDialog::Directory);
-                    dialog.setOption(QFileDialog::ShowDirsOnly, true);
-                    dialog.setMimeTypeFilters({});
-                } else if (r == 1) {
-                    dialog.setWindowTitle("Select python package file...");
-                    dialog.setFileMode(QFileDialog::AnyFile);
-                    dialog.setOption(QFileDialog::ShowDirsOnly, false);
-                    dialog.setMimeTypeFilters(Archive::getFormatMimeTypes());
-                } else if (r == 2) {
-                    break;
-                }
-                if (dialog.exec() == QFileDialog::Accepted) {
-                    auto packagePath = dialog.selectedFiles().at(0);
-                    packages.insert(packagePath.toStdString());
-                    QMessageBox::information(this, "Added package", "Added " + QString(std::filesystem::path(
-                            packagePath.toStdString()).stem().string().c_str()) + " to " +
-                                                                    QString(modulePath.stem().string().c_str()));
-                }
-            }
+            QMessageBox::information(this, "Addon package added", ("Added " + packagePath.stem().string()).c_str());
 
             QInputDialog inputDialog;
             inputDialog.setWindowTitle("Set addon version");
@@ -534,8 +497,7 @@ void CalculatorWindow::onActionCreateAddonBundle() {
             }
 
             AddonManager::InstallBundleEntry entry;
-            entry.module = moduleStr;
-            entry.packages = packages;
+            entry.packagePath = packagePath;
             entry.version = version;
 
             bundleEntries.emplace_back(entry);

@@ -30,17 +30,14 @@
 #include "addon.hpp"
 
 struct AddonBundleEntry {
-    std::string module;
-    std::string modulePath;
-    std::vector<std::string> packages;
+    std::string packagePath;
     int version;
 };
 
 class AddonManager {
 public:
     struct InstallBundleEntry {
-        std::string module;
-        std::set<std::string> packages;
+        std::string packagePath;
         int version;
     };
 
@@ -80,16 +77,8 @@ public:
      *      "addons": [
      *          // Addon declaration, add one declaration for each addon that the user can enable, disable or uninstall any time through the gui
      *          {
-     *              // The path to the addon module file in the archive containing the load() / unload() callbacks
-     *              "module": "MyAddon.py",
-     *
-     *              // The list of packages that are copied into a addon specific folder that is made available to the python import path
-     *              "packages": [
-     *                  // The path to the package, the last directory in the path is used
-     *                  // eg. in this case the package is available as "import MyModule"
-     *                  "MyDirectory/OtherDirectory/MyPackage/",
-     *                  ...
-     *              ],
+     *              // The path to the addon package in the archive, the package must contain a python module with the same name as the package containing the load() / unload() callbacks
+     *              "package": "MyDirectory/OtherDirectory/MyAddon/", // Must contain MyAddon.py
      *
      *              // The version displayed to the user (optional)
      *              "version": 1
@@ -109,10 +98,6 @@ public:
 
 
     void uninstallAddon(const std::string &moduleName);
-
-    void setAddonLibraryPaths();
-
-    void unsetAddonLibraryPaths();
 
 private:
     void readAddons();

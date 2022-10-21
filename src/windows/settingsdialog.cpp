@@ -242,9 +242,6 @@ void SettingsDialog::onInstallAddonPressed() {
                                                                            }
                                                                        });
             if (installedAddonCount > 0) {
-                addonManager.unsetAddonLibraryPaths();
-                addonManager.setAddonLibraryPaths();
-
                 QMessageBox::information(this,
                                          "Installation successful",
                                          ("Successfully installed " + std::to_string(installedAddonCount) +
