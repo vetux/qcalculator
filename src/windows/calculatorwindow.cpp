@@ -1081,7 +1081,7 @@ bool CalculatorWindow::loadSymbolTable(const std::string &path) {
         symbolTable = syms;
         currentSymbolTablePath = path;
 
-        actions.actionSaveSymbols->setEnabled(true);
+        actions.actionSaveSymbols->setEnabled(false);
 
         symbolsDialog->setSymbols(symbolTable, false, currentSymbolTablePath);
 
@@ -1108,8 +1108,6 @@ bool CalculatorWindow::saveSymbolTable(const std::string &path) {
         updateSymbolHistoryMenu();
 
         currentSymbolTablePath = path;
-
-        actions.actionSaveSymbols->setEnabled(true);
 
         actions.actionSaveSymbols->setEnabled(false);
 
