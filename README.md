@@ -1,10 +1,7 @@
 <img src="res/images/calculator.png" alt="Icon" width="64" height="64"> 
 
 # qCalculator
-This project aims to provide an accurate, extensible and fast calculator application. 
-
-Python is integrated through embedding cpython in the calculator application and allows addons 
-to modify the calculator interface (Through PySide2) and the symbol table.
+This project aims to provide an accurate, extensible and fast calculator application.
 
 ## Features
 - 100+ built in arithmetic operations
