@@ -1073,6 +1073,8 @@ bool CalculatorWindow::saveSymbolTable(const std::string &path) {
 
         actions.actionSaveSymbols->setEnabled(false);
 
+        symbolsDialog->setSymbols(symbolTable, false, currentSymbolTablePath);
+
         return true;
     }
     catch (const std::exception &e) {
