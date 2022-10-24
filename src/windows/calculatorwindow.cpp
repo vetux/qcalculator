@@ -497,7 +497,7 @@ void CalculatorWindow::onActionCreateAddonBundle() {
             }
 
             AddonManager::InstallBundleEntry entry;
-            entry.packagePath = packagePath;
+            entry.packagePath = packagePath.string();
             entry.version = version;
 
             bundleEntries.emplace_back(entry);

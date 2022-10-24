@@ -116,7 +116,7 @@ Archive AddonManager::createInstallableBundle(std::vector<InstallBundleEntry> en
 
             j["package"] = packageName;
 
-            for (auto &packageFile: FileOperations::findFilesInDirectory(packagePath, "", true)) {
+            for (auto &packageFile: FileOperations::findFilesInDirectory(packagePath.string(), "", true)) {
                 auto packageFilePath = packageFile.substr(basePath.string().size() + 1);
                 auto packageDataStr = FileOperations::fileReadAll(packageFile);
 
@@ -338,7 +338,7 @@ size_t AddonManager::installAddonBundle(std::istream &sourceFile,
 
             if (addon.packagePath.back() == '/') {
                 auto packagePath = std::filesystem::path(addon.packagePath.substr(0, addon.packagePath.size() - 1));
-                auto outputDir = concatPath(addonDir, packagePath.filename());
+                auto outputDir = concatPath(addonDir, packagePath.filename().string());
 
                 std::filesystem::remove_all(outputDir);
                 createPath(outputDir);
