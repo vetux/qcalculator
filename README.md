@@ -10,6 +10,9 @@ This project aims to provide an accurate, extensible and fast calculator applica
 - Symbol table editor
 - Python addons
 
+## Downloads
+Release binaries for 64bit Windows and Linux can be found on the [Releases](https://github.com/vetux/qcalculator/releases) page.
+
 ## Addons
 The bundle containing the default addons shipped with qCalculator can be downloaded in the [Releases](https://github.com/vetux/qcalculator/releases) 
 section of the repository. The archive can be installed by clicking the install button in the "addons" tab of the settings dialog and selecting the downloaded file. 
