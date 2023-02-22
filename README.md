@@ -22,7 +22,7 @@ Release binaries for 64bit Windows and Linux can be found on the [Releases](http
 ![img](res/images/screenshot.png)
 
 # Known Issues
-- Writing archive files ("Create Addon Bundle" or "Compress...") on Windows causes the resulting file to be corrupted because of a buggy libarchive implementation. (libarchive dependency will be removed in the future to resolve this issue)
+- Writing archive files ("Create Addon Bundle" or "Compress...") on Windows causes the resulting file to be corrupted because the libarchive implementation for windows is full of bugs. (libarchive dependency will be removed in the future to resolve this issue)
 
 ## Developing Addons
 Addons are python files containing load and unload methods that are called when the user enables the
