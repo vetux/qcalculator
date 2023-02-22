@@ -12,6 +12,8 @@ message("Python_Development_FOUND:${Python_Development_FOUND}")
 message("Python_LIBRARIES:${Python_LIBRARIES}")
 message("Python_INCLUDE_DIRS:${Python_INCLUDE_DIRS}")
 
+find_package(Threads REQUIRED)
+
 if (WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
 endif (WIN32)
@@ -64,3 +66,4 @@ target_link_libraries(qcalculator Qt5::Core Qt5::Widgets)
 target_link_libraries(qcalculator ${Python_LIBRARIES}) # Python
 target_link_libraries(qcalculator mpdec mpdec++) # mpdecimal
 target_link_libraries(qcalculator archive) # libarchive
+target_link_libraries(qcalculator Threads::Threads) # Threads

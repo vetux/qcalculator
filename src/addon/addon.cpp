@@ -24,6 +24,8 @@
 
 #include "pycx/interpreter.hpp"
 
+#include "util/interpreterhandler.hpp"
+
 Addon::Addon(std::string moduleName, std::string displayName, std::string description)
         : loaded(false),
           moduleName(std::move(moduleName)),
@@ -31,11 +33,15 @@ Addon::Addon(std::string moduleName, std::string displayName, std::string descri
           description(std::move(description)) {}
 
 void Addon::callFunctionNoArgs(const std::string &name) {
+    if (!InterpreterHandler::waitForInitialization()) {
+        throw std::runtime_error("Python is not initialized");
+    }
     moduleLoaded = true;
     if (Interpreter::isInitialized()) {
         Interpreter::callFunctionNoArgs(moduleName + "." + moduleName, name);
     } else {
-        throw std::runtime_error("Python is not initialized (The console contains the error message), ensure that the correct path is configured in the settings.");
+        throw std::runtime_error(
+                "Python is not initialized (The console contains the error message), ensure that the correct path is configured in the settings.");
     }
 }
 
@@ -43,6 +49,10 @@ void Addon::reload() {
     bool l = loaded;
     if (l)
         unload();
+
+    if (!InterpreterHandler::waitForInitialization()) {
+        throw std::runtime_error("Python is not initialized");
+    }
 
     if (Interpreter::isInitialized()) {
         Interpreter::reloadModule(moduleName + "." + moduleName);

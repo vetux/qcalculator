@@ -21,7 +21,7 @@
 
 #include "pycx/modules/stdredirmodule.hpp"
 
-#include "pycx/include.hpp"
+#include "pycx/pythoninclude.hpp"
 
 static bool redirecting = false;
 static std::function<void(const std::string &)> stdOut;

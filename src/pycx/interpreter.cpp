@@ -18,16 +18,18 @@
  */
 
 #include "pycx/interpreter.hpp"
-#include "pycx/include.hpp"
+#include "pycx/pythoninclude.hpp"
 
 #include "pycx/modules/stdredirmodule.hpp"
 #include "pycx/modules/exprtkmodule.hpp"
+#include "pycx/pythoninterpreterstate.hpp"
 
 static bool pyInitialized = false;
 
 void Interpreter::initialize() {
-    if (!pyInitialized)
+    if (!pyInitialized) {
         Py_Initialize();
+    }
     pyInitialized = true;
 }
 
@@ -39,6 +41,14 @@ void Interpreter::finalize() {
 
 bool Interpreter::isInitialized() {
     return pyInitialized;
+}
+
+std::unique_ptr<InterpreterState> Interpreter::saveThreadState() {
+    return std::make_unique<PythonInterpreterState>(PyEval_SaveThread());
+}
+
+void Interpreter::restoreThreadState(InterpreterState &state) {
+    PyEval_RestoreThread(dynamic_cast<PythonInterpreterState &>(state).state);
 }
 
 char Interpreter::getPathSeparator() {
@@ -75,10 +85,20 @@ void Interpreter::setPaths(const std::set<std::string> &path) {
 }
 
 std::wstring Interpreter::getPath() {
-    return {Py_GetPath()};
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
+    std::wstring ret = {Py_GetPath()};
+
+    PyGILState_Release(gstate);
+
+    return ret;
 }
 
 void Interpreter::setModuleDirs(const std::vector<std::string> &moduleDirectories) {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     PyObject *list = PyList_New(0);
     for (auto &v: moduleDirectories) {
         PyObject *str = PyUnicode_FromString(v.c_str());
@@ -87,9 +107,14 @@ void Interpreter::setModuleDirs(const std::vector<std::string> &moduleDirectorie
     }
     PySys_SetObject("path", list);
     Py_DECREF(list);
+
+    PyGILState_Release(gstate);
 }
 
 std::vector<std::string> Interpreter::getModuleDirs() {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     PyObject *sys_path = PySys_GetObject("path");
     Py_ssize_t size = PyList_Size(sys_path);
 
@@ -99,15 +124,25 @@ std::vector<std::string> Interpreter::getModuleDirs() {
         ret.emplace_back(PyUnicode_AsUTF8(path));
     }
 
+    PyGILState_Release(gstate);
+
     return ret;
 }
 
 void Interpreter::addModuleDir(const std::string &dir) {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     PyObject *sys_path = PySys_GetObject("path");
     PyList_Append(sys_path, PyUnicode_FromString(dir.c_str()));
+
+    PyGILState_Release(gstate);
 }
 
 void Interpreter::removeModuleDir(const std::string &dir) {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     PyObject *sys_path = PySys_GetObject("path");
     auto size = PyList_Size(sys_path);
 
@@ -120,12 +155,19 @@ void Interpreter::removeModuleDir(const std::string &dir) {
         }
     }
     PySys_SetObject("path", npath);
+
+    PyGILState_Release(gstate);
 }
 
 int Interpreter::runInteractiveLoop() {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     SymbolTable table;
 
     auto ret = PyRun_InteractiveLoop(stdin, "stdin");
+
+    PyGILState_Release(gstate);
 
     return ret;
 }
@@ -133,6 +175,9 @@ int Interpreter::runInteractiveLoop() {
 void Interpreter::runString(const std::string &expression,
                             Interpreter::ParseStyle style,
                             const std::string &context) {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     PyObject *n = PyUnicode_FromString(context.c_str());
     PyObject *m = PyImport_GetModule(n);
 
@@ -172,9 +217,14 @@ void Interpreter::runString(const std::string &expression,
 
     Py_DECREF(m);
     Py_DECREF(n);
+
+    PyGILState_Release(gstate);
 }
 
 void Interpreter::callFunctionNoArgs(const std::string &m, const std::string &f) {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     PyObject *mod = PyImport_ImportModule(m.c_str());
     if (mod == NULL) {
         throw std::runtime_error(getError());
@@ -205,9 +255,14 @@ void Interpreter::callFunctionNoArgs(const std::string &m, const std::string &f)
 
     Py_DECREF(key);
     Py_DECREF(mod);
+
+    PyGILState_Release(gstate);
 }
 
 void Interpreter::reloadModule(const std::string &module) {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     PyObject *mod = PyImport_ImportModule(module.c_str());
     if (mod == NULL) {
         throw std::runtime_error(getError());
@@ -218,6 +273,8 @@ void Interpreter::reloadModule(const std::string &module) {
     }
     Py_DECREF(mod);
     Py_DECREF(nMod);
+
+    PyGILState_Release(gstate);
 }
 
 static std::function<void(const std::string &)> _outCallback;
@@ -225,14 +282,27 @@ static std::function<void(const std::string &)> _errCallback;
 
 void Interpreter::setStdStreams(const std::function<void(const std::string &)> outCallback,
                                 const std::function<void(const std::string &)> errCallback) {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     StdRedirModule::startRedirect(outCallback, errCallback);
+
+    PyGILState_Release(gstate);
 }
 
 void Interpreter::clearStdStreams() {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     StdRedirModule::stopRedirect();
+
+    PyGILState_Release(gstate);
 }
 
 std::string Interpreter::getError() {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
     PyObject *pType, *pValue, *pTraceback;
     PyErr_Fetch(&pType, &pValue, &pTraceback);
 
@@ -275,21 +345,51 @@ std::string Interpreter::getError() {
         error += "NoValue";
     }
 
+    PyGILState_Release(gstate);
+
     return error;
 }
 
 std::string Interpreter::getVersion() {
-    return Py_GetVersion();
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
+    std::string ret = Py_GetVersion();
+
+    PyGILState_Release(gstate);
+
+    return ret;
 }
 
 std::string Interpreter::getCopyright() {
-    return Py_GetCopyright();
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
+    std::string ret = Py_GetCopyright();
+
+    PyGILState_Release(gstate);
+
+    return ret;
 }
 
 std::string Interpreter::getCompiler() {
-    return Py_GetCompiler();
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
+    std::string ret = Py_GetCompiler();
+
+    PyGILState_Release(gstate);
+
+    return ret;
 }
 
 std::string Interpreter::getBuildInfo() {
-    return Py_GetBuildInfo();
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
+    std::string ret =  Py_GetBuildInfo();
+
+    PyGILState_Release(gstate);
+
+    return ret;
 }

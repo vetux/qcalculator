@@ -21,7 +21,7 @@
 
 #include <utility>
 
-#include "pycx/include.hpp"
+#include "pycx/pythoninclude.hpp"
 #include "pycx/symboltableutil.hpp"
 
 #include "math/expressionparser.hpp"
@@ -65,28 +65,36 @@ PyObject *evaluate(PyObject *self, PyObject *args) {
 }
 
 PyObject *get_global_symtable(PyObject *self, PyObject *args) {
-    if (symbolTable == nullptr)
-        return nullptr;
-    else
-        return SymbolTableUtil::New(*symbolTable);
+    MODULE_FUNC_TRY
+
+        if (symbolTable == nullptr)
+            return nullptr;
+        else
+            return SymbolTableUtil::New(*symbolTable);
+
+    MODULE_FUNC_CATCH
 }
 
 PyObject *set_global_symtable(PyObject *self, PyObject *args) {
-    PyObject *pysym = NULL;
-    if (!PyArg_ParseTuple(args, "O:", &pysym)) {
-        return NULL;
-    }
-    SymbolTable &t = *symbolTable;
-    auto table = SymbolTableUtil::Convert(pysym);
+    MODULE_FUNC_TRY
 
-    if (symbolTableCallback
-        && !table.equalsExcludeScripts((t))) {
-        symbolTableCallback();
-    }
+        PyObject *pysym = NULL;
+        if (!PyArg_ParseTuple(args, "O:", &pysym)) {
+            return NULL;
+        }
+        SymbolTable &t = *symbolTable;
+        auto table = SymbolTableUtil::Convert(pysym);
 
-    t = table;
+        if (symbolTableCallback
+            && !table.equalsExcludeScripts((t))) {
+            symbolTableCallback();
+        }
 
-    return PyLong_FromLong(0);
+        t = table;
+
+        return PyLong_FromLong(0);
+
+    MODULE_FUNC_CATCH
 }
 
 static PyMethodDef MethodDef[] = {

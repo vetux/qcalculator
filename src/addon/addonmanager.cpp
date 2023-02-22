@@ -160,13 +160,13 @@ Archive AddonManager::createInstallableBundle(std::vector<InstallBundleEntry> en
     return archive;
 }
 
-AddonManager::AddonManager(const std::string &addonDirectory,
+AddonManager::AddonManager(std::string addonDirectory,
                            Listener onAddonLoadFail,
                            Listener onAddonUnloadFail)
-        : addonDir(addonDirectory),
+        : addonDir(std::move(addonDirectory)),
           onAddonLoadFail(std::move(onAddonLoadFail)),
           onAddonUnloadFail(std::move(onAddonUnloadFail)) {
-    reloadModules();
+    readAddons();
 }
 
 AddonManager::~AddonManager() {

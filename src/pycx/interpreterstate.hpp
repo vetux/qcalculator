@@ -1,6 +1,6 @@
 /**
  *  QCalc - Extensible programming calculator
- *  Copyright (C) 2022  Julian Zampiccoli
+ *  Copyright (C) 2021  Julian Zampiccoli
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,14 +17,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_MODULECOMMON_HPP
-#define QCALC_MODULECOMMON_HPP
+#ifndef QCALCULATOR_INTERPRETERSTATE_HPP
+#define QCALCULATOR_INTERPRETERSTATE_HPP
 
-// Try / Catch macros used at the beginning and end of each function block invoked by the python interpreter.
-// This is needed because cpython is a c library which does not handle c++ exceptions,
-// instead we have to catch all exceptions and give the error messages back to python,
-// which in turn causes python to set the error indicator which we then can retrieve again on the invocation site.
-#define MODULE_FUNC_TRY try {
-#define MODULE_FUNC_CATCH } catch (const std::exception &e) { PyErr_SetString(PyExc_RuntimeError, e.what()); return nullptr; }
+class InterpreterState {
+public:
+    virtual ~InterpreterState() = default;
+};
 
-#endif //QCALC_MODULECOMMON_HPP
+#endif //QCALCULATOR_INTERPRETERSTATE_HPP

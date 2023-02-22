@@ -19,13 +19,9 @@
 
 #include <QApplication>
 #include <QMessageBox>
-#include <QProcess>
-
 #include "windows/calculatorwindow.hpp"
 
 #include "pycx/interpreter.hpp"
-#include "pycx/modules/stdredirmodule.hpp"
-#include "pycx/modules/exprtkmodule.hpp"
 
 #include "io/paths.hpp"
 #include "io/fileoperations.hpp"
@@ -39,54 +35,6 @@ std::vector<std::string> parseArgs(int argc, char *argv[]) {
         ret.emplace_back(argv[i]);
     }
     return ret;
-}
-
-std::wstring getUserPythonPath(Settings &settings) {
-    std::string str;
-
-    if (settings.check(SETTING_PYTHON_PATH.key)) {
-        str = settings.value(SETTING_PYTHON_PATH.key).toString();
-    }
-
-    if (str.empty()) {
-        return {};
-    } else {
-        std::wstring wret;
-        for (auto &c: str) {
-            wret += c;
-        }
-        return wret;
-    }
-}
-
-bool checkPythonInit(std::string &stdErr) {
-    QProcess proc;
-    proc.start(QApplication::applicationFilePath(), {"--run_python_init_check"}, QIODevice::ReadOnly);
-    proc.waitForFinished();
-    auto ret = proc.exitCode();
-    stdErr = proc.readAllStandardError().toStdString();
-    return !ret;
-}
-
-std::string configurePython() {
-    auto settings = Settings::readSettings();
-    auto pythonPath = getUserPythonPath(settings);
-
-    std::string stdErr;
-
-    if (checkPythonInit(stdErr)) {
-        if (!pythonPath.empty()) {
-            Interpreter::setPath(pythonPath);
-        }
-
-        StdRedirModule::initialize();
-        ExprtkModule::initialize();
-        Interpreter::initialize();
-        Interpreter::addModuleDir(Paths::getLibDirectory());
-        Interpreter::addModuleDir(Paths::getAddonDirectory());
-    }
-
-    return stdErr;
 }
 
 int runPythonInitCheck() {
@@ -123,8 +71,6 @@ int main(int argc, char *argv[]) {
         return runPythonInitCheck();
     }
 
-    auto err = configurePython();
-
     if (args.size() > 1) {
         if (args.at(1) == "--interpreter" || args.at(1) == "-i") {
             // Run the application as an interactive python interpreter
@@ -139,7 +85,7 @@ int main(int argc, char *argv[]) {
             return 0;
         }
     } else {
-        CalculatorWindow w((err).c_str());
+        CalculatorWindow w;
         w.show();
         return QApplication::exec();
     }

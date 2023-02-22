@@ -24,6 +24,9 @@
 #include <string>
 #include <set>
 #include <functional>
+#include <memory>
+
+#include "pycx/interpreterstate.hpp"
 
 namespace Interpreter {
     enum ParseStyle {
@@ -38,6 +41,10 @@ namespace Interpreter {
     void finalize();
 
     bool isInitialized();
+
+    std::unique_ptr<InterpreterState> saveThreadState();
+
+    void restoreThreadState(InterpreterState &state);
 
     char getPathSeparator();
 

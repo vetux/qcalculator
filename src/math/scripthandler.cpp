@@ -19,11 +19,17 @@
 
 #include "math/scripthandler.hpp"
 
-#include "pycx/include.hpp"
+#include "pycx/pythoninclude.hpp"
 #include "pycx/interpreter.hpp"
 
+#include "util/interpreterhandler.hpp"
+
 decimal::Decimal ScriptHandler::run(PyObject *c, const std::vector<decimal::Decimal> &a) {
-    if (!Interpreter::isInitialized()){
+    if (!InterpreterHandler::waitForInitialization()) {
+        throw std::runtime_error("Python is not initialized");
+    }
+
+    if (!Interpreter::isInitialized()) {
         throw std::runtime_error("Python is not initialized.");
     }
 

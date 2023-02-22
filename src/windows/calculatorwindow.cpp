@@ -31,8 +31,6 @@
 #include <QInputDialog>
 #include <QCompleter>
 
-#include "addon/addonmanager.hpp"
-
 #include "io/paths.hpp"
 #include "io/serializer.hpp"
 #include "io/fileoperations.hpp"
@@ -52,19 +50,23 @@
 #include "pycx/modules/exprtkmodule.hpp"
 #include "pycx/interpreter.hpp"
 
+#include "util/interpreterhandler.hpp"
+
 static const int MAX_SYMBOL_TABLE_HISTORY = 100;
 static const int MAX_HISTORY = 1000;
 
-CalculatorWindow::CalculatorWindow(const QString &initErrorMessage, QWidget *parent) : QMainWindow(parent) {
+CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     setObjectName("MainWindow");
 
-    addonManager = std::make_unique<AddonManager>(Paths::getAddonDirectory(),
-                                                  [this](const std::string &module, const std::string &error) {
-                                                      return onAddonLoadFail(module, error);
-                                                  },
-                                                  [this](const std::string &module, const std::string &error) {
-                                                      return onAddonUnloadFail(module, error);
-                                                  });
+    loadSettings();
+
+    addonManager = AddonManager(Paths::getAddonDirectory(),
+                                [this](const std::string &module, const std::string &error) {
+                                    return onAddonLoadFail(module, error);
+                                },
+                                [this](const std::string &module, const std::string &error) {
+                                    return onAddonUnloadFail(module, error);
+                                });
 
     setupMenuBar();
     setupDialogs();
@@ -109,59 +111,72 @@ CalculatorWindow::CalculatorWindow(const QString &initErrorMessage, QWidget *par
             this,
             SLOT(onHistoryTextDoubleClicked(const QString &)));
 
-    loadSettings();
+    applySettings();
+
+    loadHistory();
+    saveHistory();
 
     loadSymbolTablePathHistory();
     saveSymbolTablePathHistory();
 
     updateSymbolHistoryMenu();
 
-    if (Interpreter::isInitialized()) {
-        Interpreter::setStdStreams([this](const std::string &str) {
-                                       terminalDialog->printOutput(str.c_str());
-                                   },
-                                   [this](const std::string &str) {
-                                       terminalDialog->printError(str.c_str());
-                                       terminalDialog->show();
-                                       terminalDialog->activateWindow();
-                                   });
-
-        for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
-            Interpreter::addModuleDir(path);
-        }
-    }
-
-    ExprtkModule::setGlobalTable(symbolTable,
-                                 [this]() {
-                                     onSymbolTableChanged(symbolTable);
-                                 });
-
-    enabledAddonsFilePath = Paths::getAddonsFile().c_str();
-
-    std::set<std::string> enabledAddons = loadEnabledAddons();
-
-    //Check for enabled addons which dont exist anymore.
-    std::set<std::string> availableAddons;
-    auto addons = addonManager->getAvailableAddons();
-    for (auto &addon: enabledAddons) {
-        if (addons.find(addon) != addons.end())
-            availableAddons.insert(addon);
-    }
-
-    addonManager->setActiveAddons(availableAddons);
-
-    settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
-
     setWindowIcon(QIcon(Paths::getCalculatorIconFile().c_str()));
 
-    if (initErrorMessage.isEmpty()) {
-        terminalDialog->printOutput("Initialized Python " + QString(Interpreter::getVersion().c_str()));
-    } else {
-        terminalDialog->printError("Failed to initialize Python:\n" + initErrorMessage);
-    }
+    InterpreterHandler::initialize([this]() {
+                                       runOnMainThread([this]() {
+                                                           terminalDialog->printOutput(
+                                                                   "Initialized Python " + QString(Interpreter::getVersion().c_str()));
+
+                                                           std::set<std::string> enabledAddons = loadEnabledAddons(Paths::getAddonsFile().c_str());
+
+                                                           //Check for enabled addons which dont exist anymore.
+                                                           std::set<std::string> availableAddons;
+                                                           auto addons = addonManager.getAvailableAddons();
+                                                           for (auto &addon: enabledAddons) {
+                                                               if (addons.find(addon) != addons.end())
+                                                                   availableAddons.insert(addon);
+                                                           }
+
+                                                           addonManager.setActiveAddons(availableAddons);
+
+                                                           settingsDialog->setEnabledAddons(addonManager.getActiveAddons());
+                                                       },
+                                                       Qt::BlockingQueuedConnection);
+                                   },
+                                   [this](const std::string &msg) {
+                                       runOnMainThread([this, msg]() {
+                                                           terminalDialog->printError(
+                                                                   "Failed to initialize Python:\n" +
+                                                                   QString(msg.c_str()));
+                                                       },
+                                                       Qt::BlockingQueuedConnection);
+                                   },
+                                   &symbolTable,
+                                   [this]() {
+                                       onSymbolTableChanged(symbolTable);
+                                   },
+                                   [this](const std::string &str) {
+                                       runOnMainThread([this, str]() {
+                                                           terminalDialog->printOutput(
+                                                                   str.c_str());
+                                                       },
+                                                       Qt::AutoConnection);
+                                   },
+                                   [this](const std::string &str) {
+                                       runOnMainThread([this, str]() {
+                                                           terminalDialog->printError(str.c_str());
+                                                           terminalDialog->show();
+                                                           terminalDialog->activateWindow();
+                                                       },
+                                                       Qt::AutoConnection);
+                                   });
 }
 
-CalculatorWindow::~CalculatorWindow() {}
+CalculatorWindow::~CalculatorWindow() {
+    addonManager.setActiveAddons({});
+    InterpreterHandler::finalize();
+}
 
 void CalculatorWindow::closeEvent(QCloseEvent *event) {
     cleanupDialogs();
@@ -287,7 +302,7 @@ void CalculatorWindow::onActionSettings() {
 
 void CalculatorWindow::onActionExit() {
     saveSettings();
-    addonManager->setActiveAddons({}); //Unload addons
+    addonManager.setActiveAddons({}); //Unload addons
     QCoreApplication::quit();
 }
 
@@ -302,10 +317,14 @@ void CalculatorWindow::onActionAboutQt() {
 }
 
 void CalculatorWindow::onActionAboutPython() {
-    std::string version = Interpreter::getVersion();
-    std::string copyright = Interpreter::getCopyright();
-
-    std::string str = "Python version " + version + "\n\n" + copyright;
+    std::string str;
+    if (InterpreterHandler::waitForInitialization()) {
+        std::string version = Interpreter::getVersion();
+        std::string copyright = Interpreter::getCopyright();
+        str = "Python version " + version + "\n\n" + copyright;
+    } else {
+        str = "Python not initialized.";
+    }
 
     QMessageBox box;
     box.setWindowTitle("About Python");
@@ -563,6 +582,8 @@ void CalculatorWindow::onHistoryTextDoubleClicked(const QString &text) {
 }
 
 void CalculatorWindow::onSettingsAccepted() {
+    InterpreterHandler::waitForInitialization(false);
+
     if (Interpreter::isInitialized()) {
         for (auto &path: settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList()) {
             Interpreter::removeModuleDir(path);
@@ -614,7 +635,7 @@ void CalculatorWindow::onSettingsCancelled() {
     settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
     settingsDialog->setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
 
-    settingsDialog->setEnabledAddons(addonManager->getActiveAddons());
+    settingsDialog->setEnabledAddons(addonManager.getActiveAddons());
 }
 
 void CalculatorWindow::onActionClearHistory() {
@@ -693,7 +714,17 @@ void CalculatorWindow::loadSettings() {
             settings.clear(SETTING_ROUNDING);
             break;
     }
+}
 
+void CalculatorWindow::saveSettings() {
+    try {
+        FileOperations::fileWriteAll(Paths::getSettingsFile(), Serializer::serializeSettings(settings));
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, "Failed to save settings", e.what());
+    }
+}
+
+void CalculatorWindow::applySettings() {
     decimal::context.prec(settings.value(SETTING_PRECISION).toInt());
     decimal::context.round(settings.value(SETTING_ROUNDING).toInt());
     decimal::context.emax(settings.value(SETTING_EXPONENT_MAX).toInt());
@@ -710,20 +741,9 @@ void CalculatorWindow::loadSettings() {
 
     settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
     settingsDialog->setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
-
-    loadHistory();
-    saveHistory();
 }
 
-void CalculatorWindow::saveSettings() {
-    try {
-        FileOperations::fileWriteAll(Paths::getSettingsFile(), Serializer::serializeSettings(settings));
-    } catch (const std::exception &e) {
-        QMessageBox::warning(this, "Failed to save settings", e.what());
-    }
-}
-
-std::set<std::string> CalculatorWindow::loadEnabledAddons() {
+std::set<std::string> CalculatorWindow::loadEnabledAddons(const QString &enabledAddonsFilePath) {
     if (QFile(enabledAddonsFilePath).exists()) {
         try {
             return Serializer::deserializeSet(FileOperations::fileReadAll(enabledAddonsFilePath.toStdString()));
@@ -997,7 +1017,7 @@ void CalculatorWindow::setupLayout() {
 void CalculatorWindow::setupDialogs() {
     symbolsDialog = new SymbolsEditorWindow(symbolTable, actions);
     terminalDialog = new PythonConsoleWindow(actions);
-    settingsDialog = new SettingsDialog(*addonManager, this);
+    settingsDialog = new SettingsDialog(addonManager, this);
 
     connect(symbolsDialog,
             SIGNAL(symbolsChanged(const SymbolTable &)),
@@ -1037,8 +1057,8 @@ bool CalculatorWindow::loadSymbolTable(const std::string &path) {
     try {
         auto syms = Serializer::deserializeTable(FileOperations::fileReadAll(path));
 
-        std::set<std::string> addons = addonManager->getActiveAddons();
-        addonManager->setActiveAddons({});
+        std::set<std::string> addons = addonManager.getActiveAddons();
+        addonManager.setActiveAddons({});
 
         symbolTable = syms;
         currentSymbolTablePath = path;
@@ -1047,7 +1067,7 @@ bool CalculatorWindow::loadSymbolTable(const std::string &path) {
 
         symbolsDialog->setSymbols(symbolTable, false, currentSymbolTablePath);
 
-        addonManager->setActiveAddons(addons);
+        addonManager.setActiveAddons(addons);
 
         return true;
     } catch (const std::exception &e) {
@@ -1146,6 +1166,12 @@ void CalculatorWindow::clearResultFromInputText() {
     }
 }
 
+void CalculatorWindow::runOnMainThread(const std::function<void()> &func, Qt::ConnectionType type) {
+    QMetaObject::invokeMethod(this,
+                              func,
+                              type);
+}
+
 void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
     inputTextContainsExpressionResult = false;
     inputTextAppendedHistoryValue.clear();
@@ -1153,7 +1179,7 @@ void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {
 }
 
 void CalculatorWindow::onEvaluatePython(const std::string &expr, Interpreter::ParseStyle style) {
-    if (!Interpreter::isInitialized()) {
+    if (!InterpreterHandler::waitForInitialization() || !Interpreter::isInitialized()) {
         terminalDialog->printError("Python is not initialized.\n");
     } else {
         try {

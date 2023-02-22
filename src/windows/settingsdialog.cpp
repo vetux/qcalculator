@@ -35,6 +35,8 @@
 #include "io/archive.hpp"
 #include "io/paths.hpp"
 
+#include "util/interpreterhandler.hpp"
+
 SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
         QDialog(parent), addonManager(addonManager) {
     setWindowTitle("Settings");
@@ -59,6 +61,8 @@ SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
     tabWidget->addTab(pythonTab, "Python");
 
     tabWidget->setTabPosition(QTabWidget::West);
+
+    addonTab->setAddons(addonManager.getAvailableAddons());
 
     auto *footer = new QWidget();
     auto *footerLayout = new QHBoxLayout(footer);
@@ -156,6 +160,12 @@ std::string SettingsDialog::getPythonPath() {
 void SettingsDialog::onModuleEnableChanged(AddonItemWidget *item) {
     std::string name = item->getModuleName().toStdString();
     bool enabled = item->getModuleEnabled();
+
+    if (!InterpreterHandler::isInitialized()){
+        item->setModuleEnabled(false);
+        QMessageBox::information(this, "Failed to enable addon", "Python is not initialized.");
+        return;
+    }
 
     auto it = enabledAddons.find(name);
     if (it != enabledAddons.end()) {

@@ -19,10 +19,16 @@
 
 #include "symboltableutil.hpp"
 
-#include "include.hpp"
-#include "interpreter.hpp"
+#include "pycx/pythoninclude.hpp"
+#include "pycx/interpreter.hpp"
+
+#include "util/interpreterhandler.hpp"
 
 PyObject *SymbolTableUtil::New(const SymbolTable &table) {
+    if (!InterpreterHandler::waitForInitialization()) {
+        throw std::runtime_error("Python is not initialized");
+    }
+
     PyObject *symModule = PyImport_ImportModule("exprtk");
     if (symModule == NULL) {
         throw std::runtime_error("Failed to import exprtk module, Error: " + Interpreter::getError());
@@ -147,7 +153,7 @@ void setVariables(PyObject *o, SymbolTable &ret) {
         }
 
         decimal::Decimal v;
-        if (PyUnicode_Check(value)){
+        if (PyUnicode_Check(value)) {
             v = decimal::Decimal(PyUnicode_AsUTF8(value));
         } else if (PyFloat_Check(value)) {
             v = decimal::Decimal(std::to_string(PyFloat_AsDouble(value)));
@@ -199,7 +205,7 @@ void setConstants(PyObject *o, SymbolTable &ret) {
         }
 
         decimal::Decimal v;
-        if (PyUnicode_Check(value)){
+        if (PyUnicode_Check(value)) {
             v = decimal::Decimal(PyUnicode_AsUTF8(value));
         } else if (PyFloat_Check(value)) {
             v = decimal::Decimal(std::to_string(PyFloat_AsDouble(value)));
@@ -435,6 +441,10 @@ SymbolTable SymbolTableUtil::Convert(PyObject *o) {
 }
 
 SymbolTable SymbolTableUtil::Cleanup(const SymbolTable &table) {
+    if(!InterpreterHandler::waitForInitialization()){
+        throw std::runtime_error("Python not initialized");
+    }
+
     SymbolTable ret = table;
 
     std::vector<std::string> scriptKeys;

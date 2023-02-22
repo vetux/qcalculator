@@ -45,7 +45,9 @@ public:
 
     typedef std::function<void(const std::string &, const std::string &)> Listener;
 
-    AddonManager(const std::string &addonDirectory,
+    AddonManager() = default;
+
+    AddonManager(std::string addonDirectory,
                  Listener onAddonLoadFail,
                  Listener onAddonUnloadFail);
 
@@ -93,8 +95,9 @@ public:
      * @param sourceFile
      * @param questionDialog
      */
-    size_t installAddonBundle(std::istream &sourceFile, const std::function<bool(const std::string &, const std::string &,
-                                                                           std::vector<std::string> &)>& installDialog);
+    size_t installAddonBundle(std::istream &sourceFile,
+                              const std::function<bool(const std::string &, const std::string &,
+                                                       std::vector<std::string> &)> &installDialog);
 
 
     void uninstallAddon(const std::string &moduleName);

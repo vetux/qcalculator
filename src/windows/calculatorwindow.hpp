@@ -46,7 +46,7 @@ class CalculatorWindow : public QMainWindow {
 Q_OBJECT
 
 public:
-    explicit CalculatorWindow(const QString &initErrorMessage, QWidget *parent = nullptr);
+    explicit CalculatorWindow(QWidget *parent = nullptr);
 
     ~CalculatorWindow() override;
 
@@ -131,7 +131,9 @@ private:
 
     void saveSettings();
 
-    std::set<std::string> loadEnabledAddons();
+    void applySettings();
+
+    std::set<std::string> loadEnabledAddons(const QString &path);
 
     void saveEnabledAddons(const std::set<std::string> &addons);
 
@@ -159,6 +161,8 @@ private:
 
     void clearResultFromInputText();
 
+    void runOnMainThread(const std::function<void()> &func, Qt::ConnectionType type);
+
 private:
     QWidget *rootWidget{};
     HistoryWidget *historyWidget{};
@@ -169,6 +173,8 @@ private:
     SymbolsEditorWindow *symbolsDialog = nullptr;
     SettingsDialog *settingsDialog = nullptr;
 
+    AddonManager addonManager;
+
     SymbolTable symbolTable;
 
     Settings settings;
@@ -177,10 +183,6 @@ private:
 
     std::set<std::string> symbolTablePathHistory;
     std::string currentSymbolTablePath; // If the currently active symboltable was loaded from a file or saved to a file this path contains the path of the symbol table file.
-
-    std::unique_ptr<AddonManager> addonManager;
-
-    QString enabledAddonsFilePath;
 
     std::vector<std::pair<std::string, std::string>> history;
 
