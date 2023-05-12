@@ -59,6 +59,7 @@ SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
     auto *exitAction = new QAction("Close Window");
     auto *fileMenu = new QMenu("File");
 
+    fileMenu->addAction(actions.actionNewSymbols);
     fileMenu->addAction(actions.actionOpenSymbols);
     fileMenu->addMenu(actions.menuOpenRecent);
     fileMenu->addAction(actions.actionSaveSymbols);
@@ -77,8 +78,7 @@ SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
     setWindowIcon(QIcon(Paths::getSymbolsIconFile().c_str()));
 }
 
-void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols, bool mod, const std::string &path) {
-    modified = mod;
+void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols, bool modified, const std::string &path) {
     symbolsPath = path;
     editor->setSymbols(symbols);
     if (!path.empty()) {

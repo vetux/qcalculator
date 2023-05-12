@@ -36,6 +36,7 @@ struct CalculatorWindowActions {
     QAction *actionSaveSymbols{};
     QAction *actionSaveAsSymbols{};
     QAction *actionClearSymbols{};
+    QAction *actionNewSymbols{};
 
     QAction *actionCompressDirectory{};
     QAction *actionExtractArchive{};

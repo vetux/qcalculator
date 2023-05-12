@@ -112,6 +112,8 @@ public slots:
 
     void onActionClearHistory();
 
+    void onActionNewSymbolTable();
+
     void insertInputText(const QString &text);
 
 private:
@@ -197,6 +199,8 @@ private:
     QCompleter *completer = nullptr;
     QStringListModel *completerModel = nullptr;
     QString completerWord;
+
+    bool symbolsModified = false;
 };
 
 #endif // QCALC_MAINWINDOW_HPP

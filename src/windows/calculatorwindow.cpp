@@ -100,6 +100,7 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     connect(actions.actionCreateAddonBundle, SIGNAL(triggered(bool)), this, SLOT(onActionCreateAddonBundle()));
     connect(actions.actionClearHistory, SIGNAL(triggered(bool)), this, SLOT(onActionClearHistory()));
     connect(actions.actionAboutPython, SIGNAL(triggered(bool)), this, SLOT(onActionAboutPython()));
+    connect(actions.actionNewSymbols, SIGNAL(triggered(bool)), this, SLOT(onActionNewSymbolTable()));
 
     connect(input, SIGNAL(returnPressed()), this, SLOT(onInputReturnPressed()));
     connect(input, SIGNAL(textChanged(const QString &)), this, SLOT(onInputTextChanged()));
@@ -294,8 +295,11 @@ void CalculatorWindow::onInputTextEdited() {
 }
 
 void CalculatorWindow::onSymbolTableChanged(const SymbolTable &symbolTableArg) {
+    symbolsModified = this->symbolTable.getVariables() != symbolTableArg.getVariables()
+                      || this->symbolTable.getConstants() != symbolTableArg.getConstants()
+                      || this->symbolTable.getFunctions() != symbolTableArg.getFunctions();
     this->symbolTable = symbolTableArg;
-    symbolsDialog->setSymbols(symbolTable, true, currentSymbolTablePath);
+    symbolsDialog->setSymbols(symbolTable, symbolsModified, currentSymbolTablePath);
     if (!currentSymbolTablePath.empty()) {
         actions.actionSaveSymbols->setEnabled(true);
     }
@@ -349,7 +353,7 @@ void CalculatorWindow::onActionClearSymbolTable() {
 }
 
 void CalculatorWindow::onActionOpenSymbolTable() {
-    if (symbolsDialog->isModified()) {
+    if (symbolsModified) {
         auto result = QMessageBox::question(this,
                                             "Unsaved Changes",
                                             "The current symbol table contains changes that will be lost, do you wish to save the symbols before proceeding?",
@@ -424,7 +428,7 @@ void CalculatorWindow::onActionEditSymbolTable() {
 
 void CalculatorWindow::onActionSymbolTableHistory() {
     auto path = dynamic_cast<QAction *>(sender())->data().toString().toStdString();
-    if (symbolsDialog->isModified()) {
+    if (symbolsModified) {
         auto result = QMessageBox::question(this,
                                             "Unsaved Changes",
                                             "The current symbol table contains changes that will be lost, do you wish to save the symbols before proceeding?",
@@ -689,6 +693,32 @@ void CalculatorWindow::onActionClearHistory() {
     }
 }
 
+void CalculatorWindow::onActionNewSymbolTable() {
+    if (symbolsModified) {
+        auto result = QMessageBox::question(this,
+                                            "Unsaved Changes",
+                                            "The current symbol table contains changes that will be lost, do you wish to save the symbols before proceeding?",
+                                            QMessageBox::StandardButton::Yes
+                                            | QMessageBox::StandardButton::No
+                                            | QMessageBox::StandardButton::Cancel);
+        if (result == QMessageBox::Yes) {
+            onActionSaveSymbolTable();
+        } else if (result == QMessageBox::Cancel) {
+            return;
+        }
+    }
+
+    currentSymbolTablePath = {};
+
+    auto symCopy = symbolTable;
+    symCopy.clearVariables();
+    symCopy.clearConstants();
+    symCopy.clearFunctions();
+    onSymbolTableChanged(symCopy);
+
+    symbolsModified = false;
+}
+
 void CalculatorWindow::insertInputText(const QString &v) {
     auto cursor = input->cursorPosition() - completerWord.size();
     auto text = input->text().toStdString();
@@ -774,7 +804,7 @@ void CalculatorWindow::applySettings() {
     decimal::context.emax(settings.value(SETTING_EXPONENT_MAX).toInt());
     decimal::context.emin(settings.value(SETTING_EXPONENT_MIN).toInt());
 
-    symbolsDialog->setSymbols(symbolTable, false, currentSymbolTablePath);
+    symbolsDialog->setSymbols(symbolTable, symbolsModified, currentSymbolTablePath);
 
     settingsDialog->setPrecision(settings.value(SETTING_PRECISION).toInt());
     settingsDialog->setExponentMin(settings.value(SETTING_EXPONENT_MIN).toInt());
@@ -950,6 +980,10 @@ void CalculatorWindow::setupMenuBar() {
     actions.actionAboutPython->setText("About Python");
     actions.actionAboutPython->setObjectName("actions.actionAboutPython");
 
+    actions.actionNewSymbols = new QAction(this);
+    actions.actionNewSymbols->setText("New");
+    actions.actionNewSymbols->setObjectName("actions.actionNewSymbols");
+
     actions.menuTools->addAction(actions.actionOpenTerminal);
     actions.menuTools->addSeparator();
     actions.menuTools->addAction(actions.actionCompressDirectory);
@@ -1099,6 +1133,7 @@ bool CalculatorWindow::loadSymbolTable(const std::string &path) {
 
         actions.actionSaveSymbols->setEnabled(false);
 
+        symbolsModified = false;
         symbolsDialog->setSymbols(symbolTable, false, currentSymbolTablePath);
 
         addonManager.setActiveAddons(addons);
@@ -1128,6 +1163,7 @@ bool CalculatorWindow::saveSymbolTable(const std::string &path) {
 
         actions.actionSaveSymbols->setEnabled(false);
 
+        symbolsModified = false;
         symbolsDialog->setSymbols(symbolTable, false, currentSymbolTablePath);
 
         return true;
