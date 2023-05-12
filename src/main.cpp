@@ -21,7 +21,7 @@
 #include <QMessageBox>
 #include "windows/calculatorwindow.hpp"
 
-#include "pycx/interpreter.hpp"
+#include "python/interpreter.hpp"
 
 #include "io/paths.hpp"
 #include "io/fileoperations.hpp"

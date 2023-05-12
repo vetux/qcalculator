@@ -39,7 +39,7 @@
 
 #include "settings/settingconstants.hpp"
 
-#include "math/expressionparser.hpp"
+#include "calculator/expressionparser.hpp"
 
 #include "windows/settingsdialog.hpp"
 #include "windows/symbolseditorwindow.hpp"
@@ -47,10 +47,10 @@
 
 #include "widgets/historywidget.hpp"
 
-#include "pycx/modules/exprtkmodule.hpp"
-#include "pycx/interpreter.hpp"
+#include "python/modules/exprtkmodule.hpp"
+#include "python/interpreter.hpp"
 
-#include "util/interpreterhandler.hpp"
+#include "python/interpreterhandler.hpp"
 
 static const int MAX_SYMBOL_TABLE_HISTORY = 100;
 static const int MAX_HISTORY = 1000;

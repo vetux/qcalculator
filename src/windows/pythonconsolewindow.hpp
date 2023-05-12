@@ -28,7 +28,7 @@
 #include "widgets/terminalwidget.hpp"
 #include "windows/calculatorwindowactions.hpp"
 
-#include "pycx/interpreter.hpp"
+#include "python/interpreter.hpp"
 
 #include "io/paths.hpp"
 

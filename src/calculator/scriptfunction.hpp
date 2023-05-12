@@ -17,30 +17,38 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALCULATOR_INTERPRETERHANDLER_HPP
-#define QCALCULATOR_INTERPRETERHANDLER_HPP
+#ifndef QCALC_SCRIPTFUNCTION_HPP
+#define QCALC_SCRIPTFUNCTION_HPP
 
-#include <functional>
 #include <string>
-#include <set>
 
-#include "math/symboltable.hpp"
+#include "extern/exprtk.hpp"
 
-#include "addon/addonmanager.hpp"
+#include "calculator/scripthandler.hpp"
 
-namespace InterpreterHandler {
-    void initialize(std::function<void()> onInitialized,
-                    std::function<void(const std::string &)> onInitFail,
-                    SymbolTable *globalTable,
-                    std::function<void()> tableChangeCallback,
-                    std::function<void(const std::string &)> stdOutCallback,
-                    std::function<void(const std::string &)> stdErrCallback);
+struct _object;
+typedef _object PyObject;
 
-    void finalize();
+/**
+ * The ScriptFunction executes a python function with no arguments.
+ * The script must return the result value as a string, float or int.
+ */
+template<typename T>
+struct ScriptFunction : public exprtk::ifunction<T> {
+    using exprtk::ifunction<T>::operator();
 
-    bool isInitialized();
+    ScriptFunction()
+            : exprtk::ifunction<T>(0), callback(nullptr) {}
 
-    bool waitForInitialization(bool interruptable = true);
-}
+    explicit ScriptFunction(PyObject *callback)
+            : exprtk::ifunction<T>(0), callback(callback) {}
 
-#endif //QCALCULATOR_INTERPRETERHANDLER_HPP
+    inline T operator()() {
+        return ScriptHandler::run(callback, {});
+    }
+
+private:
+    PyObject *callback;
+};
+
+#endif //QCALC_SCRIPTFUNCTION_HPP

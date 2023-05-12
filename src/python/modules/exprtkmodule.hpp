@@ -17,38 +17,24 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_SCRIPTFUNCTION_HPP
-#define QCALC_SCRIPTFUNCTION_HPP
+#ifndef QCALC_EXPRTKMODULE_HPP
+#define QCALC_EXPRTKMODULE_HPP
 
-#include <string>
+#include <functional>
 
-#include "extern/exprtk.hpp"
+#include "calculator/symboltable.hpp"
 
-#include "math/scripthandler.hpp"
+namespace ExprtkModule {
+    /**
+     * Initialize the exprtk python module,
+     * this appends logic to the cpython init tab
+     * and should therefore be called before initializing cpython.
+     *
+     * Dependency on mpreal module, initialize mpreal module beforehand.
+     */
+    void initialize();
 
-struct _object;
-typedef _object PyObject;
+    void setGlobalTable(SymbolTable &globalTable, std::function<void()> tableChangeCallback);
+}
 
-/**
- * The ScriptFunction executes a python function with no arguments.
- * The script must return the result value as a string, float or int.
- */
-template<typename T>
-struct ScriptFunction : public exprtk::ifunction<T> {
-    using exprtk::ifunction<T>::operator();
-
-    ScriptFunction()
-            : exprtk::ifunction<T>(0), callback(nullptr) {}
-
-    explicit ScriptFunction(PyObject *callback)
-            : exprtk::ifunction<T>(0), callback(callback) {}
-
-    inline T operator()() {
-        return ScriptHandler::run(callback, {});
-    }
-
-private:
-    PyObject *callback;
-};
-
-#endif //QCALC_SCRIPTFUNCTION_HPP
+#endif //QCALC_EXPRTKMODULE_HPP

@@ -26,7 +26,7 @@
 #include <functional>
 #include <memory>
 
-#include "pycx/interpreterstate.hpp"
+#include "python/interpreterstate.hpp"
 
 namespace Interpreter {
     enum ParseStyle {

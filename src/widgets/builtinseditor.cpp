@@ -22,7 +22,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 
-#include "math/symboltable.hpp"
+#include "calculator/symboltable.hpp"
 
 #include "widgets/scriptseditor.hpp"
 

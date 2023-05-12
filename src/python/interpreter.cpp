@@ -17,12 +17,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "pycx/interpreter.hpp"
-#include "pycx/pythoninclude.hpp"
+#include "python/interpreter.hpp"
+#include "python/pythoninclude.hpp"
 
-#include "pycx/modules/stdredirmodule.hpp"
-#include "pycx/modules/exprtkmodule.hpp"
-#include "pycx/pythoninterpreterstate.hpp"
+#include "python/modules/stdredirmodule.hpp"
+#include "python/modules/exprtkmodule.hpp"
+#include "python/pythoninterpreterstate.hpp"
 
 static bool pyInitialized = false;
 

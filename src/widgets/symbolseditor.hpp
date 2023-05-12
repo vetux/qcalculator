@@ -22,7 +22,7 @@
 
 #include <QWidget>
 
-#include "math/symboltable.hpp"
+#include "calculator/symboltable.hpp"
 
 #include "widgets/namedvalueeditor.hpp"
 #include "widgets/functionseditor.hpp"

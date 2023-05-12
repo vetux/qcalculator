@@ -23,7 +23,7 @@
 #include <string>
 #include <set>
 
-#include "../math/symboltable.hpp"
+#include "calculator/symboltable.hpp"
 
 #include "settings/settings.hpp"
 

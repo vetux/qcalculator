@@ -32,7 +32,7 @@
 #include "addon/addonmanager.hpp"
 #include "settings/settings.hpp"
 
-#include "math/symboltable.hpp"
+#include "calculator/symboltable.hpp"
 
 #include "widgets/symbolseditor.hpp"
 #include "widgets/historywidget.hpp"

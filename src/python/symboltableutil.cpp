@@ -19,10 +19,10 @@
 
 #include "symboltableutil.hpp"
 
-#include "pycx/pythoninclude.hpp"
-#include "pycx/interpreter.hpp"
+#include "python/pythoninclude.hpp"
+#include "python/interpreter.hpp"
 
-#include "util/interpreterhandler.hpp"
+#include "interpreterhandler.hpp"
 
 PyObject *SymbolTableUtil::New(const SymbolTable &table) {
     if (!InterpreterHandler::waitForInitialization()) {

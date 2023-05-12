@@ -23,7 +23,7 @@
 #include <QWidget>
 #include <QListWidget>
 
-#include "math/script.hpp"
+#include "calculator/script.hpp"
 
 class ScriptsEditor : public QWidget {
 Q_OBJECT

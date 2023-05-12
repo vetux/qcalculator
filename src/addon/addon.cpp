@@ -22,9 +22,9 @@
 #include <utility>
 #include <stdexcept>
 
-#include "pycx/interpreter.hpp"
+#include "python/interpreter.hpp"
 
-#include "util/interpreterhandler.hpp"
+#include "python/interpreterhandler.hpp"
 
 Addon::Addon(std::string moduleName, std::string displayName, std::string description)
         : loaded(false),

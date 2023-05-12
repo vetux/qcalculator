@@ -25,7 +25,7 @@
 
 #include "io/fileoperations.hpp"
 
-#include "pycx/interpreter.hpp"
+#include "python/interpreter.hpp"
 
 #include "extern/json.hpp"
 

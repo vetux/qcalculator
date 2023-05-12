@@ -17,12 +17,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "math/scripthandler.hpp"
+#include "calculator/scripthandler.hpp"
 
-#include "pycx/pythoninclude.hpp"
-#include "pycx/interpreter.hpp"
+#include "python/pythoninclude.hpp"
+#include "python/interpreter.hpp"
 
-#include "util/interpreterhandler.hpp"
+#include "python/interpreterhandler.hpp"
 
 decimal::Decimal ScriptHandler::run(PyObject *c, const std::vector<decimal::Decimal> &a) {
     if (!InterpreterHandler::waitForInitialization()) {

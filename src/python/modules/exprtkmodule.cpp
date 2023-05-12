@@ -21,10 +21,10 @@
 
 #include <utility>
 
-#include "pycx/pythoninclude.hpp"
-#include "pycx/symboltableutil.hpp"
+#include "python/pythoninclude.hpp"
+#include "python/symboltableutil.hpp"
 
-#include "math/expressionparser.hpp"
+#include "calculator/expressionparser.hpp"
 
 #include "modulecommon.hpp"
 

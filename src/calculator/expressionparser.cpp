@@ -17,13 +17,13 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "math/expressionparser.hpp"
+#include "calculator/expressionparser.hpp"
 
 #include "extern/exprtk_mpdecimal_adaptor.hpp"
 #include "extern/exprtk.hpp"
 
-#include "math/scriptfunction.hpp"
-#include "math/scriptvarargfunction.hpp"
+#include "calculator/scriptfunction.hpp"
+#include "calculator/scriptvarargfunction.hpp"
 
 decimal::Decimal ExpressionParser::evaluate(const std::string &expr, SymbolTable &symbolTable) {
     exprtk::parser<decimal::Decimal> parser;

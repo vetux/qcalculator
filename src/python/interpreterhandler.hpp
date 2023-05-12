@@ -17,17 +17,30 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALCULATOR_PYTHONINTERPRETERSTATE_HPP
-#define QCALCULATOR_PYTHONINTERPRETERSTATE_HPP
+#ifndef QCALCULATOR_INTERPRETERHANDLER_HPP
+#define QCALCULATOR_INTERPRETERHANDLER_HPP
 
-#include "pycx/interpreterstate.hpp"
-#include "pycx/pythoninclude.hpp"
+#include <functional>
+#include <string>
+#include <set>
 
-class PythonInterpreterState : public InterpreterState {
-public:
-    explicit PythonInterpreterState(PyThreadState *state) : state(state) {}
+#include "calculator/symboltable.hpp"
 
-    PyThreadState *state;
-};
+#include "addon/addonmanager.hpp"
 
-#endif //QCALCULATOR_PYTHONINTERPRETERSTATE_HPP
+namespace InterpreterHandler {
+    void initialize(std::function<void()> onInitialized,
+                    std::function<void(const std::string &)> onInitFail,
+                    SymbolTable *globalTable,
+                    std::function<void()> tableChangeCallback,
+                    std::function<void(const std::string &)> stdOutCallback,
+                    std::function<void(const std::string &)> stdErrCallback);
+
+    void finalize();
+
+    bool isInitialized();
+
+    bool waitForInitialization(bool interruptable = true);
+}
+
+#endif //QCALCULATOR_INTERPRETERHANDLER_HPP

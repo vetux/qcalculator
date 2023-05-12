@@ -19,9 +19,9 @@
 
 #include <stdexcept>
 
-#include "pycx/modules/stdredirmodule.hpp"
+#include "python/modules/stdredirmodule.hpp"
 
-#include "pycx/pythoninclude.hpp"
+#include "python/pythoninclude.hpp"
 
 static bool redirecting = false;
 static std::function<void(const std::string &)> stdOut;

@@ -17,24 +17,17 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef QCALC_EXPRTKMODULE_HPP
-#define QCALC_EXPRTKMODULE_HPP
+#ifndef QCALCULATOR_PYTHONINTERPRETERSTATE_HPP
+#define QCALCULATOR_PYTHONINTERPRETERSTATE_HPP
 
-#include <functional>
+#include "python/interpreterstate.hpp"
+#include "python/pythoninclude.hpp"
 
-#include "math/symboltable.hpp"
+class PythonInterpreterState : public InterpreterState {
+public:
+    explicit PythonInterpreterState(PyThreadState *state) : state(state) {}
 
-namespace ExprtkModule {
-    /**
-     * Initialize the exprtk python module,
-     * this appends logic to the cpython init tab
-     * and should therefore be called before initializing cpython.
-     *
-     * Dependency on mpreal module, initialize mpreal module beforehand.
-     */
-    void initialize();
+    PyThreadState *state;
+};
 
-    void setGlobalTable(SymbolTable &globalTable, std::function<void()> tableChangeCallback);
-}
-
-#endif //QCALC_EXPRTKMODULE_HPP
+#endif //QCALCULATOR_PYTHONINTERPRETERSTATE_HPP

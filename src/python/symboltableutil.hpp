@@ -23,7 +23,7 @@
 struct _object;
 typedef _object PyObject;
 
-#include "../math/symboltable.hpp"
+#include "calculator/symboltable.hpp"
 
 /**
  * Some helper functions for working with symbol table type on the python side.

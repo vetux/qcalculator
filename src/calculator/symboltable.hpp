@@ -25,8 +25,8 @@
 
 #include <decimal.hh>
 
-#include "math/function.hpp"
-#include "math/script.hpp"
+#include "calculator/function.hpp"
+#include "calculator/script.hpp"
 
 /**
  * The symbol table is responsible for managing 4 map objects.

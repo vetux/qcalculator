@@ -35,7 +35,7 @@
 #include "io/archive.hpp"
 #include "io/paths.hpp"
 
-#include "util/interpreterhandler.hpp"
+#include "python/interpreterhandler.hpp"
 
 SettingsDialog::SettingsDialog(AddonManager &addonManager, QWidget *parent) :
         QDialog(parent), addonManager(addonManager) {

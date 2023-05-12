@@ -32,9 +32,9 @@
 #include <utility>
 
 
-#include "pycx/modules/stdredirmodule.hpp"
-#include "pycx/modules/exprtkmodule.hpp"
-#include "pycx/interpreter.hpp"
+#include "python/modules/stdredirmodule.hpp"
+#include "python/modules/exprtkmodule.hpp"
+#include "python/interpreter.hpp"
 
 #include "io/paths.hpp"
 
