@@ -48,7 +48,7 @@ Powered by:
                       + QApplication::applicationDisplayName()
                       + " "
                       + QApplication::applicationVersion()
-                      + "</h1><p>Copyright (C) 2022 Julian Zampiccoli</p>"
+                      + "</h1><p>Copyright (C) 2023 Julian Zampiccoli</p>"
                       + t);
 
         text->setTextFormat(Qt::RichText);
