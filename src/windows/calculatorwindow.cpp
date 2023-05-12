@@ -144,6 +144,8 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
                                                            addonManager.setActiveAddons(availableAddons);
 
                                                            settingsDialog->setEnabledAddons(addonManager.getActiveAddons());
+
+                                                           historyWidget->scrollToBottom();
                                                        },
                                                        Qt::BlockingQueuedConnection);
                                    },

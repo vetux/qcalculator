@@ -104,9 +104,6 @@ public slots:
         container->layout()->invalidate();
         container->layout()->activate();
 
-        // Call to processEvents is required here so that a scroll to the bottom can be done immediately.
-        QCoreApplication::processEvents();
-
         expressionLabel->setText(expression);
         equalsLabel->setText("=");
         resultLabel->setText(value);
@@ -133,6 +130,9 @@ public slots:
     }
 
     void scrollToBottom() {
+        // Call to processEvents is required here to apply previous modifications before scrolling.
+        QCoreApplication::processEvents();
+
         // Hack to defer scrolling to next event loop iteration https://www.qtcentre.org/threads/18291-Force-a-Scroll-in-a-QScrollArea
         QTimer::singleShot(0, this, [this]() {
             scroll->verticalScrollBar()->setSliderPosition(scroll->verticalScrollBar()->maximum());
