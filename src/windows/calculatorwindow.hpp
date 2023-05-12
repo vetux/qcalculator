@@ -163,6 +163,8 @@ private:
 
     void runOnMainThread(const std::function<void()> &func, Qt::ConnectionType type);
 
+    void removeSymbolTablePath(const std::string &path);
+
 private:
     QWidget *rootWidget{};
     HistoryWidget *historyWidget{};
@@ -181,7 +183,7 @@ private:
 
     std::string previousResult;
 
-    std::set<std::string> symbolTablePathHistory;
+    std::vector<std::string> symbolTablePathHistory;
     std::string currentSymbolTablePath; // If the currently active symboltable was loaded from a file or saved to a file this path contains the path of the symbol table file.
 
     std::vector<std::pair<std::string, std::string>> history;

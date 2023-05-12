@@ -51,6 +51,8 @@ public slots:
 
     void setClearResult(bool clearResult);
 
+    void setLoadRecentSymbols(bool load);
+
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
 
@@ -65,6 +67,8 @@ public:
     bool getSaveHistory();
 
     bool getClearResult();
+
+    bool getLoadRecentSymbols();
 
 private:
     QStringListModel roundingModel;
@@ -86,6 +90,9 @@ private:
 
     QLabel *clearResultLabel;
     QCheckBox *clearResultCheckBox;
+
+    QLabel *loadRecentSymbolsLabel;
+    QCheckBox *loadRecentSymbolsCheckBox;
 };
 
 #endif //QCALC_GENERALTAB_HPP

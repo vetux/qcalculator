@@ -117,9 +117,11 @@ CalculatorWindow::CalculatorWindow(QWidget *parent) : QMainWindow(parent) {
     saveHistory();
 
     loadSymbolTablePathHistory();
-    saveSymbolTablePathHistory();
-
     updateSymbolHistoryMenu();
+
+    if (settings.value(SETTING_LOAD_RECENT_SYMBOLS).toInt() && !symbolTablePathHistory.empty()) {
+        loadSymbolTable(symbolTablePathHistory.at(0));
+    }
 
     setWindowIcon(QIcon(Paths::getCalculatorIconFile().c_str()));
 
@@ -365,7 +367,8 @@ void CalculatorWindow::onActionOpenSymbolTable() {
 
     auto path = list[0].toStdString();
     if (loadSymbolTable(path)) {
-        symbolTablePathHistory.insert(path);
+        removeSymbolTablePath(path);
+        symbolTablePathHistory.insert(symbolTablePathHistory.begin(), path);
         saveSymbolTablePathHistory();
         updateSymbolHistoryMenu();
     }
@@ -600,6 +603,7 @@ void CalculatorWindow::onSettingsAccepted() {
     settings.update(SETTING_ROUNDING.key, settingsDialog->getRoundingMode());
     settings.update(SETTING_SAVE_HISTORY.key, settingsDialog->getSaveHistoryMax());
     settings.update(SETTING_CLEAR_RESULT.key, settingsDialog->getClearResult());
+    settings.update(SETTING_LOAD_RECENT_SYMBOLS.key, settingsDialog->getLoadRecentSymbols());
 
     settings.update(SETTING_PYTHON_MODULE_PATHS.key, settingsDialog->getPythonModPaths());
     settings.update(SETTING_PYTHON_PATH.key, settingsDialog->getPythonPath());
@@ -637,6 +641,7 @@ void CalculatorWindow::onSettingsCancelled() {
             settings.value(SETTING_ROUNDING).toInt()));
     settingsDialog->setSaveHistory(settings.value(SETTING_SAVE_HISTORY).toInt());
     settingsDialog->setClearResult(settings.value(SETTING_CLEAR_RESULT).toInt());
+    settingsDialog->setLoadRecentSymbols(settings.value(SETTING_LOAD_RECENT_SYMBOLS).toInt());
 
     settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
     settingsDialog->setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
@@ -745,6 +750,7 @@ void CalculatorWindow::applySettings() {
             settings.value(SETTING_ROUNDING).toInt()));
     settingsDialog->setSaveHistory(settings.value(SETTING_SAVE_HISTORY).toInt());
     settingsDialog->setClearResult(settings.value(SETTING_CLEAR_RESULT).toInt());
+    settingsDialog->setLoadRecentSymbols(settings.value(SETTING_LOAD_RECENT_SYMBOLS).toInt());
 
     settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
     settingsDialog->setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
@@ -784,28 +790,22 @@ void CalculatorWindow::loadSymbolTablePathHistory() {
     try {
         auto lines = StringUtil::splitString(FileOperations::fileReadAll(filePath), '\n');
         for (auto &line: lines) {
-            symbolTablePathHistory.insert(line);
+            removeSymbolTablePath(line);
+            symbolTablePathHistory.emplace_back(line);
         }
 
         if (symbolTablePathHistory.size() > MAX_SYMBOL_TABLE_HISTORY) {
-            std::set<std::string> tmp;
-            int i = 0;
-            for (auto it = symbolTablePathHistory.rbegin();
-                 it != symbolTablePathHistory.rend() && i < MAX_SYMBOL_TABLE_HISTORY; it++, i++) {
-                tmp.insert(it->c_str());
-            }
-            symbolTablePathHistory = tmp;
+            symbolTablePathHistory = std::vector<std::string>(symbolTablePathHistory.begin(),
+                                                              symbolTablePathHistory.begin() +
+                                                              MAX_SYMBOL_TABLE_HISTORY);
         }
 
-        std::set<std::string> delPaths;
+        std::vector<std::string> tmp;
         for (const auto &path: symbolTablePathHistory) {
-            if (!std::filesystem::exists(path))
-                delPaths.insert(path);
+            if (std::filesystem::exists(path))
+                tmp.emplace_back(path);
         }
-
-        for (const auto &path: delPaths)
-            symbolTablePathHistory.erase(path);
-
+        symbolTablePathHistory = tmp;
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to load symbol table history", e.what());
         symbolTablePathHistory = {};
@@ -813,10 +813,6 @@ void CalculatorWindow::loadSymbolTablePathHistory() {
 }
 
 void CalculatorWindow::saveSymbolTablePathHistory() {
-    if (!settings.value(SETTING_SAVE_SYMBOLS_HISTORY).toInt()) {
-        return;
-    }
-
     try {
         std::string str;
         for (auto &path: symbolTablePathHistory) {
@@ -1092,7 +1088,8 @@ bool CalculatorWindow::saveSymbolTable(const std::string &path) {
     try {
         FileOperations::fileWriteAll(path, Serializer::serializeTable(symbolTable));
 
-        symbolTablePathHistory.insert(path);
+        removeSymbolTablePath(path);
+        symbolTablePathHistory.insert(symbolTablePathHistory.begin(), path);
         saveSymbolTablePathHistory();
         updateSymbolHistoryMenu();
 
@@ -1177,6 +1174,14 @@ void CalculatorWindow::runOnMainThread(const std::function<void()> &func, Qt::Co
     QMetaObject::invokeMethod(this,
                               func,
                               type);
+}
+
+void CalculatorWindow::removeSymbolTablePath(const std::string &path) {
+    auto it = std::find(symbolTablePathHistory.begin(), symbolTablePathHistory.end(), path);
+    while (it != symbolTablePathHistory.end()) {
+        symbolTablePathHistory.erase(it);
+        it = std::find(symbolTablePathHistory.begin(), symbolTablePathHistory.end(), path);
+    }
 }
 
 void CalculatorWindow::onInputCursorPositionChanged(int oldPos, int newPos) {

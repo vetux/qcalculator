@@ -67,6 +67,10 @@ public:
 
     bool getClearResult();
 
+    void setLoadRecentSymbols(bool load);
+
+    bool getLoadRecentSymbols();
+
     void setPythonModPaths(const std::set<std::string> &paths);
 
     std::set<std::string> getPythonModPaths();

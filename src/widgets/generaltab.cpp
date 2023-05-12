@@ -156,6 +156,10 @@ GeneralTab::GeneralTab(QWidget *parent)
     clearResultCheckBox = new QCheckBox(this);
     clearResultLabel->setText("Clear result when typing");
 
+    loadRecentSymbolsLabel = new QLabel(this);
+    loadRecentSymbolsCheckBox = new QCheckBox(this);
+    loadRecentSymbolsLabel->setText("Load the most recently saved symbol table on startup");
+
     auto *hlayout = new QHBoxLayout;
     hlayout->setMargin(5);
     hlayout->setSpacing(20);
@@ -176,6 +180,16 @@ GeneralTab::GeneralTab(QWidget *parent)
 
     clearResultContainer->setLayout(hlayout);
 
+    hlayout = new QHBoxLayout;
+    hlayout->setMargin(5);
+    hlayout->setSpacing(20);
+    hlayout->addWidget(loadRecentSymbolsCheckBox, 0);
+    hlayout->addWidget(loadRecentSymbolsLabel, 1);
+
+    auto *loadRecentSymbolsContainer = new QWidget(this);
+
+    loadRecentSymbolsContainer->setLayout(hlayout);
+
     auto *layout = new QVBoxLayout();
 
     layout->addWidget(precisionLabel);
@@ -188,6 +202,7 @@ GeneralTab::GeneralTab(QWidget *parent)
     layout->addWidget(roundingComboBox);
     layout->addWidget(saveHistoryContainer);
     layout->addWidget(clearResultContainer);
+    layout->addWidget(loadRecentSymbolsContainer);
     layout->addStretch(1);
 
     setLayout(layout);
@@ -232,4 +247,12 @@ void GeneralTab::setClearResult(bool clearResult) {
 
 bool GeneralTab::getClearResult() {
     return clearResultCheckBox->checkState() == Qt::Checked;
+}
+
+void GeneralTab::setLoadRecentSymbols(bool load) {
+    loadRecentSymbolsCheckBox->setCheckState(load ? Qt::Checked : Qt::Unchecked);
+}
+
+bool GeneralTab::getLoadRecentSymbols() {
+    return loadRecentSymbolsCheckBox->checkState() == Qt::Checked;
 }

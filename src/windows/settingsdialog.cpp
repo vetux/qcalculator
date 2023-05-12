@@ -149,6 +149,14 @@ bool SettingsDialog::getClearResult() {
     return generalTab->getClearResult();
 }
 
+void SettingsDialog::setLoadRecentSymbols(bool load) {
+    generalTab->setLoadRecentSymbols(load);
+}
+
+bool SettingsDialog::getLoadRecentSymbols() {
+    return generalTab->getLoadRecentSymbols();
+}
+
 void SettingsDialog::setPythonModPaths(const std::set<std::string> &paths) {
     pythonTab->setPythonModPaths(paths);
 }
