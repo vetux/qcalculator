@@ -936,8 +936,6 @@ void CalculatorWindow::setupMenuBar() {
     actions.menuSymbols->addMenu(actions.menuOpenRecent);
     actions.menuSymbols->addAction(actions.actionSaveSymbols);
     actions.menuSymbols->addAction(actions.actionSaveAsSymbols);
-    actions.menuSymbols->addSeparator();
-    actions.menuSymbols->addAction(actions.actionClearSymbols);
 
     actions.menuHelp->addAction(actions.actionAbout);
     actions.menuHelp->addAction(actions.actionAboutPython);
