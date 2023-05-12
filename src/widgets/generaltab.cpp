@@ -158,7 +158,7 @@ GeneralTab::GeneralTab(QWidget *parent)
 
     loadRecentSymbolsLabel = new QLabel(this);
     loadRecentSymbolsCheckBox = new QCheckBox(this);
-    loadRecentSymbolsLabel->setText("Load the most recently saved symbol table on startup");
+    loadRecentSymbolsLabel->setText("Load the most recently opened symbol table on startup");
 
     auto *hlayout = new QHBoxLayout;
     hlayout->setMargin(5);
