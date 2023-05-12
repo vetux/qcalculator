@@ -40,6 +40,10 @@ public:
                         CalculatorWindowActions &actions,
                         QWidget *parent = nullptr);
 
+    bool isModified() {
+        return modified;
+    }
+
 private slots:
     void onSaveSymbolsTriggered();
 
@@ -47,6 +51,7 @@ private:
     SymbolsEditor *editor;
     CalculatorWindowActions &actions;
     std::string symbolsPath;
+    bool modified = false;
 };
 
 #endif //QCALC_SYMBOLSDIALOG_HPP

@@ -77,7 +77,8 @@ SymbolsEditorWindow::SymbolsEditorWindow(const SymbolTable &symbols,
     setWindowIcon(QIcon(Paths::getSymbolsIconFile().c_str()));
 }
 
-void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols, bool modified, const std::string &path) {
+void SymbolsEditorWindow::setSymbols(const SymbolTable &symbols, bool mod, const std::string &path) {
+    modified = mod;
     symbolsPath = path;
     editor->setSymbols(symbols);
     if (!path.empty()) {

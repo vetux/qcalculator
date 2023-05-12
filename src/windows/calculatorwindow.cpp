@@ -349,6 +349,20 @@ void CalculatorWindow::onActionClearSymbolTable() {
 }
 
 void CalculatorWindow::onActionOpenSymbolTable() {
+    if (symbolsDialog->isModified()) {
+        auto result = QMessageBox::question(this,
+                                            "Unsaved Changes",
+                                            "The current symbol table contains changes that will be lost, do you wish to save the symbols before proceeding?",
+                                            QMessageBox::StandardButton::Yes
+                                            | QMessageBox::StandardButton::No
+                                            | QMessageBox::StandardButton::Cancel);
+        if (result == QMessageBox::Yes) {
+            onActionSaveSymbolTable();
+        } else if (result == QMessageBox::Cancel) {
+            return;
+        }
+    }
+
     QFileDialog dialog(this);
     dialog.setWindowTitle("Open symbol table...");
     dialog.setFileMode(QFileDialog::ExistingFile);
@@ -409,7 +423,26 @@ void CalculatorWindow::onActionEditSymbolTable() {
 }
 
 void CalculatorWindow::onActionSymbolTableHistory() {
-    loadSymbolTable(dynamic_cast<QAction *>(sender())->data().toString().toStdString());
+    auto path = dynamic_cast<QAction *>(sender())->data().toString().toStdString();
+    if (symbolsDialog->isModified()) {
+        auto result = QMessageBox::question(this,
+                                            "Unsaved Changes",
+                                            "The current symbol table contains changes that will be lost, do you wish to save the symbols before proceeding?",
+                                            QMessageBox::StandardButton::Yes
+                                            | QMessageBox::StandardButton::No
+                                            | QMessageBox::StandardButton::Cancel);
+        if (result == QMessageBox::Yes) {
+            onActionSaveSymbolTable();
+        } else if (result == QMessageBox::Cancel) {
+            return;
+        }
+    }
+    if (loadSymbolTable(path)) {
+        removeSymbolTablePath(path);
+        symbolTablePathHistory.insert(symbolTablePathHistory.begin(), path);
+        saveSymbolTablePathHistory();
+        updateSymbolHistoryMenu();
+    }
 }
 
 void CalculatorWindow::onActionOpenTerminal() {
@@ -1046,7 +1079,7 @@ void CalculatorWindow::cleanupDialogs() {
 void CalculatorWindow::updateSymbolHistoryMenu() {
     auto menu = actions.menuOpenRecent;
     menu->clear();
-    for (auto rev = symbolTablePathHistory.rbegin(); rev != symbolTablePathHistory.rend(); rev++) {
+    for (auto rev = symbolTablePathHistory.begin(); rev != symbolTablePathHistory.end(); rev++) {
         auto path = rev->c_str();
         auto action = menu->addAction(path);
         action->setData(path);
