@@ -141,6 +141,14 @@ int SettingsDialog::getSaveHistoryMax() {
     return generalTab->getSaveHistory();
 }
 
+void SettingsDialog::setClearResult(bool clear) {
+    generalTab->setClearResult(clear);
+}
+
+bool SettingsDialog::getClearResult() {
+    return generalTab->getClearResult();
+}
+
 void SettingsDialog::setPythonModPaths(const std::set<std::string> &paths) {
     pythonTab->setPythonModPaths(paths);
 }

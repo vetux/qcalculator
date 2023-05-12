@@ -228,7 +228,11 @@ void CalculatorWindow::onInputTextChanged() {
 void CalculatorWindow::onInputTextEdited() {
     inputMessage->setText("");
 
-    clearResultFromInputText();
+    if (settings.value(SETTING_CLEAR_RESULT).toInt()) {
+        clearResultFromInputText();
+    } else {
+        inputTextContainsExpressionResult = false;
+    }
 
     auto cursorPos = input->cursorPosition();
     auto text = input->text().toStdString();
@@ -595,6 +599,7 @@ void CalculatorWindow::onSettingsAccepted() {
     settings.update(SETTING_EXPONENT_MIN.key, settingsDialog->getExponentMin());
     settings.update(SETTING_ROUNDING.key, settingsDialog->getRoundingMode());
     settings.update(SETTING_SAVE_HISTORY.key, settingsDialog->getSaveHistoryMax());
+    settings.update(SETTING_CLEAR_RESULT.key, settingsDialog->getClearResult());
 
     settings.update(SETTING_PYTHON_MODULE_PATHS.key, settingsDialog->getPythonModPaths());
     settings.update(SETTING_PYTHON_PATH.key, settingsDialog->getPythonPath());
@@ -631,6 +636,7 @@ void CalculatorWindow::onSettingsCancelled() {
     settingsDialog->setRoundingMode(Serializer::deserializeRoundingMode(
             settings.value(SETTING_ROUNDING).toInt()));
     settingsDialog->setSaveHistory(settings.value(SETTING_SAVE_HISTORY).toInt());
+    settingsDialog->setClearResult(settings.value(SETTING_CLEAR_RESULT).toInt());
 
     settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
     settingsDialog->setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());
@@ -738,6 +744,7 @@ void CalculatorWindow::applySettings() {
     settingsDialog->setRoundingMode(Serializer::deserializeRoundingMode(
             settings.value(SETTING_ROUNDING).toInt()));
     settingsDialog->setSaveHistory(settings.value(SETTING_SAVE_HISTORY).toInt());
+    settingsDialog->setClearResult(settings.value(SETTING_CLEAR_RESULT).toInt());
 
     settingsDialog->setPythonModPaths(settings.value(SETTING_PYTHON_MODULE_PATHS).toStringList());
     settingsDialog->setPythonPath(settings.value(SETTING_PYTHON_PATH).toString());

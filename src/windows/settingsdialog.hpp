@@ -63,6 +63,10 @@ public:
 
     int getSaveHistoryMax();
 
+    void setClearResult(bool clear);
+
+    bool getClearResult();
+
     void setPythonModPaths(const std::set<std::string> &paths);
 
     std::set<std::string> getPythonModPaths();

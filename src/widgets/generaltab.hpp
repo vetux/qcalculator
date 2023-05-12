@@ -49,6 +49,8 @@ public slots:
 
     void setSaveHistory(bool saveHistory);
 
+    void setClearResult(bool clearResult);
+
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
 
@@ -61,6 +63,8 @@ public:
     int getExponentMin();
 
     bool getSaveHistory();
+
+    bool getClearResult();
 
 private:
     QStringListModel roundingModel;
@@ -79,6 +83,9 @@ private:
 
     QLabel *saveHistoryLabel;
     QCheckBox *saveHistoryCheckBox;
+
+    QLabel *clearResultLabel;
+    QCheckBox *clearResultCheckBox;
 };
 
 #endif //QCALC_GENERALTAB_HPP

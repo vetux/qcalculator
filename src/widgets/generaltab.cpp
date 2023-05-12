@@ -143,16 +143,18 @@ GeneralTab::GeneralTab(QWidget *parent)
     roundingComboBox->setToolTip("The rounding mode to use when doing arithmetic.");
     roundingComboBox->setModel(&roundingModel);
 
-    precisionSpinBox->setRange(1, std::numeric_limits<int>().max());
+    precisionSpinBox->setRange(1, std::numeric_limits<int>::max());
 
-    exponentMinSpinBox->setRange(std::numeric_limits<int>().min(), -1);
-    exponentMaxSpinBox->setRange(1, std::numeric_limits<int>().max());
-
-    auto *saveHistoryContainer = new QWidget(this);
+    exponentMinSpinBox->setRange(std::numeric_limits<int>::min(), -1);
+    exponentMaxSpinBox->setRange(1, std::numeric_limits<int>::max());
 
     saveHistoryLabel = new QLabel(this);
     saveHistoryCheckBox = new QCheckBox(this);
     saveHistoryLabel->setText("Save history to disk");
+
+    clearResultLabel = new QLabel(this);
+    clearResultCheckBox = new QCheckBox(this);
+    clearResultLabel->setText("Clear result when typing");
 
     auto *hlayout = new QHBoxLayout;
     hlayout->setMargin(5);
@@ -160,7 +162,19 @@ GeneralTab::GeneralTab(QWidget *parent)
     hlayout->addWidget(saveHistoryCheckBox, 0);
     hlayout->addWidget(saveHistoryLabel, 1);
 
+    auto *saveHistoryContainer = new QWidget(this);
+
     saveHistoryContainer->setLayout(hlayout);
+
+    hlayout = new QHBoxLayout;
+    hlayout->setMargin(5);
+    hlayout->setSpacing(20);
+    hlayout->addWidget(clearResultCheckBox, 0);
+    hlayout->addWidget(clearResultLabel, 1);
+
+    auto *clearResultContainer = new QWidget(this);
+
+    clearResultContainer->setLayout(hlayout);
 
     auto *layout = new QVBoxLayout();
 
@@ -173,6 +187,7 @@ GeneralTab::GeneralTab(QWidget *parent)
     layout->addWidget(roundingLabel);
     layout->addWidget(roundingComboBox);
     layout->addWidget(saveHistoryContainer);
+    layout->addWidget(clearResultContainer);
     layout->addStretch(1);
 
     setLayout(layout);
@@ -208,4 +223,13 @@ void GeneralTab::setSaveHistory(bool saveHistory) {
 
 bool GeneralTab::getSaveHistory() {
     return saveHistoryCheckBox->checkState() == Qt::Checked;
+}
+
+
+void GeneralTab::setClearResult(bool clearResult) {
+    clearResultCheckBox->setCheckState(clearResult ? Qt::Checked : Qt::Unchecked);
+}
+
+bool GeneralTab::getClearResult() {
+    return clearResultCheckBox->checkState() == Qt::Checked;
 }
