@@ -21,6 +21,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+#TODO: Fix bitview addon bitgroup widgets not deleting when unloading the addon.
+
 import qcalc as gui
 import decimal
 
@@ -93,43 +95,27 @@ class BitViewWidget(QtWidgets.QWidget):
         selectionBox.addItem("32")
         selectionBox.addItem("64")
         QtCore.QObject.connect(selectionBox, QtCore.SIGNAL("currentIndexChanged(int)"), self,
-                                   QtCore.SLOT("slot_current_index_changed(int)"))
+                               QtCore.SLOT("slot_current_index_changed(int)"))
         self.layout().addWidget(selectionBox)
         self.hbox0.setLayout(QtWidgets.QHBoxLayout())
         self.hbox1.setLayout(QtWidgets.QHBoxLayout())
         self.hbox0.layout().setMargin(0)
         self.hbox1.layout().setMargin(0)
-        self.bitgroup_16 = QtWidgets.QWidget()
         self.bitgroup_16.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_15 = QtWidgets.QWidget()
         self.bitgroup_15.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_14 = QtWidgets.QWidget()
         self.bitgroup_14.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_13 = QtWidgets.QWidget()
         self.bitgroup_13.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_12 = QtWidgets.QWidget()
         self.bitgroup_12.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_11 = QtWidgets.QWidget()
         self.bitgroup_11.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_10 = QtWidgets.QWidget()
         self.bitgroup_10.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_9 = QtWidgets.QWidget()
         self.bitgroup_9.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_8 = QtWidgets.QWidget()
         self.bitgroup_8.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_7 = QtWidgets.QWidget()
         self.bitgroup_7.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_6 = QtWidgets.QWidget()
         self.bitgroup_6.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_5 = QtWidgets.QWidget()
         self.bitgroup_5.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_4 = QtWidgets.QWidget()
         self.bitgroup_4.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_3 = QtWidgets.QWidget()
         self.bitgroup_3.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_2 = QtWidgets.QWidget()
         self.bitgroup_2.setLayout(QtWidgets.QHBoxLayout())
-        self.bitgroup_1 = QtWidgets.QWidget()
         self.bitgroup_1.setLayout(QtWidgets.QHBoxLayout())
         margin = 9
         self.bitgroup_16.layout().setMargin(margin)
@@ -308,9 +294,9 @@ class BitViewWidget(QtWidgets.QWidget):
             return
         i = int(value)
         if ((self.bitcount == 8 and i > max_8bit)
-        or (self.bitcount == 16 and i > max_16bit)
-        or (self.bitcount == 32 and i > max_32bit)
-        or (self.bitcount == 64 and i > max_64bit)):
+                or (self.bitcount == 16 and i > max_16bit)
+                or (self.bitcount == 32 and i > max_32bit)
+                or (self.bitcount == 64 and i > max_64bit)):
             self.set_bits_value(0)
             self.hbox0.setEnabled(False)
             self.hbox1.setEnabled(False)
@@ -402,6 +388,7 @@ def load():
     widget.slot_input_text_changed(gui.input_line_edit.text())
 
 def unload():
+    global containerWidget
     global widget
     gui.remove_widget_footer(containerWidget)
 
