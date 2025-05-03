@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "extern/exprtk.hpp"
+#include "exprtk.hpp"
 
 #include "calculator/scripthandler.hpp"
 

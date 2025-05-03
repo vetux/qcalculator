@@ -27,7 +27,7 @@
 
 #include "python/interpreter.hpp"
 
-#include "extern/json.hpp"
+#include "json.hpp"
 
 #include "io/archive.hpp"
 

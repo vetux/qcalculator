@@ -19,8 +19,8 @@
 
 #include "calculator/expressionparser.hpp"
 
-#include "extern/exprtk_mpdecimal_adaptor.hpp"
-#include "extern/exprtk.hpp"
+#include "adaptors/exprtk_mpdecimal_adaptor.hpp"
+#include "exprtk.hpp"
 
 #include "calculator/scriptfunction.hpp"
 #include "calculator/scriptvarargfunction.hpp"

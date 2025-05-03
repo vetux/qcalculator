@@ -19,7 +19,7 @@
 
 #include "serializer.hpp"
 
-#include "extern/json.hpp"
+#include "json.hpp"
 
 std::string Serializer::serializeTable(const SymbolTable &table) {
     nlohmann::json j;

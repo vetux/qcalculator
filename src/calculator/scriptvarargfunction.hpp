@@ -23,7 +23,7 @@
 #include <string>
 #include <cassert>
 
-#include "extern/exprtk.hpp"
+#include "exprtk.hpp"
 
 #include "calculator/scripthandler.hpp"
 

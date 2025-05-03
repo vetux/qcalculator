@@ -53,6 +53,14 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}) # Include for generated ui head
 include_directories(src/)
 include_directories(${Python_INCLUDE_DIRS}) # Python
 
+include_directories(thirdparty/libmpdec/include/)
+link_directories(thirdparty/libmpdec/bin/)
+
+include_directories(thirdparty/exprtk/)
+include_directories(thirdparty/json/)
+
+add_subdirectory(thirdparty/libarchive/)
+
 if (WIN32)
     set(app_icon_resource_windows "${CMAKE_CURRENT_SOURCE_DIR}/res/app.rc")
     add_executable(qcalculator WIN32 ${SRC} ${WRAP_CPP} ${WRAP_UI}  ${app_icon_resource_windows})
@@ -62,8 +70,8 @@ endif ()
 
 set_property(TARGET qcalculator PROPERTY CXX_STANDARD 17)
 
-target_link_libraries(qcalculator Qt5::Core Qt5::Widgets)
+target_link_libraries(qcalculator Qt5::Core Qt5::Widgets) # Qt
+target_link_libraries(qcalculator Threads::Threads) # Threads
 target_link_libraries(qcalculator ${Python_LIBRARIES}) # Python
 target_link_libraries(qcalculator mpdec mpdec++) # mpdecimal
 target_link_libraries(qcalculator archive) # libarchive
-target_link_libraries(qcalculator Threads::Threads) # Threads
