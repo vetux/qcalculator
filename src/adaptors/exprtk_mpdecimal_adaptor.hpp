@@ -53,7 +53,9 @@ namespace exprtk {
         inline bool is_false(const decimal::Decimal &v);
 
         template<typename Iterator>
-        inline bool string_to_real(Iterator &itr_external, const Iterator end, decimal::Decimal &t,
+        inline bool string_to_real(Iterator &itr_external,
+                                   const Iterator end,
+                                   decimal::Decimal &t,
                                    numeric::details::mpdecimal_type_tag);
 
     }
@@ -61,7 +63,8 @@ namespace exprtk {
     namespace rtl {
         namespace io {
             namespace details {
-                inline void print_type(const std::string &, const decimal::Decimal &v,
+                inline void print_type(const std::string &,
+                                       const decimal::Decimal &v,
                                        exprtk::details::numeric::details::mpdecimal_type_tag);
             }
         }
@@ -120,7 +123,7 @@ namespace exprtk {
                 };
 
                 template<>
-                struct epsilon_type<mpdecimal_type_tag> {
+                struct epsilon_type<decimal::Decimal> {
                     static inline decimal::Decimal value() {
                         static const decimal::Decimal epsilon = decimal::Decimal("1.0")
                                                                 / decimal::Decimal("1e+20");
@@ -140,6 +143,12 @@ namespace exprtk {
                 template<typename T>
                 inline long long to_int64_impl(const T &v, mpdecimal_type_tag) {
                     return static_cast<long long int>(v.i64());
+                }
+
+                template <typename T>
+                inline long long to_uint64_impl(const T& v, mpdecimal_type_tag)
+                {
+                    return static_cast<long long int>(v.u64());
                 }
 
                 template<typename T>
@@ -501,7 +510,8 @@ namespace exprtk {
         }
 
         template<typename Iterator>
-        inline bool string_to_real(Iterator &itr_external, const Iterator end, decimal::Decimal &t,
+        inline bool string_to_real(Iterator &itr_external,
+                                   const Iterator end, decimal::Decimal &t,
                                    numeric::details::mpdecimal_type_tag) {
             t = decimal::Decimal(std::string(itr_external, end));
             return true;
@@ -515,7 +525,8 @@ namespace exprtk {
     namespace rtl {
         namespace io {
             namespace details {
-                inline void print_type(const std::string &, const decimal::Decimal &v,
+                inline void print_type(const std::string &,
+                                       const decimal::Decimal &v,
                                        exprtk::details::numeric::details::mpdecimal_type_tag) {
                     printf("%s", v.format("f").c_str());
                 }
