@@ -10,6 +10,10 @@ This project aims to provide an accurate, extensible and fast calculator applica
 - Symbol table editor
 - Python Addons
 
+## Work In Progress
+- Android Support
+- GUI Redesign
+
 ## Downloads
 Release binaries for 64bit Windows and Linux can be found on the [Releases](https://github.com/vetux/qcalculator/releases) page.
 
