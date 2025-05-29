@@ -76,7 +76,7 @@ namespace exprtk {
 #include "exprtk.hpp"
 
 static std::string convertDoubleToString(const long double &value) {
-    // Avoid platform dependent NaN and Infinity string representation
+    // Avoid platform-dependent NaN and Infinity string representation
     if (std::isnan(value)) {
         return "NaN";
     } else if (std::isinf(value)) {
@@ -105,11 +105,11 @@ namespace exprtk {
             static const decimal::Decimal pi_2 = pi / decimal::Decimal("2.0", mpdecimal_context);
             static const decimal::Decimal pi_4 = pi / decimal::Decimal("4.0", mpdecimal_context);
             static const decimal::Decimal pi_180 = pi / decimal::Decimal("180.0", mpdecimal_context);
-            static const decimal::Decimal _1_pi = decimal::Decimal("1.0") / pi;
-            static const decimal::Decimal _2_pi = decimal::Decimal("2.0") / pi;
-            static const decimal::Decimal _180_pi = decimal::Decimal("180.0") / pi;
-            static const decimal::Decimal log2 = decimal::Decimal("2.0").ln(mpdecimal_context);
-            static const decimal::Decimal sqrt2 = decimal::Decimal("2.0").sqrt(mpdecimal_context);
+            static const decimal::Decimal _1_pi = decimal::Decimal("1.0", mpdecimal_context) / pi;
+            static const decimal::Decimal _2_pi = decimal::Decimal("2.0", mpdecimal_context) / pi;
+            static const decimal::Decimal _180_pi = decimal::Decimal("180.0", mpdecimal_context) / pi;
+            static const decimal::Decimal log2 = decimal::Decimal("2.0", mpdecimal_context).ln(mpdecimal_context);
+            static const decimal::Decimal sqrt2 = decimal::Decimal("2.0", mpdecimal_context).sqrt(mpdecimal_context);
         }
 
         namespace numeric {
@@ -125,8 +125,11 @@ namespace exprtk {
                 template<>
                 struct epsilon_type<decimal::Decimal> {
                     static inline decimal::Decimal value() {
-                        static const decimal::Decimal epsilon = decimal::Decimal("1.0")
-                                                                / decimal::Decimal("1e+20");
+                        // Epsilon value is cached by exprtk after the first invocation of this method,
+                        // which means the wrong epsilon value is returned when the user changes the precision.
+                        decimal::Decimal epsilon = decimal::Decimal("1e-"
+                                                                          + std::to_string(decimal::context.prec()),
+                                                                          decimal::context);
                         return epsilon;
                     }
                 };
@@ -145,9 +148,8 @@ namespace exprtk {
                     return static_cast<long long int>(v.i64());
                 }
 
-                template <typename T>
-                inline long long to_uint64_impl(const T& v, mpdecimal_type_tag)
-                {
+                template<typename T>
+                inline long long to_uint64_impl(const T &v, mpdecimal_type_tag) {
                     return static_cast<long long int>(v.u64());
                 }
 
