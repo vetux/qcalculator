@@ -29189,7 +29189,7 @@ namespace exprtk
                     (vector_size <= T(0)) ||
                     std::not_equal_to<T>()
                             (T(0),vector_size - details::numeric::trunc(vector_size)) ||
-                    (static_cast<std::size_t>(vector_size) > max_vector_size)
+                    (static_cast<std::size_t>(vector_size.u64()) > max_vector_size) // There is no implicit conversion for decimal::Decimal to std::size_t
                     )
             {
                 set_error(make_error(
@@ -29560,7 +29560,7 @@ namespace exprtk
                 }
             }
             else if (null_initialisation)
-                result = expression_generator_(T(0.0));
+                result = expression_generator_(T(0)); // decimal::Decimal requires exact values (No hardware floats) for constructors that dont have a context parameter
             else if (vec_to_vec_initialiser)
             {
                 expression_node_ptr vec_node = node_allocator_.allocate<vector_node_t>(vec_holder);
